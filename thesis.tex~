@@ -1,0 +1,61 @@
+\documentclass[twoside,english]{uiofysmaster}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsfonts, amssymb, amsmath}
+\usepackage{listings}
+\usepackage{float}
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{fontspec}
+\newfontfamily\listingsfont[Scale=0.85]{Droid Sans Mono}
+\lstset {
+    basicstyle=\footnotesize\listingsfont,
+    keywordstyle=\color{listingskeywordcolor}\footnotesize\listingsfont,
+    stringstyle=\color{listingsstringcolor}\footnotesize\listingsfont,
+    commentstyle=\color{listingscommentcolor}\footnotesize\listingsfont,
+    numberstyle=\color{listingsnumbercolor}\footnotesize\listingsfont,
+    identifierstyle=\footnotesize\listingsfont,
+}
+
+%opening
+\author{Fredrik E Pettersen\\ f.e.pettersen@fys.uio.no}
+\title{\uppercase{Multiscale modeling of diffusion processes in the brain}}
+\date{June 2013}
+\begin{document}
+
+%\bibliography{references}
+
+\maketitle
+
+\begin{abstract}
+This is an abstract text.
+\end{abstract}
+
+\begin{dedication}
+  To someone
+  \\\vspace{12pt}
+  This is a dedication to my cat.
+\end{dedication}
+
+\begin{acknowledgements}
+  I acknowledge my acknowledgements.
+\end{acknowledgements}
+
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+
+\chapter{The beginning is here}
+
+Start your chapter by writing something smart. Then go get coffee.
+
+\end{document}
+
+\end{document}
+
