@@ -54,7 +54,7 @@ class Walk:
 				counter += 1
 				del(self.walkers[walker])
 		self.walkers = counter*M
-		return self.walkers
+		return self.walkers	
 
 if __name__ == '__main__':
 	seed = False
