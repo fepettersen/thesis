@@ -56,12 +56,17 @@ class Walk:
 		self.walkers = counter*M
 		return self.walkers	
 
+boundary = [[0.3,1],[0.4,1]]
 if __name__ == '__main__':
+	print 'hei'
+	walk = Walk(boundary,1.0)
+	walk.walk()
+else:
 	seed = False
 	if seed:
 		np.random.seed(1)
 
-	d = 2				#dimension of the walks
+	d = 1				#dimension of the walks
 	d_ = [1 for i in range(d)]
 	walkers = 32
 	for walker in range(walkers):

@@ -15,7 +15,7 @@ class Diffusion:
 		self._D = D*self.dt/(self.dx**2)
 		self.will_walk = False
 
-	def solve(self,n_t=3,plot=True):
+	def solve(self,n_t=13,plot=True):
 		try:
 			Up = self.U0
 		except AttributeError:
@@ -98,7 +98,8 @@ class Diffusion:
 			else:
 				new_walkers.append(r0)
 		self.walkers = new_walkers
-		return counter_right*M
+		print 'counter_right: ',counter_right
+		return counter_right/float(M)
 
 	def SetInitialCondition(self,U0):
 		self.U0 = U0
