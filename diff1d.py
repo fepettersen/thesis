@@ -5,7 +5,8 @@ import matplotlib.animation as animation
 
 class Diffusion:
 	"""1D diffusion equation solver with random walk implementation"""
-	def __init__(self, a=0,b=1,n=10,D=1,dt=-1):
+	def __init__(self, a=0,b=1,n=100,D=1,d=1,dt=-1):
+		self.d = d 				# spatial dimension
 		self.a = a
 		self.b = b
 		self.n = n
@@ -40,17 +41,23 @@ class Diffusion:
 			if self.InAreaOfWalk(self.x[i]):
 				boundary = [[self.x0,U[i-1]],[self.x1,Up[i+1]]]
 				U[i] = self.walk(boundary)
-				print 'walking'
+				# print 'walking'
 			else:
 				U[i] = self._D*(Up[i+1]-2*Up[i]+Up[i-1]) +Up[i]
 		U = self.boundary(U)
 		return U
 
 
-	def mesh(self,x0,x1,M=20):
+	def mesh(self,x0,x1,M=20,eps=1e-14):
 		"""Initialize area for random walk"""
 		self.x0 = x0
 		self.x1 = x1
+
+		# Divide solution array into subareas???
+		# Dx = x1-x0
+		# Dn = int(Dx/self.dx)
+		# n0 = np.where(self.x-self.x0<eps)
+
 		self.M = M
 		self.will_walk = True
 		self.walkers = []
@@ -98,7 +105,7 @@ class Diffusion:
 			else:
 				new_walkers.append(r0)
 		self.walkers = new_walkers
-		print 'counter_right: ',counter_right
+		# print 'counter_right: ',counter_right
 		return counter_right/float(M)
 
 	def SetInitialCondition(self,U0):
@@ -150,7 +157,7 @@ M = 100
 if __name__ == '__main__':
 	solver = Diffusion()
 	solver.mesh(0.3,0.4)
-	solver.solve()
+	solver.solve(n_t=100)
 '''
 C = np.zeros((n_t+1,n+1))
 C[0,:(n+1)/2] = 1 #np.sin(4*np.pi*x)
