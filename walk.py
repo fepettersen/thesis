@@ -46,8 +46,9 @@ class Walk:
 	def HasLeftArea(self,pos):
 		"""pos = [x] in 1D; 
 		pos = [x,y] in 2D"""
+		# print 'HasLeftArea(self,pos)'
 		if self.d==1:
-			if pos<self.x0 or pos>self.x1:
+			if pos[0]<self.x0 or pos[0]>self.x1:
 				return True
 		elif self.d==2:
 			if pos[0]>self.x1 or pos[0]<self.x0:
@@ -68,27 +69,34 @@ class Walk:
 		self.InitializeTimestep(concentration)
 
 		steps = 100
-		# counter = 0
-		new_walkers = []
+		counter = 0
+		indices = []
+		new_walkers = []		#store the walkers that have left walk-area
 		for walker in xrange(self.nwalkers):	
 			s = 10**-2*np.random.standard_normal([self.d,steps])
-			r = np.zeros([self.d,steps+1])	
+			# r = np.zeros([self.d,steps+1])	
 			r0 = self.walkers[walker]
-			r[0] = r0
-			for i in xrange(steps):
-				r[0,i+1] = r[0,i] +s[0,i]
-#			r0 += np.sum(s)				#Alternate version (faster?)
-			if self.HasLeftArea(r[0,-1]):
-				# counter += 1
-				new_walkers.append(self.walkers[walker])
-		self.ReturnBoundary(new_walkers)
-		# self.walkers = new_walkers 		# Veldig feil!!
-		# self.walkers = counter*M
-		return self.walkers 
+			for i in xrange(self.d):
+				r0[i] += np.sum(s[i])
+			if self.HasLeftArea(r0):
+				indices.append(counter)
+				new_walkers.append(self.walkers[walker]) 
+			counter += 1
+		counter = 0
+		boundary = self.ReturnBoundary(new_walkers,concentration)
+		for i in sorted(indices):
+			# Remove walkers that have left area
+			del(self.walkers[i-counter])
+			counter +=1
+		boundary /= self.M
+		return boundary
 
 	def InitializeTimestep(self,concentration):
 		for i in xrange(len(concentration)):
 			self.put_walkers(concentration[i],i)
+		self.nwalkers = len(self.walkers)
+		# for walker in self.walkers:
+		# 	print walker
 		#check if there are walkers other places than on boundary 
 		#(and if it is needed)
 		#calculate "gradient"
@@ -122,21 +130,65 @@ class Walk:
 		"""Convert the number of walkers back into the concentration 
 		at the boundary and return the boundary so it can be returned 
 		from self.walk()"""
-		print walkers
+		# print concentration
+		boundary = np.zeros(np.shape(concentration))
 		dy = self.y1-self.y0
 		dx = self.x1-self.x0
 		d0 = dx/len(concentration[0])
 		d1 = dy/len(concentration[1])
 		for walker in walkers:
-			#find its positioon
-			pass
-		pass
+			#find its position on the boundary
+			index = self.FindPosition(walker)
+			if index != -1:
+				boundary[index] += 1
+			# print 'index = ',index
+		return boundary
+
+	def FindPosition(self,pos):
+		"""return value of -1 implies that the walker is in 
+		a corner and therefore to be ignored"""
+		if self.d==1:
+			return 0 if pos<self.x0 else 1
+		elif self.d==2:
+			# print pos, " X = (%.3f,%.3f) ; Y = (%.3f,%.3f)"%(self.x0,self.x1,self.y0,self.y1) 
+			if pos[0]<self.x0 and pos[1]>self.y0:
+				# print 'area 0'
+				if pos[1]<self.y1:
+					return 0
+				else:
+					return -1
+			elif pos[0]<self.x0 and pos[1]<self.y0:
+				return -1
+			elif pos[1]<self.y0 and pos[0]>self.x0:
+				# print 'area 1'
+				if pos[0]<self.x1:
+					return 1
+				else:
+					return -1
+			elif pos[1]<self.y0 and pos[0]<self.x0:
+				return -1
+			elif pos[1]>self.y1 and pos[0]>self.x0:
+				# print 'area 2'
+				if pos[0]<self.x1:
+					return 2
+				else:
+					return -1
+			elif pos[1]<self.y1 and pos[0]<self.x0:
+				return -1
+			elif pos[1]<self.y1 and pos[0]>self.x1:
+				# print 'area 3'
+				if pos[1]>self.y0:
+					return 3
+				else:
+					return -1
+			else:
+				return -1
 
 area = [[0.3,0.3],[0.4,0.4]]
 if __name__ == '__main__':
 	walk = Walk(area,1.0)
-	print walk.walk([1,1])
-else:
+	print walk.walk([[1],[1],[0],[0]])
+if False:
 	a = 0
 	b = 1
 	x = np.linspace(a,b,11)
