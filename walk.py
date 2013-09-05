@@ -77,7 +77,7 @@ class Walk:
 			# r = np.zeros([self.d,steps+1])	
 			r0 = self.walkers[walker]
 			for i in xrange(self.d):
-				r0[i] += np.sum(s[i])
+				r0[i] += np.sum(s[i])+0.1*self.gradient[i]
 			if self.HasLeftArea(r0):
 				indices.append(counter)
 				new_walkers.append(self.walkers[walker]) 
@@ -91,15 +91,21 @@ class Walk:
 		boundary /= self.M
 		return boundary
 
-	def InitializeTimestep(self,concentration):
-		for i in xrange(len(concentration)):
-			self.put_walkers(concentration[i],i)
+	def InitializeTimestep(self,C):
+		"C = concentration"
+		nwalkers_tmp = self.nwalkers
+		self.gradient = [(C[0][0]-C[-1][0]),\
+		(C[1][0]-C[2][0])]
+		# print gradient
+		for i in xrange(len(C)):
+			self.put_walkers(C[i],i)
 		self.nwalkers = len(self.walkers)
-		# for walker in self.walkers:
-		# 	print walker
 		#check if there are walkers other places than on boundary 
 		#(and if it is needed)
-		#calculate "gradient"
+		if nwalkers_tmp == 0:
+			print "this will hopefully only print once"
+			pass
+
 
 	def put_walkers(self,col,i):
 		"""Only works in 2D"""

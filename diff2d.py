@@ -124,9 +124,9 @@ class Diffusion:
 		nx1 = np.where(self.x-self.x1<eps)
 		ny0 = np.where(self.y-self.y0<eps)
 		ny1 = np.where(self.y-self.y1<eps)
-		print nx0, ny1, self.x, self.y
-		self.rangex = range(nx0,nx1+1)
-		self.rangey = range(ny0,ny1+1)
+		# print nx0, ny1, self.x, self.y
+		# self.rangex = range(nx0,nx1+1)
+		# self.rangey = range(ny0,ny1+1)
 		self.walk = Walk([[self.x0,self.y0],[self.x1,self.y1]])
 		#failsafe for coordinates
 		self.M = M
