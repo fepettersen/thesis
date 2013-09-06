@@ -3,6 +3,7 @@
 
 from diff2d import Diffusion
 from walk import Walk, np
+import time
 
 class MultiscaleSolver:
 	"""docstring for MultiscaleSolver
@@ -12,7 +13,7 @@ class MultiscaleSolver:
 
 
 
-	def __init__(self,mesh,PdeSolver=Diffusion()):
+	def __init__(self,mesh,PdeSolver=Diffusion(d=2)):
 		# super(MultiscaleSolver, self).__init__()
 		self.mesh = mesh
 		self.WalkSolvers = []
@@ -20,6 +21,7 @@ class MultiscaleSolver:
 		self.PdeSolver = PdeSolver
 		self.U = np.zeros((len(mesh),len(mesh)))
 		self.Up = np.zeros(np.shape(self.U))
+		self.IterationCounter = 0
 
 		
 	def AddWalkArea(self,area):
@@ -77,8 +79,21 @@ class MultiscaleSolver:
 		print 'boundary: ',boundary
 		# self.U[]
 
+	def SaveState(self,filename=None,format='npy'):
+		t = time.gmtime()
+		datetime = '%02d%02d%d_%d%d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
+		if filename is None:
+			filename = 'Results_%s_%04d'%(datetime,self.IterationCounter)
+		if format == 'npy':
+			np.save(filename,self.U)
+		elif format == 'txt' or format =='.txt':
+			np.savetxt(filename,self.U)
+		else:
+			raise TypeError
+		self.IterationCounter += 1
+
 	def Solve(self):
-		self.U = self.PdeSolver.advance(self.U,self.Up)	
+		self.U = self.PdeSolver.advance2D(self.U,self.Up)	
 		# Find boundary for walk
 		counter = 0
 		for solver in self.WalkSolvers:
@@ -96,3 +111,5 @@ if __name__ == '__main__':
 	test.AddWalkArea(area)
 	test.setInitialCondition(Up)
 	test.Solve()
+	test.SaveState()
+	print test.PdeSolver.d

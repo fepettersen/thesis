@@ -13,11 +13,9 @@ class Walk:
 		self.Hc = thresh			#conversion factor between walkers and concentration
 		self.d = 1 if len(area)==1 else 2 	#dimension of the walk
 		self.area = area	#the coordinates of the area. [[x0,x1]] in 1D, [[x0,y0],[x1,y1]] in 2D
-		# print "self.d = %d"%self.d
 		self.M = M 					#conversion parameter
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
-		# self.Initialize()
 		
 		if len(area)==1:
 			self.x0,self.x1 = area[0]

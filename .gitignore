@@ -34,6 +34,11 @@ nosetests.xml
 .project
 .pydevproject
 
+# Resultfiles
+*.npy
+*.txt
+*.bin
+
 # Latex related files
 *.log
 *.out
