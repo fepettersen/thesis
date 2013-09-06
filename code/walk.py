@@ -58,7 +58,7 @@ class Walk:
 		return False
 
 
-	def walk(self,concentration):
+	def advance(self,concentration):
 		"""
 		concentration is a 2d-by-N mattrix where each column is the 
 		concentration at the boundary of the walk-area at the last 
@@ -104,7 +104,7 @@ class Walk:
 		#(and if it is needed)
 		if nwalkers_tmp == 0:
 			print "this will hopefully only print once"
-			pass
+			# pass
 
 
 	def put_walkers(self,col,i):
@@ -193,7 +193,7 @@ class Walk:
 area = [[0.3,0.3],[0.4,0.4]]
 if __name__ == '__main__':
 	walk = Walk(area,1.0)
-	print walk.walk([[1],[1],[0],[0]])
+	print walk.advance([[1],[1],[0],[0]])
 if False:
 	a = 0
 	b = 1
