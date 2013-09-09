@@ -44,7 +44,7 @@ class MultiscaleSolver:
 				if i-self.mesh[j]<eps:
 					break
 			indeces[-1].append(j)
-		# print indeces
+		print indeces
 		return indeces
 
 	def getBoundary(self,counter):
@@ -55,6 +55,7 @@ class MultiscaleSolver:
 		y1 = self.Indeces[counter][1][1]
 		tmp = [[self.U[x0,y0],self.U[x0,y1]],[self.U[x0,y0],self.U[x1,y0]],\
 		[self.U[x0,y1],self.U[x1,y1]],[self.U[x1,y0],self.U[x1,y1]]]
+		# print 'tmp: ',tmp
 		return tmp
 
 	def setInitialCondition(self,U0):
@@ -93,23 +94,29 @@ class MultiscaleSolver:
 		self.IterationCounter += 1
 
 	def Solve(self):
-		self.U = self.PdeSolver.advance2D(self.U,self.Up)	
+		self.U = self.PdeSolver.advance2D(self.U,self.Up)
+		# print self.U
 		# Find boundary for walk
 		counter = 0
 		for solver in self.WalkSolvers:
-			boundary = self.getBoundary(counter)
-			self.setBoundary(solver.advance(boundary),counter)
+			x = self.Indeces[counter]
+			hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
+			print 'hole: ',hole
+			# boundary = self.getBoundary(counter)
+			# self.setBoundary(solver.advance(hole),counter)
+			self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
 			counter += 1
 		self.Up = self.U.copy()
+		# print self.Up
 
 area = [[0.3,0.3],[0.5,0.5]]
 mesh = np.linspace(0,1,11)
 Up = np.zeros((11,11))
 Up[:(11)/2,:(11)/2] = 1
+
 if __name__ == '__main__':
 	test = MultiscaleSolver(mesh)
 	test.AddWalkArea(area)
 	test.setInitialCondition(Up)
 	test.Solve()
-	test.SaveState()
-	print test.PdeSolver.d
+	# test.SaveState()

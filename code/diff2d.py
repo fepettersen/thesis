@@ -89,25 +89,29 @@ class Diffusion:
 		return U
 
 	def advance2D(self,U,Up):
-		if self.will_walk:
-			boundary = [[Up[3,3]],[Up[3,4]],[Up[4,3]],[Up[4,4]]]
-			boundary = self.walk.walk(boundary)
-			U[3,3] = boundary[0,0]
-			U[3,4] = boundary[1,0]
-			U[4,3] = boundary[2,0]
-			U[4,4] = boundary[3,0]
-		area = [3,4]
-		# rangex = [self.x0,self.x1]
 		for i in xrange(1,self.n):
 			for j in xrange(1,self.n):
-				if i in area or j in area: #self.InAreaOfWalk(self.x[i]):
-					#insert better test!
-					pass
-					# boundary = [[U[3,3]],[U[3,4]],[U[4,3]],[U[4,4]]]
-					# U[i] = self.walk.walk(boundary)
-				else:
-					U[i,j] = self._D*(Up[i+1,j]-2*Up[i,j]+Up[i-1,j]) +\
-					Up[i,j] +self._D*(Up[i,j+1]-2*Up[i,j]+Up[i,j-1])
+				U[i,j] = self._D*(Up[i+1,j]-2*Up[i,j]+Up[i-1,j]) +\
+				Up[i,j] +self._D*(Up[i,j+1]-2*Up[i,j]+Up[i,j-1])
+		# if self.will_walk:
+		# 	boundary = [[Up[3,3]],[Up[3,4]],[Up[4,3]],[Up[4,4]]]
+		# 	boundary = self.walk.advance(boundary)
+		# 	U[3,3] = boundary[0,0]
+		# 	U[3,4] = boundary[1,0]
+		# 	U[4,3] = boundary[2,0]
+		# 	U[4,4] = boundary[3,0]
+		# area = [3,4]
+		# # rangex = [self.x0,self.x1]
+		# for i in xrange(1,self.n):
+		# 	for j in xrange(1,self.n):
+		# 		if i in area or j in area: #self.InAreaOfWalk(self.x[i]):
+		# 			#insert better test!
+		# 			pass
+		# 			# boundary = [[U[3,3]],[U[3,4]],[U[4,3]],[U[4,4]]]
+		# 			# U[i] = self.walk.walk(boundary)
+		# 		else:
+		# 			U[i,j] = self._D*(Up[i+1,j]-2*Up[i,j]+Up[i-1,j]) +\
+		# 			Up[i,j] +self._D*(Up[i,j+1]-2*Up[i,j]+Up[i,j-1])
 		U = self.boundary2D(U)
 		return U		
 
