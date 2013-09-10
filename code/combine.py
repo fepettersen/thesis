@@ -77,7 +77,7 @@ class MultiscaleSolver:
 		for j in rangey:
 			self.U[x0,j] = boundary[0,j-y0]
 			self.U[x1,j] = boundary[-1,j-y0]
-		print 'boundary: ',boundary
+		# print 'boundary: ',boundary
 		# self.U[]
 
 	def SaveState(self,filename=None,format='npy'):
@@ -101,7 +101,7 @@ class MultiscaleSolver:
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
 			hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
-			print 'hole: ',hole
+			# print 'hole: ',hole
 			# boundary = self.getBoundary(counter)
 			# self.setBoundary(solver.advance(hole),counter)
 			self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)

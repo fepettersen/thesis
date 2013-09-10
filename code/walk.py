@@ -25,7 +25,7 @@ class Walk:
 			self.x1,self.y1 = area[1]
 		self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,n),\
 			np.linspace(self.y0,self.y1,n))
-		print self.X
+		# print self.X
 
 	def Initialize(self):
 		"""Initialize area for walk, boundary conditions etc"""
@@ -85,14 +85,15 @@ class Walk:
 				indices.append(counter)
 				walkers_leaving_area.append(self.walkers[walker]) 
 			counter += 1
-		print len(walkers_leaving_area)
+		# print len(walkers_leaving_area)
 		counter = 0
 		# boundary = self.ReturnBoundary(walkers_leaving_area,concentration)
 		boundary = self.ReturnBoundary(self.walkers,concentration)
-		for i in sorted(indices):
-			# Remove walkers that have left area
-			del(self.walkers[i-counter])
-			counter +=1
+		# for i in sorted(indices):
+		# 	# Remove walkers that have left area
+		# 	del(self.walkers[i-counter])
+		# 	counter +=1
+		self.walkers = []
 		boundary /= self.M
 		return boundary		
 
@@ -102,7 +103,6 @@ class Walk:
 		nwalkers_tmp = self.nwalkers
 		C_tot = np.sum(C)
 		N_walkers_tot = self.M*self.Hc*C_tot - nwalkers_tmp 
-		print 'C_tot = ',C_tot,' N_walkers_tot = ',N_walkers_tot
 		if C_tot == 0:
 			return None
 		self.gradient = [(C[0][0]-C[-1][0]),\
@@ -112,7 +112,7 @@ class Walk:
 		for i in xrange(len(C)):
 			for j in xrange(len(C[i])):
 				n = int((C[i][j]/C_tot)*N_walkers_tot)
-				print i,j
+				# print i,j
 				self.put_walkers(n,i,j)
 		self.nwalkers = len(self.walkers)
 		return 1
@@ -142,7 +142,7 @@ class Walk:
 			#find its position on the boundary
 			index = self.FindPosition(walker,dx,dy)
 			boundary[index[0],index[1]] += 1
-		print boundary, np.sum(boundary)
+		# print boundary, np.sum(boundary)
 		return boundary
 
 	def FindPosition(self,pos,dx,dy):
@@ -163,12 +163,12 @@ class Walk:
 					break
 			if pos[1]>self.Y[-1,0]:
 				pos[1] = np.fmod(pos[1],(self.Y[-1,0]-self.Y[0,0])+dy)+self.Y[0,0]
-				print pos[1]
+				# print pos[1]
 			for j in xrange(len(self.Y)):
 				if pos[1]-self.Y[j,j]<dy:
 					indx[1] = j
 					break
-			print indx
+			# print indx
 			return indx
 
 	def CalculateGradient(self,C):
