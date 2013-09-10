@@ -4,6 +4,8 @@
 from diff2d import Diffusion
 from walk import Walk, np
 import time
+import matplotlib.pyplot as mpl
+import matplotlib.animation as animation
 
 class MultiscaleSolver:
 	"""docstring for MultiscaleSolver
@@ -94,7 +96,7 @@ class MultiscaleSolver:
 		self.IterationCounter += 1
 
 	def Solve(self):
-		self.U = self.PdeSolver.advance2D(self.U,self.Up)
+		self.U = self.PdeSolver.advance(self.U,self.Up)
 		# print self.U
 		# Find boundary for walk
 		counter = 0
@@ -105,6 +107,7 @@ class MultiscaleSolver:
 			# boundary = self.getBoundary(counter)
 			# self.setBoundary(solver.advance(hole),counter)
 			self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
+			print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 			counter += 1
 		self.Up = self.U.copy()
 		# print self.Up
@@ -113,10 +116,26 @@ area = [[0.3,0.3],[0.5,0.5]]
 mesh = np.linspace(0,1,11)
 Up = np.zeros((11,11))
 Up[:(11)/2,:(11)/2] = 1
+X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
+t = 0
+T = 10
+mpl.ion()
+fig  = mpl.figure()
+ax = fig.add_subplot(111,projection='3d')
+ax.set_autoscaley_on(False)
+# fft_axes.set_autoscaley_on(False)
 
 if __name__ == '__main__':
 	test = MultiscaleSolver(mesh)
 	test.AddWalkArea(area)
 	test.setInitialCondition(Up)
-	test.Solve()
-	# test.SaveState()
+	wframe = ax.plot_wireframe(X,Y,test.Up)
+	mpl.draw()
+	while t<T:
+		ax.collections.remove(wframe)
+		test.Solve()
+		wframe = ax.plot_wireframe(X,Y,test.Up)
+		mpl.draw()
+		time.sleep(1)
+		t+=1
+		# test.SaveState()

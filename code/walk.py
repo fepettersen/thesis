@@ -2,14 +2,13 @@
 # simple random walk program
 
 import numpy as np
-import matplotlib.pyplot as mpl
-import matplotlib.animation as animation
+
 
 class Walk:
 	"""
 	Random walk class at the moment in 1D and 2D only
 	"""
-	def __init__(self,area,n=3,thresh=1.0,M=20):
+	def __init__(self,area,n=3,thresh=1.0,M=50):
 		self.Hc = thresh			#conversion parameter between walkers and concentration
 		self.d = 1 if len(area)==1 else 2 	#dimension of the walk
 		self.area = area	#the coordinates of the area. [[x0,x1]] in 1D, [[x0,y0],[x1,y1]] in 2D

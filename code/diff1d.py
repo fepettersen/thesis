@@ -127,22 +127,6 @@ class Diffusion:
 		else:
 			return False
 
-# def walk(concentration,x0,x1,M,steps=1000):
-# 	H = concentration
-# 	walkers = 2+int(H*M)
-# 	counter = 0
-# 	for walker in range(walkers):
-# 		r0 = 1+10**-2*np.random.standard_normal(1) 	
-# 		s = 10**-2*np.random.standard_normal([1,steps])
-# 		r = np.zeros([1,steps+1])	
-# 		r[0] = r0
-# 		for i in xrange(steps):
-# 			r[0,i+1] = r[0,i] +s[0,i]
-# 		if r[0,-1]>=x1:
-# 			counter += 1
-# 	return counter*M
-
-
 a = 0
 b = 1
 n = 10
