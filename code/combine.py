@@ -21,6 +21,9 @@ class MultiscaleSolver:
 		self.WalkSolvers = []
 		self.Indeces = []
 		self.PdeSolver = PdeSolver
+		print type(PdeSolver)
+		# if type(PdeSolver) == type(module()):
+		# 	self.dolfin = True
 		self.U = np.zeros((len(mesh),len(mesh)))
 		self.Up = np.zeros(np.shape(self.U))
 		self.IterationCounter = 0
@@ -96,21 +99,18 @@ class MultiscaleSolver:
 		self.IterationCounter += 1
 
 	def Solve(self):
+		# print self.U
 		self.U = self.PdeSolver.advance(self.U,self.Up)
 		# print self.U
-		# Find boundary for walk
 		counter = 0
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
 			hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
-			# print 'hole: ',hole
-			# boundary = self.getBoundary(counter)
-			# self.setBoundary(solver.advance(hole),counter)
+			# print hole
 			self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
-			print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
+			# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 			counter += 1
 		self.Up = self.U.copy()
-		# print self.Up
 
 area = [[0.3,0.3],[0.5,0.5]]
 mesh = np.linspace(0,1,11)
@@ -118,14 +118,16 @@ Up = np.zeros((11,11))
 Up[:(11)/2,:(11)/2] = 1
 X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 t = 0
-T = 10
-mpl.ion()
-fig  = mpl.figure()
-ax = fig.add_subplot(111,projection='3d')
-ax.set_autoscaley_on(False)
-# fft_axes.set_autoscaley_on(False)
+T = 2
+def setup_plot():
+	mpl.ion()
+	fig  = mpl.figure()
+	ax = fig.add_subplot(111,projection='3d')
+	ax.set_autoscaley_on(False)
+	return fig,ax
 
 if __name__ == '__main__':
+	fig,ax = setup_plot()
 	test = MultiscaleSolver(mesh)
 	test.AddWalkArea(area)
 	test.setInitialCondition(Up)

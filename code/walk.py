@@ -26,24 +26,6 @@ class Walk:
 			np.linspace(self.y0,self.y1,n))
 		# print self.X
 
-	def Initialize(self):
-		"""Initialize area for walk, boundary conditions etc"""
-		H = []			#temporary walker number to account for position on boundary
-		for i in xrange(len(self.boundary)):
-			H.append(int(self.boundary[i][-1]*self.M/self.Hc))
-		self.nwalkers = sum(H) 			#calculate from initial conditions
-		for i in xrange(len(H)):
-			k = H[i]
-			for j in xrange(k):
-				self.walkers.append(self.boundary[i][0:self.d]+\
-					10**-2*np.random.standard_normal(self.d))
-		
-	def setup(self):
-		"""Count previous walkers and add/remove new walkers from boundary
-		Currently not used"""
-		self.nwalkers = 2+int(H*M)
-
-		pass
 
 	def HasLeftArea(self,pos):
 		"""pos = [x] in 1D; 
@@ -93,6 +75,7 @@ class Walk:
 		# 	del(self.walkers[i-counter])
 		# 	counter +=1
 		self.walkers = []
+		self.nwalkers = len(self.walkers)
 		boundary /= self.M
 		return boundary		
 
@@ -101,8 +84,9 @@ class Walk:
 		"C = concentration"
 		nwalkers_tmp = self.nwalkers
 		C_tot = np.sum(C)
-		N_walkers_tot = self.M*self.Hc*C_tot - nwalkers_tmp 
-		if C_tot == 0:
+		N_walkers_tot = int(self.M*self.Hc*C_tot - nwalkers_tmp)
+		if C_tot == 0 or N_walkers_tot <= 0:
+			# print 'N_walkers_tot: ',N_walkers_tot
 			return None
 		self.gradient = [(C[0][0]-C[-1][0]),\
 		(C[1][0]-C[2][0])]
@@ -145,23 +129,22 @@ class Walk:
 		return boundary
 
 	def FindPosition(self,pos,dx,dy):
-		"""return value of -1 implies that the walker is in 
-		a corner and therefore to be ignored --> this is wrong!
-		If walkers in corners are ignored we lose energy conservation.
-		must be redone!
-		"""
+		"""Finds which index the walker belongs to. 
+		Implements periodic boundary conditions on the walk-area"""
 		indx = [-1,-1]
 		if self.d==1:
 			return 0 if pos<self.x0 else 1 # This will not be correct!
 		elif self.d==2:
-			if pos[0]>self.X[0,-1]:
+			if pos[0]>self.X[0,-1] or pos[0]<self.X[0,0]:
 				pos[0] = np.fmod(pos[0],(self.X[0,-1]-self.X[0,0])+dx)+self.X[0,0]
+				pos[0] *= ((self.X[0,-1]-self.X[0,0])+dx) if pos[0]<0 else 1
 			for i in xrange(len(self.X)):
 				if pos[0]-self.X[i,i]<dx:
 					indx[0] = i
 					break
-			if pos[1]>self.Y[-1,0]:
+			if pos[1]>self.Y[-1,0] or pos[1]<self.Y[0,0]:
 				pos[1] = np.fmod(pos[1],(self.Y[-1,0]-self.Y[0,0])+dy)+self.Y[0,0]
+				pos[1] *= ((self.Y[-1,0]-self.Y[0,0])+dx) if pos[1]<0 else 1
 				# print pos[1]
 			for j in xrange(len(self.Y)):
 				if pos[1]-self.Y[j,j]<dy:
@@ -173,7 +156,6 @@ class Walk:
 	def CalculateGradient(self,C):
 		"""calculate the concentration gradient in an smart way"""
 		return 1
-
 
 area = [[0.3,0.3],[0.4,0.4]]
 if __name__ == '__main__':

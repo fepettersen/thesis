@@ -1,62 +1,74 @@
-"""
-A simple example of an animated plot... In 3D!
-"""
-import numpy as np
-import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d.axes3d as p3
-import matplotlib.animation as animation
+from dolfin import *
 
-def Gen_RandLine(length, dims=2) :
-    """
-    Create a line using a random walk algorithm
+class Left(SubDomain):
+    def inside(self,x,on_boundary):
+        return near(x[0],0.0)
 
-    length is the number of points for the line.
-    dims is the number of dimensions the line has.
-    """
-    lineData = np.empty((dims, length))
-    lineData[:, 0] = np.random.rand(dims)
-    for index in range(1, length) :
-        # scaling the random numbers by 0.1 so
-        # movement is small compared to position.
-        # subtraction by 0.5 is to change the range to [-0.5, 0.5]
-        # to allow a line to move backwards.
-        step = ((np.random.rand(dims) - 0.5) * 0.1)
-        lineData[:, index] = lineData[:, index-1] + step
+class Right(SubDomain):
+    def inside(self,x,on_boundary):
+        return near(x[0],1.0)
 
-    return lineData
+class Top(SubDomain):
+    def inside(self,x,on_boundary):
+        return near(x[1],1.0)
 
-def update_lines(num, dataLines, lines) :
-    for line, data in zip(lines, dataLines) :
-        # NOTE: there is no .set_data() for 3 dim data...
-        line.set_data(data[0:2, :num])
-        line.set_3d_properties(data[2,:num])
-    return lines
+class Bottom(SubDomain):
+    def inside(self,x,on_boundary):
+        return near(x[1],0.0)
 
-# Attaching 3D axis to the figure
-fig = plt.figure()
-ax = p3.Axes3D(fig)
+class Obstacle(SubDomain):
+    def inside(self,x,on_boundary):
+        return (between(x[1], (0.5, 0.7)) and between(x[0], (0.2, 1.0)))
 
-# Fifty lines of random 3-D lines
-data = [Gen_RandLine(25, 3) for index in range(50)]
+left = Left()
+top = Top()
+right = Right()
+bottom = Bottom()
+obstacle = Obstacle()
 
-# Creating fifty line objects.
-# NOTE: Can't pass empty arrays into 3d version of plot()
-lines = [ax.plot(dat[0, 0:1], dat[1, 0:1], dat[2, 0:1])[0] for dat in data]
+mesh = UnitSquareMesh(64,64)
 
-# Setting the axes properties
-ax.set_xlim3d([0.0, 1.0])
-ax.set_xlabel('X')
+domains = CellFunction("size_t",mesh)
+domains.set_all(0)
+obstacle.mark(domains,1)
 
-ax.set_ylim3d([0.0, 1.0])
-ax.set_ylabel('Y')
+boundaries = FacetFunction("size_t", mesh)
+boundaries.set_all(0)
+left.mark(boundaries, 1)
+top.mark(boundaries, 2)
+right.mark(boundaries, 3)
+bottom.mark(boundaries, 4)
 
-ax.set_zlim3d([0.0, 1.0])
-ax.set_zlabel('Z')
+a0 = Constant(1.0)
+a1 = Constant(0.01)
+g_L = Expression("- 10*exp(- pow(x[1] - 0.5, 2))")
+g_R = Constant("1.0")
+f = Constant(1.0)
 
-ax.set_title('3D Test')
+V = FunctionSpace(mesh, "CG", 2)
+u = TrialFunction(V)
+v = TestFunction(V)
 
-# Creating the Animation object
-line_ani = animation.FuncAnimation(fig, update_lines, 25, fargs=(data, lines),
-                              interval=50, blit=False)
+bcs = [DirichletBC(V, 5.0, boundaries, 2), DirichletBC(V, 0.0, boundaries, 4)]
 
-plt.show()
+# Define new measures associated with the interior domains and
+# exterior boundaries
+dx = Measure("dx")[domains]
+ds = Measure("ds")[boundaries]
+
+# Define variational form
+F = (inner(a0*grad(u), grad(v))*dx(0) + inner(a1*grad(u), grad(v))*dx(1)
+     - g_L*v*ds(1) - g_R*v*ds(3)
+     - f*v*dx(0) - f*v*dx(1))
+
+# Separate left and right hand sides of equation
+a, L = lhs(F), rhs(F)
+
+# Solve problem
+u = Function(V)
+solve(a == L, u, bcs)
+
+# Plot solution and gradient
+plot(u, title="u")
+plot(grad(u), title="Projected grad(u)")
+interactive()
