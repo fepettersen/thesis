@@ -5,23 +5,44 @@
  the thesis homepage on githubwith this information
 """
 DEBUG = True
-
 import os, sys, time, re #,argparse??
 t = time.gmtime()
+def right_split(s,delimiter):
+	i = len(s)-1
+	while i>0:
+		if s[i] == delimiter:
+			return s[:i]
+		i -= 1
+
+this_dir = right_split(os.getcwd(),'/')
 
 datetime = '%02d%02d%d_%d%d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
-parent_path = '~/uio/thesis/doc/results/experiment_%s'%datetime
+
+html_code = """<a name="%s" class="anchor" 
+href="#%s"><span class="octicon octicon-link">
+</span></a>New experiment %s.</h3>
+"""%(datetime,datetime,time.ctime())
+
+parent_path = this_dir +'/doc/results/experiment_%s'%datetime
 code_path = parent_path+'/code'
 parameter_path = parent_path+'/parameters'
 result_path = parent_path+ '/results'
 
+
 commandline_arguments = []
 
-with open('uio/thesis/doc/web/index.html') as f:
-	html = f.read()
+print this_dir
+f = open(this_dir +'/doc/web/index.html','r')
+html = f.read()
+f.close()
 pattern = r'</table>'
 match = re.search(pattern,html)
-print match
+part = match.span()[-1]+1
+
+sum_html = html[:part]+html_code+html[part:]
+f = open(this_dir +'/doc/web/index.html','w')
+f.write(sum_html)
+f.close()
 
 if not DEBUG:
 	os.system('mkdir %s'%parent_path)
