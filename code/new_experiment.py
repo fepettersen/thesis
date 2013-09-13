@@ -18,7 +18,7 @@ this_dir = right_split(os.getcwd(),'/')
 
 datetime = '%02d%02d%d_%d%d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 
-html_code = """<a name="%s" class="anchor" 
+html_code = """<h3><a name="%s" class="anchor" 
 href="#%s"><span class="octicon octicon-link">
 </span></a>New experiment %s.</h3>
 """%(datetime,datetime,time.ctime())
