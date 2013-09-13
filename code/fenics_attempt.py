@@ -43,6 +43,7 @@ class FenicsMultiscaleSolver(MultiscaleSolver):
 		self.bc.apply(A,self.b)
 		solve(A,self.U.vector(),self.b)
 		counter = 0
+		print len(self.U.vector().array())
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
 		# 	hole = self.U.vector().array()[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
@@ -53,7 +54,7 @@ class FenicsMultiscaleSolver(MultiscaleSolver):
 alpha = 3.14
 beta = 2.78
 dt = 0.05
-mesh = UnitSquareMesh(50,50)
+mesh = UnitSquareMesh(7,5)
 V = FunctionSpace(mesh,'Lagrange',1)
 f = Constant(beta -2 - 2*alpha)
 u = TrialFunction(V)
