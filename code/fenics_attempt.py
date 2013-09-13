@@ -18,11 +18,11 @@ class FenicsMultiscaleSolver(MultiscaleSolver):
 		self.f = Constant(0)
 		self.U0 = Constant(0)
 		self.Up = interpolate(self.U0,self.V)
+		print np.shape(self.Up.compute_vertex_values())
 		self.L = (self.Up + dt*self.f)*self.v*dx
 		self.b = None
 		self.bc = DirichletBC(self.V,self.U0,u0_boundary)
 		self.a = self.U*self.v*dx + self.dt*inner(grad(self.U),grad(self.v))*dx
-		self.U = Function(self.V)
 
 		self.WalkSolvers = []
 		self.Indeces = []
@@ -38,8 +38,9 @@ class FenicsMultiscaleSolver(MultiscaleSolver):
 		return [x0boundary,x1boundary,y0boundary,y1boundary]
 
 	def Solve(self):
+		self.U = Function(self.V)
 		A = assemble(self.a)
-		self.b = assemble(L,tensor=self.b)
+		self.b = assemble(self.L,tensor=self.b)
 		self.bc.apply(A,self.b)
 		solve(A,self.U.vector(),self.b)
 		counter = 0
@@ -49,12 +50,17 @@ class FenicsMultiscaleSolver(MultiscaleSolver):
 		# 	hole = self.U.vector().array()[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 		# 	self.U.vector().array()[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
 		# 	counter += 1
+		print self.U.compute_vertex_values()
 		self.Up.assign(self.U)
 
 alpha = 3.14
 beta = 2.78
 dt = 0.05
+<<<<<<< HEAD
 mesh = UnitSquareMesh(7,5)
+=======
+mesh = UnitSquareMesh(5,5)
+>>>>>>> a79a216a1e3f3fe5ed78ed8fd53ed68c2e47b0d8
 V = FunctionSpace(mesh,'Lagrange',1)
 f = Constant(beta -2 - 2*alpha)
 u = TrialFunction(V)
@@ -76,21 +82,42 @@ u = Function(V)
 T = 2
 t = dt
 b = None
-# print u, u.vector(), u.vector().array(	)
-# while t<=T:
-# 	b = assemble(L, tensor=b)
-# 	u0.t = t
-# 	bc.apply(A,b)
-# 	solve(A,u.vector(),b)
-# 	plot(u)
-# 	#rescale=False
-# 	#interactive()
-# 	t+=dt
-# 	u_1.assign(u)
-# 	u_e = interpolate(u0, V)
-# 	maxdiff = np.abs(u_e.vector().array()-u.vector().array())
 
+'''
+print type(u_1), u_1.vector()
+q =  u_1.compute_vertex_values()
+numpy_U = np.zeros((6,6))
+for i in xrange(len(numpy_U)):
+	numpy_U[i,:] = q[6*i:6*(i+1)]
+import matplotlib.pyplot as mpl
+x,y = np.meshgrid(np.linspace(0,1,6),np.linspace(0,1,6))
+# mpl.ion()
+fig = mpl.figure()
+ax = fig.add_subplot(111,projection='3d')
+ax.plot_wireframe(x,y,numpy_U)
+mpl.show()
+
+while t<=T:
+	b = assemble(L, tensor=b)
+	u0.t = t
+	bc.apply(A,b)
+	solve(A,u.vector(),b)
+	plot(u)
+	#rescale=False
+	#interactive()
+	t+=dt
+	u_1.assign(u)
+	u_e = interpolate(u0, V)
+	maxdiff = np.abs(u_e.vector().array()-u.vector().array())
+
+'''
 area = [[0.3,0.3],[0.5,0.5]]
 test = FenicsMultiscaleSolver(mesh)
+test.Up = interpolate(u0,test.V)
+test.f = f
+test.a = test.U*test.v*dx + test.dt*inner(grad(test.U),grad(test.v))*dx
+test.L = (test.Up + test.dt*test.f)*test.v*dx
+
 test.AddWalkArea(area)
 test.Solve()
+print test.U.set_vertex_values()
