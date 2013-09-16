@@ -110,21 +110,25 @@ class Diffusion:
 		if boundary == 'all' or boundary == 0:
 			U[0,1:-1] = 2*self._D*(Up[1,1:-1]-Up[0,1:-1]) + Up[0,1:-1] +\
 			 self._D*(Up[0,2:]-2*Up[0,1:-1]+Up[0,:-2])
+			#The corner (0,0)
 			U[0,0] = 2*self._D*(Up[1,0]-Up[0,0]) +Up[0,0] + \
 			2*self._D*(Up[0,1]-Up[0,0])
 		if boundary == 'all' or boundary == 1:
 			U[-1,1:-1] = 2*self._D*(Up[-2,1:-1]-Up[-1,1:-1])+ Up[-1,1:-1] +\
 			 self._D*(Up[-1,2:]-2*Up[-1,1:-1]+Up[-1,:-2])
+			 #The corner (nx,0)
 			U[-1,0] = 2*self._D*(Up[-2,0]-Up[-1,0]) +Up[-1,0] + \
 			 2*self._D*(Up[-1,1]-Up[-1,0])
 		if boundary == 'all' or boundary == 2:
 			U[1:-1,0] = self._D*(Up[2:,0]-2*Up[1:-1,0]+Up[:-2,0]) + Up[1:-1,0] +\
 			2*self._D*(Up[1:-1,1]-Up[1:-1,0])
+			#The corner (0,ny)
 			U[0,-1] = 2*self._D*(Up[1,-1]-Up[0,-1]) + Up[0,-1] + \
 			2*self._D*(Up[0,-2]-Up[0,-1])
 		if boundary == 'all' or boundary == 3:
 			U[1:-1,-1] = self._D*(Up[2:,-1]-2*Up[1:-1,-1]+Up[:-2,-1]) + \
 			Up[1:-1,-1] +2*self._D*(Up[1:-1,-2]-Up[1:-1,-1])
+			#The corner (nx,ny)
 			U[-1,-1] = 2*self._D*(Up[-2,-1]-Up[-1,-1]) +Up[-1,-1] +\
 			 2*self._D*(Up[-1,-2]-Up[-1,-1])
 		return U
@@ -155,8 +159,8 @@ class Diffusion:
 
 
 U = np.zeros((11,11))
-Up = np.zeros(np.shape(U))
-Up[:11/2,:11/2] = 1
+Up = np.ones(np.shape(U))
+# Up[:11/2,:11/2] = 1
 
 if __name__ == '__main__':
 	solver = Diffusion(d=2)

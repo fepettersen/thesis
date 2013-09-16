@@ -118,7 +118,7 @@ Up = np.zeros((11,11))
 Up[:(11)/2,:(11)/2] = 1
 X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 t = 0
-T = 2
+T = 20
 def setup_plot():
 	mpl.ion()
 	fig  = mpl.figure()
@@ -138,6 +138,6 @@ if __name__ == '__main__':
 		test.Solve()
 		wframe = ax.plot_wireframe(X,Y,test.Up)
 		mpl.draw()
-		time.sleep(1)
+		# time.sleep(1)
 		t+=1
 		# test.SaveState()
