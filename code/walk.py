@@ -227,12 +227,8 @@ class Walk:
 import matplotlib.pyplot as mpl
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D 
-area = [[0.3,0.3],[0.4,0.4]]
-area = [[0,0],[1,1]]
-area = [[0,1]]
-U = np.zeros((11,11))
+# area = [[0.3,0.3],[0.4,0.4]]
 U = np.zeros(11)
-# U[:11/2,:11/2] = 1
 U[:11/2] = 1
 t =0
 def setup_plot():
@@ -242,70 +238,33 @@ def setup_plot():
 	ax.set_autoscaley_on(False)
 	return fig,ax
 
-X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
-x = np.linspace(0,1,11)
 if __name__ == '__main__':
-	im = []
-	fig  = mpl.figure()
-	# fig,ax = setup_plot()
-	walk = Walk(area,1.0)
-	# wframe = ax.plot_wireframe(X,Y,U)
-	# mpl.draw()
-	while t<10:
-		print 't = %d'%t
-		im.append(mpl.plot(x,U,'b-'))
-		# ax.collections.remove(wframe)
-		U = walk.advance(U)	#[[1,1],[0,0]]
-		# wframe = ax.plot_wireframe(X,Y,U)
-		# mpl.draw()
-		t+=1
-	ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
-	mpl.show()
-
-if False:
-	a = 0
-	b = 1
-	x = np.linspace(a,b,11)
-	dx=x[1]-x[0]
-	d = 1				#dimension of the walks
-	d_ = [1 for i in range(d)]
-	walkers = 50
-	C = np.zeros(len(x))
-	print 'len(C) = ',len(C)
-	C[0:5] = 10
-	t = 0
-	im = []
-	fig = mpl.figure()
-	while t<10:
-		for i in xrange(len(C)):
-			for walker in xrange(int(C[i])):
-				r0 = x[i] + 1e-2*np.random.uniform()
-				r0 += sum(1e-2*(0.5-np.random.uniform(size=100)))
-				if i==len(C)-1:
-					if r0<x[i]:
-						C[i] -=1
-						C[i-1] +=1
-					elif r0>x[i]+dx:
-						C[i] -=1
-						C[0] +=1
-				else:
-					if r0<x[i]:
-						C[i] -=1
-						C[i-1] += 1
-					elif r0>x[i+1]:
-						C[i] -= 1
-						C[i+1] +=1							
-			im.append(mpl.plot(x,C,'b-'))
-		t+= 1
-	ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
-	mpl.show()
-	# for walker in range(walkers):
-	# 	N = 100			#steps
-	# 	r0 = 1+10**-2*np.random.standard_normal(d_)
-	# 	steps = 10**-2*np.random.standard_normal([d,N])
-	# 	r = np.zeros([d,N+1])	
-	# 	r[:,0] = r0			
-	# 	for i in xrange(N):
-	# 		r[:,i+1] = r[:,i] +steps[:,i]
-	# 	mpl.plot(r[0,:],r[1,:])
-	# mpl.show()
+	if True:
+		x = np.linspace(0,1,11)
+		area = [[0,1]]
+		im = []
+		fig  = mpl.figure()
+		walk = Walk(area,1.0)
+		while t<10:
+			print 't = %d'%t
+			im.append(mpl.plot(x,U,'b-'))
+			U = walk.advance(U)	#[[1,1],[0,0]]
+			t+=1
+		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
+		mpl.show()
+	if False:
+		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
+		U = np.zeros((11,11))
+		U[:11/2,:11/2] = 1
+		area = [[0,0],[1,1]]
+		fig,ax = setup_plot()
+		walk = Walk(area,1.0)
+		wframe = ax.plot_wireframe(X,Y,U)
+		mpl.draw()
+		while t<10:
+			print 't = %d'%t
+			ax.collections.remove(wframe)
+			U = walk.advance(U)	#[[1,1],[0,0]]
+			t+=1
+			wframe = ax.plot_wireframe(X,Y,U)
+			mpl.draw()
