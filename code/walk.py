@@ -46,10 +46,12 @@ class Walk:
 		Concentration is now a matrix containing the entire are of the
 		walk. This makes the coding simpler.
 		"""
-		nx,ny = np.shape(concentration)
-		
-		self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,nx),\
+		if self.d !=1:
+			nx,ny = np.shape(concentration)
+			self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,nx),\
 			np.linspace(self.y0,self.y1,ny)) 	#should be only if needed
+		else:
+			self.x = np.linspace(self.x0,self.x1,len(concentration))
 		a = self.InitializeTimestep(concentration)
 
 		steps = 100
@@ -61,7 +63,6 @@ class Walk:
 		for walker in xrange(self.nwalkers):
 			"loop over all walkers"	
 			s = self.factor*np.random.standard_normal([self.d,steps])
-			# r = np.zeros([self.d,steps+1])	
 			r0 = self.walkers[walker]
 			for i in xrange(steps):
 				# r0[:] += s[:,i]
@@ -83,61 +84,74 @@ class Walk:
 	
 	def InitializeTimestep(self,C):
 		"""C = concentration
-		Must be redone to account for 1 and 3 D"""
+		should work in 1d as well now"""
 		nwalkers_tmp = self.nwalkers
 		C_tot = np.sum(C)
 		N_walkers_tot = int(self.M*self.Hc*C_tot - nwalkers_tmp)
+
 		if C_tot == 0 or N_walkers_tot <= 0:
-			# print 'N_walkers_tot: ',N_walkers_tot
 			return None
-		# self.gradient = [(C[0][0]-C[-1][0]),\
-		# (C[1][0]-C[2][0])]
 		self.gradient = self.CalculateGradient(C)
-		# print gradient
-		for i in xrange(len(C)):
-			for j in xrange(len(C[i])):
-				n = int((C[i][j]/C_tot)*N_walkers_tot)
-				# print i,j
-				self.put_walkers(n,i,j)
+		if self.d ==1:
+			for i in xrange(len(C)):
+				n = int((C[i]/C_tot)*N_walkers_tot)
+				self.put_walkers(n,i,0)
+		if self.d ==2:
+			for i in xrange(len(C)):
+				for j in xrange(len(C[i])):
+					n = int((C[i][j]/C_tot)*N_walkers_tot)
+					# print i,j
+					self.put_walkers(n,i,j)
 		self.nwalkers = len(self.walkers)
 		return 1
 
 
 	def put_walkers(self,N,i,j):
-		"""Only works in 2D
-		Must be redone!"""
+		"""Should work in 1d as well now"""
 		if self.d==1:
-			print 'only 2D supported'
-			raise SyntaxError
-		x = self.X[i,j]
-		y = self.Y[i,j]
-		for k in range(N):
-			self.walkers.append([x+self.factor*(0.5-np.random.uniform()),\
-				y+self.factor*(0.5-np.random.uniform())])
+			x = self.x[i]
+			for k in xrange(N):
+				self.walkers.append([x+self.factor*(0.5-np.random.uniform())])
+		elif self.d==2:
+			x = self.X[i,j]
+			y = self.Y[i,j]
+			for k in xrange(N):
+				self.walkers.append([x+self.factor*(0.5-np.random.uniform()),\
+					y+self.factor*(0.5-np.random.uniform())])
 
 	def ReturnBoundary(self,walkers,concentration=None):
 		"""Convert the number of walkers back into the concentration 
 		at the boundary and return the boundary so it can be returned 
-		from self.adnvance()"""
+		from self.advance()"""
 		# print concentration
 		boundary = np.zeros(np.shape(concentration))
-		dx = self.X[0,1]-self.X[0,0]
-		dy = self.Y[1,0]-self.Y[0,0]
-		for walker in walkers:
-			#find its position on the boundary
-			index = self.FindPosition(walker,dx,dy)
-			boundary[index[0],index[1]] += 1
+		if self.d ==1:
+			dx = self.x[1]-self.x[0]
+			for walker in walkers:
+				index = self.FindPosition(walker,dx,0)
+				boundary[index] += 1
+		if self.d ==2:
+			dx = self.X[0,1]-self.X[0,0]
+			dy = self.Y[1,0]-self.Y[0,0]
+			for walker in walkers:
+				#find its position on the boundary
+				index = self.FindPosition(walker,dx,dy)
+				boundary[index[0],index[1]] += 1
 		# print boundary, np.sum(boundary)
 		return boundary
 
 	def FindPosition(self,pos,dx,dy):
 		"""Finds which index the walker belongs to. 
-		Implements periodic boundary conditions on the walk-area"""
+		Implements periodic boundary conditions on the walk-area
+		Should work in 1d as well now"""
 		indx = [-1,-1]
 		if self.d==1:
-			return 0 if pos<self.x0 else 1 # This will not be correct!
+			for i in xrange(len(self.x)):
+				if pos-self.x[i]<dx:
+					return i
 		elif self.d==2:
 			if pos[0]>self.X[0,-1] or pos[0]<self.X[0,0]:
+				print 'this should not happen now'
 				pos[0] = np.fmod(pos[0],(self.X[0,-1]-self.X[0,0])+dx)+self.X[0,0]
 				pos[0] *= ((self.X[0,-1]-self.X[0,0])+dx) if pos[0]<0 else 1
 			for i in xrange(len(self.X)):
@@ -145,6 +159,7 @@ class Walk:
 					indx[0] = i
 					break
 			if pos[1]>self.Y[-1,0] or pos[1]<self.Y[0,0]:
+				print 'this should not happen now'
 				pos[1] = np.fmod(pos[1],(self.Y[-1,0]-self.Y[0,0])+dy)+self.Y[0,0]
 				pos[1] *= ((self.Y[-1,0]-self.Y[0,0])+dx) if pos[1]<0 else 1
 				# print pos[1]
@@ -157,7 +172,16 @@ class Walk:
 
 	def CalculateGradient(self,C):
 		"""calculate the concentration gradient in an smart way"""
-		return 1
+		grad = np.zeros(np.shape(C))
+		if self.d==1:
+			for i in xrange(len(C)):
+				grad[i] = (C[i]-C[i-1])/(self.x[1]-self.x[0])
+		elif self.d==2:
+			for i in xrange(len(C)):
+				for j in xrange(len(C[i])):
+					grad[i,j] = (C[i][j]-C[i-1][j])/((self.X[-1,-1]-self.X[0,0])/len(self.X))
+					grad[i,j] = (C[i][j]-C[i][j-1])/((self.Y[-1,-1]-self.Y[0,0])/len(self.Y))
+		return grad
 
 	def checkpos(self,r,s):
 		"""Implements reflecting boundaries"""
@@ -195,16 +219,49 @@ class Walk:
 					f += f/2.0
 				elif r[indx]+f*s[indx]-b >0:
 					f -= f/2.0
-				it += 1
+				# it += 1
 			return r+f*s -(1-f)*s
 
 
 
-
+import matplotlib.pyplot as mpl
+import matplotlib.animation as animation
+from mpl_toolkits.mplot3d import Axes3D 
 area = [[0.3,0.3],[0.4,0.4]]
+area = [[0,0],[1,1]]
+area = [[0,1]]
+U = np.zeros((11,11))
+U = np.zeros(11)
+# U[:11/2,:11/2] = 1
+U[:11/2] = 1
+t =0
+def setup_plot():
+	mpl.ion()
+	fig  = mpl.figure()
+	ax = fig.add_subplot(111,projection='3d')
+	ax.set_autoscaley_on(False)
+	return fig,ax
+
+X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
+x = np.linspace(0,1,11)
 if __name__ == '__main__':
+	im = []
+	fig  = mpl.figure()
+	# fig,ax = setup_plot()
 	walk = Walk(area,1.0)
-	print walk.advance([[1,1],[0,0]])
+	# wframe = ax.plot_wireframe(X,Y,U)
+	# mpl.draw()
+	while t<10:
+		print 't = %d'%t
+		im.append(mpl.plot(x,U,'b-'))
+		# ax.collections.remove(wframe)
+		U = walk.advance(U)	#[[1,1],[0,0]]
+		# wframe = ax.plot_wireframe(X,Y,U)
+		# mpl.draw()
+		t+=1
+	ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
+	mpl.show()
+
 if False:
 	a = 0
 	b = 1
