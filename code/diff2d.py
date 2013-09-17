@@ -91,7 +91,7 @@ class Diffusion:
 	def ForwardEuler1D(self,U,Up):
 		for i in xrange(1,self.n):
 			U[i] = self._D*(Up[i+1]-2*Up[i]+Up[i-1]) +Up[i]
-		U = self.boundary(U)
+		U = self.boundary(U,Up)
 		return U
 
 	def ForwardEuler2D(self,U,Up):
@@ -143,8 +143,10 @@ class Diffusion:
 	def SetBoundary(self,boundary_type,affected_boundary='all'):
 		pass
 
-	def boundary(self,U):
-		U[0] = 1
+	def boundary(self,U,Up):
+		"""Neumann boundary in 1D"""
+		U[0] = 2*self._D*(Up[1]-Up[0])+Up[0]
+		U[-1] = 2*self._D*(Up[-2]-Up[-1]) + Up[-1]
 		return U
 
 	def f(self,x,y,t):
@@ -159,20 +161,28 @@ class Diffusion:
 
 
 U = np.zeros((11,11))
+U = np.zeros(11)
 Up = np.ones(np.shape(U))
+Up[:6] = 0
+x = np.linspace(0,1,11)
 # Up[:11/2,:11/2] = 1
 
 if __name__ == '__main__':
-	solver = Diffusion(d=2)
-	mpl.ion()
+	# solver = Diffusion(d=2)
+	solver = Diffusion(d=1)
+	im = []
+	# mpl.ion()
 	fig = mpl.figure()
-	ax = fig.add_subplot(111,projection='3d')
-	ax.set_autoscaley_on(False)
-	wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
+	# ax = fig.add_subplot(111,projection='3d')
+	# ax.set_autoscaley_on(False)
+	# wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
 	for i in xrange(50):
-		mpl.draw()
-		ax.collections.remove(wframe)
+		# mpl.draw()
+		# ax.collections.remove(wframe)
+		im.append(mpl.plot(x,Up,'b-'))
 		U = solver.advance(U,Up)
 		Up = U.copy()
-		wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
+		# wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
+	ani = animation.ArtistAnimation(fig,im)
+	mpl.show()
 

@@ -4,27 +4,24 @@
 from diff2d import Diffusion
 from walk import Walk, np
 import time
-import matplotlib.pyplot as mpl
+import matplotlib.pyplot as mpl, inspect
 import matplotlib.animation as animation
 
 class MultiscaleSolver:
 	"""docstring for MultiscaleSolver
 	Combine a normal diffusion PDE solver with random walk model for 
 	diffusion in certain areas
-	Only works in 2D"""
+	Only works in 2D -- beeing rewritten to support 1d as well!"""
 
 
 
 	def __init__(self,mesh,PdeSolver=Diffusion(d=2)):
-		# super(MultiscaleSolver, self).__init__()
-		self.mesh = mesh
+		"Need to decide what the mesh is!"
+		self.mesh = np.asanyarray(mesh)	
 		self.WalkSolvers = []
 		self.Indeces = []
 		self.PdeSolver = PdeSolver
-		# print type(PdeSolver)
-		# if type(PdeSolver) == type(module()):
-		# 	self.dolfin = True
-		self.U = np.zeros((len(mesh),len(mesh)))
+		self.U = np.zeros((len(self.mesh),len(self.mesh)))
 		self.Up = np.zeros(np.shape(self.U))
 		self.IterationCounter = 0
 
@@ -53,7 +50,10 @@ class MultiscaleSolver:
 		return indeces
 
 	def getBoundary(self,counter):
-		"""Only works in 2D"""
+		"""Only works in 2D
+		Not used (as far as I can see)"""
+		print inspect.stack()[0][3]		#print name of current function
+
 		x0 = self.Indeces[counter][0][0]
 		x1 = self.Indeces[counter][0][1]
 		y0 = self.Indeces[counter][1][0]
@@ -64,11 +64,13 @@ class MultiscaleSolver:
 		return tmp
 
 	def setInitialCondition(self,U0):
+		if np.shape(self.U) != np.shape(U0):
+			print "Wrong shape",np.shape(U0)," of initial condition! Must match shape of mesh",np.shape(self.mesh),". Exiting"
+			raise AttributeError
 		self.Up = U0
-		if np.shape(self.U) != np.shape(self.Up):
-			self.U = np.zeros(np.shape(self.Up))
 
 	def setBoundary(self,boundary,index):
+		print inspect.stack()[0][3]		#print name of current function
 		x0 = self.Indeces[index][0][0]
 		x1 = self.Indeces[index][0][1]
 		y0 = self.Indeces[index][1][0]
@@ -115,7 +117,7 @@ class MultiscaleSolver:
 area = [[0.3,0.3],[0.5,0.5]]
 mesh = np.linspace(0,1,11)
 Up = np.zeros((11,11))
-Up[:(11)/2,:(11)/2] = 1
+Up[(11)/2:,(11)/2:] = 1
 X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 t = 0
 T = 10

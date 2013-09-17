@@ -43,7 +43,7 @@ class Walk:
 	def advance(self,concentration):
 		"""
 		will become the new advance function. 
-		Concentration is now a matrix containing the entire are of the
+		Concentration is now a matrix containing the entire area of the
 		walk. This makes the coding simpler.
 		"""
 		if self.d !=1:
@@ -78,7 +78,7 @@ class Walk:
 		boundary = self.ReturnBoundary(self.walkers,concentration)
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
-		boundary /= self.M
+		boundary /= (self.M*self.Hc)
 		return boundary		
 
 	
@@ -151,7 +151,7 @@ class Walk:
 					return i
 		elif self.d==2:
 			if pos[0]>self.X[0,-1] or pos[0]<self.X[0,0]:
-				print 'this should not happen now'
+				# print 'this should not happen now'
 				pos[0] = np.fmod(pos[0],(self.X[0,-1]-self.X[0,0])+dx)+self.X[0,0]
 				pos[0] *= ((self.X[0,-1]-self.X[0,0])+dx) if pos[0]<0 else 1
 			for i in xrange(len(self.X)):
@@ -159,7 +159,7 @@ class Walk:
 					indx[0] = i
 					break
 			if pos[1]>self.Y[-1,0] or pos[1]<self.Y[0,0]:
-				print 'this should not happen now'
+				# print 'this should not happen now'
 				pos[1] = np.fmod(pos[1],(self.Y[-1,0]-self.Y[0,0])+dy)+self.Y[0,0]
 				pos[1] *= ((self.Y[-1,0]-self.Y[0,0])+dx) if pos[1]<0 else 1
 				# print pos[1]
