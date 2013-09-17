@@ -22,8 +22,6 @@ class Walk:
 		elif len(area) == 2:
 			self.x0,self.y0 = area[0]
 			self.x1,self.y1 = area[1]
-		self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,n),\
-			np.linspace(self.y0,self.y1,n))
 		# print self.X
 
 
@@ -48,6 +46,10 @@ class Walk:
 		Concentration is now a matrix containing the entire are of the
 		walk. This makes the coding simpler.
 		"""
+		nx,ny = np.shape(concentration)
+		
+		self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,nx),\
+			np.linspace(self.y0,self.y1,ny)) 	#should be only if needed
 		a = self.InitializeTimestep(concentration)
 
 		steps = 100
@@ -56,24 +58,23 @@ class Walk:
 		walkers_leaving_area = []
 		if not a:
 			return np.zeros(np.shape(concentration))
-		for walker in xrange(self.nwalkers):	
+		for walker in xrange(self.nwalkers):
+			"loop over all walkers"	
 			s = self.factor*np.random.standard_normal([self.d,steps])
 			# r = np.zeros([self.d,steps+1])	
 			r0 = self.walkers[walker]
-			for i in xrange(self.d):
-				r0[i] += np.sum(s[i])+self.factor*self.gradient[i]
+			for i in xrange(steps):
+				# r0[:] += s[:,i]
+				r0[:] = self.checkpos(r0,s[:,i])
+			# for i in xrange(self.d):
+			# 	r0[i] += np.sum(s[i])+self.factor*self.gradient[i]
 			if self.HasLeftArea(r0):
 				indices.append(counter)
 				walkers_leaving_area.append(self.walkers[walker]) 
 			counter += 1
-		# print len(walkers_leaving_area)
 		counter = 0
 		# boundary = self.ReturnBoundary(walkers_leaving_area,concentration)
 		boundary = self.ReturnBoundary(self.walkers,concentration)
-		# for i in sorted(indices):
-		# 	# Remove walkers that have left area
-		# 	del(self.walkers[i-counter])
-		# 	counter +=1
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
 		boundary /= self.M
@@ -81,16 +82,17 @@ class Walk:
 
 	
 	def InitializeTimestep(self,C):
-		"C = concentration"
+		"""C = concentration
+		Must be redone to account for 1 and 3 D"""
 		nwalkers_tmp = self.nwalkers
 		C_tot = np.sum(C)
 		N_walkers_tot = int(self.M*self.Hc*C_tot - nwalkers_tmp)
 		if C_tot == 0 or N_walkers_tot <= 0:
 			# print 'N_walkers_tot: ',N_walkers_tot
 			return None
-		self.gradient = [(C[0][0]-C[-1][0]),\
-		(C[1][0]-C[2][0])]
-		# self.gradient = self.CalculateGradient(C)
+		# self.gradient = [(C[0][0]-C[-1][0]),\
+		# (C[1][0]-C[2][0])]
+		self.gradient = self.CalculateGradient(C)
 		# print gradient
 		for i in xrange(len(C)):
 			for j in xrange(len(C[i])):
@@ -157,10 +159,52 @@ class Walk:
 		"""calculate the concentration gradient in an smart way"""
 		return 1
 
+	def checkpos(self,r,s):
+		"""Implements reflecting boundaries"""
+		tmp = r+s
+		if not self.HasLeftArea(r+s):
+			return tmp
+		else:
+			indx = 0
+			b = 1 	#find the relevant boundary
+			if self.d==1:
+				b = self.x0 if tmp[indx]-self.x0<0 else self.x1
+			elif self.d==2:
+				if tmp[0]-self.x0<=0:
+					indx = 0
+					b = self.x0
+				elif tmp[0]-self.x1>=0:
+					indx = 0
+					b = self.x1
+				elif tmp[1]-self.y0<=0:
+					indx = 1
+					b = self.y0
+				else:
+					indx = 1
+					b = self.y1
+			f = 0.5
+			eps = 1e-5
+			it = 0
+			while f>eps:
+				if r[indx]+f*s[indx]-b<=eps:
+					r += f*s
+					r -= (1-f)*s
+					# print 'iterations: ',it
+					return r
+				elif r[indx]+f*s[indx]-b <0:
+					f += f/2.0
+				elif r[indx]+f*s[indx]-b >0:
+					f -= f/2.0
+				it += 1
+			return r+f*s -(1-f)*s
+
+
+
+
 area = [[0.3,0.3],[0.4,0.4]]
 if __name__ == '__main__':
 	walk = Walk(area,1.0)
-	print walk.advance([[1],[1],[0],[0]])
+	print walk.advance([[1,1],[0,0]])
 if False:
 	a = 0
 	b = 1
