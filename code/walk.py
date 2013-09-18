@@ -154,7 +154,7 @@ class Walk:
 		if self.d==1:
 			for i in xrange(len(self.x)+1):
 				# print 'i = %d, x[i] = '%i,self.x[i]
-				if pos-self.x[i]<dx:
+				if abs(pos-self.x[i])<dx/2.0:
 					return i
 		elif self.d==2:
 			if pos[0]>self.X[0,-1] or pos[0]<self.X[0,0]:
@@ -178,7 +178,8 @@ class Walk:
 			return indx
 
 	def CalculateGradient(self,C):
-		"""calculate the concentration gradient in an smart way"""
+		"""calculate the concentration gradient in an smart way
+		Not so smart yet"""
 		grad = np.zeros(np.shape(C))
 		if self.d==1:
 			for i in xrange(len(C)):
@@ -190,7 +191,7 @@ class Walk:
 					grad[i,j] = (C[i][j]-C[i][j-1])/((self.Y[-1,-1]-self.Y[0,0])/len(self.Y))
 		return grad
 
-	def checkpos(self,r,s):
+	def checkpos(self,r,s,eps = 1e-5):
 		"""Implements reflecting boundaries -- Has a bug!"""
 		tmp = r+s
 		if not self.HasLeftArea(tmp):
@@ -214,13 +215,12 @@ class Walk:
 					indx = 1
 					b = self.y1
 			f = 0.5
-			eps = 1e-5
 			it = 0
 			while f>eps:
 				if r[indx]+f*s[indx]-b<=eps:
 					r += f*s
 					r -= (1-f)*s
-					if it == 0: print 'tmp = ',tmp,' r = ',r,' s = ',s,' f = %g'%f
+					# if it == 0: print 'tmp = ',tmp,' r = ',r,' s = ',s,' f = %g'%f
 					return r
 				elif r[indx]+f*s[indx]-b <0:
 					f += f/2.0
@@ -246,11 +246,11 @@ def setup_plot():
 if __name__ == '__main__':
 	if True:
 		"1D"
-		n = 3
+		n = 11
 		U = np.zeros(n)
 		U[:n/2] = 1
-		x = np.linspace(0.3,0.5,n)
-		area = [[0.3,0.5]]
+		x = np.linspace(0,1,n)
+		area = [[0,1]]
 		im = []
 		fig  = mpl.figure()
 		walk = Walk(area,1.0)
@@ -260,7 +260,7 @@ if __name__ == '__main__':
 			U = walk.advance(U)	#[[1,1],[0,0]]
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
-		# mpl.show()
+		mpl.show()
 	if False:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
