@@ -20,7 +20,7 @@ class MultiscaleSolver:
 		mesh = [np.linspace(x0,x1,nx),np.linspace(y0,y1,ny)] or 
 		mesh = [np.linspace(x0,x1,nx)] in 1d"""
 		self.mesh = np.asanyarray(mesh)
-		print mesh
+		# print mesh
 		self.d = np.shape(self.mesh)[0]
 		if self.d >3:
 			"This should be more robust"
@@ -31,7 +31,7 @@ class MultiscaleSolver:
 		self.Indeces = []
 		self.PdeSolver = Diffusion(d=self.d) if PdeSolver is None else PdeSolver
 		self.U = np.zeros((nx,ny)) if self.d == 2 else np.zeros(nx)
-		print self.U
+		# print self.U
 		self.Up = np.zeros(np.shape(self.U))
 		self.IterationCounter = 0
 
@@ -133,7 +133,9 @@ class MultiscaleSolver:
 				# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 			elif self.d==1:
 				hole = self.U[x[0][0]:x[0][1]+1]
+				print hole
 				self.U[x[0][0]:x[0][1]+1] = solver.advance(hole)
+				print self.U[x[0][0]:x[0][1]+1]
 			counter += 1
 		self.Up = self.U.copy()
 
@@ -177,9 +179,9 @@ if __name__ == '__main__':
 		area = [[0.3,0.5]]
 		mesh = np.linspace(0,1,n)
 		Up = np.zeros(n)
-		Up[n/2:] = 1
+		Up[:n/2] = 1
 		test = MultiscaleSolver([mesh])
-		# test.AddWalkArea(area)
+		test.AddWalkArea(area)
 		test.setInitialCondition(Up)
 		im.append(mpl.plot(x,Up,'b-'))
 		while t<T:

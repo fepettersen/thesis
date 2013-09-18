@@ -46,6 +46,7 @@ class Walk:
 		Concentration is now a matrix containing the entire area of the
 		walk. This makes the coding simpler.
 		"""
+		print 'starting, %d walkers'%self.nwalkers
 		if self.d !=1:
 			nx,ny = np.shape(concentration)
 			self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,nx),\
@@ -76,6 +77,7 @@ class Walk:
 		counter = 0
 		# boundary = self.ReturnBoundary(walkers_leaving_area,concentration)
 		boundary = self.ReturnBoundary(self.walkers,concentration)
+		print 'done, %d walkers left'%self.nwalkers
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
 		boundary /= (self.M*self.Hc)
@@ -125,11 +127,15 @@ class Walk:
 		from self.advance()"""
 		# print concentration
 		boundary = np.zeros(np.shape(concentration))
+		print 'starting %d walkers'%self.nwalkers
 		if self.d ==1:
 			dx = self.x[1]-self.x[0]
+			cont = 0
 			for walker in walkers:
+				cont += 1
 				index = self.FindPosition(walker,dx,0)
 				boundary[index] += 1
+		print 'finished, have placed %d walkers'%np.sum(boundary)
 		if self.d ==2:
 			dx = self.X[0,1]-self.X[0,0]
 			dy = self.Y[1,0]-self.Y[0,0]
@@ -146,7 +152,8 @@ class Walk:
 		Should work in 1d as well now"""
 		indx = [-1,-1]
 		if self.d==1:
-			for i in xrange(len(self.x)):
+			for i in xrange(len(self.x)+1):
+				# print 'i = %d, x[i] = '%i,self.x[i]
 				if pos-self.x[i]<dx:
 					return i
 		elif self.d==2:
@@ -184,9 +191,9 @@ class Walk:
 		return grad
 
 	def checkpos(self,r,s):
-		"""Implements reflecting boundaries"""
+		"""Implements reflecting boundaries -- Has a bug!"""
 		tmp = r+s
-		if not self.HasLeftArea(r+s):
+		if not self.HasLeftArea(tmp):
 			return tmp
 		else:
 			indx = 0
@@ -213,13 +220,13 @@ class Walk:
 				if r[indx]+f*s[indx]-b<=eps:
 					r += f*s
 					r -= (1-f)*s
-					# print 'iterations: ',it
+					if it == 0: print 'tmp = ',tmp,' r = ',r,' s = ',s,' f = %g'%f
 					return r
 				elif r[indx]+f*s[indx]-b <0:
 					f += f/2.0
 				elif r[indx]+f*s[indx]-b >0:
 					f -= f/2.0
-				# it += 1
+				it += 1
 			return r+f*s -(1-f)*s
 
 
@@ -228,8 +235,6 @@ import matplotlib.pyplot as mpl
 import matplotlib.animation as animation
 from mpl_toolkits.mplot3d import Axes3D 
 # area = [[0.3,0.3],[0.4,0.4]]
-U = np.zeros(11)
-U[:11/2] = 1
 t =0
 def setup_plot():
 	mpl.ion()
@@ -241,8 +246,11 @@ def setup_plot():
 if __name__ == '__main__':
 	if True:
 		"1D"
-		x = np.linspace(0,1,11)
-		area = [[0,1]]
+		n = 3
+		U = np.zeros(n)
+		U[:n/2] = 1
+		x = np.linspace(0.3,0.5,n)
+		area = [[0.3,0.5]]
 		im = []
 		fig  = mpl.figure()
 		walk = Walk(area,1.0)
@@ -252,7 +260,7 @@ if __name__ == '__main__':
 			U = walk.advance(U)	#[[1,1],[0,0]]
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
-		mpl.show()
+		# mpl.show()
 	if False:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
