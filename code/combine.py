@@ -15,13 +15,23 @@ class MultiscaleSolver:
 
 
 
-	def __init__(self,mesh,PdeSolver=Diffusion(d=2)):
-		"Need to decide what the mesh is!"
-		self.mesh = np.asanyarray(mesh)	
+	def __init__(self,mesh,PdeSolver=None):
+		"""mesh is the x (and y) coordinates with correct spacing, say:
+		mesh = [np.linspace(x0,x1,nx),np.linspace(y0,y1,ny)] or 
+		mesh = [np.linspace(x0,x1,nx)] in 1d"""
+		self.mesh = np.asanyarray(mesh)
+		print mesh
+		self.d = np.shape(self.mesh)[0]
+		if self.d >3:
+			"This should be more robust"
+			self.d = 1
+		nx = len(mesh[0])
+		ny = 1 if self.d == 1 else len(mesh[1])
 		self.WalkSolvers = []
 		self.Indeces = []
-		self.PdeSolver = PdeSolver
-		self.U = np.zeros((len(self.mesh),len(self.mesh)))
+		self.PdeSolver = Diffusion(d=self.d) if PdeSolver is None else PdeSolver
+		self.U = np.zeros((nx,ny)) if self.d == 2 else np.zeros(nx)
+		print self.U
 		self.Up = np.zeros(np.shape(self.U))
 		self.IterationCounter = 0
 
@@ -33,20 +43,29 @@ class MultiscaleSolver:
 	def MapAreaToIndex(self,area,eps=1e-14):
 		"""Needs some work to tackle 1D as well
 			Only works if x = y"""
-		xcoor = [area[0][0],area[1][0]]
-		ycoor = [area[0][1],area[1][1]]
 		indeces = [[],[]]
-		for i in xcoor:
-			for j in xrange(len(self.mesh)):
-				if i-self.mesh[j]<eps:
-					break
-			indeces[0].append(j)
-		for i in ycoor:
-			for j in xrange(len(self.mesh)):
-				if i-self.mesh[j]<eps:
-					break
-			indeces[-1].append(j)
-		print indeces
+		if self.d ==1:
+			xcoor = [area[0][0],area[0][1]]
+			for i in xcoor:
+				for j in xrange(len(self.mesh[0])):
+					if i-self.mesh[0][j]<eps:
+						break
+				indeces[0].append(j)
+			indeces[-1] = 0	
+		elif self.d==2:
+			xcoor = [area[0][0],area[1][0]]
+			ycoor = [area[0][1],area[1][1]]
+			for i in xcoor:
+				for j in xrange(len(self.mesh[0])):
+					if i-self.mesh[0][j]<eps:
+						break
+				indeces[0].append(j)
+			for i in ycoor:
+				for j in xrange(len(self.mesh[-1])):
+					if i-self.mesh[-1][j]<eps:
+						break
+				indeces[-1].append(j)
+		# print indeces
 		return indeces
 
 	def getBoundary(self,counter):
@@ -66,7 +85,9 @@ class MultiscaleSolver:
 	def setInitialCondition(self,U0):
 		if np.shape(self.U) != np.shape(U0):
 			print "Wrong shape",np.shape(U0)," of initial condition! Must match shape of mesh",np.shape(self.mesh),". Exiting"
-			raise AttributeError
+			# U0 = U0[:np.shape(self.U)[0],:np.shape(self.U)[-1]]
+			import sys
+			sys.exit(0)
 		self.Up = U0
 
 	def setBoundary(self,boundary,index):
@@ -101,24 +122,21 @@ class MultiscaleSolver:
 		self.IterationCounter += 1
 
 	def Solve(self):
-		# print self.U
+		"""Need to support 1d as well"""
 		self.U = self.PdeSolver.advance(self.U,self.Up)
-		# print self.U
 		counter = 0
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
-			hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
-			# print hole
-			self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
-			# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
+			if self.d==2:
+				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
+				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
+				# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
+			elif self.d==1:
+				hole = self.U[x[0][0]:x[0][1]+1]
+				self.U[x[0][0]:x[0][1]+1] = solver.advance(hole)
 			counter += 1
 		self.Up = self.U.copy()
 
-area = [[0.3,0.3],[0.5,0.5]]
-mesh = np.linspace(0,1,11)
-Up = np.zeros((11,11))
-Up[(11)/2:,(11)/2:] = 1
-X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 t = 0
 T = 10
 def setup_plot():
@@ -129,17 +147,45 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	fig,ax = setup_plot()
-	test = MultiscaleSolver(mesh)
-	test.AddWalkArea(area)
-	test.setInitialCondition(Up)
-	wframe = ax.plot_wireframe(X,Y,test.Up)
-	mpl.draw()
-	while t<T:
-		ax.collections.remove(wframe)
-		test.Solve()
+	if False:
+		"2D"
+		nx = 11; ny =11
+		Up = np.zeros((nx,ny))
+		Up[(nx)/2:,(nx)/2:] = 1
+		area = [[0.3,0.3],[0.5,0.5]]
+		fig,ax = setup_plot()
+		X,Y = np.meshgrid(np.linspace(0,1,nx),np.linspace(0,1,ny))
+		mesh = [np.linspace(0,1,nx),np.linspace(0,1,ny)]
+		test = MultiscaleSolver(mesh)
+		test.AddWalkArea(area)
+		test.setInitialCondition(Up)
 		wframe = ax.plot_wireframe(X,Y,test.Up)
 		mpl.draw()
-		# time.sleep(1)
-		t+=1
-		# test.SaveState()
+		while t<T:
+			ax.collections.remove(wframe)
+			test.Solve()
+			wframe = ax.plot_wireframe(X,Y,test.Up)
+			mpl.draw()
+			# time.sleep(1)
+			t+=1
+			# test.SaveState()
+	if True:
+		"1D"
+		im = []; fig = mpl.figure()
+		n = 11
+		x = np.linspace(0,1,n)
+		area = [[0.3,0.5]]
+		mesh = np.linspace(0,1,n)
+		Up = np.zeros(n)
+		Up[n/2:] = 1
+		test = MultiscaleSolver([mesh])
+		# test.AddWalkArea(area)
+		test.setInitialCondition(Up)
+		im.append(mpl.plot(x,Up,'b-'))
+		while t<T:
+			print '%d of %d'%(t+1,T)
+			im.append(mpl.plot(x,test.U,'b-'))
+			test.Solve()
+			t += 1
+		ani = animation.ArtistAnimation(fig,im)
+		mpl.show()

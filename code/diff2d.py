@@ -36,15 +36,6 @@ class Diffusion:
 		return U
 
 	def solve1D(self,U,Up,plot):
-		# try:
-		# 	Up = self.U0
-		# except AttributeError:
-		# 	Up = np.zeros(self.n+1)
-		# 	Up[:(self.n+1)/2] = 1
-		# if plot:
-		# 	fig = mpl.figure()
-		# 	ims = [mpl.plot(self.x,Up,'b-')]
-		# U = np.zeros(self.n+1)
 		if self.solver == 'FE':
 			U = self.ForwardEuler1D(U,Up)
 			Up = U.copy()
@@ -52,40 +43,15 @@ class Diffusion:
 		elif self.solver == 'BE':
 			U = self.BackwardEuler1D(U,Up)
 			Up = U.copy()
-		# if plot:
-		# 	im = mpl.plot(self.x,U,'b-')
-		# 	ims.append(im)
-		# 	self.animate(fig,ims)
 		return U
 
 	def solve2D(self,U,Up,plot):
-		wframe=None
-		# try:
-		# 	Up = self.U0
-		# except AttributeError:
-		# 	Up = np.zeros((self.n+1,self.n+1))
-		# 	Up[:(self.n+1)/2,:(self.n+1)/2] = 1
-		# if plot:
-		# 	mpl.ion()
-		# 	fig = mpl.figure()
-		# 	ax = fig.add_subplot(111,projection='3d')
-		# 	self.X,self.Y = np.meshgrid(self.x,self.y)
-		# 	wframe = ax.plot_wireframe(self.X,self.Y,Up)
-		# 	mpl.draw()
-		# U = np.zeros((self.n+1,self.n+1))
 		if self.solver.upper() == 'FE':
 			U = self.ForwardEuler2D(U,Up)
 			Up = U.copy()
 		elif self.solver.upper() == 'BE':
 			U = self.BackwardEuler2D(U,Up)
 			Up = U.copy()
-		# if plot:
-		# 	wframe = ax.plot_wireframe(self.X,self.Y,U)
-		# 	if oldframe is not None:
-		# 		# ims.append(im)
-		# 		ax.collections.remove(oldframe)
-		# 	mpl.draw()
-		# 	time.sleep(1)
 		return U
 
 	def ForwardEuler1D(self,U,Up):

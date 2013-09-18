@@ -240,6 +240,7 @@ def setup_plot():
 
 if __name__ == '__main__':
 	if True:
+		"1D"
 		x = np.linspace(0,1,11)
 		area = [[0,1]]
 		im = []
@@ -253,6 +254,7 @@ if __name__ == '__main__':
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
 		mpl.show()
 	if False:
+		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 		U = np.zeros((11,11))
 		U[:11/2,:11/2] = 1
