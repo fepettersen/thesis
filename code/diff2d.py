@@ -130,6 +130,7 @@ U = np.zeros((11,11))
 U = np.zeros(11)
 Up = np.ones(np.shape(U))
 Up[:6] = 0
+Up *= np.pi
 x = np.linspace(0,1,11)
 # Up[:11/2,:11/2] = 1
 

@@ -46,15 +46,14 @@ class Walk:
 		Concentration is now a matrix containing the entire area of the
 		walk. This makes the coding simpler.
 		"""
-		print 'starting, %d walkers'%self.nwalkers
 		if self.d !=1:
 			nx,ny = np.shape(concentration)
 			self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,nx),\
 			np.linspace(self.y0,self.y1,ny)) 	#should be only if needed
 		else:
 			self.x = np.linspace(self.x0,self.x1,len(concentration))
+		# print concentration
 		a = self.InitializeTimestep(concentration)
-
 		steps = 100
 		counter = 0
 		indices = []
@@ -77,26 +76,33 @@ class Walk:
 		counter = 0
 		# boundary = self.ReturnBoundary(walkers_leaving_area,concentration)
 		boundary = self.ReturnBoundary(self.walkers,concentration)
-		print 'done, %d walkers left'%self.nwalkers
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
 		boundary /= (self.M*self.Hc)
-		return boundary		
+		# print 'Lost %d walker(s)'%int(self.M*self.Hc*(dissum-np.sum(boundary)))
+		return boundary + concentration
 
 	
 	def InitializeTimestep(self,C):
 		"""C = concentration
 		should work in 1d as well now"""
 		nwalkers_tmp = self.nwalkers
+		if nwalkers_tmp != 0: print 'this should not happen'
 		C_tot = np.sum(C)
-		N_walkers_tot = int(self.M*self.Hc*C_tot - nwalkers_tmp)
+		N_walkers_tot = int(self.M*self.Hc*C_tot)
+		
+		#There is some sort of leftover energy which must be accoounted for
+		# print '"energy" left: %.16f'%(C_tot - N_walkers_tot/(self.M*self.Hc))
 
 		if C_tot == 0 or N_walkers_tot <= 0:
 			return None
 		self.gradient = self.CalculateGradient(C)
+		# Most walkers are lost here!!!
+
 		if self.d ==1:
 			for i in xrange(len(C)):
 				n = int((C[i]/C_tot)*N_walkers_tot)
+				C[i] -= n/(self.M*self.Hc)
 				self.put_walkers(n,i,0)
 		if self.d ==2:
 			for i in xrange(len(C)):
@@ -105,6 +111,21 @@ class Walk:
 					# print i,j
 					self.put_walkers(n,i,j)
 		self.nwalkers = len(self.walkers)
+		lost = N_walkers_tot - self.nwalkers
+		if lost >0:
+			# print 'some %d walkers were lost, placing them'%lost
+			while lost >0:
+				if self.d==1:
+					i = np.where(C==C.max())[0][0]
+					C[i] -= 1/(self.M*self.Hc)
+					j = 0
+					# print 'i=',i, C[i], self.x[i]
+				elif self.d==2:
+					i,j = np.where(C==C.max())
+					i = i[0]; j = j[0]
+					C[i,j] -= 1/(self.M*self.Hc)
+				lost -= 1
+				self.put_walkers(1,i,j)
 		return 1
 
 
@@ -127,7 +148,7 @@ class Walk:
 		from self.advance()"""
 		# print concentration
 		boundary = np.zeros(np.shape(concentration))
-		print 'starting %d walkers'%self.nwalkers
+		# print 'starting %d walkers'%self.nwalkers
 		if self.d ==1:
 			dx = self.x[1]-self.x[0]
 			cont = 0
@@ -135,7 +156,7 @@ class Walk:
 				cont += 1
 				index = self.FindPosition(walker,dx,0)
 				boundary[index] += 1
-		print 'finished, have placed %d walkers'%np.sum(boundary)
+		# print 'finished, have placed %d walkers'%np.sum(boundary)
 		if self.d ==2:
 			dx = self.X[0,1]-self.X[0,0]
 			dy = self.Y[1,0]-self.Y[0,0]
@@ -153,8 +174,8 @@ class Walk:
 		indx = [-1,-1]
 		if self.d==1:
 			for i in xrange(len(self.x)+1):
-				# print 'i = %d, x[i] = '%i,self.x[i]
-				if abs(pos-self.x[i])<dx/2.0:
+				# print 'i = %d, x[i] = '%i,self.x[i],pos-self.x[i]
+				if np.abs(pos-self.x[i])<dx/2.0:
 					return i
 		elif self.d==2:
 			if pos[0]>self.X[0,-1] or pos[0]<self.X[0,0]:
@@ -174,7 +195,8 @@ class Walk:
 				if pos[1]-self.Y[j,j]<dy:
 					indx[1] = j
 					break
-			# print indx
+			if indx[0] == -1 or indx[-1] == -1:
+				print 'økadjs g'
 			return indx
 
 	def CalculateGradient(self,C):
@@ -226,7 +248,7 @@ class Walk:
 					f += f/2.0
 				elif r[indx]+f*s[indx]-b >0:
 					f -= f/2.0
-				it += 1
+				# it += 1
 			return r+f*s -(1-f)*s
 
 
@@ -244,7 +266,7 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	if True:
+	if False:
 		"1D"
 		n = 11
 		U = np.zeros(n)
@@ -261,7 +283,7 @@ if __name__ == '__main__':
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
 		mpl.show()
-	if False:
+	if True:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 		U = np.zeros((11,11))

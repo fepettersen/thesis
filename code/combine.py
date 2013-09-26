@@ -133,9 +133,9 @@ class MultiscaleSolver:
 				# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 			elif self.d==1:
 				hole = self.U[x[0][0]:x[0][1]+1]
-				print hole
+				# print hole
 				self.U[x[0][0]:x[0][1]+1] = solver.advance(hole)
-				print self.U[x[0][0]:x[0][1]+1]
+				# print self.U[x[0][0]:x[0][1]+1]
 			counter += 1
 		self.Up = self.U.copy()
 
@@ -185,9 +185,9 @@ if __name__ == '__main__':
 		test.setInitialCondition(Up)
 		im.append(mpl.plot(x,Up,'b-'))
 		while t<T:
-			print '%d of %d'%(t+1,T)
+			t += 1
+			print '%d of %d'%(t,T),' sum(U) = %g'%np.sum(test.Up)
 			im.append(mpl.plot(x,test.U,'b-'))
 			test.Solve()
-			t += 1
 		ani = animation.ArtistAnimation(fig,im)
 		mpl.show()
