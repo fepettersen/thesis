@@ -79,7 +79,6 @@ class Walk:
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
 		boundary /= (self.M*self.Hc)
-		# print 'Lost %d walker(s)'%int(self.M*self.Hc*(dissum-np.sum(boundary)))
 		return boundary + concentration
 
 	
@@ -90,6 +89,7 @@ class Walk:
 		if nwalkers_tmp != 0: print 'this should not happen'
 		C_tot = np.sum(C)
 		N_walkers_tot = int(self.M*self.Hc*C_tot)
+		# print 'N_walkers_tot = ',N_walkers_tot
 		
 		#There is some sort of leftover energy which must be accoounted for
 		# print '"energy" left: %.16f'%(C_tot - N_walkers_tot/(self.M*self.Hc))
@@ -108,9 +108,10 @@ class Walk:
 			for i in xrange(len(C)):
 				for j in xrange(len(C[i])):
 					n = int((C[i][j]/C_tot)*N_walkers_tot)
-					# print i,j
+					C[i][j] -= n/(self.M*self.Hc)
 					self.put_walkers(n,i,j)
 		self.nwalkers = len(self.walkers)
+		# print 'self.walkers = %d, N_walkers_tot = %d'%(self.nwalkers,N_walkers_tot)
 		lost = N_walkers_tot - self.nwalkers
 		if lost >0:
 			# print 'some %d walkers were lost, placing them'%lost
@@ -277,7 +278,7 @@ if __name__ == '__main__':
 		fig  = mpl.figure()
 		walk = Walk(area,1.0)
 		while t<10:
-			print 't = %d'%t
+			print 't = %d'%t, ' sum(U) = ',np.sum(U)
 			im.append(mpl.plot(x,U,'b-'))
 			U = walk.advance(U)	#[[1,1],[0,0]]
 			t+=1
@@ -294,7 +295,7 @@ if __name__ == '__main__':
 		wframe = ax.plot_wireframe(X,Y,U)
 		mpl.draw()
 		while t<10:
-			print 't = %d'%t
+			print 't = %d'%t, ' sum(U) = ',np.sum(U)
 			ax.collections.remove(wframe)
 			U = walk.advance(U)	#[[1,1],[0,0]]
 			t+=1
