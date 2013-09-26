@@ -220,37 +220,27 @@ class Walk:
 		if not self.HasLeftArea(tmp):
 			return tmp
 		else:
-			indx = 0
-			b = 1 	#find the relevant boundary
-			if self.d==1:
-				b = self.x0 if tmp[indx]-self.x0<0 else self.x1
-			elif self.d==2:
-				if tmp[0]-self.x0<=0:
-					indx = 0
-					b = self.x0
-				elif tmp[0]-self.x1>=0:
-					indx = 0
-					b = self.x1
-				elif tmp[1]-self.y0<=0:
-					indx = 1
-					b = self.y0
-				else:
-					indx = 1
-					b = self.y1
-			f = 0.5
-			it = 0
-			while f>eps:
-				if r[indx]+f*s[indx]-b<=eps:
-					r += f*s
-					r -= (1-f)*s
-					# if it == 0: print 'tmp = ',tmp,' r = ',r,' s = ',s,' f = %g'%f
-					return r
-				elif r[indx]+f*s[indx]-b <0:
-					f += f/2.0
-				elif r[indx]+f*s[indx]-b >0:
-					f -= f/2.0
-				# it += 1
-			return r+f*s -(1-f)*s
+			if self.d ==1:
+				if tmp[0]<self.x0:
+					b = -(tmp[0]-(self.x0-r[0]))
+					return r+b
+				elif tmp[0]>self.x1:
+					b = -(tmp[0]-(self.x1-r[0]))
+					return r+b
+			elif self.d == 2:
+				if tmp[0]<self.x0:
+					b = -(tmp[0]-(self.x0-r[0]))
+					r[0] += b
+				elif tmp[0]>self.x1:
+					b = -(tmp[0]-(self.x1-r[0]))
+					r[0] += b
+				if tmp[1]<self.y0:
+					b = -(tmp[1]-(self.y0-r[1]))
+					r[1] += b
+				elif tmp[1]>self.y1:
+					b = -(tmp[1]-self.y1-r[1])
+					r[1] += b
+				return r
 
 
 
@@ -267,7 +257,7 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	if False:
+	if 1:
 		"1D"
 		n = 11
 		U = np.zeros(n)
@@ -284,7 +274,7 @@ if __name__ == '__main__':
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
 		mpl.show()
-	if True:
+	if 0:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 		U = np.zeros((11,11))
