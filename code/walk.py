@@ -55,26 +55,25 @@ class Walk:
 		# print concentration
 		a = self.InitializeTimestep(concentration)
 		steps = 100
-		counter = 0
 		indices = []
 		walkers_leaving_area = []
+
 		if not a:
 			return np.zeros(np.shape(concentration))
 		for walker in xrange(self.nwalkers):
 			"loop over all walkers"	
-			s = self.factor*np.random.standard_normal([self.d,steps])
+			# s = self.factor*np.random.standard_normal([self.d,steps])
+			s = self.factor*(1.0 - 2.0*np.random.rand(self.d,steps)) 	#uniform distribution
 			r0 = self.walkers[walker]
+
 			for i in xrange(steps):
-				# r0[:] += s[:,i]
 				r0[:] = self.checkpos(r0,s[:,i])
-			# for i in xrange(self.d):
-			# 	r0[i] += np.sum(s[i])+self.factor*self.gradient[i]
+			self.walkers[walker][:] = r0[:]
+			
 			if self.HasLeftArea(r0):
+				print 'am I doing anything at all?'
 				indices.append(counter)
 				walkers_leaving_area.append(self.walkers[walker]) 
-			counter += 1
-		counter = 0
-		# boundary = self.ReturnBoundary(walkers_leaving_area,concentration)
 		boundary = self.ReturnBoundary(self.walkers,concentration)
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
@@ -179,16 +178,16 @@ class Walk:
 				if np.abs(pos-self.x[i])<dx/2.0:
 					return i
 		elif self.d==2:
-			if pos[0]>self.X[0,-1] or pos[0]<self.X[0,0]:
-				# print 'this should not happen now'
+			if pos[0]>self.x1 or pos[0]<self.x0:
+				print 'this should not happen now! pos[x] = ',pos[0]
 				pos[0] = np.fmod(pos[0],(self.X[0,-1]-self.X[0,0])+dx)+self.X[0,0]
 				pos[0] *= ((self.X[0,-1]-self.X[0,0])+dx) if pos[0]<0 else 1
 			for i in xrange(len(self.X)):
 				if pos[0]-self.X[i,i]<dx:
 					indx[0] = i
 					break
-			if pos[1]>self.Y[-1,0] or pos[1]<self.Y[0,0]:
-				# print 'this should not happen now'
+			if pos[1]>self.y1 or pos[1]<self.y0:
+				print 'this should not happen now, pos[y] = ',pos[1]
 				pos[1] = np.fmod(pos[1],(self.Y[-1,0]-self.Y[0,0])+dy)+self.Y[0,0]
 				pos[1] *= ((self.Y[-1,0]-self.Y[0,0])+dx) if pos[1]<0 else 1
 				# print pos[1]
@@ -214,33 +213,28 @@ class Walk:
 					grad[i,j] = (C[i][j]-C[i][j-1])/((self.Y[-1,-1]-self.Y[0,0])/len(self.Y))
 		return grad
 
-	def checkpos(self,r,s,eps = 1e-5):
-		"""Implements reflecting boundaries -- Has a bug!"""
+	def checkpos(self,r,s):
+		"""Implements reflecting boundaries -- Need to adjust the boundaries by dx/2 so each thing has 
+		as much space"""
 		tmp = r+s
 		if not self.HasLeftArea(tmp):
 			return tmp
 		else:
 			if self.d ==1:
 				if tmp[0]<self.x0:
-					b = -(tmp[0]-(self.x0-r[0]))
-					return r+b
+					tmp[0] = self.x0 - (tmp[0]-self.x0)
 				elif tmp[0]>self.x1:
-					b = -(tmp[0]-(self.x1-r[0]))
-					return r+b
+					tmp[0] = self.x1 - (tmp[0]-self.x1)
 			elif self.d == 2:
 				if tmp[0]<self.x0:
-					b = -(tmp[0]-(self.x0-r[0]))
-					r[0] += b
+					tmp[0] = self.x0 - (tmp[0]-self.x0)
 				elif tmp[0]>self.x1:
-					b = -(tmp[0]-(self.x1-r[0]))
-					r[0] += b
+					tmp[0] = self.x1 - (tmp[0]-self.x1)
 				if tmp[1]<self.y0:
-					b = -(tmp[1]-(self.y0-r[1]))
-					r[1] += b
+					tmp[1] = self.y0 - (tmp[1]-self.y0)
 				elif tmp[1]>self.y1:
-					b = -(tmp[1]-self.y1-r[1])
-					r[1] += b
-				return r
+					tmp[1] = self.y1 - (tmp[1]-self.y1)
+			return tmp
 
 
 
