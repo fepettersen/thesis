@@ -140,7 +140,7 @@ class MultiscaleSolver:
 		self.Up = self.U.copy()
 
 t = 0
-T = 10
+T = 20
 def setup_plot():
 	mpl.ion()
 	fig  = mpl.figure()
@@ -149,7 +149,7 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	if False:
+	if True:
 		"2D"
 		nx = 11; ny =11
 		Up = np.zeros((nx,ny))
@@ -171,7 +171,7 @@ if __name__ == '__main__':
 			# time.sleep(1)
 			t+=1
 			# test.SaveState()
-	if True:
+	if Fasle:
 		"1D"
 		im = []; fig = mpl.figure()
 		n = 11

@@ -51,14 +51,24 @@ class Walk:
 			nx,ny = np.shape(concentration)
 			self.X,self.Y = np.meshgrid(np.linspace(self.x0,self.x1,nx),\
 			np.linspace(self.y0,self.y1,ny)) 	#should be only if needed
+			self.dx = self.X[0,1]-self.X[0,0]
+			self.dy = self.Y[1,0]-self.Y[0,0]
+			self.x0_ = self.x0 - self.dx/2.0
+			self.x1_ = self.x1 + self.dx/2.0
+			self.y0_ = self.y0 - self.dy/2.0
+			self.y1_ = self.y1 + self.dy/2.0
 		else:
 			self.x = np.linspace(self.x0,self.x1,len(concentration))
+			self.dx = self.x[1]-self.x[0]
+			self.dy = 0
+			self.x0_ = self.x0 - self.dx/2.0
+			self.x1_ = self.x1 + self.dx/2.0
 		# print concentration
 		a = self.InitializeTimestep(concentration)
 		steps = 100
 		indices = []
 		walkers_leaving_area = []
-
+		counter = 0
 		if not a:
 			return np.zeros(np.shape(concentration))
 		for walker in xrange(self.nwalkers):
@@ -70,11 +80,11 @@ class Walk:
 			for i in xrange(steps):
 				r0[:] = self.checkpos(r0,s[:,i])
 			self.walkers[walker][:] = r0[:]
-			
-			if self.HasLeftArea(r0):
-				print 'am I doing anything at all?'
-				indices.append(counter)
-				walkers_leaving_area.append(self.walkers[walker]) 
+			# if self.HasLeftArea(r0):
+			# 	# print 'am I doing anything at all?'
+			# 	indices.append(counter)
+			# 	walkers_leaving_area.append(self.walkers[walker]) 
+			# counter += 1
 		boundary = self.ReturnBoundary(self.walkers,concentration)
 		self.walkers = []
 		self.nwalkers = len(self.walkers)
@@ -180,7 +190,7 @@ class Walk:
 					"This test must be implemented in 2D, and in self.checkpos()!"
 					return i
 		elif self.d==2:
-			if pos[0]>self.x1 or pos[0]<self.x0:
+			if pos[0]>self.x1_ or pos[0]<self.x0_:
 				print 'this should not happen now! pos[x] = ',pos[0]
 				pos[0] = np.fmod(pos[0],(self.X[0,-1]-self.X[0,0])+dx)+self.X[0,0]
 				pos[0] *= ((self.X[0,-1]-self.X[0,0])+dx) if pos[0]<0 else 1
@@ -188,7 +198,7 @@ class Walk:
 				if np.abs(pos[0]-self.X[i,i])<dx/2.0:
 					indx[0] = i
 					break
-			if pos[1]>self.y1 or pos[1]<self.y0:
+			if pos[1]>self.y1_ or pos[1]<self.y0_:
 				print 'this should not happen now, pos[y] = ',pos[1]
 				pos[1] = np.fmod(pos[1],(self.Y[-1,0]-self.Y[0,0])+dy)+self.Y[0,0]
 				pos[1] *= ((self.Y[-1,0]-self.Y[0,0])+dx) if pos[1]<0 else 1
@@ -224,19 +234,19 @@ class Walk:
 			return tmp
 		else:
 			if self.d ==1:
-				if tmp[0]<self.x0:
-					tmp[0] = self.x0 - (tmp[0]-self.x0)
-				elif tmp[0]>self.x1:
-					tmp[0] = self.x1 - (tmp[0]-self.x1)
+				if tmp[0]<self.x0_:
+					tmp[0] = self.x0_ - (tmp[0]-self.x0_)
+				elif tmp[0]>self.x1_:
+					tmp[0] = self.x1_ - (tmp[0]-self.x1_)
 			elif self.d == 2:
-				if tmp[0]<self.x0:
-					tmp[0] = self.x0 - (tmp[0]-self.x0)
-				elif tmp[0]>self.x1:
-					tmp[0] = self.x1 - (tmp[0]-self.x1)
-				if tmp[1]<self.y0:
-					tmp[1] = self.y0 - (tmp[1]-self.y0)
-				elif tmp[1]>self.y1:
-					tmp[1] = self.y1 - (tmp[1]-self.y1)
+				if tmp[0]<self.x0_:
+					tmp[0] = self.x0_ - (tmp[0]-self.x0_)
+				elif tmp[0]>self.x1_:
+					tmp[0] = self.x1_ - (tmp[0]-self.x1_)
+				if tmp[1]<self.y0_:
+					tmp[1] = self.y0_ - (tmp[1]-self.y0_)
+				elif tmp[1]>self.y1_:
+					tmp[1] = self.y1_ - (tmp[1]-self.y1_)
 			return tmp
 
 
