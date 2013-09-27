@@ -42,9 +42,10 @@ class Walk:
 
 	def advance(self,concentration):
 		"""
-		will become the new advance function. 
 		Concentration is now a matrix containing the entire area of the
-		walk. This makes the coding simpler.
+		walk. This makes the coding simpler. The conversion should possibly 
+		be done in the combine-class seeing as most random walk solvers do 
+		not have this form of conversion...
 		"""
 		if self.d !=1:
 			nx,ny = np.shape(concentration)
@@ -151,9 +152,9 @@ class Walk:
 		# print 'starting %d walkers'%self.nwalkers
 		if self.d ==1:
 			dx = self.x[1]-self.x[0]
-			cont = 0
+			# cont = 0
 			for walker in walkers:
-				cont += 1
+				# cont += 1
 				index = self.FindPosition(walker,dx,0)
 				boundary[index] += 1
 		# print 'finished, have placed %d walkers'%np.sum(boundary)
@@ -176,6 +177,7 @@ class Walk:
 			for i in xrange(len(self.x)+1):
 				# print 'i = %d, x[i] = '%i,self.x[i],pos-self.x[i]
 				if np.abs(pos-self.x[i])<dx/2.0:
+					"This test must be implemented in 2D, and in self.checkpos()!"
 					return i
 		elif self.d==2:
 			if pos[0]>self.x1 or pos[0]<self.x0:
@@ -183,7 +185,7 @@ class Walk:
 				pos[0] = np.fmod(pos[0],(self.X[0,-1]-self.X[0,0])+dx)+self.X[0,0]
 				pos[0] *= ((self.X[0,-1]-self.X[0,0])+dx) if pos[0]<0 else 1
 			for i in xrange(len(self.X)):
-				if pos[0]-self.X[i,i]<dx:
+				if np.abs(pos[0]-self.X[i,i])<dx/2.0:
 					indx[0] = i
 					break
 			if pos[1]>self.y1 or pos[1]<self.y0:
@@ -192,11 +194,12 @@ class Walk:
 				pos[1] *= ((self.Y[-1,0]-self.Y[0,0])+dx) if pos[1]<0 else 1
 				# print pos[1]
 			for j in xrange(len(self.Y)):
-				if pos[1]-self.Y[j,j]<dy:
+				if np.abs(pos[1]-self.Y[j,j])<dy/2.0:
 					indx[1] = j
 					break
 			if indx[0] == -1 or indx[-1] == -1:
 				print 'økadjs g'
+			# print indx
 			return indx
 
 	def CalculateGradient(self,C):
@@ -251,7 +254,7 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	if 1:
+	if 0:
 		"1D"
 		n = 11
 		U = np.zeros(n)
@@ -268,7 +271,7 @@ if __name__ == '__main__':
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
 		mpl.show()
-	if 0:
+	if 1:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 		U = np.zeros((11,11))
