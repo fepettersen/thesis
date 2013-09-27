@@ -86,7 +86,11 @@ while t<T:
 ########################
 
 commandline_arguments = []
-
+if not DEBUG:
+	"Write the values of all parameters to a .txt file"
+	os.system('cp *.py %s'%code_path)
+	f = open(parameter_path+'parameters.txt')
+	f.close()
 # print this_dir
 f = open(this_dir +'/doc/web/index.html','r')
 html = f.read()
