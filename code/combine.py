@@ -3,7 +3,7 @@
 
 from diff2d import Diffusion
 from walk import Walk, np
-import time
+import time, os
 import matplotlib.pyplot as mpl, inspect
 import matplotlib.animation as animation
 
@@ -108,11 +108,12 @@ class MultiscaleSolver:
 		# print 'boundary: ',boundary
 		# self.U[]
 
-	def SaveState(self,filename=None,format='npy'):
+	def SaveState(self,path=None,format='npy'):
 		t = time.gmtime()
 		datetime = '%02d%02d%d_%d%d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
-		if filename is None:
-			filename = 'Results_%s_%04d'%(datetime,self.IterationCounter)
+		filename = 'Results_%s_%04d'%(datetime,self.IterationCounter)
+		if path is not None:
+			filename = os.path.join(path,filename)
 		if format == 'npy':
 			np.save(filename,self.U)
 		elif format == 'txt' or format =='.txt':
@@ -128,12 +129,12 @@ class MultiscaleSolver:
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
 			if self.d==2:
-				"Average of the two solutions"
+				"Average of the two solutions, should be least squares"
 				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
 				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1])
 				# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 			elif self.d==1:
-				"Average of the two solutions"
+				"Average of the two solutions, should be least squares"
 				hole = self.U[x[0][0]:x[0][1]+1].copy()
 				# print hole
 				self.U[x[0][0]:x[0][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1])
