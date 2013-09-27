@@ -128,13 +128,15 @@ class MultiscaleSolver:
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
 			if self.d==2:
-				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
-				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = solver.advance(hole)
+				"Average of the two solutions"
+				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
+				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1])
 				# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
 			elif self.d==1:
-				hole = self.U[x[0][0]:x[0][1]+1]
+				"Average of the two solutions"
+				hole = self.U[x[0][0]:x[0][1]+1].copy()
 				# print hole
-				self.U[x[0][0]:x[0][1]+1] = solver.advance(hole)
+				self.U[x[0][0]:x[0][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1])
 				# print self.U[x[0][0]:x[0][1]+1]
 			counter += 1
 		self.Up = self.U.copy()
