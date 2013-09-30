@@ -18,6 +18,7 @@ DEBUG = False
 plot = True
 save = True
 gitpush = True
+add_text_to_web = True
 
 ########################
 # - Make directories - #
@@ -27,11 +28,6 @@ this_dir = right_split(os.getcwd(),'/')
 t = time.gmtime()
 datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 
-# This will be what is added to the webpage after a new run
-html_code = """<h3><a name="%s" class="anchor" 
-href="#%s"><span class="octicon octicon-link">
-</span></a>New experiment %s.</h3>
-"""%(datetime,datetime,time.ctime())
 
 parent_path = this_dir +'/doc/results/experiment_%s'%datetime
 code_path = parent_path+'/code'
@@ -47,6 +43,7 @@ if not DEBUG:
 ########################
 # -- Run simulation -- #
 ########################
+images = []
 
 t = 0
 T = 20
@@ -80,12 +77,23 @@ while t<T:
 		mpl.draw()
 		if t==0 or t==int(T/2) or t==T-1:
 			mpl.savefig(result_path+'/from_simulation%s_%d'%(datetime,t),format='eps')
+			images.append(result_path+'/from_simulation%s_%d'%(datetime,t))
 	# time.sleep(1)
 	t+=1
 
 ########################
 # -- update website -- #
 ########################
+# This will be what is added to the webpage after a new run
+html_code = """<h3><a name="%s" class="anchor" 
+href="#%s"><span class="octicon octicon-link">
+</span></a>New experiment %s.</h3>
+<img src="%s" height="42" width="42">
+"""%(datetime,datetime,time.ctime(),images[0])
+
+if add_text_to_web:
+	explanaiton = raw_input('Add description (optional):  ')
+	html_code += explanaiton
 
 commandline_arguments = []
 if not DEBUG:
@@ -103,14 +111,15 @@ part = match.span()[-1]+1
 
 sum_html = html[:part]+html_code+html[part:]
 
-# if not DEBUG:
-# 	f = open(this_dir +'/doc/web/index.html','w')
-# 	f.write(sum_html)
-# 	f.close()
+if not DEBUG:
+	f = open(this_dir +'/doc/web/index.html','w')
+	f.write(sum_html)
+	f.close()
 
 
 if gitpush:
 	"Add, commit and push the results to github -- Doesnt work because of directory..."
+	os.system('cd %s'%this_dir)
 	os.system('git checkout master') 	#Force branch master!
 	os.system('git add .')
 	os.system('git commit -am "Ran new experiment"')
@@ -118,6 +127,7 @@ if gitpush:
 	os.system('git merge master')
 	os.system('git push')
 	os.system('git checkout master')
+	os.system('cd code')
 # os.makedir(parent_path)
 # os.makedir(code_path)
 # os.makedir(parameter_path)
