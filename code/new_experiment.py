@@ -27,7 +27,7 @@ add_text_to_web = True
 this_dir = right_split(os.getcwd(),'/')
 t = time.gmtime()
 datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
-
+url = 'https://github.com/fepettersen/thesis/tree/master/doc/results'+'experiment_%s'%datetime
 
 parent_path = this_dir +'/doc/results/experiment_%s'%datetime
 code_path = parent_path+'/code'
@@ -77,7 +77,7 @@ while t<T:
 		mpl.draw()
 		if t==0 or t==int(T/2) or t==T-1:
 			mpl.savefig(result_path+'/from_simulation%s_%d'%(datetime,t),format='eps')
-			images.append(result_path+'/from_simulation%s_%d'%(datetime,t))
+			images.append('/from_simulation%s_%d'%(datetime,t))
 	# time.sleep(1)
 	t+=1
 
@@ -89,7 +89,7 @@ html_code = """<h3><a name="%s" class="anchor"
 href="#%s"><span class="octicon octicon-link">
 </span></a>New experiment %s.</h3>
 <img src="%s" height="42" width="42">
-"""%(datetime,datetime,time.ctime(),images[0])
+"""%(datetime,datetime,time.ctime(),url+images[0])
 
 if add_text_to_web:
 	explanaiton = raw_input('Add description (optional):  ')
