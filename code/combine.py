@@ -110,7 +110,7 @@ class MultiscaleSolver:
 
 	def SaveState(self,path=None,format='npy'):
 		t = time.gmtime()
-		datetime = '%02d%02d%d_%d%d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
+		datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		filename = 'Results_%s_%04d'%(datetime,self.IterationCounter)
 		if path is not None:
 			filename = os.path.join(path,filename)

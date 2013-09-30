@@ -25,7 +25,7 @@ gitpush = True
 
 this_dir = right_split(os.getcwd(),'/')
 t = time.gmtime()
-datetime = '%02d%02d%d_%d%d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
+datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 
 # This will be what is added to the webpage after a new run
 html_code = """<h3><a name="%s" class="anchor" 
@@ -78,6 +78,8 @@ while t<T:
 	if plot:
 		wframe = ax.plot_wireframe(X,Y,test.Up)
 		mpl.draw()
+		if t==0 or t==int(T/2) or t==T-1:
+			mpl.savefig(result_path+'/from_simulation%s_%d'%(datetime,t),format='eps')
 	# time.sleep(1)
 	t+=1
 
@@ -89,7 +91,7 @@ commandline_arguments = []
 if not DEBUG:
 	"Write the values of all parameters to a .txt file"
 	os.system('cp *.py %s'%code_path)
-	f = open(parameter_path+'parameters.txt')
+	f = open(parameter_path+'/parameters.txt','w')
 	f.close()
 # print this_dir
 f = open(this_dir +'/doc/web/index.html','r')
@@ -101,10 +103,10 @@ part = match.span()[-1]+1
 
 sum_html = html[:part]+html_code+html[part:]
 
-if not DEBUG:
-	f = open(this_dir +'/doc/web/index.html','w')
-	f.write(sum_html)
-	f.close()
+# if not DEBUG:
+# 	f = open(this_dir +'/doc/web/index.html','w')
+# 	f.write(sum_html)
+# 	f.close()
 
 
 if gitpush:
