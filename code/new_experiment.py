@@ -14,7 +14,7 @@ def right_split(s,delimiter):
 			return s[:i]
 		i -= 1
 
-DEBUG = False
+DEBUG = True
 plot = False
 save = False
 gitpush = False
@@ -28,7 +28,6 @@ this_dir = right_split(os.getcwd(),'/')
 t = time.gmtime()
 datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 url = 'https://github.com/fepettersen/thesis/tree/master/doc/results'+'/experiment_%s'%datetime
-print url
 parent_path = this_dir +'/doc/results/experiment_%s'%datetime
 code_path = parent_path+'/code'
 parameter_path = parent_path+'/parameters'
@@ -93,6 +92,8 @@ href="#%s"><span class="octicon octicon-link">
 </span></a>New experiment %s.</h3>
 <img src="%s" height="42" width="42">
 """%(datetime,datetime,time.ctime(),result_path +images[0])
+
+print result_path +images[0]
 
 if add_text_to_web:
 	explanaiton = raw_input('Add description (optional):  ')

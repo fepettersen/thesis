@@ -132,7 +132,10 @@ class MultiscaleSolver:
 				"Average of the two solutions, should be least squares"
 				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
 				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1])
-				# print self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1]
+				''' # least square
+				tmp = solver.advance(hole)
+				m,c = np.linalg.lstsq(tmp,hole)[0],tmp
+				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = m*tmp+c'''
 			elif self.d==1:
 				"Average of the two solutions, should be least squares"
 				hole = self.U[x[0][0]:x[0][1]+1].copy()
@@ -174,7 +177,7 @@ if __name__ == '__main__':
 			# time.sleep(1)
 			t+=1
 			# test.SaveState()
-	if Fasle:
+	if False:
 		"1D"
 		im = []; fig = mpl.figure()
 		n = 11
