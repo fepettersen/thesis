@@ -91,7 +91,7 @@ commandline_arguments = []
 if not DEBUG:
 	"Write the values of all parameters to a .txt file"
 	os.system('cp *.py %s'%code_path)
-	f = open(parameter_path+'/parameters.txt','w')
+	f = open(parameter_path+'/parameters.txt')
 	f.close()
 # print this_dir
 f = open(this_dir +'/doc/web/index.html','r')
@@ -103,15 +103,13 @@ part = match.span()[-1]+1
 
 sum_html = html[:part]+html_code+html[part:]
 
-# if not DEBUG:
-# 	f = open(this_dir +'/doc/web/index.html','w')
-# 	f.write(sum_html)
-# 	f.close()
+if not DEBUG:
+	f = open(this_dir +'/doc/web/index.html','w')
+	f.write(sum_html)
+	f.close()
 
 
 if gitpush:
-	"Add, commit and push the results to github -- Doesnt work because of directory..."
-	os.system('git checkout master') 	#Force branch master!
 	os.system('git add .')
 	os.system('git commit -am "Ran new experiment"')
 	os.system('git checkout gh-pages')

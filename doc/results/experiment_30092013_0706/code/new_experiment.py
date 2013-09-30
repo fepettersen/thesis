@@ -110,8 +110,6 @@ sum_html = html[:part]+html_code+html[part:]
 
 
 if gitpush:
-	"Add, commit and push the results to github -- Doesnt work because of directory..."
-	os.system('git checkout master') 	#Force branch master!
 	os.system('git add .')
 	os.system('git commit -am "Ran new experiment"')
 	os.system('git checkout gh-pages')
