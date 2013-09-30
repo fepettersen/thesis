@@ -76,7 +76,7 @@ while t<T:
 		wframe = ax.plot_wireframe(X,Y,test.Up)
 		mpl.draw()
 		if t==0 or t==int(T/2) or t==T-1:
-			mpl.savefig(result_path+'/from_simulation%s_%d'%(datetime,t),format='eps')
+			mpl.savefig(result_path+'/from_simulation%s_%d.eps'%(datetime,t))
 			images.append('/from_simulation%s_%d'%(datetime,t))
 	# time.sleep(1)
 	t+=1
