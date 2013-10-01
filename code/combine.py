@@ -8,11 +8,8 @@ import matplotlib.pyplot as mpl, inspect
 import matplotlib.animation as animation
 
 class MultiscaleSolver:
-	"""docstring for MultiscaleSolver
-	Combine a normal diffusion PDE solver with random walk model for 
-	diffusion in certain areas
-	Only works in 2D -- beeing rewritten to support 1d as well!"""
-
+	"""Combine a normal diffusion PDE solver with random walk model for 
+	diffusion in certain areas"""
 
 
 	def __init__(self,mesh,PdeSolver=None):
@@ -91,6 +88,7 @@ class MultiscaleSolver:
 		self.Up = U0
 
 	def setBoundary(self,boundary,index):
+		"""Not used any more"""
 		print inspect.stack()[0][3]		#print name of current function
 		x0 = self.Indeces[index][0][0]
 		x1 = self.Indeces[index][0][1]
@@ -123,7 +121,7 @@ class MultiscaleSolver:
 		self.IterationCounter += 1
 
 	def Solve(self):
-		"""Need to support 1d as well"""
+		"""Now also with 1d support"""
 		self.U = self.PdeSolver.advance(self.U,self.Up)
 		counter = 0
 		for solver in self.WalkSolvers:
