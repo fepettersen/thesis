@@ -264,7 +264,7 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	if 1:
+	if 0:
 		"1D"
 		n = 11
 		U = np.zeros(n)
@@ -281,7 +281,7 @@ if __name__ == '__main__':
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
 		mpl.show()
-	if 0:
+	if 1:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 		U = np.zeros((11,11))
@@ -289,12 +289,14 @@ if __name__ == '__main__':
 		area = [[0,0],[1,1]]
 		fig,ax = setup_plot()
 		walk = Walk(area,1.0)
+		walk.factor = 7e-3
 		wframe = ax.plot_wireframe(X,Y,U)
 		mpl.draw()
-		while t<10:
+		while t<1:
 			print 't = %d'%t, ' sum(U) = ',np.sum(U)
 			ax.collections.remove(wframe)
 			U = walk.advance(U)	#[[1,1],[0,0]]
 			t+=1
 			wframe = ax.plot_wireframe(X,Y,U)
 			mpl.draw()
+	raw_input('Press Return..')

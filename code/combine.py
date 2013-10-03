@@ -127,10 +127,10 @@ class MultiscaleSolver:
 		for solver in self.WalkSolvers:
 			x = self.Indeces[counter]
 			if self.d==2:
-				"Average of the two solutions, should be least squares"
-				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
+				"Average of the two solutions -- Now using the previous timestep as input (looks better)"
+				hole = self.Up[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
 				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1])
-				''' # least square
+				''' # least squares (doesn't seem better)
 				tmp = solver.advance(hole)
 				m,c = np.linalg.lstsq(tmp,hole)[0],tmp
 				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = m*tmp+c'''

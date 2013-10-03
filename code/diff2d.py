@@ -8,26 +8,40 @@ import time
 
 class Diffusion:
 	"""2D diffusion equation solver with random walk implementation"""
-	def __init__(self,x=[0,1],y=[0,1],nx=10,D=1,d=1,dt=-1,solver='FE'):
+	def __init__(self,x=[0,1],y=[0,1],D=1,d=1,dt=-1,solver='FE'):
 		self.d = d 				# spatial dimension
-		self.n = nx				# spatial resolution
-		self.x = np.linspace(x[0],x[1],nx+1)
-		self.dx = self.x[1]-self.x[0]
-		self.dt = self.dx**2/3.0 if dt==-1 else dt
-		self._D = D*self.dt/(self.dx**2)
+		self.x = None
+		self.x0,self.x1 = x
+		self.y0,self.y1 = y
+		self.dt = dt
+		self.D = D
 		self.solver = solver
 		self.t = 0
-		if self.d ==2:
-			self.y = np.linspace(y[0],y[1],nx+1)
-			self.dy = self.y[1]-self.y[0]
-			self.dt = self.dx**2/5.0 if dt==-1 else dt
-			self._D = D*self.dt/(self.dx**2)
-			self.X,self.Y = np.meshgrid(self.x,self.y)
+
+
+		# self.n = nx				# spatial resolution
+		# self.x = np.linspace(x[0],x[1],nx+1)
+		# self.dx = self.x[1]-self.x[0]
+		# self.dt = self.dx**2/3.0 if dt==-1 else dt
+		# self._D = D*self.dt/(self.dx**2)
+		# self.solver = solver
+		# self.t = 0
+		# if self.d ==2:
+		# 	self.y = np.linspace(y[0],y[1],nx+1)
+		# 	self.dy = self.y[1]-self.y[0]
+		# 	self.dt = self.dx**2/5.0 if dt==-1 else dt
+		# 	self._D = D*self.dt/(self.dx**2)
+		# 	self.X,self.Y = np.meshgrid(self.x,self.y)
 
 	def advance(self,U,Up,plot=False):
 		if self.d==1:
+			if self.x == None:
+				self.Initialize_1d()
 			U = self.solve1D(U,Up,plot)
 		elif self.d==2:
+			if self.x == None:
+				nx,ny = np.shape(U)
+				self.Initialize_2d(nx,ny)
 			U = self.solve2D(U,Up,plot)
 		else:
 			print 'error!'
@@ -99,6 +113,23 @@ class Diffusion:
 			 2*self._D*(Up[-1,-2]-Up[-1,-1])
 		return U
 
+	def Initialize_1d(self,nx):
+		self.x = np.linspace(self.x0,self.x1,nx)
+		self.dx = self.x[1] - self.x[0]
+		if self.dt == -1:
+			self.dt = self.dx**2/3.0
+		self._D = self.D*self.dt/(self.dx**2)
+
+	def Initialize_2d(self,nx,ny):
+		self.x = np.linspace(self.x0,self.x1,nx)
+		self.y = np.linspace(self.y0,self.y1,ny)
+		self.dx = self.x[1] - self.x[0]
+		self.dy = self.y[1] - self.y[0]
+		if self.dt == -1:
+			self.dt = self.dx**2/5.0
+		self.X,self.Y = np.meshgrid(self.x,self.y)
+		self._D = self.D*self.dt/(self.dx*self.dx)		# Insert for proper condotion
+
 	def DirichletBC(self,U,Up,boundary='all'):
 		"""Dirichlet boundaryconditions. TO DO!"""
 		pass
@@ -126,30 +157,47 @@ class Diffusion:
 		return 0
 
 
-U = np.zeros((11,11))
-U = np.zeros(11)
-Up = np.ones(np.shape(U))
-Up[:6] = 0
-Up *= np.pi
-x = np.linspace(0,1,11)
-# Up[:11/2,:11/2] = 1
+
+twoD = True
+nx = 11
+ny = 11
+T = 120
+
+def f(x,y,t):
+	return x*y
 
 if __name__ == '__main__':
-	# solver = Diffusion(d=2)
-	solver = Diffusion(d=1)
-	im = []
-	# mpl.ion()
-	fig = mpl.figure()
-	# ax = fig.add_subplot(111,projection='3d')
-	# ax.set_autoscaley_on(False)
-	# wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
-	for i in xrange(50):
-		# mpl.draw()
-		# ax.collections.remove(wframe)
-		im.append(mpl.plot(x,Up,'b-'))
-		U = solver.advance(U,Up)
-		Up = U.copy()
-		# wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
-	ani = animation.ArtistAnimation(fig,im)
-	mpl.show()
+	if twoD:
+		U = np.zeros((nx,ny))
+		Up = np.zeros(np.shape(U))/np.sqrt(2)
+		# Up[nx/4:3*nx/4,nx/4:3*nx/4] = 1
+		Up[:nx/2,:nx/2] = 1
+		solver = Diffusion(d=2)
+		solver.f = np.vectorize(f)
+		mpl.ion()
+		fig = mpl.figure()
+		ax = fig.add_subplot(111,projection='3d')
+		ax.set_autoscaley_on(False)
+		for i in xrange(T):	
+			U = solver.advance(U,Up)
+			wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
+			mpl.draw()
+			ax.collections.remove(wframe)
+			Up = U.copy()
+	else:
+		U = np.zeros(11)
+		Up[:6] = 0
+		Up *= np.pi
+		x = np.linspace(0,1,11)
+		solver = Diffusion(d=1)
+		im = []
+		fig = mpl.figure()
+		for i in xrange(50):
+			im.append(mpl.plot(x,Up,'b-'))
+			U = solver.advance(U,Up)
+			Up = U.copy()
+			# wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
+		ani = animation.ArtistAnimation(fig,im)
+		mpl.show()
 
+	raw_input('Press Return..')
