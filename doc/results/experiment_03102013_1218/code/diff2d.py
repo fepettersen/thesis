@@ -180,7 +180,6 @@ if __name__ == '__main__':
 		ax.set_autoscaley_on(False)
 		for i in xrange(T):	
 			U = solver.advance(U,Up)
-			print solver.dt
 			wframe = ax.plot_wireframe(solver.X,solver.Y,Up)
 			mpl.draw()
 			ax.collections.remove(wframe)

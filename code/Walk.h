@@ -19,6 +19,7 @@ class Walk
 		double *FindPosition();
 		double **CalculateGradient();
 		double *checkpos();
+		void SetInitialCondition(double **);
 
 };
 

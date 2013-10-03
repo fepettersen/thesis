@@ -1,0 +1,45 @@
+In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation. 
+When a part of the solution acquired is replaced by the solution from another model, which in this case is stochastic, we will change the initial condition to the next iteration in time. 
+This might have a number of effects on our final solution. 
+When we solve a differential equation numerically we only get an approximation to the actual solution because we are using approximate derivatives (see figure \ref{illustrate_approximate_derivatives}). 
+We can investigate this type of error by doing two simulations of the same problem, but replacing the solution in one of the simuations in some area by the random walk model for one timestep. 
+
+\begin{lstlisting}
+ path = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_03102013_1218/results/'
+import glob
+
+i = [];e = [];s = []
+
+for excl in sorted(glob.glob(path+'Excl*')):
+	e.append(np.load(excl))
+
+for incl in sorted(glob.glob(path+'Incl*')):
+	i.append(np.load(incl))
+
+for j in xrange(len(i)):
+	s.append(np.max(np.abs(i[j]-e[j])))
+	print s[-1]
+\end{lstlisting}
+As we can see this will print the maximum absolute difference between the two solutions. 
+Since we are dealing with a diffusion process we expect that the first timestep should have the largest error and that the error will in time be killed by the diffusion process. 
+\begin{lstlisting}
+...
+0.0
+0.023472
+0.0089632
+0.00600192
+0.003841664
+0.0030460416
+0.00225273344
+0.001974472704
+0.0015961899008
+0.00145438941184
+0.00126162542592
+0.0011517103702
+0.00103607220175
+0.000954075453981
+0.000876626478367
+0.000815189817568
+\end{lstlisting}
+The error is larger than $\Delta t$ by a factor of $10$ ($\Delta t = 0.002$)... 
+This might be improved by increasing the number of walkers, or finding a better steplength for the walkers as well as improving the walk-algorithm etc..
