@@ -1,4 +1,5 @@
 #include "Walk.h"
+#include "Diffusion.h"
 #include <iostream>
 using namespace std;
 
@@ -14,7 +15,7 @@ int main()
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
 			if(i<n/2 && j<n/2){
-				C[i][j] = 1;
+				C[i][j] = 10;
 			}
 			else{
 				C[i][j] = 0;

@@ -17,6 +17,7 @@ class Walk
 		double *x;
 		double *y;
 		double dx,dy;
+		long idum;
 		
 
 		bool HasLeftArea(double *);

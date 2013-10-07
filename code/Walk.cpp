@@ -1,6 +1,36 @@
 #include "Walk.h"
 using namespace std;
 
+#define IA 16807
+#define IM 2147483647
+#define AM (1.0/IM)
+#define IQ 127773
+#define IR 2836
+#define MASK 123459876
+
+double ran0(long *idum)
+{
+   long     k;
+   double   ans;
+
+   *idum ^= MASK;
+   k = (*idum)/IQ;
+   *idum = IA*(*idum - k*IQ) - IR*k;
+   if(*idum < 0) *idum += IM;
+   ans=AM*(*idum);
+   *idum ^= MASK;
+   return ans;
+}
+#undef IA
+#undef IM
+#undef AM
+#undef IQ
+#undef IR
+#undef MASK
+#define MBIG 1000000000
+#define MSEED 161803398
+#define MZ 0
+#define FAC (1.0/MBIG)
 Walk::Walk(int dimension)
 {
 	d = dimension;
@@ -8,12 +38,15 @@ Walk::Walk(int dimension)
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
 	dt = 0.001;
+	idum = 123;
 };
 
-void Walk::SetInitialCondition(int **C, int m, int n){
+void Walk::SetInitialCondition(int **C, int M, int N){
 	/*Takes the initial condition as an array C[m,n] of ints(?) 
 	describing how many walkers in each entry. */
-	int nwalkers = 0;
+	nwalkers = 0;
+	m = M;
+	n = N;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n;j++){
 			nwalkers += C[i][j];
@@ -23,12 +56,15 @@ void Walk::SetInitialCondition(int **C, int m, int n){
 	
 	for(int i=0; i<nwalkers;i++){
 		tmp[i] = new double[d];
+		for(int l=0; l<d;l++){
+			tmp[i][l] = 0;
+		}
 	}
 	walkers = tmp;
 	x = new double[m];
 	y = new double[n];
-	double dx = (x1-x0)/(m-1);
-	double dy = (y1-y0)/(n-1);
+	dx = (x1-x0)/(m-1);
+	dy = (y1-y0)/(n-1);
 	for(int k=0;k<m;k++){
 		x[k] = k*dx;
 	}
@@ -39,13 +75,12 @@ void Walk::SetInitialCondition(int **C, int m, int n){
 
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n;j++){
-			for(int n=0;n<C[i][j];n++){
+			for(int l=0; l<C[i][j]; l++){
 				PutWalkers(i,j,counter);
 				counter ++;
 			}
 		}
 	}
-	double x0_, x1_, y0_, y1_;
 	x0_ = x0 - (dx/2.0);
 	x1_ = x1 + (dx/2.0);
 	y0_ = y0 - (dx/2.0);
@@ -72,22 +107,45 @@ bool Walk::HasLeftArea(double *pos){
 }
 
 int **Walk::advance(int **C){
+
 	int steps = 100;
 	double *newPos, **s;
 	newPos = new double[d];
 	s = new double*[steps];
-	for(int k=0; k<d; k++){
+	int *index = new int[d];
+	for(int k=0; k<steps; k++){
 		s[k] = new double[d];
+		for(int l=0; l<d; l++){
+			s[k][l] = 0;
+		}
 	}
+
 	for(int i=0; i<nwalkers; i++){
-		for(int k=0;k<steps; k++){
-			for(int n=0; n<d; n++){
-				s[k][n] = factor*(0.5-rand());
+		for(int k=0; k<steps; k++){
+			for(int l=0; l<d; l++){
+				s[k][l] = factor*(0.5-ran0(&idum));
 			}
 		}
 		for(int j=0;j<steps;j++){
 			newPos = Step(walkers[i],s[j]);
 			walkers[i] = checkpos(newPos,s[j]);
+		}
+	}
+	for(int i=0; i<m;i++){
+		for(int j=0;j<n;j++){
+			C[i][j] = 0;
+		}
+	}
+	if(d==1){
+		for(int i=0;i<nwalkers;i++){
+			index = FindPosition(walkers[i]);
+			C[index[0]] += 1;
+		}
+	}
+	else if(d==2){
+		for(int i=0; i<nwalkers; i++){
+			index = FindPosition(walkers[i]);
+			C[index[0]][index[1]] += 1;
 		}
 	}
 	return C; 
@@ -115,10 +173,10 @@ int Walk::InitializeTimestep(int **C){
 void Walk::PutWalkers(int i, int j, int counter){
 	for(int k=0; k<d; k++){
 		if(k==0){
-			walkers[counter][k] = x[i]+factor*(0.5-rand());
+			walkers[counter][k] = x[i]+factor*(0.5-ran0(&idum));
 		}
 		else if(k==1){
-			walkers[counter][k] = y[i]+factor*(0.5-rand());
+			walkers[counter][k] = y[i]+factor*(0.5-ran0(&idum));
 		}
 	}
 }
@@ -130,7 +188,7 @@ double **Walk::ReturnBoundary(){
 }
 
 int *Walk::FindPosition(double *pos){
-	/*Remember to make dx and dy*/
+	/*Maps the walkers position to its index*/
 	int *indx;
 	if(d==1){
 		indx = new int[1];
@@ -200,6 +258,8 @@ double *Walk::checkpos(double *r,double *s){
 		return r;
 	}
 }
+
+
 
 // int len(double*){
 // 	/*Length function in python*/
