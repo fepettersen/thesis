@@ -128,7 +128,7 @@ class MultiscaleSolver:
 			x = self.Indeces[counter]
 			if self.d==2:
 				"Average of the two solutions -- Now using the previous timestep as input (looks better)"
-				hole = self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
+				hole = self.Up[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1].copy()
 				self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1] = 0.5*(solver.advance(hole) + self.U[x[0][0]:x[0][1]+1,x[1][0]:x[1][1]+1])
 				 # least squares (doesn't seem better)
 				# tmp = solver.advance(hole)

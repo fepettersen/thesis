@@ -66,6 +66,4 @@ Doing the same experiment with the modification of using the latest timestep as 
 0.000437414641664
 0.00041956655104
 \end{lstlisting}
-That is, the initial error is larger, but it is reduced faster. 
-However, this is a stochastic process, and one should average over many experiments. 
-An average over (only) ten experiments using twice the number of walkers (M=100) shows that the errors seem to be converging towards the same value regardless of which timestep is used as input.
+That is, the initial error is larger, but it is reduced faster.

@@ -1,4 +1,4 @@
-#include "Walk.h"
+#include "main_walk.h"
 using namespace std;
 
 #define IA 16807
@@ -21,16 +21,9 @@ double ran0(long *idum)
    *idum ^= MASK;
    return ans;
 }
-#undef IA
-#undef IM
-#undef AM
-#undef IQ
-#undef IR
-#undef MASK
-#define MBIG 1000000000
-#define MSEED 161803398
-#define MZ 0
-#define FAC (1.0/MBIG)
+
+long Idum = 123;
+
 Walk::Walk(int dimension)
 {
 	d = dimension;
@@ -38,7 +31,6 @@ Walk::Walk(int dimension)
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
 	dt = 0.001;
-	idum = 123;
 };
 
 void Walk::SetInitialCondition(int **C, int M, int N){
@@ -123,7 +115,7 @@ int **Walk::advance(int **C){
 	for(int i=0; i<nwalkers; i++){
 		for(int k=0; k<steps; k++){
 			for(int l=0; l<d; l++){
-				s[k][l] = factor*(0.5-ran0(&idum));
+				s[k][l] = factor*(0.5-ran0(&Idum));
 			}
 		}
 		for(int j=0;j<steps;j++){
@@ -173,10 +165,10 @@ int Walk::InitializeTimestep(int **C){
 void Walk::PutWalkers(int i, int j, int counter){
 	for(int k=0; k<d; k++){
 		if(k==0){
-			walkers[counter][k] = x[i]+factor*(0.5-ran0(&idum));
+			walkers[counter][k] = x[i]+factor*(0.5-ran0(&Idum));
 		}
 		else if(k==1){
-			walkers[counter][k] = y[i]+factor*(0.5-ran0(&idum));
+			walkers[counter][k] = y[i]+factor*(0.5-ran0(&Idum));
 		}
 	}
 }
@@ -268,3 +260,13 @@ double *Walk::checkpos(double *r,double *s){
 // 		it++;
 // 	}
 // }
+#undef IA
+#undef IM
+#undef AM
+#undef IQ
+#undef IR
+#undef MASK
+#define MBIG 1000000000
+#define MSEED 161803398
+#define MZ 0
+#define FAC (1.0/MBIG)

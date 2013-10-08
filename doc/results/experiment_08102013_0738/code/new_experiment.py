@@ -15,10 +15,10 @@ def right_split(s,delimiter):
 		i -= 1
 
 DEBUG = False
-plot = False
+plot = True
 save = True
 gitpush = False
-add_text_to_web = False
+add_text_to_web = True
 
 ########################
 # - Make directories - #

@@ -17,7 +17,7 @@ class Walk
 		double *x;
 		double *y;
 		double dx,dy;
-		long idum;
+		// long Idum;
 		
 
 		bool HasLeftArea(double *);
@@ -30,6 +30,7 @@ class Walk
 		double **CalculateGradient();
 		double *checkpos(double*,double*);
 		void SetInitialCondition(int **, int, int);
+		// double ran0(long*);
 
 };
 

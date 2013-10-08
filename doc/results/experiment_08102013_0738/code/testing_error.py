@@ -2,7 +2,7 @@ from walk import Walk
 from diff2d import Diffusion
 import sys, numpy as np
 
-# N = int(sys.argv[1]) if len(sys.argv)>1 else 20
+N = int(sys.argv[1]) if len(sys.argv)>1 else 20
 
 # Mean_U = np.zeros((11,11))
 # U = np.zeros(np.shape(Mean_U))
@@ -22,18 +22,17 @@ import sys, numpy as np
 
 # Mean_U /= N
 # X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
-path = sys.argv[1] if len(sys.argv)>1 else '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_08102013_0738/results'
-
+path = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_07102013_0645/results/'
 import glob
 
 i = []
 e = []
 s = []
 
-for excl in sorted(glob.glob(path+'/Excl*')):
+for excl in sorted(glob.glob(path+'Excl*')):
 	e.append(np.load(excl))
 
-for incl in sorted(glob.glob(path+'/Incl*')):
+for incl in sorted(glob.glob(path+'Incl*')):
 	i.append(np.load(incl))
 
 for j in xrange(len(i)):
