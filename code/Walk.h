@@ -21,7 +21,7 @@ class Walk
 		
 
 		bool HasLeftArea(double *);
-		int **advance(int **);
+		void advance(int **);
 		double *Step(double*, double*);
 		int InitializeTimestep(int **);
 		void PutWalkers(int, int, int);

@@ -31,6 +31,7 @@ Walk::Walk(int dimension)
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
 	dt = 0.001;
+	factor = 0.01;
 };
 
 void Walk::SetInitialCondition(int **C, int M, int N){
@@ -98,8 +99,7 @@ bool Walk::HasLeftArea(double *pos){
 	return false;
 }
 
-int **Walk::advance(int **C){
-
+void Walk::advance(int **C){
 	int steps = 100;
 	double *newPos, **s;
 	newPos = new double[d];
@@ -111,17 +111,22 @@ int **Walk::advance(int **C){
 			s[k][l] = 0;
 		}
 	}
-
+	// cout<<"---------------------------"<<endl;
 	for(int i=0; i<nwalkers; i++){
+		// cout<<"before: "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
+		/*For every walker: */
 		for(int k=0; k<steps; k++){
+			/*Fill array s with steps*d random numbers*/
 			for(int l=0; l<d; l++){
 				s[k][l] = factor*(0.5-ran0(&Idum));
 			}
 		}
 		for(int j=0;j<steps;j++){
+			/**/
 			newPos = Step(walkers[i],s[j]);
 			walkers[i] = checkpos(newPos,s[j]);
 		}
+		// cout<<"after: "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
 	}
 	for(int i=0; i<m;i++){
 		for(int j=0;j<n;j++){
@@ -137,10 +142,10 @@ int **Walk::advance(int **C){
 	else if(d==2){
 		for(int i=0; i<nwalkers; i++){
 			index = FindPosition(walkers[i]);
+			// cout<<index[0];
 			C[index[0]][index[1]] += 1;
 		}
 	}
-	return C; 
 }
 
 double *Walk::Step(double *r,double *s){
@@ -152,7 +157,7 @@ double *Walk::Step(double *r,double *s){
 	}
 	else if(false){
 		for(int i=0; i<d; i++){
-			r[i] += dt*dt*s[i];		//Need velovity as well
+			r[i] += dt*dt*s[i];		//Need velocity as well
 		}
 	}
 	return r;
@@ -168,7 +173,7 @@ void Walk::PutWalkers(int i, int j, int counter){
 			walkers[counter][k] = x[i]+factor*(0.5-ran0(&Idum));
 		}
 		else if(k==1){
-			walkers[counter][k] = y[i]+factor*(0.5-ran0(&Idum));
+			walkers[counter][k] = y[j]+factor*(0.5-ran0(&Idum));
 		}
 	}
 }

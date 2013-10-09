@@ -42,7 +42,7 @@ int main()
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
 			if(i<n/2 && j<n/2){
-				C[i][j] = 10;
+				C[i][j] = 1000;
 				Up[i][j] = PI;
 			}
 			else{
@@ -52,20 +52,31 @@ int main()
 			U[i][j] = 0;
 		}
 	}
+	double *x = new double[2];
+	double *y = new double[2];
+	x[0] = 0.3; x[1] = 0.5;
+	y[0] = 0.3; y[1] = 0.5;
 	Walk balle(2);
 	Diffusion solver(0.1,0.1,1.0);
 	balle.SetInitialCondition(C,n,n);
 
 	for(int t=0; t<T; t++){
-		C = balle.advance(C);
-		solver.advance(U,Up,n,n);
-		// output(&outfile,Up,buffer,t,n);
+		balle.advance(C);
+		// solver.advance(U,Up,n,n);
 		for(int i=0; i<n; i++){
 			for(int j=0; j<n; j++){
-				Up[i][j] = U[i][j];
+				Up[i][j] = C[i][j]/1000.0;
 			}
 		}
+		output(&outfile,Up,buffer,t,n);
 	}
+	// Combine gremlin(n,n,0,1,0,1,1);
+	// gremlin.SetInitialCondition(Up,n,n);
+	// gremlin.AddWalkArea(x,y);
+	// for(int t=0; t<T; t++){
+	// 	gremlin.Solve();
+	// 	output(&outfile,gremlin.Up,buffer,t,n);
+	// }
 	cout<<"Hello, world! "<<endl;
 	return 0;
 }

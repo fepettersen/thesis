@@ -7,21 +7,27 @@ class Combine
 		Combine(int, int, double, double, double, double, double);
 
 		void advance();
-		void AddWalkArea(int );
+		void AddWalkArea(double*, double*);
 		void Solve();
-		void ConvertToWalkers(int**C,int i);
-		void ConvertFromWalkers(int**C,int i);
-		void MapAreaToIndex();
+		void ConvertToWalkers(double **, int**, int **);
+		void ConvertFromWalkers(double **, int**, int **);
+		void MapAreaToIndex(double *, double *, int **);
+		void SetInitialCondition(double**,int,int);
 
 		double dx, dy, D;
+		double *X,*Y;
 		double x0, x1, y0, y1;
-		int m,n,d;
+		int m,n,d;				/*resolution in x and y dir. and dim. n=0 => d=1*/
 		double **U, **Up;		/*Actual solution*/
-		int **C;				/*Distribution of walkers -- Should 
-									support more than one walk-solver*/
+		int **C;				/*Distribution of walkers -- replaced?*/
+		double Hc;			/*conversion factors*/
 		int walk_areas;
+
 		std::vector<Walk*> walk_solvers; 	/*A linked list of the walk-solvers*/
-		Diffusion pde_solver(double, double, double);
+		std::vector<int**> c;				/*Linked list of walker-distr. for area i*/
+		std::vector<int**> indeces;			/*Indeces of walk-area i*/
+
+		Diffusion *pde_solver;
 };
 
 
