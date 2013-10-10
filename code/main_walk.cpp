@@ -9,7 +9,7 @@ string make_filename(string buffer,string filename,int n){
 		sprintf(buff,"/results_FE_n%03d.txt",n);
 	}
 	else{
-		sprintf(buff,"%s_n%03d.txt",filename.c_str(),n);
+		sprintf(buff,"/%s_n%03d.txt",filename.c_str(),n);
 	}
   	buffer = buff;
   	// delete(buff);
@@ -82,22 +82,7 @@ int main(int argc, char** argv)
 	double *y = new double[2];
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
-	// Walk balle(2);
-	// Diffusion solver(0.1,0.1,1.0);
-	// balle.SetInitialCondition(C,n,n);
 
-	// for(int t=0; t<T; t++){
-	// 	balle.advance(C);
-	// 	// solver.advance(U,Up,n,n);
-	// 	for(int i=0; i<n; i++){
-	// 		for(int j=0; j<n; j++){
-	// 			Up[i][j] = C[i][j]/1000.0;
-	// 		}
-	// 	}
-	// 	if(tofile){
-	// 		output(&outfile,Up,buffer,path,t,n);
-	// 	}
-	// }
 	Combine gremlin(n,n,0,1,0,1,1);
 	gremlin.SetInitialCondition(Up,n,n);
 	gremlin.AddWalkArea(x,y);
@@ -105,7 +90,7 @@ int main(int argc, char** argv)
 		cout<<"Step "<<t<<" of "<<T-1<<endl;
 		gremlin.Solve();
 		if(tofile){
-			output(&outfile,gremlin.Up,buffer,filename,path,t,n);
+			output(&outfile,gremlin.Up,buffer,path,filename,t,n);
 		}
 	}
 	cout<<"Hello, world! "<<endl;

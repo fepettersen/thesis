@@ -16,7 +16,7 @@ def right_split(s,delimiter):
 		i -= 1
 
 DEBUG = False
-plot = False
+plot = True
 save = True
 gitpush = False
 add_text_to_web = False
@@ -49,7 +49,7 @@ x0 = 0.3
 x1 = 0.5
 y0 = 0.3
 y1 = 0.5
-n = 201
+n = 21
 T = 100
 filename = "Using_walk"
 
@@ -96,7 +96,7 @@ for step in sorted(glob.glob(result_path+'/U*.txt')):
 	walk.append(np.loadtxt(step))
 error = []
 for i in range(len(walk)):
-	error.append(np.max(np.abs(no_walk-walk)))
+	error.append(np.max(np.abs(no_walk[i]-walk[i])))
 ########################
 # -- update website -- #
 ########################
@@ -123,8 +123,11 @@ if not DEBUG:
 	os.system('cp *.cpp *.h new_experiment.py %s'%code_path)
 	f = open(parameter_path+'/parameters.txt','w')
 	f.write("This is the comparison between using and not unsing walk. Should be placed somewhere else! \n")
+	f.write("[")
 	for line in error:
-		f.write(line)
+		to_write = str(line)+', '
+		f.write(to_write)
+		f.write("]")
 	f.close()
 
 
