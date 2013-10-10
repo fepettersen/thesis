@@ -2,9 +2,10 @@
 """
  script that runs an experiment, creates a new subdirectory with a copy of 
  the relevant code and parameters, stores the results (plots) and updates 
- the thesis homepage on githubwith this information
+ the thesis homepage on github with this information
 """
 import os, sys, time, re, numpy as np, matplotlib.pyplot as mpl #,argparse??
+import glob
 from combine import MultiscaleSolver
 
 def right_split(s,delimiter):
@@ -42,83 +43,91 @@ if not DEBUG:
 ########################
 # -- Run simulation -- #
 ########################
+
+tofile = 1 if save else 0;
+x0 = 0.3
+x1 = 0.5
+y0 = 0.3
+y1 = 0.5
+n = 201
+T = 100
+filename = "Using_walk"
+
+os.system('g++ *.cpp -o main_walk') 	#compile for good measure
+os.system('./main_walk %d %f %f %f %f %d %d %s %s'%(tofile,x0,x1,y0,y1,n,T,result_path,filename))
+filename = "Without_walk"
+x0 = x1 = y0 = y1 = 0
+os.system('./main_walk %d %f %f %f %f %d %d %s %s'%(tofile,x0,x1,y0,y1,n,T,result_path,filename))
+###########################
+# -- Visualize results -- #
+###########################
+
 images = []
+if plot:
+	"2D"
+	counter = 0
+	def setup_plot():
+		mpl.ion()
+		fig  = mpl.figure()
+		ax = fig.add_subplot(111,projection='3d')
+		ax.set_autoscaley_on(False)
+		return fig,ax
 
-t = 0
-T = 20
-def setup_plot():
-	mpl.ion()
-	fig  = mpl.figure()
-	ax = fig.add_subplot(111,projection='3d')
-	ax.set_autoscaley_on(False)
-	return fig,ax
-
-"2D"
-nx = 11; ny =11
-Up = np.zeros((nx,ny))
-Up[(nx)/2:,(nx)/2:] = 1
-area = [[0.3,0.3],[0.5,0.5]]
-fig,ax = setup_plot()
-X,Y = np.meshgrid(np.linspace(0,1,nx),np.linspace(0,1,ny))
-mesh = [np.linspace(0,1,nx),np.linspace(0,1,ny)]
-test = MultiscaleSolver(mesh)
-test.setInitialCondition(Up)
-wframe = ax.plot_wireframe(X,Y,test.Up)
-if plot: mpl.draw()
-while t<T:
-	if t==5:
-		# Testing the effect of one step with random walks
-		test.AddWalkArea(area)
-	test.Solve()
-	if save: test.SaveState(path=result_path,fname='Including_walk')
-	if t==5:
-		# Testing the effect of one step with random walks
-		test.WalkSolvers = []
-	ax.collections.remove(wframe)
-	wframe = ax.plot_wireframe(X,Y,test.Up)
-	if plot:
+	fig,ax = setup_plot()
+	X,Y = np.meshgrid(np.linspace(0,1,n),np.linspace(0,1,n))
+	for step in sorted(glob.glob(result_path+'/*.txt')):
+		img = np.loadtxt(step)
+		wframe = ax.plot_wireframe(X,Y,img)
 		mpl.draw()
-	if t==0 or t==int(T/2) or t==T-1:
-		if not DEBUG: 
-			mpl.savefig(result_path+'/from_simulation%s_%d.eps'%(datetime,t))
-			mpl.savefig(result_path+'/from_simulation%s_%d.png'%(datetime,t))
-		images.append('/from_simulation%s_%d.png'%(datetime,t))
-	# time.sleep(1)
-	t+=1
 
-
-# Resetting important parameters 
-Up[(nx)/2:,(nx)/2:] = 1
-t = 0
-SecondRun = MultiscaleSolver(mesh)
-SecondRun.setInitialCondition(Up)
-while t<T:
-	SecondRun.Solve()
-	if save: SecondRun.SaveState(path=result_path,fname='Excluding_walk')
-	t += 1
-
+		if counter==0 or counter==int(T/2) or counter==T-1:
+			if not DEBUG: 
+				mpl.savefig(result_path+'/from_simulation%s_%d.eps'%(datetime,counter))
+				mpl.savefig(result_path+'/from_simulation%s_%d.png'%(datetime,counter))
+			images.append('/from_simulation%s_%d.png'%(datetime,counter))
+		# time.sleep(1)
+		ax.collections.remove(wframe)
+		counter+=1
+no_walk = []
+for step in sorted(glob.glob(result_path+'/W*.txt')):
+	no_walk.append(np.loadtxt(step))
+walk = []
+for step in sorted(glob.glob(result_path+'/U*.txt')):
+	walk.append(np.loadtxt(step))
+error = []
+for i in range(len(walk)):
+	error.append(np.max(np.abs(no_walk-walk)))
 ########################
 # -- update website -- #
 ########################
 
 # This will be what is added to the webpage after a new run
+# html_code = """<h3><a name="%s" class="anchor" 
+# href="#%s"><span class="octicon octicon-link">
+# </span></a>New experiment %s.</h3>
+# <img src="%s" height="42" width="42">
+# """%(datetime,datetime,time.ctime(),url +images[0])
+
 html_code = """<h3><a name="%s" class="anchor" 
 href="#%s"><span class="octicon octicon-link">
 </span></a>New experiment %s.</h3>
-<img src="%s" height="42" width="42">
-"""%(datetime,datetime,time.ctime(),url +images[0])
+
+"""%(datetime,datetime,time.ctime())
 
 if add_text_to_web:
 	explanaiton = raw_input('Add description (optional):  ')
-	html_code += explanaiton
+	html_code += '<br>'+explanaiton
 
-commandline_arguments = []
 if not DEBUG:
 	"Write the values of all parameters to a .txt file"
-	os.system('cp *.py %s'%code_path)
+	os.system('cp *.cpp *.h new_experiment.py %s'%code_path)
 	f = open(parameter_path+'/parameters.txt','w')
+	f.write("This is the comparison between using and not unsing walk. Should be placed somewhere else! \n")
+	for line in error:
+		f.write(line)
 	f.close()
-# print this_dir
+
+
 f = open(this_dir +'/doc/web/index.html','r')
 html = f.read()
 f.close()
