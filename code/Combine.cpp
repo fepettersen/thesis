@@ -1,7 +1,7 @@
 #include "main_walk.h"
 using namespace std;
 
-bool DEBUG = true;
+bool DEBUG = false;
 
 Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double DiffusionConstant)
 {
@@ -40,6 +40,7 @@ void Combine::Solve(){
 	pde_solver->advance(U,Up,m,n);
 	for(vector<Walk*>::iterator it1 = walk_solvers.begin(); it1 != walk_solvers.end(); it1++){
 		ConvertToWalkers(U,c[counter],indeces[counter]);
+		(*it1)->ResetInitialCondition(C);
 		(*it1)->advance(c[counter]);
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
@@ -102,7 +103,7 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 	}
 	for(int k=0; k<M; k++){
 		for(int l=0; l<N; l++){
-			Conc[k][l] = u[k+m0][l+n0]*Hc;
+			Conc[k][l] = (int) (u[k+m0][l+n0]*Hc);
 		}
 	}
 }
@@ -121,10 +122,12 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
 	}
+
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
 			u[k+m0][j+n0] = 0.5*((Conc[k][j]/Hc)+u[k+m0][j+n0]);
+			// u[k+m0][j+n0] = Conc[k][j]/Hc;
 		}
 	}
 }

@@ -30,6 +30,12 @@ class Walk
 		double **CalculateGradient();
 		double *checkpos(double*,double*);
 		void SetInitialCondition(int **, int, int);
+		void ResetInitialCondition(int **);
+		void ResetWalkers(){
+			for(int k=0;k<nwalkers;k++)
+				for(int l=0; l<d; l++)
+					walkers[k][l] = 0;
+		};
 		// double ran0(long*);
 
 };

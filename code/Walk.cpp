@@ -45,15 +45,18 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 			nwalkers += C[i][j];
 		}
 	}
-	double **tmp = new double*[nwalkers];
-	
+	// delete(walkers);
+	// double **tmp = new double*[nwalkers];
+	walkers = new double*[nwalkers];
 	for(int i=0; i<nwalkers;i++){
-		tmp[i] = new double[d];
+		// tmp[i] = new double[d];
+		walkers[i] = new double[d];
 		for(int l=0; l<d;l++){
-			tmp[i][l] = 0;
+			// tmp[i][l] = 0;
+			walkers[i][l] = 0;
 		}
 	}
-	walkers = tmp;
+	// walkers = tmp;
 	x = new double[m];
 	y = new double[n];
 	dx = (x1-x0)/(m-1);
@@ -80,6 +83,24 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 	y1_ = y1 + (dx/2.0);
 }
 
+void Walk::ResetInitialCondition(int **C){
+	ResetWalkers();
+	nwalkers = 0;
+	for(int i=0; i<m;i++){
+		for(int j=0; j<n;j++){
+			nwalkers += C[i][j];
+		}
+	}
+	int counter = 0;
+	for(int i=0; i<m;i++){
+		for(int j=0; j<n;j++){
+			for(int l=0; l<C[i][j]; l++){
+				PutWalkers(i,j,counter);
+				counter ++;
+			}
+		}
+	}
+}
 bool Walk::HasLeftArea(double *pos){
 	/*pos = [x] in 1d;
 	pos = [x,y] in 2d etc*/
@@ -128,11 +149,11 @@ void Walk::advance(int **C){
 		}
 		// cout<<"after: "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
 	}
-	for(int i=0; i<m;i++){
-		for(int j=0;j<n;j++){
-			C[i][j] = 0;
-		}
-	}
+	// for(int i=0; i<m;i++){
+	// 	for(int j=0;j<n;j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
 	if(d==1){
 		for(int i=0;i<nwalkers;i++){
 			index = FindPosition(walkers[i]);

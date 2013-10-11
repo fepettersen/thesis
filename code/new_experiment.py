@@ -52,14 +52,15 @@ x1 = 0.5
 y0 = 0.3
 y1 = 0.5
 n = 21
-T = 50
+T = 51
 filename = "Using_walk"
 
-os.system('g++ *.cpp -O2 main_walk') 	#compile for good measure
+os.system('g++ *.cpp -o main_walk') 	#compile for good measure
 os.system('./main_walk %d %f %f %f %f %d %d %s %s'%(tofile,x0,x1,y0,y1,n,T,result_path,filename))
 filename = "Without_walk"
 x0 = x1 = y0 = y1 = 0
-# os.system('./main_walk %d %f %f %f %f %d %d %s %s'%(tofile,x0,x1,y0,y1,n,T,result_path,filename))
+os.system('./main_walk %d %f %f %f %f %d %d %s %s'%(tofile,x0,x1,y0,y1,n,T,result_path,filename))
+
 ###########################
 # -- Visualize results -- #
 ###########################
@@ -72,12 +73,13 @@ if plot:
 		mpl.ion()
 		fig  = mpl.figure()
 		ax = fig.add_subplot(111,projection='3d')
-		ax.set_autoscaley_on(False)
 		return fig,ax
 
 	fig,ax = setup_plot()
 	X,Y = np.meshgrid(np.linspace(0,1,n),np.linspace(0,1,n))
 	for step in sorted(glob.glob(result_path+'/*.txt')):
+		if counter ==1:
+			ax.set_autoscaley_on(False)
 		img = np.loadtxt(step)
 		wframe = ax.plot_wireframe(X,Y,img)
 		mpl.draw()
@@ -90,15 +92,18 @@ if plot:
 		# time.sleep(1)
 		ax.collections.remove(wframe)
 		counter+=1
-# no_walk = []
-# for step in sorted(glob.glob(result_path+'/W*.txt')):
-# 	no_walk.append(np.loadtxt(step))
-# walk = []
-# for step in sorted(glob.glob(result_path+'/U*.txt')):
-# 	walk.append(np.loadtxt(step))
-# error = []
-# for i in range(len(walk)):
-# 	error.append(np.max(np.abs(no_walk[i]-walk[i])))
+	
+no_walk = []
+walk = []
+error = []
+if mode != 'test':
+	for step in sorted(glob.glob(result_path+'/W*.txt')):
+		no_walk.append(np.loadtxt(step))
+	for step in sorted(glob.glob(result_path+'/U*.txt')):
+		walk.append(np.loadtxt(step))
+	for i in range(len(walk)):
+		error.append(np.max(np.abs(no_walk[i]-walk[i])))
+
 ########################
 # -- update website -- #
 ########################
@@ -124,12 +129,12 @@ if not DEBUG:
 	"Write the values of all parameters to a .txt file"
 	os.system('cp *.cpp *.h new_experiment.py %s'%code_path)
 	f = open(parameter_path+'/parameters.txt','w')
-	# f.write("This is the comparison between using and not unsing walk. Should be placed somewhere else! \n")
-	# f.write("[")
-	# for line in error:
-	# 	to_write = str(line)+', '
-	# 	f.write(to_write)
-	# 	f.write("]")
+	f.write("This is the comparison between using and not unsing walk. Should be placed somewhere else! \n")
+	f.write("[")
+	for line in error:
+		to_write = str(line)+', '
+		f.write(to_write)
+	f.write("]")
 	f.close()
 
 
@@ -142,7 +147,7 @@ part = match.span()[-1]+1
 
 sum_html = html[:part]+html_code+html[part:]
 
-if not DEBUG:
+if not DEBUG and mode != 'test':
 	f = open(this_dir +'/doc/web/index.html','w')
 	f.write(sum_html)
 	f.close()

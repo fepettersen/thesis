@@ -67,9 +67,9 @@ int main(int argc, char** argv)
 	}
 	for(int i=0; i<n; i++){
 		for(int j=0; j<n; j++){
-			if(i<n/2 && j<n/2){
+			if(i>n/2 && j<n/2){
 				C[i][j] = 1000;
-				Up[i][j] = 1.0;
+				Up[i][j] = PI;
 			}
 			else{
 				C[i][j] = 0;
@@ -91,14 +91,14 @@ int main(int argc, char** argv)
 	gremlin.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		cout<<"Step "<<t<<" of "<<T-1<<endl;
-		// gremlin.Solve();
-		snow.advance(C);
-		for(int g=0; g<n; g++)
-			for(int h=0; h<n; h++)
-				U[g][h] = C[g][h]/1000.0;
+		gremlin.Solve();
+		// snow.advance(C);
+		// for(int g=0; g<n; g++)
+		// 	for(int h=0; h<n; h++)
+		// 		U[g][h] = C[g][h]/1000.0;
 		if(tofile){
-			output(&outfile,U,buffer,path,filename,t,n);
-			// output(&outfile,gremlin.Up,buffer,path,filename,t,n);
+			// output(&outfile,U,buffer,path,filename,t,n);
+			output(&outfile,gremlin.Up,buffer,path,filename,t,n);
 		}
 	}
 	cout<<"Hello, world! "<<endl;
