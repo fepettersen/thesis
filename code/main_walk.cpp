@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 		for(int j=0; j<n; j++){
 			if(i<n/2 && j<n/2){
 				C[i][j] = 1000;
-				Up[i][j] = PI;
+				Up[i][j] = 1.0;
 			}
 			else{
 				C[i][j] = 0;
@@ -83,14 +83,22 @@ int main(int argc, char** argv)
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
 
+	Walk snow(2);
+	snow.SetInitialCondition(C,n,n);
+
 	Combine gremlin(n,n,0,1,0,1,1);
 	gremlin.SetInitialCondition(Up,n,n);
 	gremlin.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		cout<<"Step "<<t<<" of "<<T-1<<endl;
-		gremlin.Solve();
+		// gremlin.Solve();
+		snow.advance(C);
+		for(int g=0; g<n; g++)
+			for(int h=0; h<n; h++)
+				U[g][h] = C[g][h]/1000.0;
 		if(tofile){
-			output(&outfile,gremlin.Up,buffer,path,filename,t,n);
+			output(&outfile,U,buffer,path,filename,t,n);
+			// output(&outfile,gremlin.Up,buffer,path,filename,t,n);
 		}
 	}
 	cout<<"Hello, world! "<<endl;

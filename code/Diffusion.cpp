@@ -1,6 +1,8 @@
 #include "main_walk.h"
 using namespace std;
 
+
+
 Diffusion::Diffusion(double dx, double dy, double D){
 	dx = dx;
 	dy = dy;
