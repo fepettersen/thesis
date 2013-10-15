@@ -37,25 +37,17 @@
         </div>
         <article class="markdown-body">
           <table></table>
+<h3><a name="15102013_1502" class="anchor" 
+		href="#15102013_1502"><span class="octicon octicon-link">
+		</span></a>Updated run-script and error calculations</h3>
+		<br>There is still some problems in the script with regards to the error. Seems to be calculating same error several times. Still, the interface is smoother and, more importantly, we can now run the program for several conversion-rates.<br>
+    <img src="https://raw.github.com/fepettersen/thesis/master/doc/results/experiment_15102013_1502/results/errorplot.png" height="142" width="142">
+          
 <h3><a name="11102013_0940" class="anchor" 
 href="#11102013_0940"><span class="octicon octicon-link">
 </span></a>New experiment Fri Oct 11 11:40:04 2013.</h3><br>
-Starting to investigate the effects of changing the number of walkers (and by extension the conversion factor), the walk-algorithm and whether or not one should reset walkers for each PDE-timestep (there should be a better relation here).
-
-
-<h3><a name="11102013_0924" class="anchor" 
-href="#11102013_0924"><span class="octicon octicon-link">
-</span></a>New experiment Fri Oct 11 11:24:28 2013.</h3>
-
-
-<h3><a name="11102013_0712" class="anchor" 
-href="#11102013_0712"><span class="octicon octicon-link">
-</span></a>New experiment Fri Oct 11 09:13:13 2013.</h3>
-
-
-<h3><a name="10102013_1120" class="anchor" 
-href="#10102013_1120"><span class="octicon octicon-link">
-</span></a>New experiment Thu Oct 10 13:24:49 2013.</h3>
+Starting to investigate the effects of changing the number of walkers (and by extension the conversion factor), the walk-algorithm and whether or not one should reset walkers for each PDE-timestep (there should be a better relation here).<br>
+Seems that we can force the error to be of order dt by setting Hc = a/dt where a = 100. The parameter a is very important!
 
 <h3><a name="08102013_0738" class="anchor" 
 href="#08102013_0738"><span class="octicon octicon-link">

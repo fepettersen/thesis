@@ -4,7 +4,7 @@
 class Combine
 {
 	public:
-		Combine(int, int, double, double, double, double, double);
+		Combine(int, int, double, double, double, double, double, double);
 
 		void advance();
 		void AddWalkArea(double*, double*);

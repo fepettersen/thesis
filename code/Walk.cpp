@@ -22,7 +22,7 @@ double ran0(long *idum)
    return ans;
 }
 
-long Idum = 123;
+long Idum = -1*rand();
 
 Walk::Walk(int dimension)
 {

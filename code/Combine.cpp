@@ -3,7 +3,7 @@ using namespace std;
 
 bool DEBUG = false;
 
-Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double DiffusionConstant)
+Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double DiffusionConstant, double factor)
 {
 	if(DEBUG){cout<<"Combine::Combine"<<endl;}
 	m = M; n = N;
@@ -14,7 +14,6 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	walk_areas = 0;
 	dx = (x1-x0)/(m-1);
 	dy = (y1-y0)/(n-1);
-	Hc = 100;
 
 	X = new double[m];
 	Y = new double[n];
@@ -32,6 +31,7 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	}
 	C = tmp;
 	pde_solver = new Diffusion(dx,dy,D);
+	Hc = factor;
 };
 
 void Combine::Solve(){

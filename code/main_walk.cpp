@@ -51,6 +51,7 @@ int main(int argc, char** argv)
 
     string path = argv[8];
     string filename = argv[9];
+    double factor =atof(argv[10]);
     string buffer;
 
     ofstream outfile;
@@ -86,11 +87,11 @@ int main(int argc, char** argv)
 	Walk snow(2);
 	snow.SetInitialCondition(C,n,n);
 
-	Combine gremlin(n,n,0,1,0,1,1);
+	Combine gremlin(n,n,0,1,0,1,1,factor);
 	gremlin.SetInitialCondition(Up,n,n);
 	gremlin.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
-		cout<<"Step "<<t<<" of "<<T-1<<endl;
+		// cout<<"Step "<<t<<" of "<<T-1<<endl;
 		gremlin.Solve();
 		// snow.advance(C);
 		// for(int g=0; g<n; g++)
@@ -101,6 +102,6 @@ int main(int argc, char** argv)
 			output(&outfile,gremlin.Up,buffer,path,filename,t,n);
 		}
 	}
-	cout<<"Hello, world! "<<endl;
+	// cout<<"Hello, world! "<<endl;
 	return 0;
 }
