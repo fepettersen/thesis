@@ -1,6 +1,5 @@
-#include <iostream>
-#include <cmath>
-#include <stdlib.h>
+#ifndef WALK_H
+#define WALK_H
 
 class Walk
 {
@@ -40,4 +39,4 @@ class Walk
 
 };
 
-// #endif // WALK_H
+#endif // WALK_H

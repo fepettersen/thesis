@@ -1,3 +1,6 @@
+#ifndef DIFFUSION_H
+#define DIFFUSION_H
+
 class Diffusion
 {
 	public:
@@ -12,3 +15,5 @@ class Diffusion
 		void advance(double **U,double **Up, int, int);
 		void boundary(double **,double **, int, int);
 };
+
+#endif // DIFFUSION_H

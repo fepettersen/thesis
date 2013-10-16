@@ -172,8 +172,8 @@ class Experiment:
 			os.system('rm -rf %s'%self.parent_path)
 
 DEBUG = False
-plot = False
-save = True
+plot = True
+save_files = True
 add_text_to_web = False
 mode = 'test'
 
@@ -189,7 +189,7 @@ dx = 1.0/(n-1)
 dt = dx**2/5.0
 Hc = [50/dt,100/dt,200/dt]
 
-run = Experiment(this_dir,True)
+run = Experiment(this_dir,plot,DEBUG)
 run.SetupRun(x0,x1,y0,y1,n,T)
 run.RunDeterministic()
 for i in Hc:
@@ -198,7 +198,7 @@ for i in Hc:
 
 run.CalculateError()
 run.PlotError()
-run.UpdateSpecial()
+# run.UpdateSpecial()
 
 run.Finish()
 
