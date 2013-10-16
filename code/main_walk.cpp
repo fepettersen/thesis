@@ -6,10 +6,10 @@ string make_filename(string buffer,string filename,int n){
     //Returns a filename saying something about the particular run.
 	char buff[100];
 	if(filename ==""){
-		sprintf(buff,"/results_FE_n%03d.txt",n);
+		sprintf(buff,"/results_FE_n%03d.bin",n);
 	}
 	else{
-		sprintf(buff,"/%s_n%03d.txt",filename.c_str(),n);
+		sprintf(buff,"/%s_n%03d.bin",filename.c_str(),n);
 	}
   	buffer = buff;
   	// delete(buff);
@@ -24,10 +24,10 @@ void output(ofstream* outfile, double **u, string buffer, string path,string fil
     **N is the size of the array (in one direction)*/
     string tmp = path;
     tmp.append(make_filename(buffer,filename,n));
-    outfile->open(tmp.c_str());
+    outfile->open(tmp.c_str(),ios::binary);
     for(int i=0;i<N;i++){
         for(int j=0;j<N;j++){
-            *outfile <<u[i][j]<<setprecision(16)<<"  ";
+            *outfile <<u[i][j]<<setprecision(16)<<" ";
             }
         if(i<N){*outfile <<endl;}
     }

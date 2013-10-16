@@ -62,7 +62,7 @@ class Experiment:
 		self.samples = 0
 
 	def compile(self):
-		os.system('g++ *.cpp -o main_walk')
+		os.system('g++ *.cpp -O2 -o main_walk')
 
 	def SetupRun(self,x0,x1,y0,y1,n,T,filename="tmp_results"):
 		self.x0 = x0; self.x1 = x1; self.y0 = y0; self.y1 = y1
@@ -72,8 +72,9 @@ class Experiment:
 	def RunDeterministic(self):
 		# self.walk = [0]*self.T
 		os.system('./main_walk %d %f %f %f %f %d %d %s %s %f'%(self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))
-		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
-			self.walk.append(np.loadtxt(step))
+		for step in sorted(glob.glob(self.result_path+'/Deterministic*.bin')):
+			self.walk.append(np.fromfile(step,sep=" "))
+		# print 'RunDeterministic: shape(walk[0]): ',np.shape(self.walk[0])
 
 	def RunSimulation(self,Hc,nsamples=30):
 		tofile = self.tofile
@@ -86,8 +87,8 @@ class Experiment:
 		for i in range(nsamples):
 			os.system('./main_walk %d %f %f %f %f %d %d %s %s %f'%(tofile,x0,x1,y0,y1,n,T,result_path,filename,Hc))
 			a = 0
-			for step in sorted(glob.glob(result_path+'/tmp_results*.txt')):
-				tmp[a] += np.loadtxt(step)
+			for step in sorted(glob.glob(result_path+'/tmp_results*.bin')):
+				tmp[a] += np.fromfile(step,sep=" ")
 				a += 1
 		for i in xrange(T):
 			tmp[i] /= nsamples
@@ -97,7 +98,7 @@ class Experiment:
 		self.samples = nsamples
 
 	def CalculateError(self):
-		self.error = [[0]*self.T]*self.runcounter
+		self.error = [np.zeros(self.T)]*self.runcounter
 		for i in xrange(self.runcounter):
 			for j in xrange(self.T):
 				self.error[i][j] = np.max(np.abs(self.walk[j]-self.no_walk[i][j]))
@@ -118,6 +119,7 @@ class Experiment:
 		mpl.hold('on')
 		for i in range(self.runcounter):
 			mpl.plot(self.error[i])
+		print np.where(self.error[0]!=self.error[1])
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
 			mpl.savefig(self.result_path+'/errorplot.eps')
@@ -187,9 +189,10 @@ T = 151
 nsamples = 30
 dx = 1.0/(n-1)
 dt = dx**2/5.0
-Hc = [50/dt,100/dt,200/dt]
+Hc = [5/dt,200/dt]
 
-run = Experiment(this_dir,plot,DEBUG)
+run = Experiment(this_dir,plot,DEBUG,save_files)
+run.compile()
 run.SetupRun(x0,x1,y0,y1,n,T)
 run.RunDeterministic()
 for i in Hc:
