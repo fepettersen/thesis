@@ -6,7 +6,8 @@
 """
 import os, sys, time, re, numpy as np, matplotlib.pyplot as mpl #,argparse??
 import glob
-from combine import MultiscaleSolver
+import matplotlib.animation as animation
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 def right_split(s,delimiter):
 	i = len(s)-1
@@ -34,7 +35,7 @@ class Experiment:
 	obj.PlotError()
 	obj.Finish()
 	"""
-	def __init__(self,path,visualize,DEBUG=False,save=True):
+	def __init__(self,path, visualize, DEBUG=False, save=True):
 		self.debug = DEBUG
 		self.visualize = visualize
 		this_dir = path
@@ -64,28 +65,26 @@ class Experiment:
 	def compile(self):
 		os.system('g++ *.cpp -O2 -o main_walk')
 
-	def SetupRun(self,x0,x1,y0,y1,n,T,filename="tmp_results"):
+	def SetupRun(self,x0,x1,y0,y1,m,n,T,filename="tmp_results"):
 		self.x0 = x0; self.x1 = x1; self.y0 = y0; self.y1 = y1
-		self.n = n; self.T = T
+		self.m = m; self.n = n; self.T = T
 		self.filename = filename
 
 	def RunDeterministic(self):
 		# self.walk = [0]*self.T
-		os.system('./main_walk %d %f %f %f %f %d %d %s %s %f'%(self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))
+		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0))
 		for step in sorted(glob.glob(self.result_path+'/Deterministic*.bin')):
 			self.walk.append(np.fromfile(step,sep=" "))
-		# print 'RunDeterministic: shape(walk[0]): ',np.shape(self.walk[0])
 
 	def RunSimulation(self,Hc,nsamples=30):
 		tofile = self.tofile
 		x0 = self.x0; x1 = self.x1; y0 = self.y0; y1 = self.y1
-		n = self.n; T = self.T
+		m = self.m; n = self.n; T = self.T
 		filename = self.filename
 		result_path = self.result_path
-		# Deterministic run first
 		tmp = [0]*T
 		for i in range(nsamples):
-			os.system('./main_walk %d %f %f %f %f %d %d %s %s %f'%(tofile,x0,x1,y0,y1,n,T,result_path,filename,Hc))
+			os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f'%(tofile,x0,x1,y0,y1,m,n,T,result_path,filename,Hc))
 			a = 0
 			for step in sorted(glob.glob(result_path+'/tmp_results*.bin')):
 				tmp[a] += np.fromfile(step,sep=" ")
@@ -102,7 +101,6 @@ class Experiment:
 		for i in xrange(self.runcounter):
 			for j in xrange(self.T):
 				self.error[i][j] = np.max(np.abs(self.walk[j]-self.no_walk[i][j]))
-		# print self.walk
 
 	def SaveError(self):
 		fname = result_path+'/error.txt'
@@ -110,16 +108,9 @@ class Experiment:
 		np.savetxt(fname,f)
 
 	def PlotError(self,save=True):
-		# fig = mpl.figure()
-		# ax = fig.add_subplot(111)
-		# mpl.hold('on')
-		# for i in range(self.runcounter):
-		# 	ax.plot(self.error[i])
-		# mpl.show()
 		mpl.hold('on')
 		for i in range(self.runcounter):
 			mpl.plot(self.error[i])
-		print np.where(self.error[0]!=self.error[1])
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
 			mpl.savefig(self.result_path+'/errorplot.eps')
@@ -173,35 +164,61 @@ class Experiment:
 		if self.debug:
 			os.system('rm -rf %s'%self.parent_path)
 
-DEBUG = False
-plot = True
-save_files = True
-add_text_to_web = False
-mode = 'test'
+	def Visualize(self,path=None,filename=None):
+		if path is None:
+			path = self.result_path
+		if filename is None:
+			filename = 'tmp'
+		im = []
+		fig = mpl.figure()
+		for step in sorted(glob.glob(path+filename+'*.bin')):
+			print step
+			f = open(step,'rb')
+			tmp = np.asanyarray(f.readlines())
+			print tmp
+			im.append(mpl.plot(tmp,'b-'))
+			f.close()
+		ani = animation.ArtistAnimation(fig,im)
+		mpl.show()
 
 
-this_dir = right_split(os.getcwd(),'/')
 
-x0 = y0 = 0.6
-x1 = y1 = 0.7
-n = 21
-T = 151
-nsamples = 30
-dx = 1.0/(n-1)
-dt = dx**2/5.0
-Hc = [5/dt,200/dt]
+if __name__ == '__main__':
+	DEBUG = False
+	plot = True
+	save_files = True
+	add_text_to_web = False
+	mode = 'test'
 
-run = Experiment(this_dir,plot,DEBUG,save_files)
-run.compile()
-run.SetupRun(x0,x1,y0,y1,n,T)
-run.RunDeterministic()
-for i in Hc:
-	print "Hc = %g"%i
-	run.RunSimulation(i,nsamples)
 
-run.CalculateError()
-run.PlotError()
-# run.UpdateSpecial()
+	this_dir = right_split(os.getcwd(),'/')
 
-run.Finish()
+	x0 = 0.6
+	y0 = 0
+	x1 = 0.7
+	y1 = 0
+	m = 21
+	n = 1
+	T = 151
+	nsamples = 1
+	dx = 1.0/(m-1)
+	dt = dx**2/5.0
+	Hc = [5/dt]
+	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_17102013_1150/results/'
 
+
+	run = Experiment(this_dir, plot,DEBUG,save_files)
+	run.compile()
+	run.SetupRun(x0,x1,y0,y1,m,n,T)
+	# run.RunDeterministic()
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i,nsamples)
+
+	# run.CalculateError()
+	# run.PlotError()
+	# run.UpdateSpecial()
+	run.Visualize()
+	run.Finish()
+
+	# (self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))

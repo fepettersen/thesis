@@ -24,9 +24,11 @@ double ran0(long *idum)
 
 // long Idum = -1*rand();
 long Idum = -1*time(0);
+bool debug_walk = false;
 
 Walk::Walk(int dimension)
 {
+	if(debug_walk){cout<<"Walk::Walk"<<endl;}
 	d = dimension;
 	x0 = 0; x1 = 1;
 	y0 = 0; y1 = 1;
@@ -38,6 +40,7 @@ Walk::Walk(int dimension)
 void Walk::SetInitialCondition(int **C, int M, int N){
 	/*Takes the initial condition as an array C[m,n] of ints(?) 
 	describing how many walkers in each entry. */
+	if(debug_walk){cout<<"Walk::SetInitialCondition"<<endl;}
 	nwalkers = 0;
 	m = M;
 	n = N;
@@ -56,7 +59,7 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 	x = new double[m];
 	y = new double[n];
 	dx = (x1-x0)/(m-1);
-	dy = (y1-y0)/(n-1);
+	dy = (n>1)?((y1-y0)/(n-1)):0;
 	for(int k=0;k<m;k++){
 		x[k] = k*dx;
 	}
@@ -80,6 +83,7 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 }
 
 void Walk::ResetInitialCondition(int **C){
+	if(debug_walk){cout<<"Walk:ResetInitialCondition"<<endl;}
 	ResetWalkers();
 	nwalkers = 0;
 	for(int i=0; i<m;i++){
@@ -98,6 +102,7 @@ void Walk::ResetInitialCondition(int **C){
 	}
 }
 bool Walk::HasLeftArea(double *pos){
+	if(debug_walk){cout<<"Walk::HasLeftArea"<<endl;}
 	/*pos = [x] in 1d;
 	pos = [x,y] in 2d etc*/
 	if(d==1){
@@ -117,6 +122,7 @@ bool Walk::HasLeftArea(double *pos){
 }
 
 void Walk::advance(int **C){
+	if(debug_walk){cout<<"Walk::advance"<<endl;}
 	int steps = 100;
 	double *newPos, **s;
 	newPos = new double[d];
@@ -159,6 +165,7 @@ void Walk::advance(int **C){
 
 double *Walk::Step(double *r,double *s){
 	/*Possibility of changing the algorithm*/
+	if(debug_walk){cout<<"Walk::Step"<<endl;}
 	if(false){
 		for(int i=0; i<d; i++){
 			r[i] += s[i];
@@ -190,6 +197,7 @@ int Walk::InitializeTimestep(int **C){
 }
 
 void Walk::PutWalkers(int i, int j, int counter){
+	if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
 	for(int k=0; k<d; k++){
 		if(k==0){
 			walkers[counter][k] = x[i]+factor*(0.5-ran0(&Idum));

@@ -1,19 +1,19 @@
 #include "main_walk.h"
 using namespace std;
 
-bool DEBUG = false;
+int debug = 0;
 
 Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double DiffusionConstant, double factor)
 {
-	if(DEBUG){cout<<"Combine::Combine"<<endl;}
+	if(debug){cout<<"Combine::Combine"<<endl;}
 	m = M; n = N;
-	d = (n>0) ? 2:1; // x = (condition) ? (value_if_true) : (value_if_false);
+	d = (n>1) ? 2:1; // x = (condition) ? (value_if_true) : (value_if_false);
 	x0 = X0; x1 = X1;
 	y0 = Y0; y1 = Y1;
 	D = DiffusionConstant;
 	walk_areas = 0;
 	dx = (x1-x0)/(m-1);
-	dy = (y1-y0)/(n-1);
+	dy = (n>1)?(y1-y0)/(n-1):0;
 
 	X = new double[m];
 	Y = new double[n];
@@ -35,7 +35,7 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 };
 
 void Combine::Solve(){
-	if(DEBUG){cout<<"Combine::Solve"<<endl;}
+	if(debug){cout<<"Combine::Solve"<<endl;}
 	int counter = 0;
 	pde_solver->advance(U,Up,m,n);
 	for(vector<Walk*>::iterator it1 = walk_solvers.begin(); it1 != walk_solvers.end(); it1++){
@@ -53,9 +53,9 @@ void Combine::Solve(){
 }
 
 void Combine::AddWalkArea(double *x, double *y){
-	if(DEBUG){cout<<"Combine::AddWalkArea"<<endl;}
+	if(debug){cout<<"Combine::AddWalkArea"<<endl;}
 	walk_areas++;
-	int M = m; int N = n;
+	int M = 0; int N = 0;
 	int **index = new int*[2];
 	for(int k=0; k<2;k++){
 		index[k] = new int[d];
@@ -74,12 +74,6 @@ void Combine::AddWalkArea(double *x, double *y){
 	for(int k=0; k<M;k++){
 		Ctmp[k] = new int[N];
 	}
-	// for(int k=0; k<M; k++){
-	// 	for(int l=0; l<N; l++){
-	// 		cout<<C[k][l]<<"  ";
-	// 	}
-	// 	cout<<endl;
-	// }
 	ConvertToWalkers(Up,Ctmp,index);
 	tmp->SetInitialCondition(Ctmp,M,N);		/*The solution in the relevant area converted to walkers*/
 	walk_solvers.push_back(tmp);		/*Throws std::bad_alloc*/
@@ -88,7 +82,7 @@ void Combine::AddWalkArea(double *x, double *y){
 }
 
 void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
-	if(DEBUG){cout<<"Combine::ConvertToWalkers"<<endl;}
+	if(debug){cout<<"Combine::ConvertToWalkers"<<endl;}
 	int M,N,m0,n0;
 	m0 = index[0][0];
 	if(d==1){
@@ -109,7 +103,7 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 }
 
 void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
-	if(DEBUG){cout<<"Combine::ConvertFromWalkers"<<endl;}
+	if(debug){cout<<"Combine::ConvertFromWalkers"<<endl;}
 	int M,N,m0,n0;
 	m0 = index[0][0];
 	if(d==1){
@@ -133,7 +127,7 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 }
 
 void Combine::MapAreaToIndex(double *x,double *y, int **index){
-	if(DEBUG){cout<<"Combine::MapAreaToIndex"<<endl;}
+	if(debug){cout<<"Combine::MapAreaToIndex"<<endl;}
 	/*x and y holds the limits of the area:
 	x[0],y[0]; x[0],y[1]; x[1],y[0]; x[1],y[1]*/
 	double eps = 0.0001;
@@ -169,7 +163,7 @@ void Combine::MapAreaToIndex(double *x,double *y, int **index){
 }
 
 void Combine::SetInitialCondition(double** U0,int x,int y){	
-	if(DEBUG){cout<<"Combine::SetInitialCondition"<<endl;}
+	if(debug){cout<<"Combine::SetInitialCondition"<<endl;}
 	if(x !=m || y!=n){
 		cout<<"Initial condition must have same dimensions as rest of problem"<<endl;
 		exit(1);
