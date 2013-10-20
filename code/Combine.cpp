@@ -17,11 +17,11 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 
 	X = new double[m];
 	Y = new double[n];
-	int **tmp = new int*[m];
+	C = new int*[m];
 	U = new double*[m];
 	Up = new double*[m];
 	for(int i=0; i<m; i++){
-		tmp[i] = new int[n];
+		C[i] = new int[n];
 		U[i] = new double[n];
 		Up[i] = new double[n];
 		X[i] = i*dx;
@@ -29,7 +29,7 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	for(int j=0; j<n;j++){
 		Y[j] = j*dy;
 	}
-	C = tmp;
+
 	pde_solver = new Diffusion(dx,dy,D);
 	Hc = factor;
 };
@@ -45,8 +45,9 @@ void Combine::Solve(){
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}
+
 	for(int k=0; k<m; k++){
-		for(int l=0; l<m; l++){
+		for(int l=0; l<n; l++){
 			Up[k][l] = U[k][l];
 		}
 	}

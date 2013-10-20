@@ -2,14 +2,14 @@
 using namespace std;
 
 
-string make_filename(string buffer,string filename,int n){
+string make_filename(string buffer,string filename,int step_no){
     //Returns a filename saying something about the particular run.
 	char buff[100];
 	if(filename ==""){
-		sprintf(buff,"/results_FE_n%03d.bin",n);
+		sprintf(buff,"/results_FE_n%03d.txt",step_no);
 	}
 	else{
-		sprintf(buff,"/%s_n%03d.bin",filename.c_str(),n);
+		sprintf(buff,"/%s_n%03d.txt",filename.c_str(),step_no);
 	}
   	buffer = buff;
   	// delete(buff);
@@ -23,18 +23,19 @@ void output(ofstream* outfile, double **u, string buffer, string path,string fil
     **scheme is an integer telling what scheme is used to obtain the solution
     **N is the size of the array (in one direction)*/
     string tmp = path;
-    tmp.append(make_filename(buffer,filename,n));
-    outfile->open(tmp.c_str(),ios::binary);
-    for(int i=0;i<N;i++){
-        for(int j=0;j<N;j++){
+    tmp.append(make_filename(buffer,filename,N));
+    // outfile->open(tmp.c_str(),ios::binary);
+    outfile->open(tmp.c_str());
+    for(int i=0;i<m;i++){
+        for(int j=0;j<n;j++){
             *outfile <<u[i][j]<<setprecision(16)<<" ";
             }
-        if(i<N){*outfile <<endl;}
+        if(i<m){*outfile <<endl;}
     }
     outfile->close();
     // delete(&tmp);
 }
-#define PI 3,1415926535897932;
+#define PI 3.1415926535897932;
 
 
 
@@ -56,8 +57,7 @@ int main(int argc, char** argv)
     string buffer;
 
     ofstream outfile;
-	// int T = 20;
-	// int n = 11;
+
 	int **C = new int*[m];
 	double **Up = new double*[m];
 	double **U = new double*[m];
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 
 	for(int i=0; i<m; i++){
 		for(int j=0; j<n; j++){
-			if(i>m/2 && j<n/2){
+			if(i>=m/2 && j<=n/2){
 				C[i][j] = 1000;
 				Up[i][j] = PI;
 			}
@@ -82,30 +82,32 @@ int main(int argc, char** argv)
 		}
 	}
 
+
 	double *x = new double[2];
 	double *y = new double[2];
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
-	double dx = (x[1]-x[0])/(m-1);
+	double dx = 1.0/(m-1);
 	// Walk snow(2);
 	// snow.SetInitialCondition(C,m,n);
-	Diffusion giraffe(dx,0,1);
+	// Diffusion giraffe(dx,0,1);
 
-	// Combine gremlin(m,n,0,1,0,1,1,factor);
-	// gremlin.SetInitialCondition(Up,m,n);
-	// gremlin.AddWalkArea(x,y);
+	Combine gremlin(m,n,0,1,0,1,1,factor);
+	gremlin.SetInitialCondition(Up,m,n);
+	gremlin.AddWalkArea(x,y);
 
 	for(int t=0; t<T; t++){
 		// cout<<"Step "<<t<<" of "<<T-1<<endl;
-		// gremlin.Solve();
-		giraffe.advance(U,Up,m,n);
+		gremlin.Solve();
+
+		// giraffe.advance(U,Up,m,n);
 		// snow.advance(C);
-		// for(int g=0; g<n; g++)
+		// for(int g=0; g<m; g++)
 		// 	for(int h=0; h<n; h++)
-		// 		U[g][h] = C[g][h]/1000.0;
+		// 		Up[g][h] = U[g][h];
 		if(tofile){
-			output(&outfile,U,buffer,path,filename,t,m,n);
-			// output(&outfile,gremlin.Up,buffer,path,filename,t,n);
+			// output(&outfile,U,buffer,path,filename,m,n,t);
+			output(&outfile,gremlin.Up,buffer,path,filename,m,n,t);
 		}
 	}
 	// cout<<"Hello, world! "<<endl;

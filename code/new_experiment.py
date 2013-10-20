@@ -163,19 +163,19 @@ class Experiment:
 	def Finish(self):
 		if self.debug:
 			os.system('rm -rf %s'%self.parent_path)
+		else:
+			os.system('rm -rf %s'%self.parent_path)
 
 	def Visualize(self,path=None,filename=None):
 		if path is None:
 			path = self.result_path
 		if filename is None:
-			filename = 'tmp'
+			filename = '/tmp'
 		im = []
 		fig = mpl.figure()
-		for step in sorted(glob.glob(path+filename+'*.bin')):
-			print step
-			f = open(step,'rb')
-			tmp = np.asanyarray(f.readlines())
-			print tmp
+		for step in sorted(glob.glob(path+filename+'*.txt')):
+			f = open(step,'r')
+			tmp = np.asarray(f.readlines())
 			im.append(mpl.plot(tmp,'b-'))
 			f.close()
 		ani = animation.ArtistAnimation(fig,im)
@@ -199,12 +199,12 @@ if __name__ == '__main__':
 	y1 = 0
 	m = 21
 	n = 1
-	T = 151
+	T = 51
 	nsamples = 1
 	dx = 1.0/(m-1)
 	dt = dx**2/5.0
 	Hc = [5/dt]
-	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_17102013_1150/results/'
+	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 
 	run = Experiment(this_dir, plot,DEBUG,save_files)

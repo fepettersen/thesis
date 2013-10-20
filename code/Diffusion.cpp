@@ -8,6 +8,7 @@ Diffusion::Diffusion(double dx, double dy, double D){
 	dy = dy;
 	D = D;
 	d = (dy>0)?2:1;
+	// cout<<"dx,dy = "<<dx<<","<<dy<<endl;
 	if(d==2){
 		dt = dx*dy/5.0;
 		_D = D*dt/(dx*dy);
@@ -34,8 +35,7 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 		else if(d==1){
 			for(int i=1; i<(m-1);i++){
 				for(int j=0; j<1; j++){
-					U[i][j] = _D*(Up[i+1][j]-2*Up[i][j] +Up[i-1][j]) +
-					_D*(Up[i][j+1]-2*Up[i][j]+Up[i][j-1]) + Up[i][j];
+					U[i][j] = _D*(Up[i+1][j]-2*Up[i][j] +Up[i-1][j]) + Up[i][j];
 				}
 				boundary(U,Up,m,n);
 			}
