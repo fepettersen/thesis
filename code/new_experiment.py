@@ -96,21 +96,40 @@ class Experiment:
 		self.runcounter += 1
 		self.samples = nsamples
 
-	def CalculateError(self):
+	def CalculateError(self,exact=None):
 		self.error = [np.zeros(self.T)]*self.runcounter
-		for i in xrange(self.runcounter):
-			for j in xrange(self.T):
-				self.error[i][j] = np.max(np.abs(self.walk[j]-self.no_walk[i][j]))
+		print np.shape(self.error)," , ",np.shape(self.no_walk)," , "
+		if exact is None:
+			for i in xrange(self.runcounter):
+				for j in xrange(self.T):
+					self.error[i][j] = np.max(np.abs(self.walk[j]-self.no_walk[i][j]))
+		else:
+			if self.n <= 1:
+				X = np.linspace(0,1,self.m)
+				Y = np.zeros(self.m)
+				dt = (X[1]-X[0])**2/3.0
+			else:
+				X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+				dt = (X[1,1]-X[0,0])**2/5.0
+			for i in xrange(self.runcounter):
+				for j in xrange(self.T):
+					self.error[i][j] = np.max(np.abs(self.no_walk[i][j]-self.exact(X,Y,(j+1)*dt)))
 
-	def SaveError(self):
-		fname = result_path+'/error.txt'
+	def SaveError(self,header=None):
+		fname = self.result_path+'/error.txt'
 		f = np.asanyarray(self.error)
-		np.savetxt(fname,f)
+		if header is None:
+			np.savetxt(fname,f)
+		else:
+			np.savetxt(fname,f)
 
 	def PlotError(self,save=True):
 		mpl.hold('on')
 		for i in range(self.runcounter):
 			mpl.plot(self.error[i])
+		mpl.xlabel('timestep no.')
+		mpl.ylabel('max(abs(simulation-"exact"))')
+		mpl.title('Error plot')
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
 			mpl.savefig(self.result_path+'/errorplot.eps')
@@ -163,8 +182,8 @@ class Experiment:
 	def Finish(self):
 		if self.debug:
 			os.system('rm -rf %s'%self.parent_path)
-		else:
-			os.system('rm -rf %s'%self.parent_path)
+		# else:
+		# 	os.system('rm -rf %s'%self.parent_path)
 
 	def Visualize(self,path=None,filename=None):
 		if path is None:
@@ -173,15 +192,27 @@ class Experiment:
 			filename = '/tmp'
 		im = []
 		fig = mpl.figure()
-		for step in sorted(glob.glob(path+filename+'*.txt')):
+		x = np.linspace(0,1,self.m)
+		# dt = (x[1]-x[0])**2/3.0
+		# err = np.zeros(self.T)
+		# k = 0
+		for step in sorted(glob.glob(path+filename+'*.bin')):
 			f = open(step,'r')
 			tmp = np.asarray(f.readlines())
-			im.append(mpl.plot(tmp,'b-'))
+			tmp = tmp.astype(np.float32)
+			# err[k] = np.max(np.abs(np.transpose(tmp)-self.exact(x,0,(k+1)*dt)))
+			im.append(mpl.plot(x,tmp,'b-'))
 			f.close()
+			# print err[k], np.log(err[k]/dt), "dt = %g"%dt
+			# k +=1
 		ani = animation.ArtistAnimation(fig,im)
 		mpl.show()
 
+	def exact(self,x,y,t):
+		return 0
 
+def f(x,y,t):
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x) +1
 
 if __name__ == '__main__':
 	DEBUG = False
@@ -215,8 +246,10 @@ if __name__ == '__main__':
 		print "Hc = %g"%i
 		run.RunSimulation(i,nsamples)
 
-	# run.CalculateError()
-	# run.PlotError()
+	run.exact = f
+	run.CalculateError(exact=True)
+	run.PlotError()
+	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
 	run.Visualize()
 	run.Finish()

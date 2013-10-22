@@ -14,6 +14,7 @@ class Diffusion
 
 		void advance(double **U,double **Up, int, int);
 		void boundary(double **,double **, int, int);
+		double f(double x,double y, double t);
 };
 
 #endif // DIFFUSION_H

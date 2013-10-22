@@ -1,0 +1,43 @@
+In this chapter we will take a closer look at random walks, both in general and the transition from the statistical view to partial differential equations. 
+We will take a look at different algorithms to produce random walks, and discuss their pros and cons in light of this project.
+
+\section{Introduction to random walks}
+The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
+Using (pseudo-) random numbers on a computer we can simulate the outturn of a random walk. 
+For each step (of which there are N) we draw a random number, r, between 0 and 1 from some distribution (say a uniform one) which will be the probability. 
+If $r\leq p$ the walker will take a step to the left, otherwise it will take a step to the left. 
+After the N steps the walker will have taken R steps to the right, and $L = N-R$ steps to the left. 
+The net displacement from the origin will be $S = R-L$. 
+
+\subsection{Further discussion and analysis of the introduction}
+If we do sufficiently many walks, the net displacement will vary from $S=+N$ to $S=-N$ representing all steps to the right and all steps to the left respectively. 
+The probability of all steps beeing to the right is $P_N(N) = p^N$. 
+Should one of the steps be to the left, and the rest to the right we will get a net displacement of $S = N-2$ with the probability $P_N(R = N-1) = Np^{N-1}q$. 
+We can generalize this to finding the probability of a walk with a R steps to the right as 
+\begin{equation}\label{bernoulli_distr}
+ P_N(R) = {N\choose R}p^{R}q^{N-R}
+\end{equation}
+where ${N\choose R}=\frac{N!}{R!(N-R)!}$ is the number of walks which satisfy the net displacement in question, or the multiplicity of this walk in statistical mechanics terms. 
+Equation \ref{bernoulli_distr} is the Bernoulli probability distribution, which is normalized.
+\begin{align*}
+ \sum\limits_{R=0}^N P_N(R) = (p+q)^N = 1^N = 1
+\end{align*}
+We can use this distribution to calculate various average properties of a walk consisting of N steps. 
+For example, the average number of steps to the right is
+\begin{align*}
+ \langle R\rangle &=  \sum\limits_{R=0}^N RP_N(R) =  \sum\limits_{R=0}^N {N\choose R}Rp^Rq^{N-R} = \\
+ p\frac{d}{dp} \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= p\frac{d}{dp}(p+q)^N = Np(p+q)^{N-1} = Np
+\end{align*}
+From this we can also find the average value of the net displacement using $S = R-L = R-(N-R) = 2R-N$.
+\begin{align*}
+ \langle S\rangle = \langle2R\rangle -N = 2Np-N\underbrace{(p+q)}_{=1} = N(2p-p-q) = N(p-q)
+\end{align*}
+We notice that the average net displacement is greatly dependent on the probability of the walk and that any symmetric walk will have an expected net displacement of zero. 
+In many cases we will be more interrested in the mean square displacement than the displacement itself. 
+This can also be calculated rather straightforwardly. 
+\begin{align*}
+  \langle R^2\rangle &=  \sum\limits_{R=0}^N R^2P_N(R) =  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
+ \left(p\frac{d}{dp}\right)^2 \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= \left(p\frac{d}{dp}\right)^2(p+q)^N \\
+ = Np(p+q)^{N-1} +p^2N(N-1)(p+q)^{N-2} &= (Np)^2 +Np(1-p) = (Np)^2 +Npq
+\end{align*}
+

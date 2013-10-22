@@ -10,7 +10,10 @@
 \usepackage{listings}
 \usepackage{float}
 \usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{hyperref}
+\usepackage{epstopdf}
 
+\renewcommand{\d}{\partial}
 % \usepackage{fontspec}
 % \newfontfamily\listingsfont[Scale=0.85]{Droid Sans Mono}
 % \lstset {
@@ -52,8 +55,11 @@ This is an abstract text.
 \clearpage
 \listoftables
 
-\chapter{The beginning is here}
+\chapter{Introduction}
 \include{Intro}
+
+\chapter{Random walks}
+\include{RandomWalks}
 
 \chapter{Analysis}
 \include{errors}

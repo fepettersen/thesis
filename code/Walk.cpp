@@ -49,6 +49,7 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 			nwalkers += C[i][j];
 		}
 	}
+	// cout<<"nwalkers"<<nwalkers<<endl;
 	walkers = new double*[nwalkers];
 	for(int i=0; i<nwalkers;i++){
 		walkers[i] = new double[d];
@@ -63,7 +64,7 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 	for(int k=0;k<m;k++){
 		x[k] = k*dx;
 	}
-	for(int k=0;k<m;k++){
+	for(int k=0;k<n;k++){
 		y[k] = k*dy;
 	}
 	int counter = 0;

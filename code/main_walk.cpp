@@ -6,10 +6,10 @@ string make_filename(string buffer,string filename,int step_no){
     //Returns a filename saying something about the particular run.
 	char buff[100];
 	if(filename ==""){
-		sprintf(buff,"/results_FE_n%03d.txt",step_no);
+		sprintf(buff,"/results_FE_n%03d.bin",step_no);
 	}
 	else{
-		sprintf(buff,"/%s_n%03d.txt",filename.c_str(),step_no);
+		sprintf(buff,"/%s_n%03d.bin",filename.c_str(),step_no);
 	}
   	buffer = buff;
   	// delete(buff);
@@ -24,8 +24,8 @@ void output(ofstream* outfile, double **u, string buffer, string path,string fil
     **N is the size of the array (in one direction)*/
     string tmp = path;
     tmp.append(make_filename(buffer,filename,N));
-    // outfile->open(tmp.c_str(),ios::binary);
-    outfile->open(tmp.c_str());
+    outfile->open(tmp.c_str(),ios::binary);
+    // outfile->open(tmp.c_str());
     for(int i=0;i<m;i++){
         for(int j=0;j<n;j++){
             *outfile <<u[i][j]<<setprecision(16)<<" ";
@@ -58,36 +58,45 @@ int main(int argc, char** argv)
 
     ofstream outfile;
 
-	int **C = new int*[m];
-	double **Up = new double*[m];
-	double **U = new double*[m];
-
-	for(int i=0; i<m; i++){
-		C[i] = new int[n];
-		Up[i] = new double[n];
-		U[i] = new double[n];
-	}
-
-	for(int i=0; i<m; i++){
-		for(int j=0; j<n; j++){
-			if(i>=m/2 && j<=n/2){
-				C[i][j] = 1000;
-				Up[i][j] = PI;
-			}
-			else{
-				C[i][j] = 0;
-				Up[i][j] = 0;
-			}
-			U[i][j] = 0;
-		}
-	}
-
-
 	double *x = new double[2];
 	double *y = new double[2];
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
 	double dx = 1.0/(m-1);
+	double wth = 0;
+
+	int **C = new int*[m];
+	double **Up = new double*[m];
+	double **U = new double*[m];
+	double *X = new double[m];
+
+	for(int i=0; i<m; i++){
+		C[i] = new int[n];
+		Up[i] = new double[n];
+		U[i] = new double[n];
+		X[i] = i*dx;
+	}
+
+	for(int i=0; i<m; i++){
+		for(int j=0; j<n; j++){
+			if(i>=m/2 && j<=n/2){
+				C[i][j] = (int) (factor);
+			}
+			else{
+				C[i][j] = 0;
+				// Up[i][j] = 0;
+			}
+			wth = X[i]*PI;
+			Up[i][j] = cos(wth) +1;
+			U[i][j] = 0;
+		}
+	}
+
+	// for(int k=0;k<m;k++){
+	// 	cout<<Up[k][0]<<"  ";
+	// }
+	// cout<<endl;
+
 	// Walk snow(2);
 	// snow.SetInitialCondition(C,m,n);
 	// Diffusion giraffe(dx,0,1);
@@ -97,7 +106,6 @@ int main(int argc, char** argv)
 	gremlin.AddWalkArea(x,y);
 
 	for(int t=0; t<T; t++){
-		// cout<<"Step "<<t<<" of "<<T-1<<endl;
 		gremlin.Solve();
 
 		// giraffe.advance(U,Up,m,n);
@@ -110,6 +118,5 @@ int main(int argc, char** argv)
 			output(&outfile,gremlin.Up,buffer,path,filename,m,n,t);
 		}
 	}
-	// cout<<"Hello, world! "<<endl;
 	return 0;
 }

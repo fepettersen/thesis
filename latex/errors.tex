@@ -69,3 +69,40 @@ Doing the same experiment with the modification of using the latest timestep as 
 That is, the initial error is larger, but it is reduced faster. 
 However, this is a stochastic process, and one should average over many experiments. 
 An average over (only) ten experiments using twice the number of walkers (M=100) shows that the errors seem to be converging towards the same value regardless of which timestep is used as input.
+
+\section{Manifactured Solutions}
+A normal way of checking that our sceme of choise is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
+As a first, simple implenetation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \hyperref[simple_diffusion_equation]{\ref*{simple_diffusion_equation}}. 
+This discretization is expected to have an error-term of the order of $\Delta t$, which again is limited by a stability criterion. 
+We can now decide that the solution to equation \ref{simple_diffusion_equation} should be
+\begin{equation}\label{manifactured_solution_1D}
+ u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
+\end{equation}
+which satisfies our equation if we set the diffusion constant to 1.
+\begin{align}
+ \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\\
+ -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1
+\end{align}
+As we saw in section \ref{something_about_erroranalysis} the Forward Euler scheme is expected to have an error of the order of $\Delta t$. 
+Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_21102013_1141/results/errorplot.eps}
+\caption{Numerical error for 1D Forwar Euler discretization.}
+\label{errorplot_FE1D_noWalk}
+\end{figure}
+
+We then introduce an area on the domain where we swich models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last timestep from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$. 
+These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
+\begin{equation}\label{conversion_rate}
+ C_{ij} = \frac{a}{\Delta t}U_{ij}
+\end{equation}
+The area where the model has been replaced is between $x=0.6$ and $x=0.7$, which is three mesh points. 
+In the same way as for only the simple 1D PDE case we compare the combined numerical solution from the two models to the exact solution. 
+Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligable. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_21102013_1231/results/errorplot.eps}
+\caption{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$.}
+\end{figure}
