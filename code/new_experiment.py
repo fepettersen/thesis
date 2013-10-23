@@ -229,7 +229,7 @@ if __name__ == '__main__':
 	x1 = 0.7
 	y1 = 0
 	m = 21
-	n = 1
+	n = 21
 	T = 51
 	nsamples = 1
 	dx = 1.0/(m-1)

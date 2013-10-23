@@ -63,18 +63,24 @@ int main(int argc, char** argv)
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
 	double dx = 1.0/(m-1);
+	double dy = 1.0/(n-1);
 	double wth = 0;
+	double wty = 0;
 
 	int **C = new int*[m];
 	double **Up = new double*[m];
 	double **U = new double*[m];
 	double *X = new double[m];
+	double *Y = new double[n];
 
 	for(int i=0; i<m; i++){
 		C[i] = new int[n];
 		Up[i] = new double[n];
 		U[i] = new double[n];
 		X[i] = i*dx;
+	}
+	for(int j=0; j<n; j++){
+		Y[j] = j*dy;
 	}
 
 	for(int i=0; i<m; i++){
@@ -87,7 +93,8 @@ int main(int argc, char** argv)
 				// Up[i][j] = 0;
 			}
 			wth = X[i]*PI;
-			Up[i][j] = cos(wth) +1;
+			wty = Y[j]*PI;
+			Up[i][j] = cos(wth)*cos(wty) +1;
 			U[i][j] = 0;
 		}
 	}
@@ -103,7 +110,7 @@ int main(int argc, char** argv)
 
 	Combine gremlin(m,n,0,1,0,1,1,factor);
 	gremlin.SetInitialCondition(Up,m,n);
-	gremlin.AddWalkArea(x,y);
+	// gremlin.AddWalkArea(x,y);
 
 	for(int t=0; t<T; t++){
 		gremlin.Solve();

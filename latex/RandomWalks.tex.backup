@@ -36,8 +36,100 @@ We notice that the average net displacement is greatly dependent on the probabil
 In many cases we will be more interrested in the mean square displacement than the displacement itself. 
 This can also be calculated rather straightforwardly. 
 \begin{align*}
-  \langle R^2\rangle &=  \sum\limits_{R=0}^N R^2P_N(R) =  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
+  \langle R^2\rangle =  \sum\limits_{R=0}^N R^2P_N(R) &=  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
  \left(p\frac{d}{dp}\right)^2 \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= \left(p\frac{d}{dp}\right)^2(p+q)^N \\
  = Np(p+q)^{N-1} +p^2N(N-1)(p+q)^{N-2} &= (Np)^2 +Np(1-p) = (Np)^2 +Npq
 \end{align*}
+Like before, the average nett displacement is given as $S^2 = (2R-N)^2$ and we obtain
+\begin{align*}
+ \langle S^2\rangle = 4\langle R^2\langle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
+ = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq
+\end{align*}
+which for the 1D symmetric walk gives $\langle S^2\rangle =N$.\\
+When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
+This is most easily done in the symmertric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
+The Bernoulli distribution then simplifies to
+\begin{equation}
+ P(S,N) = \left(\frac{1}{2}\right)^N\frac{N!}{R!L!}
+\end{equation}
+on which we apply Stirlings famous formula for large factorials $n!\simeq\sqrt{2\pi n}n^ne^{-n}$.
+\begin{align*}
+ P(S,N) &= \left(\frac{1}{2}\right)^N\frac{N!}{R!L!} \\
+ &= \exp\left(-N\ln2+\ln\sqrt{2\pi N}+N\ln N - \ln\sqrt{2\pi R} -R\ln R - \ln\sqrt{2\pi L} - L\ln L \right) \\
+ &= \sqrt{\frac{N}{2\pi RL}}\exp\left(-R\ln\frac{2R}{N}-L\ln\frac{2L}{N}\right)
+\end{align*}
+Where we have used $R+L=N$. We now insert for $\frac{2R}{N}=1+\frac{S}{N}$ and $\frac{2L}{N}=1-\frac{S}{N}$ and expand the logarithms to first order, $RL=\frac{N^2-S^2}{4}$ in the prefactor, and approximate $1-\frac{S^2}{N^2}\simeq1$. This gives
+\begin{equation}\label{descrete_gaussian_distr}
+ P(S,N) =\sqrt{\frac{2}{\pi N}}c
+\end{equation}
+which is an ordinary, descrete Gaussian distribution with $\langle S\rangle = 0$  and $\langle S^2\rangle = N$. 
+If we keep assuming that the walker is on the x-axis, and let the step length, a, get small the final position will be $x=Sa$ which we can assume is a continous variable. 
+Similarly, we let the time interval between each step, $\tau$, be small and let the walk run for a contious time $t=N\tau$. This changes the distribution \ref{descrete_gaussian_distr} to
+\begin{equation}
+ P(x,t) = \frac{1}{2a}\sqrt{\frac{2\tau}{\pi t}}e^{-\frac{x^2\tau}{2a^2t}}.
+\end{equation}
+The prefactor $\frac{1}{2a}$ is needed to normalize the continous probability distribution since the sepatation between each possible final position in walks with the same number of steps is $\Delta x=2a$. 
+We also introduce the diffusion constant
+\begin{equation}
+D = \frac{a^2}{2\tau} 
+\end{equation}
+making the distribution
+\begin{equation}
+ P(x,t) = \sqrt{\frac{1}{4\pi Dt}}e^{-\frac{x^2}{4Dt}}
+\end{equation}
 
+\subsection{More general Random Walks}
+In the more general case, the position of a random walker,$\vec{r}$ at a time $t_i$ is given by the sum
+\begin{equation}\label{brownian_motion}
+ \vec{r}(t_i)=\sum\limits_{j=0}^i \Delta \vec{x}(t_j)
+\end{equation}
+where $\Delta \vec{x}(t_j) = \left(\Delta x(t_j),\Delta y(t_j),\Delta z(t_j)\right)$ in 3D. Each $\Delta x,y,z$ is a random number drawn from a distribution with a finite variance $\sigma^2 = \langle\Delta x^2\rangle$. 
+By the central limit theorem, any stochastic process with a well defined mean and variance can, given enough samples, be approximated by a Gaussian distribution. 
+This means that the probability of finding the walker at some position x after M steps is 
+\begin{equation}
+ P(x,N)\propto e^{-\frac{x^2}{2M\sigma^2}}
+\end{equation}
+Seeing as $M\propto t$ we can introduce an Einstein relation and substitute $2M\sigma^2\to4Dt$. 
+We see that $\langle \Delta x^2\rangle = 2Dt$. 
+Normalizing the expression gives us 
+\begin{equation}
+ P(x,t) = \sqrt{\frac{1}{4Dt}}e^{-\frac{x^2}{4Dt}}
+\end{equation}
+
+If we have a large number, N, of walkers, their concentration will be $C(x,t) = NP(x,t)$. 
+The concentration is conserved, so any amount that flows out of an area must reflect as a decrease in concentration. 
+We can express this by the flow of concentration
+\begin{equation}
+ J_x = \frac{d}{dt}\int\limits_x^{\infty}C(x,t)dx = -D\frac{\d C(x,t)}{\d x}
+\end{equation}
+or $\vec{J} = -D\nabla C$. Using some vector calculus we obtain
+\begin{equation}
+ \frac{d}{dt}\int_V C(x,t)dV = -\oint\nabla C\cdot d\vec{S} = -\int_V D\nabla^2C dV
+\end{equation}
+which is the diffusion equation.
+\begin{equation}
+ \frac{\d C}{\d t} = D\nabla^2 C
+\end{equation}
+
+\subsection{Choosing random walk algorithm}
+As this article points out \cite{} the simplest random walk model, which places walker on discrete mesh points and uses a fixed step length, has been used with great succsess to model diffusion processes. 
+However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. \emph{Author} also suggests a method for improving the results by adjusting the step length according to to position, thus effectively adjusting the diffusion constant of the walk as well. 
+We see then that the simplest model is rather robust, and well tested. 
+However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
+Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
+We can model brownian motion simply by using equation \ref{brownian_motion}, and we can with a bit of work expand it to model collisions between walkers as well.
+
+\subsection{Potential problems or pitfalls with combining solutions}
+
+There are a few obvious difficulties we can expect to run into in our planned project. 
+Future ones will be added here as well.
+
+\begin{itemize}
+ \item Different timescales\\
+  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definately have an impact on the error. 
+  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
+  Depending on the couplig chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
+  Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$, but it might turn out to be difficult to makes sure that this is fulfilled.
+ \item 
+
+\end{itemize}

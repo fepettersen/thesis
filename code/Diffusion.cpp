@@ -74,3 +74,7 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 		U[m-1][0] = 2*_D*(Up[m-2][0]-Up[m-1][0]) +Up[m-1][0];
 	}
 }
+
+double Diffusion::f(double x,double y, double t){
+	return 0;
+}
