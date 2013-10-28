@@ -48,11 +48,11 @@ class Experiment:
 		self.parameter_path = self.parent_path+'/parameters'
 		self.result_path = self.parent_path+ '/results'
 		self.tofile = 1 if save else 0;
-		if not DEBUG:
-			os.system('mkdir %s'%self.parent_path)
-			os.system('mkdir %s'%self.parameter_path)
-			os.system('mkdir %s'%self.result_path)
-			os.system('mkdir %s'%self.code_path)
+
+		os.system('mkdir %s'%self.parent_path)
+		os.system('mkdir %s'%self.parameter_path)
+		os.system('mkdir %s'%self.result_path)
+		os.system('mkdir %s'%self.code_path)
 		
 		self.walk = []
 		self.no_walk = []
@@ -102,7 +102,7 @@ class Experiment:
 		for i in Hc:
 			self.ReadError(i)
 		self.error = [np.zeros(self.T)]*self.runcounter
-		print np.shape(self.error)," , ",np.shape(self.no_walk)," , "
+		# print np.shape(self.error)," , ",np.shape(self.no_walk)
 		if exact is None:
 			for i in xrange(self.runcounter):
 				for j in xrange(self.T):
@@ -113,9 +113,15 @@ class Experiment:
 				Y = np.zeros(self.m)
 			else:
 				X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-			for i in xrange(self.runcounter):
-				for j in xrange(self.T):
-					self.error[i][j] = np.max(np.abs(self.no_walk[i][j]-self.exact(X,Y,(j+1)*dt)))
+			# for i in xrange(self.runcounter):
+			# 	for j in xrange(self.T):
+			# 		self.error[i][j] = np.max(np.abs(self.no_walk[i][j]-self.exact(X,Y,(j+1)*dt)))
+			a=0
+			for i in Hc:
+				for j in xrange(self.T): 
+					step = np.loadtxt(self.result_path+'/results_FE_Hc%d_n%03d.txt'%(i+1,j))
+					self.error[a][j-1] = np.max(np.abs(self.exact(X,Y,j*self.dt)-step))
+				a+=1
 
 	def ReadError(self,Hc):
 		tmp = [0]*T
@@ -197,7 +203,7 @@ class Experiment:
 		if path is None:
 			path = self.result_path
 		if filename is None:
-			filename = '/tmp'
+			filename = '/results'
 		im = []
 		if self.n<=1:
 			fig = mpl.figure()
@@ -218,17 +224,17 @@ class Experiment:
 			ax = fig.add_subplot(111,projection='3d')
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
-				print step
 				tmp = np.loadtxt(step)
-				wframe = ax.plot_wireframe(X,Y,(tmp))
+				wframe = ax.plot_wireframe(X,Y,(self.exact(X,Y,(counter*self.dt))-tmp))
 				mpl.draw()
 				if counter==1:
-					ax.set_autoscaley_on(False)
+					pass
+					# ax.set_autoscaley_on(False)
 				ax.collections.remove(wframe)
 				counter +=1
-			ax.plot_wireframe(X,Y,self.exact(X,Y,0))
-			mpl.draw()
-			time.sleep(5)
+			# ax.plot_wireframe(X,Y,self.exact(X,Y,0))
+			# mpl.draw()
+			# time.sleep(1)
 
 
 	def exact(self,x,y,t):
@@ -238,16 +244,15 @@ class Experiment:
 	def Finish(self):
 		if self.debug:
 			os.system('rm -rf %s'%self.parent_path)
-		else:
-			os.system('rm -rf %s'%self.parent_path)
+
 
 
 def f(x,y,t):
 	return np.exp(-t*np.pi**2)*np.cos(np.pi*x) +1
-	# return np.ones(np.shape(x))*1.5
+		# return np.ones(np.shape(x))*1.5
 
 if __name__ == '__main__':
-	DEBUG = False
+	DEBUG = True
 	plot = True
 	save_files = True
 	add_text_to_web = False
@@ -269,7 +274,6 @@ if __name__ == '__main__':
 	dt = dx*dy/5.0 if n>1 else dx**2/3.0
 	Hc = [5/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
-
 
 	run = Experiment(this_dir, plot,DEBUG,save_files)
 	run.compile()

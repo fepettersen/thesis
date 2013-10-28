@@ -93,22 +93,19 @@ int main(int argc, char** argv)
 				C[i][j] = 0;
 				// Up[i][j] = 0;
 			}
-			wth = X[i]*PI;
-			// wty = Y[j]*PI;
-			Up[i][j] = cos(wth) +1;
-			// Up[i][j] = 1.5;
+			wth = X[j]*PI;
+			Up[i][j] = cos(wth)+1;
 			U[i][j] = 0;
 		}
 	}
 
-
 	Combine BlackBox(m,n,0,1,0,1,1,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-	BlackBox.AddWalkArea(x,y);
+	// BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
 		if(tofile){
-			output(&outfile,BlackBox.Up,buffer,path,filename,m,n,factor,t);
+			output(&outfile,BlackBox.U,buffer,path,filename,m,n,factor,t);
 		}
 	}
 	return 0;
