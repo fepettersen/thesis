@@ -122,7 +122,7 @@ class Experiment:
 		a=0
 		for step in sorted(glob.glob(self.result_path+'/results_FE_Hc%d_*.txt'%(Hc+1))):
 			# tmp[a] += np.fromfile(step,sep=" ")
-			print step
+			# print step
 			tmp[a] += np.loadtxt(step)	
 			a += 1
 		self.no_walk.append(tmp)
