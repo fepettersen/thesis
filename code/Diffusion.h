@@ -4,11 +4,11 @@
 class Diffusion
 {
 	public:
-		Diffusion(double dx, double dy, double D);
+		Diffusion(double dx, double dy, double D, double Dt);
 
 		int d;
 		double dt,dx,dy;
-		double D,_D;	/*should be double **D ?*/
+		double D,_Dx,_Dy;	/*should be double **D ?*/
 		int solver; /*Which solver to use*/
 		int t; 		/*Timestep number*/
 

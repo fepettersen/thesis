@@ -33,8 +33,9 @@ Walk::Walk(int dimension)
 	x0 = 0; x1 = 1;
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
-	dt = 0.001;
-	factor = 0.01;
+	int D = 1;
+	dt = 0.01;
+	factor = sqrt(2*D*dt);
 };
 
 void Walk::SetInitialCondition(int **C, int M, int N){
@@ -49,7 +50,6 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 			nwalkers += C[i][j];
 		}
 	}
-	// cout<<"nwalkers"<<nwalkers<<endl;
 	walkers = new double*[nwalkers];
 	for(int i=0; i<nwalkers;i++){
 		walkers[i] = new double[d];
@@ -201,6 +201,7 @@ void Walk::PutWalkers(int i, int j, int counter){
 	if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
 	for(int k=0; k<d; k++){
 		if(k==0){
+			/*Should this be something with the steplength? - cange factor in that case*/
 			walkers[counter][k] = x[i]+factor*(0.5-ran0(&Idum));
 		}
 		else if(k==1){

@@ -1,3 +1,32 @@
+\section{Discretizing the PDE}
+To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation
+\begin{equation}
+ \frac{\d u}{\d t} = \nabla D\nabla u +f
+\end{equation}
+where f is some source term. 
+The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will mostly have the same approximation. \\
+We start off by doing the innermost derivative in one dimension. 
+The generalization to more dimesions is trivial, and will consist of adding the same terms for the y and z derivatives. 
+\begin{align*}
+ \left[\frac{d}{dx}u\right]^n \approx \frac{u^n_{i+1/2}-u^n_{i-1/2}}{\Delta x}
+\end{align*}
+Where we have made the approximate derivative around the point $x_i$. 
+We then set $\phi(x)=D\frac{du}{dx}$ and do the second derivative
+\begin{align*}
+  \left[\frac{d}{dx}\phi\right]^n \approx \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x}
+\end{align*}
+and insert for $\phi$
+\begin{align*}
+ \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x} = \frac{1}{\Delta x^2}\left(D_{i+1/2}(u^n_{i+1}-u^n_{i+1}) -D_{i-1/2}(u^n_{i}-u^n_{i-1})\right)
+\end{align*}
+Since we can only evaluate the diffusion constant at the mesh points (or strictly speaking since it is a lot simpler to do so) we must approximate $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$. 
+Inerting this gives us 
+\begin{equation}
+ \nabla D\nabla u\approx\frac{1}{2(\Delta x+\Delta y+\Delta z)}\left((D_{i+1,j,k}+D_{i,j,k})(u_{i+1,j,k}-u_{i,j,k})-(D_{i,j,k}+D_{i-1,j,k})(u_{i,j,k}-u_{i-1,j,k})\right)
+\end{equation}
+
+
+\section{Some discussion}
 In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation. 
 When a part of the solution acquired is replaced by the solution from another model, which in this case is stochastic, we will change the initial condition to the next iteration in time. 
 This might have a number of effects on our final solution. 
@@ -93,7 +122,16 @@ Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE
 \label{errorplot_FE1D_noWalk}
 \end{figure}
 
-We then introduce an area on the domain where we swich models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last timestep from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=5$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$.
+We then introduce an area on the domain where we swich models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last timestep from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$. 
+These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
 \begin{equation}\label{conversion_rate}
  C_{ij} = \frac{a}{\Delta t}U_{ij}
 \end{equation}
+The area where the model has been replaced is between $x=0.6$ and $x=0.7$, which is three mesh points. 
+In the same way as for only the simple 1D PDE case we compare the combined numerical solution from the two models to the exact solution. 
+Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligable. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_21102013_1231/results/errorplot.eps}
+\caption{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$.}
+\end{figure}

@@ -45,7 +45,11 @@ Like before, the average nett displacement is given as $S^2 = (2R-N)^2$ and we o
  \langle S^2\rangle = 4\langle R^2\langle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
  = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq
 \end{align*}
-which for the 1D symmetric walk gives $\langle S^2\rangle =N$.\\
+which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by instertion as
+\begin{align}
+ \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npql^2 \label{random_walk_variance}
+\end{align}
+where $l$ is the step length ($\Delta x_{i+1} = \Delta x_i \pm l$).\\
 When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
 This is most easily done in the symmertric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
@@ -87,12 +91,17 @@ where $\Delta \vec{x}(t_j) = \left(\Delta x(t_j),\Delta y(t_j),\Delta z(t_j)\rig
 By the central limit theorem, any stochastic process with a well defined mean and variance can, given enough samples, be approximated by a Gaussian distribution. 
 This means that the probability of finding the walker at some position x after M steps is 
 \begin{equation}
- P(x,N)\propto e^{-\frac{x^2}{2M\sigma^2}}
+ P(x,M)\propto e^{-\frac{x^2}{2M\sigma^2}}
 \end{equation}
-Seeing as $M\propto t$ we can introduce an Einstein relation and substitute $2M\sigma^2\to4Dt$. 
+Remember that the actual gaussian distribution is 
+$$
+\frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{(n-\mu)^2}{2\sigma^2}\right)
+$$
+We can introduce an Einstein relation $\sigma^2 = 2D\Delta t$ and the obvios relation $t = M\Delta t$ to get a more desirable exponent.
 We see that $\langle \Delta x^2\rangle = 2Dt$. 
+\emph{The introduction of the Einstein relation might put some restrictions on our model.}
 Normalizing the expression gives us 
-\begin{equation}
+\begin{equation}\label{rw_gaussian_distribution}
  P(x,t) = \sqrt{\frac{1}{4Dt}}e^{-\frac{x^2}{4Dt}}
 \end{equation}
 
@@ -110,6 +119,16 @@ which is the diffusion equation.
 \begin{equation}
  \frac{\d C}{\d t} = D\nabla^2 C
 \end{equation}
+By insertion we can check that this version (\ref{rw_gaussian_distribution}) of the gaussian distribution fulfills the diffusion eqution.
+\begin{align*}
+ \frac{\d P}{\d t} = -\frac{4\pi D\exp\left(-\frac{x^2}{4Dt}\right)}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2\exp\left(-\frac{x^2}{4Dt}\right)}{4Dt^2\sqrt{4\pi Dt}} \\
+ = \exp\left(-\frac{x^2}{4Dt}\right)\left(\frac{8Dx^2}{2\sqrt{\pi}(4Dt)^{5/2}} -\frac{(4D)^2t}{2\sqrt{\pi}(4Dt)^{5/2}}\right)&= \frac{4D\exp\left(-\frac{x^2}{4Dt}\right)(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
+\end{align*}
+ 
+\begin{align*}
+ D\frac{\d^2 P}{\d x^2} &= \frac{D}{\sqrt{4\pi Dt}}\frac{\d}{\d x}\left[-\exp\left(\frac{-x^2}{4Dt}\right)\left(\frac{-2x}{4Dt}\right)\right]\\
+ = \frac{2D}{4Dt\sqrt{4\pi Dt}}&\exp\left(\frac{-x^2}{4Dt}\right)\left[1-x\left(\frac{2x}{4Dt}\right)\right] = \frac{4D\exp\left(-\frac{x^2}{4Dt}\right)(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
+\end{align*}
 
 \subsection{Choosing random walk algorithm}
 As this article points out \cite{} the simplest random walk model, which places walker on discrete mesh points and uses a fixed step length, has been used with great succsess to model diffusion processes. 
@@ -130,6 +149,51 @@ Future ones will be added here as well.
   The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
   Depending on the couplig chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
   Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$, but it might turn out to be difficult to makes sure that this is fulfilled.
- \item 
+ \item Boundary conditions\\
+ To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
+ Finding a boundary condition that accurately models the actual system turns out to be quite straightforward, so long as the walk-domain is not on the actual boundary of the whole system. 
+ We can assume that the number of walkers in the walk-domain is conserved for each PDE-timestep, and thus no walkers can escape the domain. 
+ Implementing perfectly reflecting boundaries solves this quite well. 
+ This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
+ Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) untill we have the desired concentration of walkers.
+ \item Negative concentration of walkers \\
+ Should not be to difficult...
 
 \end{itemize}
+
+
+\section{Actually combining}
+This section will deal with the actual combination of the two models.\\
+\subsection{\emph{Some subtitle}}
+The basic structure of the program is to have one solver-object which contains one PDE-solver for the normal diffusion equation, and a linked list of random walk-solvers and their relevant areas. 
+Before we start we must add an initial condition along with some parameters such as the diffusion constant (/tensor) and $\Delta t$, and we have the opportunity to mark areas on the mesh where we want random walk solvers. 
+The method for adding walk-areas will map them to an index and set the initial condition for the walk. 
+In the future we plan to add the possibility of setting boundary conditions and having anisotropy follow into the random walk solvers as well.
+At each timestep we call the solve-method of the combined solver, which in turn calls the solve method for the PDE-solver. 
+We then loop over the random walk solvers and call their solve-methods. 
+The results of these are inserted in the solution from the PDE using some rutine (e.g. the average of the two) and the timestep is done.
+
+\subsection{Probability distribution and timesteps}
+As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the gaussian distribution. 
+In our application, however, we are not interrested in finding the walker at an exact position, but in an interval around the meshpoints sent to the walk-solver. 
+This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
+We will also run the walk solver for some $n$ timesteps on the random-walk scale (where $n$ steps on the random walk scale is the same as one step on the PDE scale). 
+This slightly modifies our distribution into
+\begin{equation}
+ P(x_i\pm\Delta x,t_{n+1}) = \frac{1}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
+\end{equation}
+This makes the concentration of walkers 
+\begin{equation}
+ C(x_i\pm\Delta x,t_{n+1}) = \frac{N}{\sqrt{4\pi Dn\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4Dn\Delta \tilde{t}}\right)
+\end{equation}
+For each PDE-timestep we reset the walkers to have some new initial condition. 
+This is done to make sure that statistical fluctuations will not put the diffusive process ``off course''. 
+The point is that $ C(x_i\pm\Delta x,t_{n+1})$ will be dependent on the initial condition $ C(x_i\pm\Delta x,t_{n})$.
+
+
+Looking at the difference in timestep size between the two lengthscales we see from equation \ref{descrete_gaussian_distr} that the stepsize on the random walk scale is dependent on the variance in the actual steps. 
+This gives something like 
+\begin{equation}
+ \Delta\tilde{t} \propto \frac{\langle \Delta x^2\rangle}{N}
+\end{equation}
+where we can set the number of timesteps, N, but we must find the variance...

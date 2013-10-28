@@ -65,18 +65,18 @@ class Experiment:
 	def compile(self):
 		os.system('g++ *.cpp -O2 -o main_walk')
 
-	def SetupRun(self,x0,x1,y0,y1,m,n,T,filename="tmp_results"):
+	def SetupRun(self,x0,x1,y0,y1,m,n,T,dt,filename="a"):
 		self.x0 = x0; self.x1 = x1; self.y0 = y0; self.y1 = y1
-		self.m = m; self.n = n; self.T = T
+		self.m = m; self.n = n; self.T = T; self.dt = dt
 		self.filename = filename
 
 	def RunDeterministic(self):
 		# self.walk = [0]*self.T
-		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0))
-		for step in sorted(glob.glob(self.result_path+'/Deterministic*.bin')):
+		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %f'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0,self.dt))
+		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
 			self.walk.append(np.fromfile(step,sep=" "))
 
-	def RunSimulation(self,Hc,nsamples=30):
+	def RunSimulation(self,Hc,nsamples=1):
 		tofile = self.tofile
 		x0 = self.x0; x1 = self.x1; y0 = self.y0; y1 = self.y1
 		m = self.m; n = self.n; T = self.T
@@ -84,19 +84,23 @@ class Experiment:
 		result_path = self.result_path
 		tmp = [0]*T
 		for i in range(nsamples):
-			os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f'%(tofile,x0,x1,y0,y1,m,n,T,result_path,filename,Hc))
-			a = 0
-			for step in sorted(glob.glob(result_path+'/tmp_results*.bin')):
-				tmp[a] += np.fromfile(step,sep=" ")
-				a += 1
-		for i in xrange(T):
-			tmp[i] /= nsamples
+			os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %f'%(tofile,x0,x1,y0,y1,m,n,T,result_path,filename,Hc,self.dt))
+		# 	a = 0
+		# 	print result_path+'/results_FE_Hc%d*.txt'%Hc
+		# 	for step in sorted(glob.glob(result_path+'/results_FE_Hc%d*.txt'%Hc)):
+		# 		# tmp[a] += np.fromfile(step,sep=" ")
+		# 		tmp[a] += np.loadtxt(step)	
+		# 		a += 1
+		# for i in xrange(T):
+		# 	tmp[i] /= nsamples
 
-		self.no_walk.append(tmp)
+		# self.no_walk.append(tmp)
 		self.runcounter += 1
 		self.samples = nsamples
 
-	def CalculateError(self,exact=None):
+	def CalculateError(self,Hc,exact=None):
+		for i in Hc:
+			self.ReadError(i)
 		self.error = [np.zeros(self.T)]*self.runcounter
 		print np.shape(self.error)," , ",np.shape(self.no_walk)," , "
 		if exact is None:
@@ -107,13 +111,21 @@ class Experiment:
 			if self.n <= 1:
 				X = np.linspace(0,1,self.m)
 				Y = np.zeros(self.m)
-				dt = (X[1]-X[0])**2/3.0
 			else:
 				X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-				dt = (X[1,1]-X[0,0])**2/5.0
 			for i in xrange(self.runcounter):
 				for j in xrange(self.T):
 					self.error[i][j] = np.max(np.abs(self.no_walk[i][j]-self.exact(X,Y,(j+1)*dt)))
+
+	def ReadError(self,Hc):
+		tmp = [0]*T
+		a=0
+		for step in sorted(glob.glob(self.result_path+'/results_FE_Hc%d_*.txt'%(Hc+1))):
+			# tmp[a] += np.fromfile(step,sep=" ")
+			print step
+			tmp[a] += np.loadtxt(step)	
+			a += 1
+		self.no_walk.append(tmp)
 
 	def SaveError(self,header=None):
 		fname = self.result_path+'/error.txt'
@@ -126,6 +138,7 @@ class Experiment:
 	def PlotError(self,save=True):
 		mpl.hold('on')
 		for i in range(self.runcounter):
+			# mpl.plot(np.log(self.error[i]/self.dt))
 			mpl.plot(self.error[i])
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('max(abs(simulation-"exact"))')
@@ -179,11 +192,6 @@ class Experiment:
 		f.write(sum_html)
 		f.close()
 
-	def Finish(self):
-		if self.debug:
-			os.system('rm -rf %s'%self.parent_path)
-		# else:
-		# 	os.system('rm -rf %s'%self.parent_path)
 
 	def Visualize(self,path=None,filename=None):
 		if path is None:
@@ -191,28 +199,52 @@ class Experiment:
 		if filename is None:
 			filename = '/tmp'
 		im = []
-		fig = mpl.figure()
-		x = np.linspace(0,1,self.m)
-		# dt = (x[1]-x[0])**2/3.0
-		# err = np.zeros(self.T)
-		# k = 0
-		for step in sorted(glob.glob(path+filename+'*.bin')):
-			f = open(step,'r')
-			tmp = np.asarray(f.readlines())
-			tmp = tmp.astype(np.float32)
-			# err[k] = np.max(np.abs(np.transpose(tmp)-self.exact(x,0,(k+1)*dt)))
-			im.append(mpl.plot(x,tmp,'b-'))
-			f.close()
-			# print err[k], np.log(err[k]/dt), "dt = %g"%dt
-			# k +=1
-		ani = animation.ArtistAnimation(fig,im)
-		mpl.show()
+		if self.n<=1:
+			fig = mpl.figure()
+			x = np.linspace(0,1,self.m)
+			# dt = (x[1]-x[0])**2/3.0
+			for step in sorted(glob.glob(path+filename+'*.txt')):
+				f = open(step,'r')
+				tmp = np.asarray(f.readlines())
+				tmp = tmp.astype(np.float32)
+				im.append(mpl.plot(x,tmp,'b-'))
+				f.close()
+			ani = animation.ArtistAnimation(fig,im)
+			mpl.show()
+		else:
+			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+			mpl.ion()
+			fig = mpl.figure()
+			ax = fig.add_subplot(111,projection='3d')
+			counter = 1
+			for step in sorted(glob.glob(path+filename+'*.txt')):
+				print step
+				tmp = np.loadtxt(step)
+				wframe = ax.plot_wireframe(X,Y,(tmp))
+				mpl.draw()
+				if counter==1:
+					ax.set_autoscaley_on(False)
+				ax.collections.remove(wframe)
+				counter +=1
+			ax.plot_wireframe(X,Y,self.exact(X,Y,0))
+			mpl.draw()
+			time.sleep(5)
+
 
 	def exact(self,x,y,t):
 		return 0
 
+
+	def Finish(self):
+		if self.debug:
+			os.system('rm -rf %s'%self.parent_path)
+		else:
+			os.system('rm -rf %s'%self.parent_path)
+
+
 def f(x,y,t):
 	return np.exp(-t*np.pi**2)*np.cos(np.pi*x) +1
+	# return np.ones(np.shape(x))*1.5
 
 if __name__ == '__main__':
 	DEBUG = False
@@ -225,29 +257,31 @@ if __name__ == '__main__':
 	this_dir = right_split(os.getcwd(),'/')
 
 	x0 = 0.6
-	y0 = 0
+	y0 = 0.6
 	x1 = 0.7
-	y1 = 0
+	y1 = 0.7
 	m = 21
 	n = 21
 	T = 51
 	nsamples = 1
 	dx = 1.0/(m-1)
-	dt = dx**2/5.0
+	dy = 1.0/(n-1) if n>1 else 0
+	dt = dx*dy/5.0 if n>1 else dx**2/3.0
 	Hc = [5/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 
 	run = Experiment(this_dir, plot,DEBUG,save_files)
 	run.compile()
-	run.SetupRun(x0,x1,y0,y1,m,n,T)
+	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
 	# run.RunDeterministic()
 	for i in Hc:
 		print "Hc = %g"%i
 		run.RunSimulation(i,nsamples)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
 
 	run.exact = f
-	run.CalculateError(exact=True)
 	run.PlotError()
 	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()

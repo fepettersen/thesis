@@ -2,30 +2,30 @@
 using namespace std;
 
 
-string make_filename(string buffer,string filename,int step_no){
+string make_filename(string buffer,string filename,int factor,int step_no){
     //Returns a filename saying something about the particular run.
 	char buff[100];
-	if(filename ==""){
-		sprintf(buff,"/results_FE_n%03d.bin",step_no);
+	if(filename =="a"){
+		sprintf(buff,"/results_FE_Hc%d_n%03d.txt",factor,step_no);
 	}
 	else{
-		sprintf(buff,"/%s_n%03d.bin",filename.c_str(),step_no);
+		sprintf(buff,"/%s_n%03d.txt",filename.c_str(),step_no);
 	}
   	buffer = buff;
   	// delete(buff);
   	return buffer;
 }
 
-void output(ofstream* outfile, double **u, string buffer, string path,string filename,int m,int n, int N){
+void output(ofstream* outfile, double **u, string buffer, string path,string filename,int m,int n,int factor, int N){
     /*outfile is an ofstram-object letting us open a file
     **u is an armadillo-object containing the solution at time n
     **n is the timestep number
     **scheme is an integer telling what scheme is used to obtain the solution
     **N is the size of the array (in one direction)*/
     string tmp = path;
-    tmp.append(make_filename(buffer,filename,N));
-    outfile->open(tmp.c_str(),ios::binary);
-    // outfile->open(tmp.c_str());
+    tmp.append(make_filename(buffer,filename,factor,N));
+    // outfile->open(tmp.c_str(),ios::binary);
+    outfile->open(tmp.c_str());
     for(int i=0;i<m;i++){
         for(int j=0;j<n;j++){
             *outfile <<u[i][j]<<setprecision(16)<<" ";
@@ -54,8 +54,9 @@ int main(int argc, char** argv)
     string path = argv[9];
     string filename = argv[10];
     double factor =atof(argv[11]);
-    string buffer;
+    double Dt = atof(argv[12]);
 
+    string buffer;
     ofstream outfile;
 
 	double *x = new double[2];
@@ -93,36 +94,21 @@ int main(int argc, char** argv)
 				// Up[i][j] = 0;
 			}
 			wth = X[i]*PI;
-			wty = Y[j]*PI;
-			Up[i][j] = cos(wth)*cos(wty) +1;
+			// wty = Y[j]*PI;
+			Up[i][j] = cos(wth) +1;
+			// Up[i][j] = 1.5;
 			U[i][j] = 0;
 		}
 	}
 
-	// for(int k=0;k<m;k++){
-	// 	cout<<Up[k][0]<<"  ";
-	// }
-	// cout<<endl;
 
-	// Walk snow(2);
-	// snow.SetInitialCondition(C,m,n);
-	// Diffusion giraffe(dx,0,1);
-
-	Combine gremlin(m,n,0,1,0,1,1,factor);
-	gremlin.SetInitialCondition(Up,m,n);
-	// gremlin.AddWalkArea(x,y);
-
+	Combine BlackBox(m,n,0,1,0,1,1,factor,Dt);
+	BlackBox.SetInitialCondition(Up,m,n);
+	BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
-		gremlin.Solve();
-
-		// giraffe.advance(U,Up,m,n);
-		// snow.advance(C);
-		// for(int g=0; g<m; g++)
-		// 	for(int h=0; h<n; h++)
-		// 		Up[g][h] = U[g][h];
+		BlackBox.Solve();
 		if(tofile){
-			// output(&outfile,U,buffer,path,filename,m,n,t);
-			output(&outfile,gremlin.Up,buffer,path,filename,m,n,t);
+			output(&outfile,BlackBox.Up,buffer,path,filename,m,n,factor,t);
 		}
 	}
 	return 0;

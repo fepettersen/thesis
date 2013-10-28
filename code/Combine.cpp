@@ -3,7 +3,7 @@ using namespace std;
 
 int debug = 0;
 
-Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double DiffusionConstant, double factor)
+Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double DiffusionConstant, double factor, double Dt)
 {
 	if(debug){cout<<"Combine::Combine"<<endl;}
 	m = M; n = N;
@@ -30,7 +30,7 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 		Y[j] = j*dy;
 	}
 
-	pde_solver = new Diffusion(dx,dy,D);
+	pde_solver = new Diffusion(dx,dy,D,Dt);
 	Hc = factor;
 };
 
