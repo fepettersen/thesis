@@ -120,10 +120,11 @@ class Experiment:
 			for i in Hc:
 				for j in xrange(self.T): 
 					step = np.loadtxt(self.result_path+'/results_FE_Hc%d_n%03d.txt'%(i+1,j))
-					self.error[a][j-1] = np.max(np.abs(self.exact(X,Y,j*self.dt)-step))
+					self.error[a][j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-step)
 				a+=1
 
 	def ReadError(self,Hc):
+		"""Unused?"""
 		tmp = [0]*T
 		a=0
 		for step in sorted(glob.glob(self.result_path+'/results_FE_Hc%d_*.txt'%(Hc+1))):
@@ -145,7 +146,7 @@ class Experiment:
 		mpl.hold('on')
 		for i in range(self.runcounter):
 			# mpl.plot(np.log(self.error[i]/self.dt))
-			mpl.plot(self.error[i])
+			mpl.plot(self.error[i],'b-o')
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('max(abs(simulation-"exact"))')
 		mpl.title('Error plot')
@@ -209,12 +210,15 @@ class Experiment:
 			fig = mpl.figure()
 			x = np.linspace(0,1,self.m)
 			# dt = (x[1]-x[0])**2/3.0
+			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
-				f = open(step,'r')
-				tmp = np.asarray(f.readlines())
-				tmp = tmp.astype(np.float32)
-				im.append(mpl.plot(x,tmp,'b-'))
-				f.close()
+				# f = open(step,'r')
+				# tmp = np.asarray(f.readlines())
+				# tmp = tmp.astype(np.float32)
+				tmp = np.loadtxt(step)
+				im.append(mpl.plot(x,(tmp-self.exact(x,np.zeros(self.m),counter*self.dt)),'b-'))
+				# im.append(mpl.plot(x,tmp,'b-'))
+				counter += 1
 			ani = animation.ArtistAnimation(fig,im)
 			mpl.show()
 		else:
@@ -266,8 +270,8 @@ if __name__ == '__main__':
 	x1 = 0.7
 	y1 = 0.7
 	m = 21
-	n = 21
-	T = 51
+	n = 1
+	T = 51	
 	nsamples = 1
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0

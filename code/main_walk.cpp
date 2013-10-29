@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 				C[i][j] = 0;
 				// Up[i][j] = 0;
 			}
-			wth = X[j]*PI;
+			wth = X[i]*PI;
 			Up[i][j] = cos(wth)+1;
 			U[i][j] = 0;
 		}
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
 	Combine BlackBox(m,n,0,1,0,1,1,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-	// BlackBox.AddWalkArea(x,y);
+	BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
 		if(tofile){
