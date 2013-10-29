@@ -1,0 +1,30 @@
+Guide to/explanation of code
+
+All code exept for the manifactured solution is calculated in c++. 
+The program is run form "new_experiment.py" - which can also compile
+
+At the bottom of new_experiment you will find the following parameters:
+
+DEBUG		-bool. true=>remove all generated files upon completion
+plot		-bool. doesnt do anything, will be removed
+save_files	-bool. write resultfiles or not
+add_text_to_web -bool. not used
+
+x0,y0,x1,y1	-float. the coordinates of walk-area
+m,n 		spatial resolution in x- and y. n=1 => 1d
+T		number of timesteps to run (resultfiles limit to 999)
+
+Hc		1 unit of PDE is Hc walkers
+
+The script generates a new directory in thesis/doc/results called experiment_"datetag" which saves a copy of all code, all parameters and the resultfiles and plots. everything is removed if DEBUG is true.
+
+after running SetupRun(args) we execute the program by RunSimulation.
+main_walk (executable c++ program) is called with the appropriate commandline arguments (should be config file?) and sets up the initial condition. The initial condition must be edited in main_walk.cpp.
+
+Combine.cpp is the class which contains and calls the various solvers in turn and combines the results from the two solvers. 
+As of now (29.10) we can run only PDE, but not only random walk from the combine class.
+
+Diffusion.cpp is the diffusion solver
+Walk.cpp is the random walk solver
+
+
