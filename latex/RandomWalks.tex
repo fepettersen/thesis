@@ -1,5 +1,6 @@
 In this chapter we will take a closer look at random walks, both in general and the transition from the statistical view to partial differential equations. 
-We will take a look at different algorithms to produce random walks, and discuss their pros and cons in light of this project.
+We will take a look at different algorithms to produce random walks, and discuss their pros and cons in light of this project. 
+Then we will take a quick look at partial diffential equations and numerical solution of them.
 
 \section{Introduction to random walks}
 The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
@@ -64,13 +65,13 @@ on which we apply Stirlings famous formula for large factorials $n!\simeq\sqrt{2
 \end{align*}
 Where we have used $R+L=N$. We now insert for $\frac{2R}{N}=1+\frac{S}{N}$ and $\frac{2L}{N}=1-\frac{S}{N}$ and expand the logarithms to first order, $RL=\frac{N^2-S^2}{4}$ in the prefactor, and approximate $1-\frac{S^2}{N^2}\simeq1$. This gives
 \begin{equation}\label{descrete_gaussian_distr}
- P(S,N) =\sqrt{\frac{2}{\pi N}}c
+ P(S,N) =\sqrt{\frac{2}{\pi N}}\exp\left(\frac{-S^2}{2N}\right)
 \end{equation}
 which is an ordinary, descrete Gaussian distribution with $\langle S\rangle = 0$  and $\langle S^2\rangle = N$. 
 If we keep assuming that the walker is on the x-axis, and let the step length, a, get small the final position will be $x=Sa$ which we can assume is a continous variable. 
 Similarly, we let the time interval between each step, $\tau$, be small and let the walk run for a contious time $t=N\tau$. This changes the distribution \ref{descrete_gaussian_distr} to
 \begin{equation}
- P(x,t) = \frac{1}{2a}\sqrt{\frac{2\tau}{\pi t}}e^{-\frac{x^2\tau}{2a^2t}}.
+ P(x,t) = \frac{1}{2a}\sqrt{\frac{2\tau}{\pi t}}\exp\left(-\frac{x^2\tau}{2a^2t}\right). 
 \end{equation}
 The prefactor $\frac{1}{2a}$ is needed to normalize the continous probability distribution since the sepatation between each possible final position in walks with the same number of steps is $\Delta x=2a$. 
 We also introduce the diffusion constant
@@ -79,7 +80,7 @@ D = \frac{a^2}{2\tau}
 \end{equation}
 making the distribution
 \begin{equation}
- P(x,t) = \sqrt{\frac{1}{4\pi Dt}}e^{-\frac{x^2}{4Dt}}
+ P(x,t) = \sqrt{\frac{1}{4\pi Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
 
 \subsection{More general Random Walks}
@@ -136,7 +137,9 @@ However, this model will struggle with reproducing anisotropic diffusion, that i
 We see then that the simplest model is rather robust, and well tested. 
 However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
 Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
-We can model brownian motion simply by using equation \ref{brownian_motion}, and we can with a bit of work expand it to model collisions between walkers as well.
+We can model brownian motion simply by using equation \ref{brownian_motion}, and we can with a bit of work expand it to model collisions between walkers as well. \\
+That beeing said, by the central limit theorem both models will after some timesteps be described by a gaussian distribution meaning that on the PDE scale we will not know the difference. 
+Hence it will make no sense to not use the simplest random walk model.
 
 \subsection{Potential problems or pitfalls with combining solutions}
 
@@ -161,23 +164,119 @@ Future ones will be added here as well.
 
 \end{itemize}
 
+\subsection{Random walks and anisotropy}
 
-\section{Actually combining}
+Any real problem where parts of the diffusion process cannot be modelled by the continuum approximation is bound to be anisotropic. 
+There is reason to belive that an anisotropic diffusion process on the PDE level will lead to an aisotropic random walk model as well, but how do we modell this. 
+Equation \ref{steplength} shows the step length as a function of the diffusion constant. 
+If we simply replace the diffusion constant by a function $D = D(\vec{x})$ we are at least started, but this will not quite be sufficient as 
+
+\subsection{Random walks and drift}
+
+Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
+Initially one thought that diffusion in the ECS of the brain was governed by a drift term \cite{}, but the modern preception is that this drift term is in the very least negligible \cite{}.
+The drift term might be of importance in other applications, however, and som we should look into it.\\
+How do we model random walks with drift? \\
+A first instinct is to simply add some vector to the brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
+This approach can also be used in the fixed steplength (or variable steplength in the anisotropic case)  if we express the new step, $\vec{s}$, as
+\begin{align*}
+ \vec{s} = (\pm l \text{ or }0,\pm l \text{ or }0) +\vec{d}
+\end{align*}
+where $\vec{d}$ denotes the drift of the walker.\\
+We can set up the continuity equation for a concentration, $C(x,t) = NP(x,t)$ of random walkers which are affected by a drift.
+\begin{equation}
+ \frac{\d C}{\d t} +\nabla\cdot\vec{j} = S
+\end{equation}
+Where $\vec{j}$ denotes the total flux of walkers through some enclosed volume and $S$ is a source/sink term. 
+Since the walkers are affected by drift the flux will consist of two terms; $\vec{j} = \vec{j}_{diff}+\vec{j}_{drift}$. 
+From Fick's first law we know that $\vec{j}_{diff} = -D\nabla C$. 
+The second flux term is the advective flux which will be equal to the average velocity of the system; $\vec{j}_{drift} = \vec{v}C$. 
+Inserting this in the continuity equation gives us the well known convection diffusion eqution (\ref{convection_diffusion_equation}).
+\begin{equation}\label{convection_diffusion_equation}
+ \frac{\d C}{\d t} = \nabla\cdot\left(D\nabla C\right)-\nabla\cdot\left(\vec{v}C\right) + S
+\end{equation}
+Which in many cases will simplify to
+\begin{equation}
+ \frac{\d C}{\d t} = D\nabla^2 C-\vec{v}\cdot\nabla C
+\end{equation}
+
+
+
+\section{Some words about partial differential equations}\label{some_words_on_PDEs}
+\subsection{Discretizing}
+
+To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation
+\begin{equation}
+ \frac{\d u}{\d t} = \nabla D\nabla u +f
+\end{equation}
+where f is some source term. 
+The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will mostly have the same approximation. \\
+We start off by doing the innermost derivative in one dimension. 
+The generalization to more dimesions is trivial, and will consist of adding the same terms for the y and z derivatives. 
+\begin{align*}
+ \left[\frac{d}{dx}u\right]^n \approx \frac{u^n_{i+1/2}-u^n_{i-1/2}}{\Delta x}
+\end{align*}
+Where we have made the approximate derivative around the point $x_i$. 
+We then set $\phi(x)=D\frac{du}{dx}$ and do the second derivative
+\begin{align*}
+  \left[\frac{d}{dx}\phi\right]^n \approx \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x}
+\end{align*}
+and insert for $\phi$
+\begin{align*}
+ \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x} = \frac{1}{\Delta x^2}\left(D_{i+1/2}(u^n_{i+1}-u^n_{i+1}) -D_{i-1/2}(u^n_{i}-u^n_{i-1})\right)
+\end{align*}
+Since we can only evaluate the diffusion constant at the mesh points (or strictly speaking since it is a lot simpler to do so) we must approximate $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$. 
+Inerting this gives us 
+\begin{equation}
+ \nabla D\nabla u\approx\frac{1}{2(\Delta x+\Delta y+\Delta z)}\left((D_{i+1,j,k}+D_{i,j,k})(u_{i+1,j,k}-u_{i,j,k})-(D_{i,j,k}+D_{i-1,j,k})(u_{i,j,k}-u_{i-1,j,k})\right)
+\end{equation}
+provided that $\Delta x=\Delta y=\Delta z$!
+
+\subsection{Truncation error}
+As we know the numerical derivative is not the analytical derivative, but an approximation. 
+This approximation has a well defined residual, or truncation error which we can find by Taylor expansion.
+\begin{equation*}
+  R = \frac{u(t_{n+1}) -u(t_n)}{\Delta t} -u'(t_n)
+\end{equation*}
+Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h$
+\begin{align*}
+ R &= \frac{u(t_n)+u'(t_n)\Delta t +0.5u''(t_n)\Delta t^2 + \mathcal{O}(\Delta t^3)-u(t_n)}{\Delta t} -u'(t_n)\\
+  &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) = \mathcal{O}(\Delta t)
+\end{align*}
+We can do better than this by using another discretization scheme for the PDE, but in our case the PDE is not the only error source seeing as we will combine it with a random walk solver. 
+Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
+So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
+Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per meshpoint in the walk-area. 
+This will be such a costly operation that it will not necesarily be worth it.
+
+
+
+
+\section{Combining the two solvers}
 This section will deal with the actual combination of the two models.\\
-\subsection{\emph{Some subtitle}}
+\subsection{The basic algorithm}
 The basic structure of the program is to have one solver-object which contains one PDE-solver for the normal diffusion equation, and a linked list of random walk-solvers and their relevant areas. 
 Before we start we must add an initial condition along with some parameters such as the diffusion constant (/tensor) and $\Delta t$, and we have the opportunity to mark areas on the mesh where we want random walk solvers. 
 The method for adding walk-areas will map them to an index and set the initial condition for the walk. 
 In the future we plan to add the possibility of setting boundary conditions and having anisotropy follow into the random walk solvers as well.
 At each timestep we call the solve-method of the combined solver, which in turn calls the solve method for the PDE-solver. 
 We then loop over the random walk solvers and call their solve-methods. 
-The results of these are inserted in the solution from the PDE using some rutine (e.g. the average of the two) and the timestep is done.
+The results of these are inserted in the solution from the PDE using some rutine (e.g. the average of the two) and the timestep is done. 
+A schematic of the algoritm is provided in figure \ref{schematic}.
+
+\begin{figure}[H]
+\centering
+% \includegraphics{schematic.eps}
+\caption[Algorithm]{Schematic diagram of the algorithm.}
+\label{schematic}
+\end{figure}
+
 
 \subsection{Probability distribution and timesteps}
 As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the gaussian distribution. 
 In our application, however, we are not interrested in finding the walker at an exact position, but in an interval around the meshpoints sent to the walk-solver. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
-We will also run the walk solver for some $n$ timesteps on the random-walk scale (where $n$ steps on the random walk scale is the same as one step on the PDE scale). 
+We will also run the walk solver for some $N$ timesteps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
 This slightly modifies our distribution into
 \begin{equation}
  P(x_i\pm\Delta x,t_{n+1}) = \frac{1}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)

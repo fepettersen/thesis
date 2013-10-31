@@ -1,6 +1,9 @@
 \select@language {english}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Algorithm}}{14}{figure.caption.4}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Numerical error for 1D Forwar Euler discretization.\relax }}{18}{figure.caption.4}
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$.\relax }}{18}{figure.caption.5}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Initial condition in 1d}}{18}{figure.caption.5}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Numerical error for 1D Forwar Euler discretization}}{19}{figure.caption.6}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Effect of increasing number of walkers}}{20}{figure.caption.7}
+\addvspace {10\p@ }

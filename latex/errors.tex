@@ -1,106 +1,27 @@
-\section{Discretizing the PDE}
-To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation
-\begin{equation}
- \frac{\d u}{\d t} = \nabla D\nabla u +f
-\end{equation}
-where f is some source term. 
-The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will mostly have the same approximation. \\
-We start off by doing the innermost derivative in one dimension. 
-The generalization to more dimesions is trivial, and will consist of adding the same terms for the y and z derivatives. 
-\begin{align*}
- \left[\frac{d}{dx}u\right]^n \approx \frac{u^n_{i+1/2}-u^n_{i-1/2}}{\Delta x}
-\end{align*}
-Where we have made the approximate derivative around the point $x_i$. 
-We then set $\phi(x)=D\frac{du}{dx}$ and do the second derivative
-\begin{align*}
-  \left[\frac{d}{dx}\phi\right]^n \approx \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x}
-\end{align*}
-and insert for $\phi$
-\begin{align*}
- \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x} = \frac{1}{\Delta x^2}\left(D_{i+1/2}(u^n_{i+1}-u^n_{i+1}) -D_{i-1/2}(u^n_{i}-u^n_{i-1})\right)
-\end{align*}
-Since we can only evaluate the diffusion constant at the mesh points (or strictly speaking since it is a lot simpler to do so) we must approximate $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$. 
-Inerting this gives us 
-\begin{equation}
- \nabla D\nabla u\approx\frac{1}{2(\Delta x+\Delta y+\Delta z)}\left((D_{i+1,j,k}+D_{i,j,k})(u_{i+1,j,k}-u_{i,j,k})-(D_{i,j,k}+D_{i-1,j,k})(u_{i,j,k}-u_{i-1,j,k})\right)
-\end{equation}
 
 
 \section{Some discussion}
-In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation. 
+In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
 When a part of the solution acquired is replaced by the solution from another model, which in this case is stochastic, we will change the initial condition to the next iteration in time. 
 This might have a number of effects on our final solution. 
 When we solve a differential equation numerically we only get an approximation to the actual solution because we are using approximate derivatives (see figure \ref{illustrate_approximate_derivatives}). 
-We can investigate this type of error by doing two simulations of the same problem, but replacing the solution in one of the simuations in some area by the random walk model for one timestep. 
+To investigate the error we are introducing we will first need to test that the truncation error of the numerical PDE solver behaves as expected. 
+This can be done by chosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
+As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
+We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
+Figure \ref{errorplot_1d} shows the error norm (\ref{}) of only the PDE solver done in 1 dimension plotted for each timestep of the simulation. 
+The manifactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x)$ and its initial condition is shown in figure \ref{}.
 
-\begin{lstlisting}
- path = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_03102013_1218/results/'
-import glob
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/initial_condition.eps}
+ \caption[Initial condition in 1d]{Initial condition of manifactured solution in 1d and the simulation.}
+ \label{initial_condition_1d}
+\end{figure}
 
-i = [];e = [];s = []
-
-for excl in sorted(glob.glob(path+'Excl*')):
-	e.append(np.load(excl))
-
-for incl in sorted(glob.glob(path+'Incl*')):
-	i.append(np.load(incl))
-
-for j in xrange(len(i)):
-	s.append(np.max(np.abs(i[j]-e[j])))
-	print s[-1]
-\end{lstlisting}
-As we can see this will print the maximum absolute difference between the two solutions. 
-Since we are dealing with a diffusion process we expect that the first timestep should have the largest error and that the error will in time be killed by the diffusion process. 
-\begin{lstlisting}
-[...]
-0.0
-0.025832
-0.0054384
-0.00360192
-0.00212352
-0.0016940416
-0.0012704
-0.001173512704
-0.0009942699008
-0.00093037021184
-0.00083786862592
-0.000782433954202
-0.000723955260948
-0.000680186522141
-0.000638864266527
-0.000604769629612
-
-\end{lstlisting}
-The error is larger than $\Delta t$ by a factor of $10$ ($\Delta t = 0.002$)... 
-This might be improved by increasing the number of walkers, or finding a better steplength for the walkers as well as improving the walk-algorithm etc..
-The above results were obtained by using the previous timestep as input to the random walk solver. 
-In most numerical algorithms (Euler-Chromer etc) one will benefit from using the newest timestep as early as possible. 
-Doing the same experiment with the modification of using the latest timestep as input to the random walk solver we obtain the following:
-\begin{lstlisting}
-[...]
-0.0
-0.06
-0.014
-0.0072
-0.0036
-0.00232
-0.0014912
-0.0011744
-0.000803712
-0.000703744
-0.00059240448
-0.000536887296
-0.0004960012288
-0.00047304564736
-0.000437414641664
-0.00041956655104
-\end{lstlisting}
-That is, the initial error is larger, but it is reduced faster. 
-However, this is a stochastic process, and one should average over many experiments. 
-An average over (only) ten experiments using twice the number of walkers (M=100) shows that the errors seem to be converging towards the same value regardless of which timestep is used as input.
 
 \section{Manifactured Solutions}
-A normal way of checking that our sceme of choise is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
+A normal way of checking that our scheme of choise is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
 As a first, simple implenetation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \hyperref[simple_diffusion_equation]{\ref*{simple_diffusion_equation}}. 
 This discretization is expected to have an error-term of the order of $\Delta t$, which again is limited by a stability criterion. 
 We can now decide that the solution to equation \ref{simple_diffusion_equation} should be
@@ -117,8 +38,8 @@ Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_21102013_1141/results/errorplot.eps}
-\caption{Numerical error for 1D Forwar Euler discretization.}
+\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/deterministic_errorplot.eps}
+\caption[Numerical error for 1D Forwar Euler discretization]{Numerical error for 1D Forwar Euler discretization of the PDE. Nothing else is done to the simulation.}
 \label{errorplot_FE1D_noWalk}
 \end{figure}
 
@@ -132,9 +53,34 @@ In the same way as for only the simple 1D PDE case we compare the combined numer
 Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligable. 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_21102013_1231/results/errorplot.eps}
-\caption{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$.}
+\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/errorplot.eps}
+\caption[Effect of increasing number of walkers]{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$. Other parameters of importance are $\Delta t\approx 0.00083333$, $\Delta x = 0.05$.}
 \end{figure}
-\subsection{2D}
+As we can se from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the number of walkers that each ``unit concentration'' corresponds to has a positive effect on the errornorm up to a certain point. 
+After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of the Forward Euler scheme. 
+This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
+Meaning of course that the calculations in section \ref{} are not hopeless.
+
+\subsection{The effects of adding drift to the walkers}
+
+As shown in section \ref{} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
+In our analysis so far we have completely ignored the spatial truncation error because it is of second order, and the truncation error in time is of first order. 
+When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
+Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
+We must also find a new stability criterion for the scheme. \\
+As for now, the Leap-frog discretization will do (though it is not by far a perfect choise seeing as it is unstable).
+\begin{equation}\label{convection_diffusion_equation_leapfrog}
+ C^{n+1} = \frac{D\Delta t}{\Delta x^2}\left(C^n_{i+1}-2C^n_i+C^n_{i-1}\right)-\frac{v\Delta t}{2\Delta x}\left(C^n_{i+1}-C^n_{i-1}\right)
+\end{equation}
+The truncation error for the first order derivative using the Leap-frog scheme is obtained as follows
+\begin{align*}
+ u(t,x+\Delta x) = u(t,x) + \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)\\
+ u(t,x-\Delta x) = u(t,x) - \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)
+\end{align*}
+which we recognize as the same error we got from the second order spatial derivatives.\\
+If we now do the same analysis as we have already done, by finding a manifactured solution to the convection diffusion equation, implementing a numerical scheme like \ref{convection_diffusion_equation_leapfrog} to solve it after and taking the errornorm.
+
+
+\section{2D}
 Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
 This can, however be tweaked by increasing the conversion parameters.

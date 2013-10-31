@@ -6,8 +6,9 @@ The program is run form "new_experiment.py" - which can also compile
 At the bottom of new_experiment you will find the following parameters:
 
 DEBUG		-bool. true=>remove all generated files upon completion
+plot		-bool. doesnt do anything, will be removed
 save_files	-bool. write resultfiles or not
-
+add_text_to_web -bool. not used
 
 x0,y0,x1,y1	-float. the coordinates of walk-area
 m,n 		spatial resolution in x- and y. n=1 => 1d

@@ -1,7 +1,3 @@
-This thesis is an attept at modeling duffusion processes in which part of the process takes place on a length scale so small that the continuum approximation becomes invalid. 
-In this part we will therefore try and introduce anoter model of the diffusion process in the hope that this will give us something extra. 
-It is the hope of Hans Petter that this thesis will be an introduction to a new research project to understand mesoscale physics in collaboration with Gaute Einevoll at UMB.
-
 The very first approach was to simply try the problem on a bit. That is to try and substitute some small part of the mesh in a Finite Difference Diffusion solver (Froward Euler scheme) with a stochastic diffusion solver. A random walk method was implemented on part of the mesh to take over the equation-solving. This was done in 1 and 2 spatial dimensions with the aim of finding potential difficulties so that we can further investigate them. \\
 Upon switching length-scales a fundamental question arises almost immediately; what is the contiuum limit? In our case this question takes a slightly different, and possibly more answearble form; what is the conversion rate beween the continuum model and the microscopic model, and by extension, what does a walker correspond to?
 The first instinct of this candidate was to just try some conversion rate (say some value corresponds to som enumber of walkers), and this was implemented in both 1 and 2 dimensions.

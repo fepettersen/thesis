@@ -253,7 +253,7 @@ def f(x,y,t):
 		# return np.ones(np.shape(x))*1.5
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -277,7 +277,7 @@ if __name__ == '__main__':
 	run.exact = f
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
+	run.VerifyDeterministicError()
 	for i in Hc:
 		print "Hc = %g"%i
 		run.RunSimulation(i)

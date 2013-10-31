@@ -124,32 +124,13 @@ class Experiment:
 			# mpl.plot(np.log(self.error[i]/self.dt))
 			mpl.plot(self.error[i],color[i],label='Hc = %d'%(self.legends[i]+1))
 			# print self.error[i]
-		mpl.legend(loc=2)
+		mpl.legend(loc=4)
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('max(abs(simulation-exact))')
 		mpl.title('Error plot')
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
 			mpl.savefig(self.result_path+'/errorplot.eps')
-		mpl.show()
-
-	def VerifyDeterministicError(self,save=True):
-		self.RunDeterministic()
-		self.error = []
-		if self.n>=1:
-			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-		else:
-			X = np.linspace(0,1,self.m)
-			Y = np.zeros(self.m)
-		for i in range(len(self.walk)):
-			self.error.append(np.abs(np.linalg.norm(self.walk[i]-self.exact(X,Y,(i+1)*self.dt))))
-		mpl.plot(self.error,'b-o')
-		mpl.xlabel('timestep #')
-		mpl.ylabel('errornorm')
-		mpl.title('dt = %g'%self.dt)
-		if save:
-			mpl.savefig(self.result_path+'/deterministic_errorplot.png')
-			mpl.savefig(self.result_path+'/deterministic_errorplot.eps')
 		mpl.show()
 
 	def UpdateWebpageDefault(self):
@@ -253,7 +234,7 @@ def f(x,y,t):
 		# return np.ones(np.shape(x))*1.5
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -270,14 +251,15 @@ if __name__ == '__main__':
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/3.0
-	Hc = [0.3/dt,3/dt,30/dt,300/dt]
+	Hc = [5/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
+	print dt
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
+	# run.RunDeterministic()
 	for i in Hc:
 		print "Hc = %g"%i
 		run.RunSimulation(i)
@@ -287,7 +269,7 @@ if __name__ == '__main__':
 	run.PlotError()
 	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	# run.Visualize()
+	run.Visualize()
 	run.Finish()
 
 	# (self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))
