@@ -71,6 +71,7 @@ int main(int argc, char** argv)
 	int **C = new int*[m];
 	double **Up = new double*[m];
 	double **U = new double*[m];
+	double **aD = new double*[m];
 	double *X = new double[m];
 	double *Y = new double[n];
 
@@ -78,6 +79,7 @@ int main(int argc, char** argv)
 		C[i] = new int[n];
 		Up[i] = new double[n];
 		U[i] = new double[n];
+		aD[i] = new double[n];
 		X[i] = i*dx;
 	}
 	for(int j=0; j<n; j++){
@@ -88,9 +90,11 @@ int main(int argc, char** argv)
 		for(int j=0; j<n; j++){
 			if(i>=m/2 && j<=n/2){
 				C[i][j] = (int) (factor);
+				aD[i][j] = PI;
 			}
 			else{
 				C[i][j] = 0;
+				aD[i][j] = 1.0;
 				// Up[i][j] = 0;
 			}
 			wth = X[i]*PI;
@@ -99,7 +103,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	Combine BlackBox(m,n,0,1,0,1,1,factor,Dt);
+	Combine BlackBox(m,n,0,1,0,1,aD,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){

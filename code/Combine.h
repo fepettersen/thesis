@@ -5,6 +5,7 @@ class Combine
 {
 	public:
 		Combine(int, int, double, double, double, double, double, double, double);
+		Combine(int, int, double, double, double, double, double**, double, double);
 
 		void advance();
 		void AddWalkArea(double*, double*);
@@ -16,6 +17,7 @@ class Combine
 
 		double dx, dy, D;
 		double *X,*Y;
+		double **aD;			/*anisotropic diffusion*/
 		double x0, x1, y0, y1;
 		int m,n,d;				/*resolution in x and y dir. and dim. n=0 => d=1*/
 		double **U, **Up;		/*Actual solution*/

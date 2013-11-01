@@ -33,6 +33,37 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	pde_solver = new Diffusion(dx,dy,D,Dt);
 	Hc = factor;
 };
+Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double **DiffTensor, double factor, double Dt)
+{
+	if(debug){cout<<"Combine::Combine"<<endl;}
+	m = M; n = N;
+	d = (n>1) ? 2:1; // x = (condition) ? (value_if_true) : (value_if_false);
+	x0 = X0; x1 = X1;
+	y0 = Y0; y1 = Y1;
+	aD = DiffTensor;
+	walk_areas = 0;
+	dx = (x1-x0)/(m-1);
+	dy = (n>1)?(y1-y0)/(n-1):0;
+
+	X = new double[m];
+	Y = new double[n];
+	C = new int*[m];
+	U = new double*[m];
+	Up = new double*[m];
+	for(int i=0; i<m; i++){
+		C[i] = new int[n];
+		U[i] = new double[n];
+		Up[i] = new double[n];
+		X[i] = i*dx;
+	}
+	for(int j=0; j<n;j++){
+		Y[j] = j*dy;
+	}
+
+	pde_solver = new Diffusion(dx,dy,aD,Dt);
+	Hc = factor;
+};
+
 
 void Combine::Solve(){
 	if(debug){cout<<"Combine::Solve"<<endl;}

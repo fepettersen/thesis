@@ -18,8 +18,23 @@ Diffusion::Diffusion(double dx, double dy, double D, double Dt){
 		dt = (dt>(dx*dx/2.0))? (dx*dx/(3.0)):Dt;
 		_Dx = D*dt/(dx*dx);
 	}
-	// cout<<"dx,dy = "<<dx<<","<<dy<<endl;
 };
+Diffusion::Diffusion(double dx, double dy, double **D, double Dt){
+	dx = dx;
+	dy = dy;
+	aD = D;
+	d = (dy>0)?2:1;
+	solver = 1;
+	// if(d==2 && solver==0){
+	// 	dt = (dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
+	// 	_Dx = D*dt/(dx*dx);
+	// 	_Dy = D*dt/(dy*dy);
+	// }
+	// else if(d==1 && solver==0){
+	// 	dt = (dt>(dx*dx/2.0))? (dx*dx/(3.0)):Dt;
+	// 	_Dx = D*dt/(dx*dx);
+	// }
+}
 
 void Diffusion::advance(double **U,double **Up, int m, int n){
 	if (solver==0){
@@ -37,6 +52,31 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 			for(int i=1; i<(m-1);i++){
 				for(int j=0; j<1; j++){
 					U[i][j] = _Dx*(Up[i+1][j]-2*Up[i][j] +Up[i-1][j]) + Up[i][j];
+				}
+			}
+			boundary(U,Up,m,n);
+		}
+	}
+	else if(solver==1){
+		/*Anisotropy - Forward Euler*/
+		if(d==1){
+			for(int i=1;i<(m-1);i++)
+				for(int j=0;j<1;j++){
+					U[i][j] = (dt/(2.0*dx*dx))*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
+						(aD[i][j]+aD[i-1][j])*(Up[i][j]-Up[i-1][j])) + Up[i][j];
+				}
+			boundary(U,Up,m,n);
+		}
+	}
+	else{
+		/*Anisotropic convection diffusion - Forward Euler*/
+		if(d==1){
+			double v = 1;
+			for(int i=1;i<(m-1);i++){
+				for(int j=0;j<1;j++){
+					U[i][j] = (dt/(2.0*dx*dx))*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
+						(aD[i][j]+aD[i-1][j])*(Up[i][j]-Up[i-1][j])) +Up[i][j] - 
+					((dt*v)/(2.0*dx))*(Up[i+1][j]-Up[i-1][j]);	
 				}
 			}
 			boundary(U,Up,m,n);

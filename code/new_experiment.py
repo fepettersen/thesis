@@ -212,8 +212,8 @@ class Experiment:
 				# tmp = np.asarray(f.readlines())
 				# tmp = tmp.astype(np.float32)
 				tmp = np.loadtxt(step)
-				im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
-				# im.append(mpl.plot(x,tmp,'b-'))
+				# im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
+				im.append(mpl.plot(x,tmp,'b-'))
 				# print np.max(np.absolute(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp))
 				counter += 1
 			ani = animation.ArtistAnimation(fig,im)
@@ -277,17 +277,17 @@ if __name__ == '__main__':
 	run.exact = f
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
-	for i in Hc:
-		print "Hc = %g"%i
-		run.RunSimulation(i)
-	time.sleep(1)
-	run.CalculateError(Hc,exact=True)
+	run.VerifyDeterministicError()
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.RunSimulation(i)
+	# time.sleep(1)
+	# run.CalculateError(Hc,exact=True)
 
-	run.PlotError()
-	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
+	# run.PlotError()
+	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	# run.Visualize()
+	run.Visualize()
 	run.Finish()
 
 	# (self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))

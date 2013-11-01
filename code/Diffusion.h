@@ -5,10 +5,12 @@ class Diffusion
 {
 	public:
 		Diffusion(double dx, double dy, double D, double Dt);
+		Diffusion(double dx, double dy, double **D, double Dt);
 
 		int d;
 		double dt,dx,dy;
 		double D,_Dx,_Dy;	/*should be double **D ?*/
+		double **aD;		/*anisotropic D*/
 		int solver; /*Which solver to use*/
 		int t; 		/*Timestep number*/
 
