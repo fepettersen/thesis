@@ -1,3 +1,4 @@
+
 In this chapter we will take a closer look at random walks, both in general and the transition from the statistical view to partial differential equations. 
 We will take a look at different algorithms to produce random walks, and discuss their pros and cons in light of this project. 
 Then we will take a quick look at partial diffential equations and numerical solution of them.
@@ -6,9 +7,11 @@ Then we will take a quick look at partial diffential equations and numerical sol
 The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
 Using (pseudo-) random numbers on a computer we can simulate the outturn of a random walk. 
 For each step (of which there are N) we draw a random number, r, between 0 and 1 from some distribution (say a uniform one) which will be the probability. 
-If $r\leq p$ the walker will take a step to the left, otherwise it will take a step to the left. 
+If $r\leq p$ the walker will take a step to the left, otherwise it will take a step to the right. 
 After the N steps the walker will have taken R steps to the right, and $L = N-R$ steps to the left. 
-The net displacement from the origin will be $S = R-L$. 
+The net displacement from the origin will be $S = R-L$. \\
+This simple approach is easily generalizable to two and three dimensions by having $2d$ possible outcomes from the random number, where d is the dimensionality. 
+In two d the walker will step up if $r\in(0.75,1]$ and left if $r\in[0,0.25)$, for example.
 
 \subsection{Further discussion and analysis of the introduction}
 If we do sufficiently many walks, the net displacement will vary from $S=+N$ to $S=-N$ representing all steps to the right and all steps to the left respectively. 
@@ -33,24 +36,24 @@ From this we can also find the average value of the net displacement using $S = 
 \begin{align*}
  \langle S\rangle = \langle2R\rangle -N = 2Np-N\underbrace{(p+q)}_{=1} = N(2p-p-q) = N(p-q)
 \end{align*}
-We notice that the average net displacement is greatly dependent on the probability of the walk and that any symmetric walk will have an expected net displacement of zero. 
-In many cases we will be more interrested in the mean square displacement than the displacement itself. 
+We notice that the average net displacement is greatly dependent on the relationship between $p$ and $q$, and that any symmetric walk will have an expected net displacement of zero. 
+In many cases we will be more interrested in the mean square displacement than the displacement itself, because many important large scale parameters can be related to the root-mean-sqare displacement. 
 This can also be calculated rather straightforwardly. 
 \begin{align*}
   \langle R^2\rangle =  \sum\limits_{R=0}^N R^2P_N(R) &=  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
  \left(p\frac{d}{dp}\right)^2 \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= \left(p\frac{d}{dp}\right)^2(p+q)^N \\
  = Np(p+q)^{N-1} +p^2N(N-1)(p+q)^{N-2} &= (Np)^2 +Np(1-p) = (Np)^2 +Npq
 \end{align*}
-Like before, the average nett displacement is given as $S^2 = (2R-N)^2$ and we obtain
+Like before, the average net displacement is given as $S^2 = (2R-N)^2$ and we obtain
 \begin{align*}
  \langle S^2\rangle = 4\langle R^2\langle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
- = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq
+ = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq.
 \end{align*}
 which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by instertion as
 \begin{align}
- \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npql^2 \label{random_walk_variance}
+ \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq \label{random_walk_variance}
 \end{align}
-where $l$ is the step length ($\Delta x_{i+1} = \Delta x_i \pm l$).\\
+% where $l$ is the step length ($\Delta x_{i+1} = \Delta x_i \pm l$).\\
 When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
 This is most easily done in the symmertric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
@@ -82,6 +85,16 @@ making the distribution
 \begin{equation}
  P(x,t) = \sqrt{\frac{1}{4\pi Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
+Introducing $x=Sa$ also gives us the expected value and variance of x on a form which will be usefull later. 
+We have $x=Sa$ which means 
+$$\langle x\rangle=a\langle S\rangle$$ 
+and 
+$$\langle x^2\rangle=a^2\langle S^2\rangle$$
+Finally by insertion we find the variance $\langle \Delta x^2\rangle$
+\begin{align}
+ \langle \Delta x^2\rangle = \langle\langle x^2\rangle -\langle x\rangle^2\rangle = \langle a^2\langle S^2\rangle -a^2\langle S\rangle^2\rangle
+\end{align}
+
 
 \subsection{More general Random Walks}
 In the more general case, the position of a random walker,$\vec{r}$ at a time $t_i$ is given by the sum

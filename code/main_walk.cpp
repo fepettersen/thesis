@@ -90,22 +90,21 @@ int main(int argc, char** argv)
 		for(int j=0; j<n; j++){
 			if(i>=m/2 && j<=n/2){
 				C[i][j] = (int) (factor);
-				aD[i][j] = PI;
 			}
 			else{
 				C[i][j] = 0;
-				aD[i][j] = 1.0;
 				// Up[i][j] = 0;
 			}
 			wth = X[i]*PI;
 			Up[i][j] = cos(wth)+1;
 			U[i][j] = 0;
+			aD[i][j] = i*dx*PI;
 		}
 	}
 
-	Combine BlackBox(m,n,0,1,0,1,aD,factor,Dt);
+	Combine BlackBox(m,n,0,1,0,1,1,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-	BlackBox.AddWalkArea(x,y);
+	// BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
 		if(tofile){

@@ -1,7 +1,6 @@
 #include "main_walk.h"
+#include <algorithm>
 using namespace std;
-
-
 
 Diffusion::Diffusion(double dx, double dy, double D, double Dt){
 	dx = dx;
@@ -25,15 +24,17 @@ Diffusion::Diffusion(double dx, double dy, double **D, double Dt){
 	aD = D;
 	d = (dy>0)?2:1;
 	solver = 1;
-	// if(d==2 && solver==0){
-	// 	dt = (dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
-	// 	_Dx = D*dt/(dx*dx);
-	// 	_Dy = D*dt/(dy*dy);
-	// }
-	// else if(d==1 && solver==0){
-	// 	dt = (dt>(dx*dx/2.0))? (dx*dx/(3.0)):Dt;
-	// 	_Dx = D*dt/(dx*dx);
-	// }
+	if(d==2 && solver==1){
+		dt = (dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
+		// _Dx = D*dt/(dx*dx);
+		// _Dy = D*dt/(dy*dy);
+	}
+	else if(d==1 && solver==1){
+		double Dtmp = 3.141592654;
+		dt = (dt>(dx*dx/(2.0*Dtmp)))? (dx*dx/(10.0*Dtmp)):Dt;
+		_Dx = dt/(dx*dx);
+	}
+	cout<<"dt,dx = "<<dt<<","<<dx<<endl;
 }
 
 void Diffusion::advance(double **U,double **Up, int m, int n){
@@ -60,9 +61,10 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 	else if(solver==1){
 		/*Anisotropy - Forward Euler*/
 		if(d==1){
+			// cout<<aD[m-1][0]<<endl;
 			for(int i=1;i<(m-1);i++)
 				for(int j=0;j<1;j++){
-					U[i][j] = (dt/(2.0*dx*dx))*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
+					U[i][j] = (_Dx/2.0)*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
 						(aD[i][j]+aD[i-1][j])*(Up[i][j]-Up[i-1][j])) + Up[i][j];
 				}
 			boundary(U,Up,m,n);

@@ -59,8 +59,8 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	for(int j=0; j<n;j++){
 		Y[j] = j*dy;
 	}
-
 	pde_solver = new Diffusion(dx,dy,aD,Dt);
+	cout<<"Before advance: "<<pde_solver->dt<<","<<pde_solver->dx<<endl;
 	Hc = factor;
 };
 
