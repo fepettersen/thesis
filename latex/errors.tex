@@ -1,11 +1,8 @@
 \section{Some discussion}
-<<<<<<< HEAD
-=======
 
 This chapter will concern most of the numerical error analysis and som of the discussion of this analysis as well as an introduction to the methods used for error analysis in general, and how they are adapted to this particular problem.\\
 
 
->>>>>>> 36d01e701a5b78f6de6b3609e43f8149a9a80eb3
 In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
 When a part of the solution acquired is replaced by the solution from another model, which in this case is stochastic, we will change the initial condition to the next iteration in time. 
 This might have a number of effects on our final solution. 
@@ -27,11 +24,7 @@ To investigate the error we are introducing we will first need to test that the 
 
 \section{Manifactured Solutions}
 A normal way of checking that our scheme of choise is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
-<<<<<<< HEAD
-As a first, simple implenetation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \ref*{simple_diffusion_equation}. 
-=======
 As a first, simple implenetation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \ref{simple_diffusion_equation}. 
->>>>>>> 36d01e701a5b78f6de6b3609e43f8149a9a80eb3
 This discretization is expected to have an error-term of the order of $\Delta t$, which again is limited by a stability criterion. 
 We can now decide that the solution to equation \ref{simple_diffusion_equation} should be
 \begin{equation}\label{manifactured_solution_1D}

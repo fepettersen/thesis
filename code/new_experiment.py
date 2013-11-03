@@ -287,7 +287,7 @@ if __name__ == '__main__':
 	# run.PlotError()
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	run.Visualize(filename='Deterministic')
+	run.Visualize(filename='/Deterministic_n')
 	run.Finish()
 
 	# (self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))

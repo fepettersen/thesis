@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	Combine BlackBox(m,n,0,1,0,1,1,factor,Dt);
+	Combine BlackBox(m,n,0,1,0,1,aD,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	// BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){

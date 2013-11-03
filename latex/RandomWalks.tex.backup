@@ -51,14 +51,8 @@ Like before, the average net displacement is given as $S^2 = (2R-N)^2$ and we ob
 \end{align*}
 which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by instertion as
 \begin{align}
-<<<<<<< HEAD
- \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq \label{random_walk_variance}
-\end{align}
-% where $l$ is the step length ($\Delta x_{i+1} = \Delta x_i \pm l$).\\
-=======
  \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq 
 \end{align}
->>>>>>> 36d01e701a5b78f6de6b3609e43f8149a9a80eb3
 When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
 This is most easily done in the symmertric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
@@ -230,11 +224,7 @@ Which in many cases will simplify to
 
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
-<<<<<<< HEAD
-\subsection{Discretizing}
-=======
 \subsection{Discretizing}\label{discretizing}
->>>>>>> 36d01e701a5b78f6de6b3609e43f8149a9a80eb3
 
 To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation in 2d. The extension to 3d is trivial, as is the 1d version.
 \begin{equation}
