@@ -1,14 +1,21 @@
 \section{Some discussion}
+<<<<<<< HEAD
+=======
+
+This chapter will concern most of the numerical error analysis and som of the discussion of this analysis as well as an introduction to the methods used for error analysis in general, and how they are adapted to this particular problem.\\
+
+
+>>>>>>> 36d01e701a5b78f6de6b3609e43f8149a9a80eb3
 In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
 When a part of the solution acquired is replaced by the solution from another model, which in this case is stochastic, we will change the initial condition to the next iteration in time. 
 This might have a number of effects on our final solution. 
 When we solve a differential equation numerically we only get an approximation to the actual solution because we are using approximate derivatives (see figure \ref{illustrate_approximate_derivatives}). 
 To investigate the error we are introducing we will first need to test that the truncation error of the numerical PDE solver behaves as expected. 
-This can be done by chosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
-As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
-We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
-Figure \ref{errorplot_1d} shows the error norm (\ref{}) of only the PDE solver done in 1 dimension plotted for each timestep of the simulation. 
-The manifactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x)$ and its initial condition is shown in figure \ref{}.
+% This can be done by chosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
+% As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
+% We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
+% Figure \ref{errorplot_1d} shows the error norm (\ref{}) of only the PDE solver done in 1 dimension plotted for each timestep of the simulation. 
+% The manifactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x)$ and its initial condition is shown in figure \ref{}.
 
 \begin{figure}[H]
  \centering
@@ -20,7 +27,11 @@ The manifactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x
 
 \section{Manifactured Solutions}
 A normal way of checking that our scheme of choise is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
+<<<<<<< HEAD
 As a first, simple implenetation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \ref*{simple_diffusion_equation}. 
+=======
+As a first, simple implenetation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \ref{simple_diffusion_equation}. 
+>>>>>>> 36d01e701a5b78f6de6b3609e43f8149a9a80eb3
 This discretization is expected to have an error-term of the order of $\Delta t$, which again is limited by a stability criterion. 
 We can now decide that the solution to equation \ref{simple_diffusion_equation} should be
 \begin{equation}\label{manifactured_solution_1D}
@@ -31,7 +42,7 @@ which satisfies our equation if we set the diffusion constant to 1.
  \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\\
  -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1
 \end{align}
-As we saw in section \ref{something_about_erroranalysis} the Forward Euler scheme is expected to have an error of the order of $\Delta t$. 
+As we saw in section \ref{truncation_error} the Forward Euler scheme is expected to have an error of the order of $\Delta t$. 
 Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation. 
 
 \begin{figure}[H]
@@ -49,11 +60,14 @@ These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers.
 The area where the model has been replaced is between $x=0.6$ and $x=0.7$, which is three mesh points. 
 In the same way as for only the simple 1D PDE case we compare the combined numerical solution from the two models to the exact solution. 
 Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligable. 
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/errorplot.eps}
 \caption[Effect of increasing number of walkers]{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$. Other parameters of importance are $\Delta t\approx 0.00083333$, $\Delta x = 0.05$.}
+\label{errorplot_FE1D_Walk_first_attemt}
 \end{figure}
+
 As we can se from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the number of walkers that each ``unit concentration'' corresponds to has a positive effect on the errornorm up to a certain point. 
 After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of the Forward Euler scheme. 
 This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
@@ -61,7 +75,7 @@ Meaning of course that the calculations in section \ref{} are not hopeless.
 
 \subsection{The effects of adding drift to the walkers}
 
-As shown in section \ref{} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
+As shown in section \ref{random_walks_and_drift} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
 In our analysis so far we have completely ignored the spatial truncation error because it is of second order, and the truncation error in time is of first order. 
 When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
 Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
