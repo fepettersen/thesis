@@ -66,6 +66,8 @@ After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of 
 This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
 Meaning of course that the calculations in section \ref{} are not hopeless.
 
+
+
 \subsection{The effects of adding drift to the walkers}
 
 As shown in section \ref{random_walks_and_drift} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
@@ -73,9 +75,11 @@ In our analysis so far we have completely ignored the spatial truncation error b
 When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
 Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
 We must also find a new stability criterion for the scheme. \\
-As for now, the Leap-frog discretization will do (though it is not by far a perfect choise seeing as it is unstable).
+As for now, the Leap-frog discretization will do (though it is not by far a perfect choise seeing as it is unstable). 
+As a sidenote we can also note that the Neumann boundary condition will be very clear in this scheme. 
+$\frac{\d C}{\d n} = 0 \implies \frac{\d C}{\d x} = 0 $ on the boundary, leading to $C_{-1} = C_{1}$ on the boundary and cancelling the drift term on the boundary.
 \begin{equation}\label{convection_diffusion_equation_leapfrog}
- C^{n+1} = \frac{D\Delta t}{\Delta x^2}\left(C^n_{i+1}-2C^n_i+C^n_{i-1}\right)-\frac{v\Delta t}{2\Delta x}\left(C^n_{i+1}-C^n_{i-1}\right)
+ C^{n+1} = \frac{D\Delta t}{\Delta x^2}\left(C^n_{i+1}-2C^n_i+C^n_{i-1}\right)-\frac{v\Delta t}{2\Delta x}\left(C^n_{i+1}-C^n_{i-1}\right) + C^n
 \end{equation}
 The truncation error for the first order derivative using the Leap-frog scheme is obtained as follows
 \begin{align*}
@@ -83,8 +87,35 @@ The truncation error for the first order derivative using the Leap-frog scheme i
  u(t,x-\Delta x) = u(t,x) - \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)
 \end{align*}
 which we recognize as the same error we got from the second order spatial derivatives.\\
-If we now do the same analysis as we have already done, by finding a manifactured solution to the convection diffusion equation, implementing a numerical scheme like \ref{convection_diffusion_equation_leapfrog} to solve it after and taking the errornorm.
+If we now do the same analysis as we have already done, by finding a manifactured solution to the convection diffusion equation, implementing a numerical scheme like \ref{convection_diffusion_equation_leapfrog} to solve it after and taking the errornorm. \\
+The errornorm does not have to go as $\Delta t$, but it must be halved (approximately) if we halv $\Delta t$. 
+Figure \ref{} shows two simulations of equation \ref{convection_diffusion_equation} for $D =1$ and $v=1$ compared to the manifactured solution \ref{manifactured_solution_1D} without adding walkers. 
+Before the simulation we must find a source term so the manifactured solution will solve the equation.
+\begin{align*}
+ -\pi^2\exp\left(-\pi^2t\right)\cos\left(\pi x\right) &= -\pi^2D\exp\left(-\pi^2t\right)\cos\left(\pi x\right) + \pi v \exp\left(-\pi^2t\right)\sin\left(\pi x\right) + f(x,t)\\
+ -\pi^2\cos\left(\pi x\right) &= \pi^2D\cos\left(\pi x\right) +\pi v \sin\left(\pi x\right) + \tilde{f}(x) \\
+ \tilde{f}(x) &= -\pi\sin\left(\pi x\right)
+\end{align*}
+Where $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$.
 
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_0923/results/deterministic_errorplot.eps}
+\caption{}
+\label{Verification_convection_diffusion:single_dt}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_0925/results/deterministic_errorplot.eps}
+\caption{}
+\label{Verification_convection_diffusion:double_dt}
+\end{subfigure}
+\caption[Verification of Convection diffusion equation implenetation]{Verification of Convection diffusion equation implenetation}
+\label{Verification_convection_diffusion}
+\end{figure}
+As we see from figure \ref{Verification_convection_diffusion} the errornorm is halved when $\Delta t$ is halved, just as we expected. 
+We can then advance to testing the effect of adding an area of walkers for different values of $Hc$ as before. 
+Note that we have now added some drift to the walkers so the model will fit better.
 
 \section{2D}
 Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 

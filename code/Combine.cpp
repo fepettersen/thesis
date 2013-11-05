@@ -126,9 +126,14 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
 	}
+	signmap = new int*[M];
+	for(int e=0;e<M;e++){
+		signmap[e] = new int[N];
+	}
 	for(int k=0; k<M; k++){
 		for(int l=0; l<N; l++){
-			Conc[k][l] = (int) (u[k+m0][l+n0]*Hc);
+			Conc[k][l] = (int) (fabs(u[k+m0][l+n0]*Hc));
+			(u[k+m0][l+n0]>0)?(signmap[k][l]=1):(signmap[k][l]=-1);
 		}
 	}
 }
@@ -151,10 +156,11 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
-			u[k+m0][j+n0] = 0.5*((Conc[k][j]/Hc)+u[k+m0][j+n0]);
+			u[k+m0][j+n0] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
 			// u[k+m0][j+n0] = Conc[k][j]/Hc;
 		}
 	}
+	delete[] signmap;
 }
 
 void Combine::MapAreaToIndex(double *x,double *y, int **index){

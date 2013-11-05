@@ -182,7 +182,7 @@ double *Walk::Step(double *r,double *s){
 			r[0] = (s[0]>0) ?(r[0]+factor):(r[0]-factor);
 		}
 		else if(d==2){
-			if(s[0>s[1]]){
+			if(s[0]>s[1]){
 				r[0] = (s[0]>0) ?(r[0]+factor):(r[0]-factor);
 			}
 			else{

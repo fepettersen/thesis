@@ -101,9 +101,10 @@ class Experiment:
 			else:
 				X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
 			for a in range(len(Hc)):
-				i = Hc[a]
+				i = int(np.round(Hc[a]))
+				print i
 				for j in xrange(self.T): 
-					step = np.loadtxt(self.result_path+'/results_FE_Hc%d_n%03d.txt'%(i+1,j))
+					step = np.loadtxt(self.result_path+'/results_FE_Hc%d_n%03d.txt'%(i,j))
 					tmp[j] = np.max(np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-step))
 				self.error.append(tmp.copy())
 
@@ -122,7 +123,7 @@ class Experiment:
 		color = ['b-o','r-o','k-o','c-o','g-o','m-o','b-x','r-x','k-x','c-x','g-x','m-x']
 		for i in range(len(self.error)):
 			# mpl.plot(np.log(self.error[i]/self.dt))
-			mpl.plot(self.error[i],color[i],label='Hc = %d'%(self.legends[i]+1))
+			mpl.plot(self.error[i],color[i],label='Hc = %d'%(int(np.round(self.legends[i]))))
 			# print self.error[i]
 		mpl.legend(loc=2)
 		mpl.xlabel('timestep no.')
@@ -197,7 +198,7 @@ class Experiment:
 		f.close()
 
 
-	def Visualize(self,path=None,filename=None):
+	def Visualize(self,path=None,filename=None,viz_type='difference'):
 		if path is None:
 			path = self.result_path
 		if filename is None:
@@ -208,13 +209,11 @@ class Experiment:
 			x = np.linspace(0,1,self.m)
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
-				# f = open(step,'r')
-				# tmp = np.asarray(f.readlines())
-				# tmp = tmp.astype(np.float32)
 				tmp = np.loadtxt(step)
-				# im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
-				im.append(mpl.plot(x,tmp,'b-'))
-				# print np.max(np.absolute(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp))
+				if viz_type=='difference':
+					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
+				else:
+					im.append(mpl.plot(x,tmp,'b-'))
 				counter += 1
 			ani = animation.ArtistAnimation(fig,im)
 			mpl.show()
@@ -249,7 +248,7 @@ class Experiment:
 
 
 def f(x,y,t):
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x) +1
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
 		# return np.ones(np.shape(x))*1.5
 
 if __name__ == '__main__':
@@ -269,8 +268,9 @@ if __name__ == '__main__':
 	T = 51	
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
-	dt = dx*dy/5.0 if n>1 else dx**2/3.0
-	Hc = [0.3/dt,3/dt,30/dt,300/dt]
+	dt = dx*dy/5.0 if n>1 else dx**2/5.0
+	# dt = 8e-05
+	Hc = [0.016/dt,0.16/dt,1.6/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
