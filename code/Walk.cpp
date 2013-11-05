@@ -190,7 +190,7 @@ double *Walk::Step(double *r,double *s){
 			}
 		}
 	}
-	r[0] -= factor/1.0;		//slight drift in x direction
+	r[0] += factor/10.0;		//slight drift in x direction
 	return r;
 }
 

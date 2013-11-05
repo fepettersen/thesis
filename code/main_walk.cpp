@@ -98,13 +98,13 @@ int main(int argc, char** argv)
 			wth = X[i]*PI;
 			Up[i][j] = cos(wth);
 			U[i][j] = 0;
-			aD[i][j] = 1.0;//i*dx*PI;
+			aD[i][j] = i*dx*PI;
 		}
 	}
 
 	Combine BlackBox(m,n,0,1,0,1,aD,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-	// BlackBox.AddWalkArea(x,y);
+	BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
 		if(tofile){

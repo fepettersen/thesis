@@ -68,7 +68,7 @@ Meaning of course that the calculations in section \ref{} are not hopeless.
 
 
 
-\subsection{The effects of adding drift to the walkers}
+\subsection{The effects of adding drift to the walkers}\label{effect_of_drift_on_walkers}
 
 As shown in section \ref{random_walks_and_drift} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
 In our analysis so far we have completely ignored the spatial truncation error because it is of second order, and the truncation error in time is of first order. 
@@ -101,22 +101,68 @@ Where $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_0923/results/deterministic_errorplot.eps}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_1235/results/deterministic_errorplot.eps}
 \caption{}
 \label{Verification_convection_diffusion:single_dt}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_0925/results/deterministic_errorplot.eps}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_1234/results/deterministic_errorplot.eps}
 \caption{}
 \label{Verification_convection_diffusion:double_dt}
 \end{subfigure}
 \caption[Verification of Convection diffusion equation implenetation]{Verification of Convection diffusion equation implenetation}
 \label{Verification_convection_diffusion}
 \end{figure}
-As we see from figure \ref{Verification_convection_diffusion} the errornorm is halved when $\Delta t$ is halved, just as we expected. 
-We can then advance to testing the effect of adding an area of walkers for different values of $Hc$ as before. 
-Note that we have now added some drift to the walkers so the model will fit better.
 
+As we see from figure \ref{Verification_convection_diffusion} the errornorm is halved when $\Delta t$ is roughly halved, just as we expected. It is also of the order of $\Delta t$, which is nice.  
+We can then advance to testing the effect of adding an area of walkers for different values of $Hc$ as before. 
+Note that we have now added some drift to the walkers so the model will fit better. 
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_1237/results/errorplot.eps}
+\caption{}
+\label{Errortest_convection_diffusion_walkers:few_walkers}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_1239/results/errorplot.eps}
+\caption{Adding more walkers still has the desired effect on the error, suggesting that the central limit theorem is at work behind the scenes.}
+\label{Errortest_convection_diffusion_walkers:more_walkers}
+\end{subfigure}
+\caption[Adding walkers influenced by drift]{The figure shows the effect adding walkers influenced by drift has on the error. 
+The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrog in relation to the steplength. $\Delta t =8e-5$}
+\label{Errortest_convection_diffusion_walkers}
+\end{figure}
+
+\subsection{Anisotropic diffusion}
+
+As we discussed in section \ref{random_walks_and_anisotropy} we should also be able to model diffusion where the diffusion constant is not a constant. 
+The scheme we derived in section \ref{discretizing} allready takes this into account, and so all we need to do is to add the drift term which was discussed in section \ref{effect_of_drift_on_walkers} to the scheme. 
+Like before we should verify that the scheme solves the equation to the expected accuracy by using a manifactured solution \ref{manifactured_solution_1D} and tweaking the source term so this function solved the equation \ref{convection_diffusion_equation}. 
+When $v=0$ and $D(x) = \pi x$ the source term becomes
+\begin{align*}
+ -\pi^2\exp\left(-\pi^2t\right)\cos\left(\pi x\right) &= -\pi\exp\left(-\pi^2t\right)\frac{\d}{\d x}\pi x\sin(\pi x) +f(x,t) \\
+ -\pi^2\cos\left(\pi x\right) &= -\pi^2\left(\sin(\pi x) + \pi x\cos(\pi x)\right) +\tilde{f}(x) \\
+ \tilde{f}(x) &= \pi^2\left(\sin(\pi x) +\cos(\pi x)(\pi x-1)\right)
+\end{align*}
+Once again $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$. Figure \ref{anisotropic_diffusion_verification} shows the errornorm of the result of simulations of this equation with different values of $\Delta t$.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_1303/results/deterministic_errorplot.eps}
+\caption{}
+\label{anisotropic_diffusion_verification:single_dt}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_05112013_1304/results/deterministic_errorplot.eps}
+\caption{}
+\label{anisotropic_diffusion_verification:double_dt}
+\end{subfigure}
+\caption[Verification of anisotropic diffusion equation implenetation]{Verification of anisotropic diffusion equation implenetation}
+\label{anisotropic_diffusion_verification}
+\end{figure}
+Again, the error is of the order of $\Delta t$ and is roughly halved by halving $\Delta t$.
 \section{2D}
 Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
 This can, however be tweaked by increasing the conversion parameters.

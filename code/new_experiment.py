@@ -269,25 +269,25 @@ if __name__ == '__main__':
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	# dt = 8e-05
-	Hc = [0.016/dt,0.16/dt,1.6/dt]
+	dt = 8e-05
+	Hc = [0.16/dt,01.6/dt,16/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	run.VerifyDeterministicError()
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
+	# run.VerifyDeterministicError()
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
 
-	# run.PlotError()
-	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
+	run.PlotError()
+	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	run.Visualize(filename='/Deterministic_n')
+	# run.Visualize(filename='/Deterministic_n')
 	run.Finish()
 
 	# (self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))
