@@ -28,7 +28,7 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt){
 	_Dx = dt/(dx*dx);
 	aD = D;
 	d = (dy>0)?2:1;
-	solver = 1;
+	solver = 2;
 	if(d==2 && solver==1){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		// _Dx = D*dt/(dx*dx);
@@ -85,8 +85,6 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 					U[i][j] = (_Dx/2.0)*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
 						(aD[i][j]+aD[i-1][j])*(Up[i][j]-Up[i-1][j])) +Up[i][j] - 
 					((dt*v)/(2.0*dx))*(Up[i+1][j]-Up[i-1][j]) + dt*f(i*dx,0,t*dt);
-					// U[i][j] = _Dx*(Up[i+1][j]-2*Up[i][j]+Up[i-1][j]) +Up[i][j] - 
-					// (dt*v)/(2.0*dx)*(Up[i+1][j]-Up[i-1][j]) + dt*f(i*dx,0,t*dt);
 				}
 			}
 			boundary(U,Up,m,n);
@@ -137,6 +135,6 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 
 double Diffusion::f(double x,double y, double t){
 	double pi = 3.1415926535897932;
-	return exp(-t*pi*pi)*pi*pi*(sin(pi*x)+cos(pi*x)*(pi*x-1));
-	// return -pi*sin(pi*x)*exp(-t*pi*pi);
+	// return exp(-t*pi*pi)*pi*pi*(sin(pi*x)+cos(pi*x)*(pi*x-1));
+	return -pi*sin(pi*x)*exp(-t*pi*pi);
 }

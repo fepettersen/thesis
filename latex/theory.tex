@@ -224,7 +224,28 @@ Which in many cases will simplify to
  \frac{\d C}{\d t} = D\nabla^2 C-\vec{v}\cdot\nabla C
 \end{equation}
 
-
+In order to determine all the parameters of the convection diffusion equation \ref{convection_diffusion_equation} we will need to go through some of the calculations from chapter \ref{introduction_to_random_walks}. 
+The situation is the same, a walker in one dimension which can jump left or right, but this time will also move a finite distance $d$ each timestep. 
+This will make the expected net displacement
+\begin{equation*}
+ \langle S\rangle = R-L +Nd = N(p-q) + Nd
+\end{equation*}
+and the expected mean square displacement
+\begin{equation*}
+ \langle S^2\rangle = (2\langle R\rangle -N)^2 +(Nd)^2 = N^2(p-q)^2 +4Npq +(Nd)^2
+\end{equation*}
+which in turn gives us the variance
+\begin{align*}
+ \langle \Delta S^2\rangle &= \langle\langle S^2\rangle-\langle S\rangle^2\rangle \\
+ &= N^2(p-q)^2 +4Npq +(Nd)^2 - N^2(p-q)^2 -(Nd)^2 \\
+\langle \Delta S^2\rangle &= 4Npq
+\end{align*}
+This shows us that the variance is untouched by the drift term, but not the mean which for the symmertric case is $\langle S\rangle = Nd$. 
+When we convert this to the continous variables $x$ and $t$ we get the solution shown in equation \ref{solution_convection_diffusion_eq}.
+\begin{equation}\label{solution_convection_diffusion_eq}
+ C(x,t) = \frac{N}{\sqrt{4\pi Dt}}\exp\left(-\frac{(x-vt)^2}{4Dt}\right)
+\end{equation}
+Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is the well known diffusion constant, inserted from the Einstein relation $\sigma^2 = 2D\Delta t$.
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
 \subsection{Discretizing}\label{discretizing}
@@ -268,9 +289,18 @@ where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which,
 We notice that we must have $\left|A\right|\leq 1$ if $u$ is to not blow up. 
 Inserting \ref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives us the following
 \begin{align*}
- \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= A^n\frac{D}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
-  A^n\exp(ikp\Delta x)\left(A-1\right) &=  A^n\exp(ikp\Delta x)\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)
+ \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= A^n\frac{D\Delta t}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
+  A^n\exp(ikp\Delta x)\left(A-1\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
 \end{align*}
+Using the well known identies $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left((\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
+\begin{equation}
+ A-1 = \frac{D\Delta t}{\Delta x^2}\sin^2\left(\frac{k\Delta x}{2}\right)
+\end{equation}
+We now insert for the ``worst case scenario'' $max(\sin^2\left(\frac{k\Delta x}{2}\right))= 1$
+\begin{equation}
+ A = \frac{D\Delta t}{2\Delta x^2}+1 \implies \Delta t\leq\frac{\Delta x^2}{2D}
+\end{equation}
+In 2d this criterion is halved, and for the anisotropic case we must insert for the maximum value of D which, again, will be the ``worst case scenario''.
 
 
 

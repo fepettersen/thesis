@@ -270,7 +270,7 @@ if __name__ == '__main__':
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
 	dt = 8e-05
-	Hc = [0.16/dt,01.6/dt,16/dt]
+	Hc = [0.016/dt,0.16/dt,1.6/dt,16/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)

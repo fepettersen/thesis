@@ -6,7 +6,7 @@ class Walk
 	public:
 		Walk(int d);
 
-		int nwalkers;
+		int nwalkers, steps;
 		double **area;
 		double **walkers;	//Array of the positions of all the walkers [[0.1,0.2],[0.2,0.3],...]
 		int d,m,n;
@@ -15,7 +15,7 @@ class Walk
 		double x0_, x1_, y0_, y1_; 		/*x0_ = x0 - (dx/2.0); etc*/
 		double *x;
 		double *y;
-		double dx,dy;
+		double dx,dy,drift;
 		// long Idum;
 		
 

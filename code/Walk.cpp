@@ -30,12 +30,14 @@ Walk::Walk(int dimension)
 {
 	if(debug_walk){cout<<"Walk::Walk"<<endl;}
 	d = dimension;
+	steps = 100;
 	x0 = 0; x1 = 1;
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
 	int D = 1;
-	dt = 0.01;
+	dt = 1.0/steps;
 	factor = sqrt(2*D*dt);
+	drift = factor/steps;
 };
 
 void Walk::SetInitialCondition(int **C, int M, int N){
@@ -124,7 +126,6 @@ bool Walk::HasLeftArea(double *pos){
 
 void Walk::advance(int **C){
 	if(debug_walk){cout<<"Walk::advance"<<endl;}
-	int steps = 100;
 	double *newPos, **s;
 	newPos = new double[d];			//delete at the end!
 	s = new double*[steps];			//delete at the end!
@@ -190,7 +191,7 @@ double *Walk::Step(double *r,double *s){
 			}
 		}
 	}
-	r[0] += factor/10.0;		//slight drift in x direction
+	r[0] += drift;		//slight drift in x direction
 	return r;
 }
 

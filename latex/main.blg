@@ -2,8 +2,8 @@ This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
 The top-level auxiliary file: main.aux
 The style file: biblatex.bst
 A level-1 auxiliary file: Intro.aux
-A level-1 auxiliary file: RandomWalks.aux
-A level-1 auxiliary file: errors.aux
+A level-1 auxiliary file: theory.aux
+A level-1 auxiliary file: analysis.aux
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: main-blx.bib
 Database file #2: references.bib
@@ -11,7 +11,7 @@ Biblatex version: 1.7
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 You've used 3 entries,
             6019 wiz_defined-function locations,
-            1141 strings with 8422 characters,
+            1141 strings with 8419 characters,
 and the built_in function-call counts, 7761 in all, are:
 = -- 339
 > -- 269
