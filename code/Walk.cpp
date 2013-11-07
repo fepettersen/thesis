@@ -38,6 +38,7 @@ Walk::Walk(int dimension)
 	dt = 1.0/steps;
 	factor = sqrt(2*D*dt);
 	drift = factor/steps;
+	cout<<"drift = "<<drift<<endl;
 };
 
 void Walk::SetInitialCondition(int **C, int M, int N){

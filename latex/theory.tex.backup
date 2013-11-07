@@ -224,6 +224,40 @@ Which in many cases will simplify to
  \frac{\d C}{\d t} = D\nabla^2 C-\vec{v}\cdot\nabla C
 \end{equation}
 
+In order to determine all the parameters of the convection diffusion equation \ref{convection_diffusion_equation} we will need to go through some of the calculations from chapter \ref{introduction_to_random_walks}. 
+The situation is the same, a walker in one dimension which can jump left or right, but this time will also move a finite distance $d$ each timestep. 
+This will make the expected net displacement
+\begin{equation*}
+ \langle S\rangle = R-L +Nd = N(p-q) + Nd
+\end{equation*}
+and the expected mean square displacement
+\begin{equation*}
+ \langle S^2\rangle = (2\langle R\rangle -N)^2 +(Nd)^2 = N^2(p-q)^2 +4Npq +(Nd)^2
+\end{equation*}
+which in turn gives us the variance
+\begin{align*}
+ \langle \Delta S^2\rangle &= \langle\langle S^2\rangle-\langle S\rangle^2\rangle \\
+ &= N^2(p-q)^2 +4Npq +(Nd)^2 - N^2(p-q)^2 -(Nd)^2 \\
+\langle \Delta S^2\rangle &= 4Npq
+\end{align*}
+This shows us that the variance is untouched by the drift term, but not the mean which for the symmertric case is $\langle S\rangle = Nd$. 
+When we convert this to the continous variables $x$ and $t$ we get the solution shown in equation \ref{solution_convection_diffusion_eq}.
+\begin{equation}\label{solution_convection_diffusion_eq}
+ C(x,t) = \frac{N}{\sqrt{4\pi Dt}}\exp\left(-\frac{(x-vt)^2}{4Dt}\right)
+\end{equation}
+Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is the well known diffusion constant, inserted from the Einstein relation $\sigma^2 = 2D\Delta t$.\\
+The only problem with the solution \ref{solution_convection_diffusion_eq} is that it is invalid for $t=0$. 
+In order to use it we will need an initial condition which fits the rest of the solution. 
+We try and find this by first checking by simulation if it converges towards some initial solution as $t\to0$ and if so, extrapolate this to $t=0$ as the initial condition. 
+Figure \ref{} shows the result of this little experiment, and as we clearly see it does diverge as $t\to0$. 
+However, it also converges to a Dirac deltafunction, $\delta(x)$ which is defined by its properties
+\begin{align*}
+\delta(x) = \begin{cases} +\infty, & x = 0 \\ 0, & x \ne 0 \end{cases}
+\end{align*}
+and
+\begin{equation*}
+ \int_{-\infty}^\infty \delta(x) \, dx = 1
+\end{equation*}
 
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}

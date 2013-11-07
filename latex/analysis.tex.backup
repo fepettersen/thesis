@@ -116,8 +116,7 @@ Where $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$.
 
 As we see from figure \ref{Verification_convection_diffusion} the errornorm is halved when $\Delta t$ is roughly halved, just as we expected. It is also of the order of $\Delta t$, which is nice.  
 We can then advance to testing the effect of adding an area of walkers for different values of $Hc$ as before. 
-Note that we can no longer use the manifactured solution now if we wish to add drift to the walkers because we have forced the solution to fit the equation by tampering with the source term. 
-The effect of
+Note that we have now added some drift to the walkers so the model will fit better. 
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
@@ -131,11 +130,9 @@ The effect of
 \label{Errortest_convection_diffusion_walkers:more_walkers}
 \end{subfigure}
 \caption[Adding walkers influenced by drift]{The figure shows the effect adding walkers influenced by drift has on the error. 
-The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrong in relation to the steplength. $\Delta t =8e-5$}
+The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrog in relation to the steplength. $\Delta t =8e-5$}
 \label{Errortest_convection_diffusion_walkers}
 \end{figure}
-
-
 
 \subsection{Anisotropic diffusion}
 

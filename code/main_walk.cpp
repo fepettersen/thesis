@@ -96,11 +96,13 @@ int main(int argc, char** argv)
 				// Up[i][j] = 0;
 			}
 			wth = X[i]*PI;
-			Up[i][j] = cos(wth);
+			Up[i][j] = 0.0;//cos(wth);
 			U[i][j] = 0;
-			aD[i][j] = i*dx*PI;
+			aD[i][j] = 1.0;//i*dx*PI;
 		}
 	}
+
+	Up[0][0] = 1.0;
 
 	Combine BlackBox(m,n,0,1,0,1,aD,factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);

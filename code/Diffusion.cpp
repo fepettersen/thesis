@@ -136,5 +136,6 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 double Diffusion::f(double x,double y, double t){
 	double pi = 3.1415926535897932;
 	// return exp(-t*pi*pi)*pi*pi*(sin(pi*x)+cos(pi*x)*(pi*x-1));
-	return -pi*sin(pi*x)*exp(-t*pi*pi);
+	// return -pi*sin(pi*x)*exp(-t*pi*pi);
+	return 0.0;
 }

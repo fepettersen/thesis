@@ -212,6 +212,8 @@ class Experiment:
 				tmp = np.loadtxt(step)
 				if viz_type=='difference':
 					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
+				elif viz_type=='exact':
+					im.append(mpl.plot(x,self.exact(x,np.zeros(self.m),counter*self.dt),'-b'))
 				else:
 					im.append(mpl.plot(x,tmp,'b-'))
 				counter += 1
@@ -248,8 +250,11 @@ class Experiment:
 
 
 def f(x,y,t):
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
-		# return np.ones(np.shape(x))*1.5
+	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
+	# return np.ones(np.shape(x))*1.5
+	D = v = 1
+	tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
+	return tmp/np.sum(tmp)
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -265,7 +270,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 21
 	n = 1
-	T = 51	
+	T = 151	
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
@@ -277,17 +282,17 @@ if __name__ == '__main__':
 	run.exact = f
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
-	for i in Hc:
-		print "Hc = %g"%i
-		run.RunSimulation(i)
-	time.sleep(1)
-	run.CalculateError(Hc,exact=True)
+	run.VerifyDeterministicError()
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.RunSimulation(i)
+	# time.sleep(1)
+	# run.CalculateError(Hc,exact=True)
 
-	run.PlotError()
-	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
+	# run.PlotError()
+	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	# run.Visualize(filename='/Deterministic_n')
+	run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	run.Finish()
 
 	# (self.tofile,0,0,0,0,self.n,self.T,self.result_path,"Deterministic",0))
