@@ -166,6 +166,56 @@ void Walk::advance(int **C){
 	}
 }
 
+void Walk::InhomogenousAdvance(int **C, double **D, double _dt){
+	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
+	dt = _dt/100;
+	double *newPos, **s;
+	newPos = new double[d];			//delete at the end!
+	s = new double*[steps];			//delete at the end!
+	int *index = new int[d];		//delete at the end!
+	for(int k=0; k<steps; k++){
+		s[k] = new double[d];
+		for(int l=0; l<d; l++){
+			s[k][l] = 0;
+		}
+	}
+	for(int i=0; i<nwalkers; i++){
+		/*For every walker: */
+		Tr = (1+0.5*L_deriv(walker[i]));
+		Tl = (1-0.5*L_deriv(walker[i]));
+		Delta_p = L(walker[i])*Tr;
+		Delta_m = L(walker[i])*Tl;
+		Tr /= 2.0;
+		// Tl /= 2.0;
+		for(int j=0;j<steps;j++){
+			/*Advance n steps*/
+			r = ran0(&Idum);
+			if(r>Tr){
+				newPos = walker[i]+Delta_p;
+				walkers[i] = checkpos(newPos,Delta_p);
+			}
+			else{
+				newPos = walker[i]-Delta_m;
+				walkers[i] = checkpos(newPos,-Delta_m);
+			}
+		}
+	}
+
+	if(d==1){
+		for(int i=0;i<nwalkers;i++){
+			index = FindPosition(walkers[i]);
+			C[index[0]] += 1;
+		}
+	}
+	else if(d==2){
+		for(int i=0; i<nwalkers; i++){
+			index = FindPosition(walkers[i]);
+			C[index[0]][index[1]] += 1;
+		}
+	}
+
+}
+
 double *Walk::Step(double *r,double *s){
 	/*Possibility of changing the algorithm*/
 	if(debug_walk){cout<<"Walk::Step"<<endl;}
@@ -193,6 +243,10 @@ double *Walk::Step(double *r,double *s){
 		}
 	}
 	r[0] += drift;		//slight drift in x direction
+	return r;
+}
+
+double *Walk::InhomogenousStep(double *r, double *s){
 	return r;
 }
 

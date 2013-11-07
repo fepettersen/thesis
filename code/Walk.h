@@ -21,10 +21,12 @@ class Walk
 
 		bool HasLeftArea(double *);
 		void advance(int **);
+		void InhomogenousAdvance(int **C, double **D, double _dt);
 		double *Step(double*, double*);
+		double *InhomogenousStep(double*, double*);
 		int InitializeTimestep(int **);
 		void PutWalkers(int, int, int);
-		double **ReturnBoundary();	//should have a better name
+		double **ReturnBoundary();			//should have a better name
 		int *FindPosition(double *);
 		double **CalculateGradient();
 		double *checkpos(double*,double*);
