@@ -72,6 +72,7 @@ void Combine::Solve(){
 		ConvertToWalkers(U,c[counter],indeces[counter]);
 		(*it1)->ResetInitialCondition(C);
 		(*it1)->advance(c[counter]);
+		// (*it1)->InhomogenousAdvance(c[counter],ad[indeces[counter]]);	/*Maybe we should have a walk.SetDiffusionConstant(D) and let the advance function figure out what to do*/
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}

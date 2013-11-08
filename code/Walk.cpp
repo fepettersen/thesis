@@ -171,20 +171,27 @@ void Walk::InhomogenousAdvance(int **C, double **D, double _dt){
 	dt = _dt/100;
 	double *newPos, **s;
 	newPos = new double[d];			//delete at the end!
-	s = new double*[steps];			//delete at the end!
 	int *index = new int[d];		//delete at the end!
-	for(int k=0; k<steps; k++){
-		s[k] = new double[d];
-		for(int l=0; l<d; l++){
-			s[k][l] = 0;
-		}
-	}
+	// s = new double*[steps];			//delete at the end!
+	// for(int k=0; k<steps; k++){
+	// 	s[k] = new double[d];
+	// 	for(int l=0; l<d; l++){
+	// 		s[k][l] = 0;
+	// 	}
+	// }
+	double L = 0;
+	double L_deriv = 0;
+	double L0 = sqrt(2*dt);
+	double L_deriv0 = dt/(2*dx*sqrt(2*dt));
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
-		Tr = (1+0.5*L_deriv(walker[i]));
-		Tl = (1-0.5*L_deriv(walker[i]));
-		Delta_p = L(walker[i])*Tr;
-		Delta_m = L(walker[i])*Tl;
+		index = FindPosition(walker[i]);	/*Must work in 2d as well!*/
+		L = L0*sqrt(D[index[0]]);
+		L_deriv = L_deriv0/sqrt(D[index[0]])*(D[index[0]+1]-D[index[0]+1]); 	/*This should not work and is horrible programming*/
+		Tr = (1+0.5*L_deriv);
+		Tl = (1-0.5*L_deriv);
+		Delta_p = L*Tr;
+		Delta_m = L*Tl;
 		Tr /= 2.0;
 		// Tl /= 2.0;
 		for(int j=0;j<steps;j++){
