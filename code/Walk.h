@@ -4,7 +4,7 @@
 class Walk
 {
 	public:
-		Walk(int d);
+		Walk(int d,double _dt=0.01);
 
 		int nwalkers, steps;
 		double **area;

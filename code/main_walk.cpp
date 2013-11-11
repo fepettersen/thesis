@@ -2,11 +2,11 @@
 using namespace std;
 
 
-string make_filename(string buffer,string filename,int factor,int step_no){
+string make_filename(string buffer,string filename,int conversion_factor,int step_no){
     //Returns a filename saying something about the particular run.
 	char buff[100];
 	if(filename =="a"){
-		sprintf(buff,"/results_FE_Hc%d_n%03d.txt",factor,step_no);
+		sprintf(buff,"/results_FE_Hc%d_n%03d.txt",conversion_factor,step_no);
 	}
 	else{
 		sprintf(buff,"/%s_n%03d.txt",filename.c_str(),step_no);
@@ -16,14 +16,14 @@ string make_filename(string buffer,string filename,int factor,int step_no){
   	return buffer;
 }
 
-void output(ofstream* outfile, double **u, string buffer, string path,string filename,int m,int n,int factor, int N){
+void output(ofstream* outfile, double **u, string buffer, string path,string filename,int m,int n,int conversion_factor, int N){
     /*outfile is an ofstram-object letting us open a file
     **u is an armadillo-object containing the solution at time n
     **n is the timestep number
     **scheme is an integer telling what scheme is used to obtain the solution
     **N is the size of the array (in one direction)*/
     string tmp = path;
-    tmp.append(make_filename(buffer,filename,factor,N));
+    tmp.append(make_filename(buffer,filename,conversion_factor,N));
     // outfile->open(tmp.c_str(),ios::binary);
     outfile->open(tmp.c_str());
     for(int i=0;i<m;i++){
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
     string path = argv[9];
     string filename = argv[10];
-    double factor =atof(argv[11]);
+    double conversion_factor =atof(argv[11]);
     double Dt = atof(argv[12]);
 
     string buffer;
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 	for(int i=0; i<m; i++){
 		for(int j=0; j<n; j++){
 			if(i>=m/2 && j<=n/2){
-				C[i][j] = (int) (factor);
+				C[i][j] = (int) (conversion_factor);
 			}
 			else{
 				C[i][j] = 0;
@@ -99,18 +99,45 @@ int main(int argc, char** argv)
 			Up[i][j] = 0.0;//cos(wth);
 			U[i][j] = 0;
 			aD[i][j] = 1.0;//i*dx*PI;
+			C[i][j] = 0;
 		}
 	}
 
 	Up[0][0] = 1.0;
+	C[0][0] = conversion_factor;
+	U[0][0] = 1.0;
 
-	Combine BlackBox(m,n,0,1,0,1,aD,factor,Dt);
+	// for(int i=0;i<m;i++){
+	// 	for(int j=0; j<n; j++){
+	// 		cout<<C[i][j]<<" "<<endl;
+	// 	}
+	// }
+	string RWname = "RWname";
+
+	Walk walksolver(1,Dt);
+	walksolver.SetInitialCondition(C,m,n);
+	walksolver.drift = 0;
+
+	Combine BlackBox(m,n,0,1,0,1,1,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-	BlackBox.AddWalkArea(x,y);
+	// BlackBox.AddWalkArea(x,y);
+	int sum = 0;
+	output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,0);
 	for(int t=0; t<T; t++){
+		// cout<<"---------------"<<endl;
 		BlackBox.Solve();
+		walksolver.advance(C);
+		for(int i=0;i<m;i++){
+			for(int j=0; j<n; j++){
+				U[i][j] = (double) (C[i][j]/conversion_factor);
+				// cout<<C[i][j]<<" "<<endl;
+			}
+		}
+		// walksolver.ResetInitialCondition(C);
+		sum = 0;
 		if(tofile){
-			output(&outfile,BlackBox.U,buffer,path,filename,m,n,factor,t);
+			output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
+			output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,(t+1));
 		}
 	}
 	return 0;
