@@ -14,6 +14,7 @@ class Combine
 		void ConvertFromWalkers(double **, int**, int **);
 		void MapAreaToIndex(double *, double *, int **);
 		void SetInitialCondition(double**,int,int);
+		double abs_max(double **array,int m, int n);
 
 		double dx, dy, D;
 		double *X,*Y;

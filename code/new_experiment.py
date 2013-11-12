@@ -74,7 +74,8 @@ class Experiment:
 		# self.walk = [0]*self.T
 		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %f'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0,self.dt))
 		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
-			self.walk.append(np.fromfile(step,sep=" "))
+			# self.walk.append(np.fromfile(step,sep=" "))
+			self.walk.append(np.loadtxt(step))		
 
 	def RunSimulation(self,Hc):
 		tofile = self.tofile
@@ -128,7 +129,7 @@ class Experiment:
 		mpl.legend(loc=2)
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('max(abs(simulation-exact))')
-		mpl.title('Error plot')
+		mpl.title('Error plot; dt = %g'%self.dt)
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
 			mpl.savefig(self.result_path+'/errorplot.eps')
@@ -144,6 +145,7 @@ class Experiment:
 			Y = np.zeros(self.m)
 		for i in range(len(self.walk)):
 			self.error.append(np.abs(np.linalg.norm(self.walk[i]-self.exact(X,Y,(i+1)*self.dt))))
+			# print self.walk[i]
 		mpl.plot(self.error,'b-o')
 		mpl.xlabel('timestep #')
 		mpl.ylabel('errornorm')
@@ -227,11 +229,16 @@ class Experiment:
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
-				wframe = ax.plot_wireframe(X,Y,(self.exact(X,Y,(counter*self.dt))-tmp))
+				if viz_type=='difference':
+					wframe = ax.plot_wireframe(X,Y,(self.exact(X,Y,(counter*self.dt))-tmp))
+				elif viz_type=='exact':
+					wframe = ax.plot_wireframe(X,Y,self.exact(X,Y,(counter*self.dt)))
+				else:
+					wframe = ax.plot_wireframe(X,Y,tmp)
 				mpl.draw()
 				if counter==1:
-					pass
-					# ax.set_autoscaley_on(False)
+					# pass
+					ax.set_autoscaley_on(False)
 				ax.collections.remove(wframe)
 				counter +=1
 			# ax.plot_wireframe(X,Y,self.exact(X,Y,0))
@@ -250,11 +257,11 @@ class Experiment:
 
 
 def f(x,y,t):
-	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
 	# return np.ones(np.shape(x))*1.5
-	D = v = 1
-	tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
-	return tmp/np.sum(tmp)
+	# D = v = 1
+	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
+	# return tmp/np.sum(tmp)
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -269,13 +276,13 @@ if __name__ == '__main__':
 	x1 = 0.7
 	y1 = 0.7
 	m = 21
-	n = 1
-	T = 21
+	n = 21
+	T = 151
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	dt = 8e-05
-	Hc = [1.6/dt]
+	# dt = 8e-05
+	Hc = [16/dt]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
@@ -286,13 +293,13 @@ if __name__ == '__main__':
 	for i in Hc:
 		print "Hc = %g"%i
 		run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
 	# run.PlotError()
+
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	run.Visualize(filename='/RWname_n',viz_type=None)
+	# run.Visualize(filename='/RWname_n',viz_type=None)
 	run.Visualize(viz_type=None)
 
 	run.Finish()

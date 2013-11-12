@@ -59,6 +59,11 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	for(int j=0; j<n;j++){
 		Y[j] = j*dy;
 	}
+
+	double stabilitycriteria = dx*dx/(4*abs_max(aD,m,n));
+	if(Dt>stabilitycriteria){
+		Dt = stabilitycriteria;
+	}
 	pde_solver = new Diffusion(dx,dy,aD,Dt);
 	Hc = factor;
 };
@@ -69,6 +74,7 @@ void Combine::Solve(){
 	int counter = 0;
 	pde_solver->advance(U,Up,m,n);
 	for(vector<Walk*>::iterator it1 = walk_solvers.begin(); it1 != walk_solvers.end(); it1++){
+		(*it1)->drift = 0;
 		ConvertToWalkers(U,c[counter],indeces[counter]);
 		(*it1)->ResetInitialCondition(C);
 		(*it1)->advance(c[counter]);
@@ -93,6 +99,8 @@ void Combine::AddWalkArea(double *x, double *y){
 		index[k] = new int[d];
 	}
 	Walk *tmp = new Walk(d);
+	// tmp->SetDiffusionConstant();
+	// tmp->SetDiffusionTensor();
 	MapAreaToIndex(x,y,index);
 	if(d==1){
 		M = index[1][0]-index[0][0];
@@ -213,4 +221,18 @@ void Combine::SetInitialCondition(double** U0,int x,int y){
 			}
 		}
 	}
+}
+
+double Combine::abs_max(double **array,int m, int n){
+	double max = array[0][0];
+	double tmp = 0;
+	for(int i=0; i<m; i++){
+		for(int j=0; j<n; j++){
+			tmp = fabs(array[i][j]);
+			if(tmp>max){
+				max = tmp;
+			}
+		}
+	}
+	return max;
 }

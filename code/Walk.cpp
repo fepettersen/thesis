@@ -30,7 +30,7 @@ Walk::Walk(int dimension, double _dt)
 {
 	if(debug_walk){cout<<"Walk::Walk"<<endl;}
 	d = dimension;
-	steps = 2;
+	steps = 100;
 	x0 = 0; x1 = 1;
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
@@ -38,6 +38,7 @@ Walk::Walk(int dimension, double _dt)
 	dt = _dt;
 	factor = sqrt(2*D*dt);
 	drift = factor/steps;
+	inhomogenous = false;
 };
 
 void Walk::SetInitialCondition(int **C, int M, int N){
@@ -152,12 +153,12 @@ void Walk::advance(int **C){
 		}
 	}
 
-	for(int i=0;i<m; i++){
-		/*Empty the array to conserve energy*/
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
+	// for(int i=0;i<m; i++){
+	// 	Empty the array to conserve energy
+	// 	for(int j=0; j<n; j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
 	if(d==1){
 		for(int i=0;i<nwalkers;i++){
 			index = FindPosition(walkers[i]);
@@ -173,7 +174,8 @@ void Walk::advance(int **C){
 	// delete [] s,newPos, index;
 }
 
-void Walk::InhomogenousAdvance(int **C, double **D, double _dt){
+void Walk::InhomogenousAdvance(int **C, double _dt){
+	/*This should now implement the normal advance-function as well*/
 	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
 	dt = _dt/100;
 	double *newPos, **s;
@@ -191,18 +193,26 @@ void Walk::InhomogenousAdvance(int **C, double **D, double _dt){
 	double L0 = sqrt(2*dt);
 	double L_deriv0 = (dt/d)/(2*dx*sqrt(2*(dt/d)));
 	double Tr,Tl,Delta_m,Delta_p,r,stepvector[d];
+	if(not inhomogenous){
+		L = L0*sqrt(D);
+		Tr = 0.5;
+		Delta_p = L;
+		Delta_m = L;
+	}
 
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
-		index = FindPosition(walkers[i]);	/*Must work in 1d as well!*/
-		L = (d>1)?(L0*sqrt(D[index[0]][index[1]])):(L0*sqrt(D[index[0]][0]));
-		L_deriv = (d>1)?(L_deriv0/sqrt(D[index[0]][index[1]])*(D[index[0]+1][index[1]]-D[index[0]+1][index[1]])):(L_deriv0/sqrt(D[index[0]][0])*(D[index[0]+1][0]-D[index[0]+1][0])); 	/*This should not work and is horrible programming*/
-		Tr = (1+0.5*L_deriv);
-		Tl = (1-0.5*L_deriv);
-		Delta_p = L*Tr;
-		Delta_m = L*Tl;
-		Tr /= 2.0;
-		// Tl /= 2.0;
+		if(inhomogenous){
+			index = FindPosition(walkers[i]);	/*Must work in 1d as well!*/
+			L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
+			L_deriv = (d>1)?(L_deriv0/sqrt(aD[index[0]][index[1]])*(aD[index[0]+1][index[1]]-aD[index[0]+1][index[1]])):(L_deriv0/sqrt(aD[index[0]][0])*(aD[index[0]+1][0]-aD[index[0]+1][0])); 	/*This should not work and is horrible programming*/
+			Tr = (1+0.5*L_deriv);
+			Tl = (1-0.5*L_deriv);
+			Delta_p = L*Tr;
+			Delta_m = L*Tl;
+			Tr /= 2.0;
+		}
+		
 		for(int j=0;j<steps;j++){
 			/*Advance n steps*/
 			for(int p=0; p<d; p++){
@@ -222,7 +232,7 @@ void Walk::InhomogenousAdvance(int **C, double **D, double _dt){
 	if(d==1){
 		for(int i=0;i<nwalkers;i++){
 			index = FindPosition(walkers[i]);
-			C[index[0]] += 1;
+			C[index[0]][0] += 1;
 		}
 	}
 	else if(d==2){
@@ -272,8 +282,20 @@ double *Walk::InhomogenousStep(double *r, double *s){
 	return tmp;
 }
 
-int Walk::InitializeTimestep(int **C){
-	return 0;
+void Walk::SetDiffusionTensor(double **Diff, int m, int n){
+	aD = new double*[m];
+	for(int i=0;i<m;i++){
+		aD[i] = new double[n];
+	}
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++)
+		aD[i][j] = Diff[i][j];
+	}
+	inhomogenous = true;
+}
+void Walk::SetDiffusionConstant(double Diff){
+	D = Diff;
+	inhomogenous = false;
 }
 
 void Walk::PutWalkers(int i, int j, int counter){
@@ -373,14 +395,6 @@ double *Walk::checkpos(double *r,double *s){
 }
 
 
-
-// int len(double*){
-// 	/*Length function in python*/
-// 	double*::iterator it;
-// 	while(it != null){
-// 		it++;
-// 	}
-// }
 #undef IA
 #undef IM
 #undef AM
