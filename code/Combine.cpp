@@ -77,8 +77,8 @@ void Combine::Solve(){
 		(*it1)->drift = 0;
 		ConvertToWalkers(U,c[counter],indeces[counter]);
 		(*it1)->ResetInitialCondition(C);
-		(*it1)->advance(c[counter]);
-		// (*it1)->InhomogenousAdvance(c[counter],ad[indeces[counter]]);	/*Maybe we should have a walk.SetDiffusionConstant(D) and let the advance function figure out what to do*/
+		// (*it1)->advance(c[counter]);
+		(*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);	/**/
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}
@@ -99,8 +99,6 @@ void Combine::AddWalkArea(double *x, double *y){
 		index[k] = new int[d];
 	}
 	Walk *tmp = new Walk(d);
-	// tmp->SetDiffusionConstant();
-	// tmp->SetDiffusionTensor();
 	MapAreaToIndex(x,y,index);
 	if(d==1){
 		M = index[1][0]-index[0][0];
@@ -109,6 +107,37 @@ void Combine::AddWalkArea(double *x, double *y){
 	else if(d==2){
 		M = index[0][1]-index[0][0];
 		N = index[1][1]-index[1][0];
+	}
+	if(pde_solver->solver == 0){
+		/*Should have a better test. Testing if we have a diffusion 
+		constant or inhomogenous diffusion*/
+		tmp->SetDiffusionConstant(D);
+	}
+	else{
+		if(d==2){
+			double **temp = new double*[M+2];
+			for(int k=0; k<(M+2);k++){
+				temp[k] = new double[N+2];
+			}
+			for(int k=0; k<(M+2);k++){
+				for(int l=0; l<(N+2);l++){
+					temp[k][l] = aD[index[0][0]+k][index[1][0]+l];
+				}
+			}
+			tmp->SetDiffusionTensor(temp,M+2,N+2);
+		}
+		else if(d==1){
+			double **temp = new double*[M+2];
+			for(int k=0; k<(M+2);k++){
+				temp[k] = new double[1];
+			}
+			for(int k=0; k<(M+2);k++){
+				for(int l=0; l<1;l++){
+					temp[k][l] = aD[index[0][0]+k][0];
+				}
+			}
+			tmp->SetDiffusionTensor(temp,M+2,1);
+		}
 	}
 	int **Ctmp = new int*[M];
 	for(int k=0; k<M;k++){

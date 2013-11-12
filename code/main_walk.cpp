@@ -94,10 +94,12 @@ int main(int argc, char** argv)
 			else{
 				C[i][j] = 0;
 			}
-			wth = X[j]*PI;
-			Up[i][j] = cos(wth);
+			wth = X[i]*PI;
+			// Up[i][j] = cos(wth);
+			Up[i][j] = wth*(j*dy)*PI;
+			// Up[i][j] = 0;
 			U[i][j] = 0;
-			aD[i][j] = i*dx*PI;
+			aD[i][j] = X[i]+Y[j];//i*dx*PI;
 			C[i][j] = 0;
 		}
 	}
@@ -105,7 +107,7 @@ int main(int argc, char** argv)
 	C[0][0] = conversion_factor;
 	U[0][0] = 1.0;
 
-	string RWname = "RWname";
+	// string RWname = "RWname";
 
 
 

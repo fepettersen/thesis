@@ -203,7 +203,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
 		if(inhomogenous){
-			index = FindPosition(walkers[i]);	/*Must work in 1d as well!*/
+			index = FindPosition(walkers[i]);
 			L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
 			L_deriv = (d>1)?(L_deriv0/sqrt(aD[index[0]][index[1]])*(aD[index[0]+1][index[1]]-aD[index[0]+1][index[1]])):(L_deriv0/sqrt(aD[index[0]][0])*(aD[index[0]+1][0]-aD[index[0]+1][0])); 	/*This should not work and is horrible programming*/
 			Tr = (1+0.5*L_deriv);

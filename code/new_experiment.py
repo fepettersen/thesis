@@ -257,11 +257,12 @@ class Experiment:
 
 
 def f(x,y,t):
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
+	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
 	# return np.ones(np.shape(x))*1.5
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
+	return np.pi**2*np.exp(-t*np.pi**2)*x*y
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -281,26 +282,27 @@ if __name__ == '__main__':
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	# dt = 8e-05
-	Hc = [16/dt]
+	dt = dx**2/(4*np.pi)
+	print 'Python: ',dt
+	Hc = [100,1000,10000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
-	for i in Hc:
-		print "Hc = %g"%i
-		run.RunSimulation(i)
-	time.sleep(1)
-	run.CalculateError(Hc,exact=True)
+	run.VerifyDeterministicError()
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.RunSimulation(i)
+	# time.sleep(1)
+	# run.CalculateError(Hc,exact=True)
 	# run.PlotError()
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
 	# run.Visualize(filename='/RWname_n',viz_type=None)
-	run.Visualize(viz_type=None)
+	run.Visualize(filename='/Deterministic_n',viz_type=None)
 
 	run.Finish()
 

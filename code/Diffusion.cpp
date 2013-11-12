@@ -181,5 +181,6 @@ double Diffusion::f(double x,double y, double t){
 	double pi = 3.1415926535897932;
 	// return exp(-t*pi*pi)*pi*pi*(sin(pi*x)+cos(pi*x)*(pi*x-1));
 	// return -pi*sin(pi*x)*exp(-t*pi*pi);
-	return 0.0;
+	return pi*pi*exp(-t*pi*pi)*(pi*pi*x*y + x + y);
+	// return 0.0;
 }
