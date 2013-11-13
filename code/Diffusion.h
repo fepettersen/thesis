@@ -10,7 +10,7 @@ class Diffusion
 		double **aD;		/*anisotropic D*/
 		int d;
 		double dt,dx,dy, v;
-		double D,_Dx,_Dy;	/*should be double **D ?*/
+		double D,_Dx,_Dy,vdtdx2,vdtdy2;	/*should be double **D ?*/
 		int solver; /*Which solver to use*/
 		int t; 		/*Timestep number*/
 
