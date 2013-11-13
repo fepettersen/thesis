@@ -39,6 +39,7 @@ As we saw in section \ref{truncation_error} the Forward Euler scheme is expected
 Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation. 
 
 \begin{figure}[H]
+
 \centering
 \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/deterministic_errorplot.eps}
 \caption[Numerical error for 1D Forwar Euler discretization]{Numerical error for 1D Forwar Euler discretization of the PDE. Nothing else is done to the simulation.}
@@ -169,3 +170,14 @@ Again, the error is of the order of $\Delta t$ and is roughly halved by halving 
 \section{2D}
 Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
 This can, however be tweaked by increasing the conversion parameters.
+
+\begin{equation}
+ - \frac{\pi^{2} \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}}
+\end{equation}
+\begin{equation}
+- \frac{\pi^{2} \left(x + y\right) \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}} - \frac{\pi \operatorname{sin}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}}
+\end{equation}
+\begin{equation}
+- \frac{\pi^{2} \left(x + y\right) \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}} - \frac{\pi \operatorname{sin}\left(\pi y\right) \operatorname{cos}\left(\pi x\right)}{e^{\pi^{2} t}}
+\end{equation}
+

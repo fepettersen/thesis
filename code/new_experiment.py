@@ -262,7 +262,7 @@ def f(x,y,t):
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	return np.pi**2*np.exp(-t*np.pi**2)*x*y
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -302,7 +302,9 @@ if __name__ == '__main__':
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
 	# run.Visualize(filename='/RWname_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 
 	run.Finish()
 

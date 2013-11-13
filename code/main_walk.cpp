@@ -95,8 +95,8 @@ int main(int argc, char** argv)
 				C[i][j] = 0;
 			}
 			wth = X[i]*PI;
-			// Up[i][j] = cos(wth);
-			Up[i][j] = wth*(j*dy)*PI;
+			wty = Y[j]*PI;
+			Up[i][j] = cos(wth)*cos(wty);
 			// Up[i][j] = 0;
 			U[i][j] = 0;
 			aD[i][j] = X[i]+Y[j];//i*dx*PI;
