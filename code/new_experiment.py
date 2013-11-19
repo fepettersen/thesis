@@ -121,12 +121,12 @@ class Experiment:
 
 	def PlotError(self,save=True):
 		# mpl.hold('on')
-		color = ['b-o','r-o','k-o','c-o','g-o','m-o','b-x','r-x','k-x','c-x','g-x','m-x']
+		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-x']
 		for i in range(len(self.error)):
 			# mpl.plot(np.log(self.error[i]/self.dt))
 			mpl.plot(self.error[i],color[i],label='Hc = %d'%(int(np.round(self.legends[i]))))
 			# print self.error[i]
-		mpl.legend(loc=2)
+		mpl.legend(loc=0)
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('max(abs(simulation-exact))')
 		mpl.title('Error plot; dt = %g'%self.dt)
@@ -265,25 +265,25 @@ def f(x,y,t):
 	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
 
 	this_dir = right_split(os.getcwd(),'/')
 
-	x0 = 0.6
+	x0 = 0.4
 	y0 = 0.6
-	x1 = 0.7
+	x1 = 0.6
 	y1 = 0.7
 	m = 101
 	n = 1
-	T = 99
+	T = 999
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
-	dt = dx*dy/5.0 if n>1 else dx**2/5.0
+	dt = dx*dy/5.0 if n>1 else dx**2/3.0
 	dt = 0.01
-	print 'Python: ',dt
+	print 'Python: ',dt,' dx: ',dx
 	Hc = [100,1000,10000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
@@ -292,18 +292,18 @@ if __name__ == '__main__':
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
 	run.VerifyDeterministicError()
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
 	# run.Visualize(filename='/RWname_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 
 	run.Finish()

@@ -297,6 +297,36 @@ Inerting this gives us
  \nabla D\nabla u\approx\frac{1}{2\Delta x^2}\left((D_{i+1,j}+D_{i,j})(u_{i+1,j}-u_{i,j})-(D_{i,j}+D_{i-1,j})(u_{i,j}-u_{i-1,j})\right) \\
  +\frac{1}{2\Delta y^2}\left((D_{i,j+1}+D_{i,j})(u_{i,j+1}-u_{i,j})-(D_{i,j}+D_{i,j-1})(u_{i,j}-u_{i,j-1})\right)
 \end{align*}
+The Forward Euler discretization has one drawaback which is its instability for ``large'' $\Delta t$. 
+A common tradeoff for explicit numerical schemes. 
+We could sacrifice ease of implementation for unconditional stability in our scheme. 
+At least in 1d the implemetation is not that much worse either if we chose the Backward Euler discretisation for an isotropic (homogenous) equation. 
+The discretisation itself is found in equation \ref{BE_discretisation_isotropic}. 
+\begin{equation}\label{BE_discretisation_isotropic}
+ \frac{u^n_i - u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i +u^n_{i-1}}{\Delta x^2}
+\end{equation}
+The advantage of this discretisation is that it results in a tridiagonal linear system, which we can easily find if we just insert the first couple of steps.
+\begin{align*}
+ \frac{u^{n}_i-u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i + u^n_{i-1}}{\Delta x^2} \\
+ u^n_i -\frac{D\Delta t}{\Delta x^2}\left(u^n_{i+1}-2u^n_i + u^n_{i-1}\right) = u^{n-1}_i \\
+ u^n_i\Big(1+2\dfrac{D\Delta t}{\Delta x^2}\Big) -u^n_{i-1}\dfrac{D\Delta t}{\Delta x^2} - u^n_{n+1}\dfrac{D\Delta t}{\Delta x^2} 
+ = u^{n-1}_i
+\end{align*}
+If we insert for a few steps we see that this takes the form of
+\begin{align*}\label{BE}
+ \left(\begin{array}{c c c c c c c c}
+        \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2} &0 &\dots & & &0 &0 \\
+        -\frac{D\Delta t}{\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2} &0 &\dots & & &0 \\
+        0& \ddots & \ddots & \ddots & 0 & \dots &  &0\\
+        0& \dots & & &0&-\frac{D\Delta t}{\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2}\\
+         0& \dots & && &0&-\frac{\Delta t}{D\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) 
+       \end{array}\right)\mathbf{u}^n = \mathbf{u}^{n-1} 
+\end{align*}
+\begin{equation*}
+ \mathbf{A}\mathbf{u}^n = \mathbf{u^{n-1}}
+\end{equation*}
+This can be solved vey efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
+We implement the Backward Euler discretisation in order to efficiently simlulate for longer times, and by extension to test the effects the longer timesteps will have on the random walk model.
 
 \subsection{Stability}\label{stability}
 

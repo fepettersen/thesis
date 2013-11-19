@@ -249,7 +249,7 @@ Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is t
 The only problem with the solution \ref{solution_convection_diffusion_eq} is that it is invalid for $t=0$. 
 In order to use it we will need an initial condition which fits the rest of the solution. 
 We try and find this by first checking by simulation if it converges towards some initial solution as $t\to0$ and if so, extrapolate this to $t=0$ as the initial condition. 
-Figure \ref{} shows the result of this little experiment, and as we clearly see it does diverge as $t\to0$. 
+Figure \ref{convection_diffusion_eq_initial_condition} shows the result of this little experiment, and as we clearly see it does diverge as $t\to0$. 
 However, it also converges to a Dirac deltafunction, $\delta(x)$ which is defined by its properties
 \begin{align*}
 \delta(x) = \begin{cases} +\infty, & x = 0 \\ 0, & x \ne 0 \end{cases}
@@ -258,6 +258,14 @@ and
 \begin{equation*}
  \int_{-\infty}^\infty \delta(x) \, dx = 1
 \end{equation*}
+The Dirac delta function often sought as an inital condition in experimental setups for measurements on diffusion processes because of its compatibility with a variety of diffusion equations, and should do a very good job in our numerical setup as well. 
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/latex/Figures/convection_diffusion_eq_initial_condition.eps}
+ \caption[Initial condition for convection diffusion]{Experiment to determine the initial condition of equation \ref{solution_convection_diffusion_eq}}
+ \label{convection_diffusion_eq_initial_condition}
+\end{figure}
 
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
@@ -289,6 +297,36 @@ Inerting this gives us
  \nabla D\nabla u\approx\frac{1}{2\Delta x^2}\left((D_{i+1,j}+D_{i,j})(u_{i+1,j}-u_{i,j})-(D_{i,j}+D_{i-1,j})(u_{i,j}-u_{i-1,j})\right) \\
  +\frac{1}{2\Delta y^2}\left((D_{i,j+1}+D_{i,j})(u_{i,j+1}-u_{i,j})-(D_{i,j}+D_{i,j-1})(u_{i,j}-u_{i,j-1})\right)
 \end{align*}
+The Forward Euler discretization has one drawaback which is its instability for ``large'' $\Delta t$. 
+A common tradeoff for explicit numerical schemes. 
+We could sacrifice ease of implementation for unconditional stability in our scheme. 
+At least in 1d the implemetation is not that much worse either if we chose the Backward Euler discretisation for an isotropic (homogenous) equation. 
+The discretisation itself is found in equation \ref{BE_discretisation_isotropic}. 
+\begin{equation}\label{BE_discretisation_isotropic}
+ \frac{u^n_i - u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i +u^n_{i-1}}{\Delta x^2}
+\end{equation}
+The advantage of this discretisation is that it results in a tridiagonal linear system, which we can easily find if we just insert the first couple of steps.
+\begin{align*}
+ \frac{u^{n}_i-u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i + u^n_{i-1}}{\Delta x^2} \\
+ u^n_i -\frac{D\Delta t}{\Delta x^2}\left(u^n_{i+1}-2u^n_i + u^n_{i-1}\right) = u^{n-1}_i \\
+ u^n_i\Big(1+2\dfrac{D\Delta t}{\Delta x^2}\Big) -u^n_{i-1}\dfrac{D\Delta t}{\Delta x^2} - u^n_{n+1}\dfrac{D\Delta t}{\Delta x^2} 
+ = u^{n-1}_i
+\end{align*}
+If we insert for a few steps we see that this takes the form of
+\begin{align*}\label{BE}
+ \left(\begin{array}{c c c c c c c c}
+        \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2} &0 &\dots & & &0 &0 \\
+        -\frac{D\Delta t}{\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2} &0 &\dots & & &0 \\
+        0& \ddots & \ddots & \ddots & 0 & \dots &  &0\\
+        0& \dots & & &0&-\frac{D\Delta t}{\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2}\\
+         0& \dots & && &0&-\frac{\Delta t}{D\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) 
+       \end{array}\right)\mathbf{u}^n = \mathbf{u}^{n-1} 
+\end{align*}
+\begin{equation*}
+ \mathbf{A}\mathbf{u}^n = \mathbf{u^{n-1}}
+\end{equation*}
+This can be solved vey efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
+
 
 \subsection{Stability}\label{stability}
 
@@ -324,7 +362,7 @@ This approximation has a well defined residual, or truncation error which we can
 \begin{equation*}
   R = \frac{u(t_{n+1}) -u(t_n)}{\Delta t} -u'(t_n)
 \end{equation*}
-Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h$
+Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h^i$
 \begin{align*}
  R &= \frac{u(t_n)+u'(t_n)\Delta t +0.5u''(t_n)\Delta t^2 + \mathcal{O}(\Delta t^3)-u(t_n)}{\Delta t} -u'(t_n)\\
   &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) = \mathcal{O}(\Delta t)
@@ -333,9 +371,18 @@ We can do better than this by using another discretization scheme for the PDE, b
 Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
 Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per meshpoint in the walk-area. 
-This will be such a costly operation that it will not necesarily be worth it.
-
-
+This will be such a costly operation that it will not necesarily be worth it.\\
+The spatial derivative also has a well defined residual which is found by Taylor expansion.
+\begin{equation}
+R = \frac{u(x_{i+1})-2u(x_i)+u(x_{i-1})}{\Delta x^2}-u''(x_i) 
+\end{equation}
+Remember Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
+\begin{align*}
+ R &= \frac{u(x_i)+u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}-\frac{2u(x_i)}{\Delta x^2}+\\
+ &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} -u'(x_i)\\
+R &= u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
+\end{align*}
+There are discretisations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will allways be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative.
 
 
 \section{Combining the two solvers}\label{combining_the_solvers}

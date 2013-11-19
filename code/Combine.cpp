@@ -100,7 +100,7 @@ void Combine::AddWalkArea(double *x, double *y){
 	for(int k=0; k<2;k++){
 		index[k] = new int[d];
 	}
-	Walk *tmp = new Walk(d);
+	Walk *tmp = new Walk(d,pde_solver->dt);
 	MapAreaToIndex(x,y,index);
 	if(d==1){
 		M = index[1][0]-index[0][0];

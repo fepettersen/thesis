@@ -14,14 +14,20 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Initial condition in 1d}}{20}{figure.caption.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Numerical error for 1D Forwar Euler discretization}}{22}{figure.caption.7}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Numerical error for 1D Forward Euler discretization}}{22}{figure.caption.7}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.3}{\ignorespaces Effect of increasing number of walkers}}{23}{figure.caption.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Verification of Convection diffusion equation implenetation}}{24}{figure.caption.9}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{24}{figure.caption.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Adding walkers influenced by drift}}{25}{figure.caption.10}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{24}{figure.caption.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Verification of anisotropic diffusion equation implenetation}}{26}{figure.caption.11}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces \relax }}{25}{figure.caption.11}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Verification of Convection diffusion equation implenetation}}{26}{figure.caption.12}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Adding walkers influenced by drift}}{26}{figure.caption.13}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Verification of anisotropic diffusion equation implenetation}}{27}{figure.caption.14}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }

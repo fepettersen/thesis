@@ -60,7 +60,9 @@ For longer simuations, however, we expect the analytic solution to take a steady
  u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
 \end{equation}
 The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of timesteps. 
-Figure \ref{errorplot_FE1D_noWalk_long} shows a longer simuation of the equation.
+Figure \ref{errorplot_FE1D_noWalk_long} shows a longer simuation of the equation which includes the corverging part as well. 
+Looking closely at figure \ref{errorplot_FE1D_noWalk_long}, which has a smaller $\Delta t$ by a factor of $\sim6$ with respect to figure \ref{errorplot_FE1D_noWalk}, we can note that the errornorm $0.0015$ is reached after some $100-200$ timesteps, which is later than in figure \ref{errorplot_FE1D_noWalk}. 
+Although this is not an exact measurment, it is another indication that the implementation is correct.
 
 \begin{figure}[H]
 \centering
@@ -74,7 +76,7 @@ Figure \ref{errorplot_FE1D_noWalk_long} shows a longer simuation of the equation
  \caption{}
  \label{errorplot_FE1D_noWalk_long}
 \end{subfigure}
-\caption[Numerical error for 1D Forwar Euler discretization]{Numerical error for 1D Forwar Euler discretization of the PDE. Nothing else is done to the simulation.}
+\caption[Numerical error for 1D Forward Euler discretization]{Numerical error for 1D Forwar Euler discretization of the PDE. Nothing else is done to the simulation.}
 \label{errorplot_FE1D_noWalk_super}
 \end{figure}
 
@@ -84,7 +86,8 @@ These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers.
  C_{ij} = \frac{a}{\Delta t}U_{ij}
 \end{equation}
 Mostly we will rewrite equation \ref{conversion_rate} to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
-As of now, the conversion factor, $Hc$, is defined in equation \ref{definition_Hc_first}.
+As of now, the conversion factor, $Hc$, is defined in equation \ref{definition_Hc_first}. 
+One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
 \begin{equation}\label{definition_Hc_first}
  Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
 \end{equation}
@@ -105,7 +108,64 @@ After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of 
 This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
 Meaning of course that the calculations in section \ref{} are not hopeless.
 
+\subsection{Increasing the timestep and the relative size of walk-area}\label{increasing_dt}
 
+Now that we have an estimate of how to adjust the steplength of the walkers in order to adjust for the timestep, $\Delta t$, on the PDE level we would like to investigate the actual effects of running the simulation with a larger timestep to verify our calculations. 
+First off all, figure \ref{errorplot_BE1D_noWalk} shows the errornorm of a simulation of the simplest diffusion equation \ref{simple_diffusion_equation} discretised by the Backward Euler scheme \ref{BE_discretisation_isotropic} using a timestep which would make the Forward Euler discretization unstable (There is something strange about its convergence). 
+Figure \ref{errorplot_BE1D_Walk} shows the same simulation for various conversion parameters for the random walk. 
+These simulations have input from the random walk model on some 20\% of the mesh points. 
+As a comparison we can turn to figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} which have 5\% and 35\% of the meshpoints affected by walkers.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1514/results/deterministic_errorplot.eps}
+\caption{}
+\label{errorplot_BE1D_noWalk}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1514/results/errorplot.eps}
+ \caption{}
+ \label{errorplot_BE1D_Walk}
+\end{subfigure}
+\caption[Numerical error for 1D Backward Euler discretization]{Numerical error for 1D Backward Euler discretization of the PDE. In figure b there has been added walkers to the solution in the area $x\in[0.5,0.7]$.}
+\label{errorplot_BE1D_first}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1559/results/errorplot.eps}
+ \caption{}
+ \label{errorplot_BE1D_walk_5_percent}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1603/results/errorplot.eps}
+ \caption{}
+ \label{errorplot_BE1D_walk_35_percent}
+\end{subfigure}
+\caption{}
+\label{}
+\end{figure}
+
+These experiments have been done using the Backward Euler discretization so that we can simulate for a longer time and still see the effects to their full extent. 
+We have also investigated the effects of changing the timestep (also using the BE discretization to avoid instabilities and be able to do longer simulations). 
+The results are summarized in figures \ref{} to \ref{}.
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1625/results/errorplot.eps}
+ \caption{}
+ \label{errorplot_BE1D_small_dt}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1627/results/errorplot.eps}
+ \caption{}
+ \label{errorplot_BE1D_walk_large_dt}
+\end{subfigure}
+\caption{}
+\label{}
+\end{figure}
 
 \subsection{The effects of adding drift to the walkers}\label{effect_of_drift_on_walkers}
 
@@ -113,7 +173,7 @@ As shown in section \ref{random_walks_and_drift} adding drift to the walkers wil
 In our analysis so far we have completely ignored the spatial truncation error because it is of second order, and the truncation error in time is of first order. 
 When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
 
-Otherwise the truncation error in this term will completely dominate seeing as $\Delta t\Delta x$. 
+Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
 We must also find a new stability criterion for the scheme. \\
 As for now, the Leap-frog discretization will do (though it is not by far a perfect choise seeing as it is unstable). 
 As a sidenote we can also note that the Neumann boundary condition will be very clear in this scheme. 
