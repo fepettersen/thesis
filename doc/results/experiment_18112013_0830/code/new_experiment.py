@@ -265,7 +265,7 @@ def f(x,y,t):
 	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -276,13 +276,13 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.7
 	y1 = 0.7
-	m = 101
+	m = 21
 	n = 1
-	T = 99
+	T = 5999
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	dt = 0.01
+	dt = dx**2/(4*4.0)
 	print 'Python: ',dt
 	Hc = [100,1000,10000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
@@ -303,7 +303,7 @@ if __name__ == '__main__':
 	# run.UpdateSpecial()
 	# run.Visualize(filename='/RWname_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 
 	run.Finish()

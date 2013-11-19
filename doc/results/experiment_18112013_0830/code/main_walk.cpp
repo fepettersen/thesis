@@ -88,13 +88,11 @@ int main(int argc, char** argv)
 
 	for(int i=0; i<m; i++){
 		for(int j=0; j<n; j++){
-			if(i<=m/2 && j<=n/2){
+			if(i>=m/2 && j<=n/2){
 				C[i][j] = (int) (conversion_factor);
-				// Up[i][j] = 1.0;
 			}
 			else{
 				C[i][j] = 0;
-				// Up[i][j] = 0;
 			}
 			wth = X[i]*PI;
 			wty = Y[j]*PI;

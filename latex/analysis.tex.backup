@@ -1,6 +1,6 @@
 \section{Some discussion}
 
-This chapter will concern most of the numerical error analysis and som of the discussion of this analysis as well as an introduction to the methods used for error analysis in general, and how they are adapted to this particular problem.\\
+This chapter will concern most of the numerical error analysis and some of the discussion of this analysis as well as an introduction to the methods used for error analysis in general, and how they are adapted to this particular problem.\\
 
 
 In this numerical setup we will potentially introduce several new error sources in addition to the nomal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
@@ -21,6 +21,23 @@ To investigate the error we are introducing we will first need to test that the 
  \label{initial_condition_1d}
 \end{figure}
 
+\section{The error}
+Before we do anything we should specify what we use to measure the error. 
+Throughout this thesis the term error is used quite lazily, but except something else is specified we refer to the expression 
+\begin{equation}
+ err = max\left(||u_e-u||_2\right)
+\end{equation}
+where $u_e$ is the exact (manifactured) solution to the equation. 
+This is not necessarily the best error measure, but as it lets us study the time evolution of the error it makes debugging a bit simpler. 
+Other error measures that might come in handy later will be the integrated spatial error as a function of time
+\begin{equation}
+ err = ||\sum u_e-u||_2
+\end{equation}
+and the same error integrated in time as well
+\begin{equation}
+ err = \sum||\sum u_e-u||_2
+\end{equation}
+The error will be calculated over the entire mesh, regardless of any random walk areas on the mesh.
 
 \section{Manifactured Solutions}
 A normal way of checking that our scheme of choise is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
@@ -35,14 +52,30 @@ which satisfies our equation if we set the diffusion constant to 1.
  \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\\
  -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1
 \end{align}
-As we saw in section \ref{truncation_error} the Forward Euler scheme is expected to have an error of the order of $\Delta t$. 
-Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation. 
+As we saw in section \ref{truncation_error} the Forward Euler scheme is expected to have an error of the order of $\Delta t$ in time. 
+The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and the error term coming from the time derivative due to the stability criterion \ref{stability}, which is also of the order $\Delta x^2$. 
+Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation, showing us that the error is linear in the first part of a simuation. 
+For longer simuations, however, we expect the analytic solution to take a steady state which we find in the limit of large $t$. 
+\begin{equation}
+ u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
+\end{equation}
+The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of timesteps. 
+Figure \ref{errorplot_FE1D_noWalk_long} shows a longer simuation of the equation.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/deterministic_errorplot.eps}
-\caption[Numerical error for 1D Forwar Euler discretization]{Numerical error for 1D Forwar Euler discretization of the PDE. Nothing else is done to the simulation.}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/deterministic_errorplot.eps}
+\caption{}
 \label{errorplot_FE1D_noWalk}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18112013_0830/results/deterministic_errorplot.eps}
+ \caption{}
+ \label{errorplot_FE1D_noWalk_long}
+\end{subfigure}
+\caption[Numerical error for 1D Forwar Euler discretization]{Numerical error for 1D Forwar Euler discretization of the PDE. Nothing else is done to the simulation.}
+\label{errorplot_FE1D_noWalk_super}
 \end{figure}
 
 We then introduce an area on the domain where we swich models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last timestep from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$. 
@@ -50,6 +83,12 @@ These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers.
 \begin{equation}\label{conversion_rate}
  C_{ij} = \frac{a}{\Delta t}U_{ij}
 \end{equation}
+Mostly we will rewrite equation \ref{conversion_rate} to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
+As of now, the conversion factor, $Hc$, is defined in equation \ref{definition_Hc_first}.
+\begin{equation}\label{definition_Hc_first}
+ Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
+\end{equation}
+
 The area where the model has been replaced is between $x=0.6$ and $x=0.7$, which is three mesh points. 
 In the same way as for only the simple 1D PDE case we compare the combined numerical solution from the two models to the exact solution. 
 Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligable. 
@@ -73,7 +112,8 @@ Meaning of course that the calculations in section \ref{} are not hopeless.
 As shown in section \ref{random_walks_and_drift} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
 In our analysis so far we have completely ignored the spatial truncation error because it is of second order, and the truncation error in time is of first order. 
 When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
-Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
+
+Otherwise the truncation error in this term will completely dominate seeing as $\Delta t\Delta x$. 
 We must also find a new stability criterion for the scheme. \\
 As for now, the Leap-frog discretization will do (though it is not by far a perfect choise seeing as it is unstable). 
 As a sidenote we can also note that the Neumann boundary condition will be very clear in this scheme. 
@@ -116,7 +156,8 @@ Where $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$.
 
 As we see from figure \ref{Verification_convection_diffusion} the errornorm is halved when $\Delta t$ is roughly halved, just as we expected. It is also of the order of $\Delta t$, which is nice.  
 We can then advance to testing the effect of adding an area of walkers for different values of $Hc$ as before. 
-Note that we have now added some drift to the walkers so the model will fit better. 
+Note that we can no longer use the manifactured solution now if we wish to add drift to the walkers because we have forced the solution to fit the equation by tampering with the source term. 
+The effect of
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
@@ -130,9 +171,11 @@ Note that we have now added some drift to the walkers so the model will fit bett
 \label{Errortest_convection_diffusion_walkers:more_walkers}
 \end{subfigure}
 \caption[Adding walkers influenced by drift]{The figure shows the effect adding walkers influenced by drift has on the error. 
-The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrog in relation to the steplength. $\Delta t =8e-5$}
+The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrong in relation to the steplength. $\Delta t =8e-5$}
 \label{Errortest_convection_diffusion_walkers}
 \end{figure}
+
+
 
 \subsection{Anisotropic diffusion}
 
@@ -166,3 +209,14 @@ Again, the error is of the order of $\Delta t$ and is roughly halved by halving 
 \section{2D}
 Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
 This can, however be tweaked by increasing the conversion parameters.
+
+\begin{equation}
+ - \frac{\pi^{2} \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}}
+\end{equation}
+\begin{equation}
+- \frac{\pi^{2} \left(x + y\right) \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}} - \frac{\pi \operatorname{sin}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}}
+\end{equation}
+\begin{equation}
+- \frac{\pi^{2} \left(x + y\right) \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}} - \frac{\pi \operatorname{sin}\left(\pi y\right) \operatorname{cos}\left(\pi x\right)}{e^{\pi^{2} t}}
+\end{equation}
+

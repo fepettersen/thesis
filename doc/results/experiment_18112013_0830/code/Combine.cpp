@@ -32,7 +32,6 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 
 	pde_solver = new Diffusion(dx,dy,D,Dt);
 	Hc = factor;
-	inhomogenous = false;
 };
 Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double **DiffTensor, double factor, double Dt)
 {
@@ -67,7 +66,6 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	}
 	pde_solver = new Diffusion(dx,dy,aD,Dt);
 	Hc = factor;
-	inhomogenous = true;
 };
 
 
@@ -110,7 +108,7 @@ void Combine::AddWalkArea(double *x, double *y){
 		M = index[0][1]-index[0][0];
 		N = index[1][1]-index[1][0];
 	}
-	if(not inhomogenous){
+	if(pde_solver->solver == 0){
 		/*Should have a better test. Testing if we have a diffusion 
 		constant or inhomogenous diffusion*/
 		tmp->SetDiffusionConstant(D);

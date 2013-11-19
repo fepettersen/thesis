@@ -332,7 +332,7 @@ This approximation has a well defined residual, or truncation error which we can
 \begin{equation*}
   R = \frac{u(t_{n+1}) -u(t_n)}{\Delta t} -u'(t_n)
 \end{equation*}
-Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h$
+Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h^i$
 \begin{align*}
  R &= \frac{u(t_n)+u'(t_n)\Delta t +0.5u''(t_n)\Delta t^2 + \mathcal{O}(\Delta t^3)-u(t_n)}{\Delta t} -u'(t_n)\\
   &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) = \mathcal{O}(\Delta t)
@@ -341,9 +341,18 @@ We can do better than this by using another discretization scheme for the PDE, b
 Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
 Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per meshpoint in the walk-area. 
-This will be such a costly operation that it will not necesarily be worth it.
-
-
+This will be such a costly operation that it will not necesarily be worth it.\\
+The spatial derivative also has a well defined residual which is found by Taylor expansion.
+\begin{equation}
+R = \frac{u(x_{i+1})-2u(x_i)+u(x_{i-1})}{\Delta x^2}-u''(x_i) 
+\end{equation}
+Remember Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
+\begin{align*}
+ R &= \frac{u(x_i)+u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}-\frac{2u(x_i)}{\Delta x^2}+\\
+ &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} -u'(x_i)\\
+R &= u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
+\end{align*}
+There are discretisations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will allways be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative.
 
 
 \section{Combining the two solvers}\label{combining_the_solvers}

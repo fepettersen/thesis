@@ -9,7 +9,7 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	dy = _dy;
 	D = _D;
 	d = (dy>0)?2:1;
-	solver = 3;
+	solver = 0;
 	if(d==2 && solver==0){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = D*dt/(dx*dx);
@@ -18,9 +18,6 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	else if(d==1 && solver==0){
 		dt = (Dt>(dx*dx/2.0))? (dx*dx/(3.0)):Dt;
 		_Dx = D*dt/(dx*dx);
-	}
-	else{
-		dt = Dt;
 	}
 	t=1;
 	v = _v;
@@ -84,38 +81,6 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 			boundary(U,Up,m,n);
 		}
 	}
-	else if(solver==3){
-		/*Isotropic Bacward Euler discretization (1d)*/
-		if(d==1){
-			double a = -dt/(dx*dx);
-			double c = a;
-			double b = 1.0-2.0*a;
-		    double *bv = new double[m];
-		    for(int i=0;i<m;i++){
-		    	bv[i] = 0;
-		    }
-		    double temp = 0;
-
-		    bv[0]=2*c/b;
-		    U[0][0] = Up[0][0]/b;
-		    for(int i=1; i<m-1; i++){
-		        //forward substitution
-		       	temp = 1.0/(b-a*bv[i-1]);
-		        bv[i] = c*temp;
-		        U[i][0] = (Up[i][0] -a*U[i-1][0])*temp;
-		    }
-		    /*Boundary condition (Neumann)*/
-	       	temp = 1.0/(1-c-a*bv[m-2]);
-	        bv[m-1] = c*temp;
-	        U[m-1][0] = (Up[m-1][0] -a*U[m-2][0])*temp;
-		    for(int i=(m-2);i>0;i--){
-		        //Backward substitution 
-		        U[i][0] -= bv[i]*U[i+1][0];
-		    }
-		    boundary(U,Up,m,n);
-		    delete [] bv;
-		}
-	}
 	else{
 		/*Anisotropic convection diffusion - Forward Euler*/
 		if(d==1){
@@ -140,7 +105,6 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 			boundary(U,Up,m,n);
 		}
 	}
-
 	t++;
 }
 // U[1:-1] = factor*(Up[2:]-2*Up[1:-1]+Up[:-2]) + Up[1:-1] - (dt*v)/(2*dx)*(Up[2:]-Up[:-2]) +dt*F
@@ -209,17 +173,7 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 			
 			U[m-1][n-1] = _Dx*(aD[m-2][n-1]+aD[m-1][n-1])*(Up[m-2][n-1]-Up[m-1][n-1]) +Up[m-1][n-1] +
 			 _Dy*(aD[m-1][n-2]+aD[m-1][n-1])*(Up[m-1][n-2]-Up[m-1][n-1])+dt*f((m-1)*dx,(n-1)*dy,t*dt);
-			// cout<<aD[0][0]<<","<<aD[1][0]<<","<<aD[0][1]<<endl;
-		}
-	}
-	else if(solver==3){
-		/*Backward Euler*/
-		if(d==1){
-			double Q = (2.0*D*dt/(dx*dx));
-			U[0][0] = (Q*U[1][0]+Up[0][0])/(1.0+Q);
-			U[m-1][0] = (Q*U[m-2][0] +Up[m-1][0])/(1.0+Q);
-			// U[0][0] = 1.0;
-			// U[m-1][0] = -1.0;
+			cout<<aD[0][0]<<","<<aD[1][0]<<","<<aD[0][1]<<endl;
 		}
 	}
 }

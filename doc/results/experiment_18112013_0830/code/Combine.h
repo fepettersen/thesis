@@ -26,7 +26,6 @@ class Combine
 		double Hc;			/*conversion factors*/
 		int walk_areas;
 		int **signmap;
-		bool inhomogenous;
 
 		std::vector<Walk*> walk_solvers; 	/*A linked list of the walk-solvers*/
 		std::vector<int**> c;				/*Linked list of walker-distr. for area i*/
