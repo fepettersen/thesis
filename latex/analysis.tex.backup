@@ -136,35 +136,43 @@ As a comparison we can turn to figures \ref{errorplot_BE1D_walk_5_percent} and \
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1559/results/errorplot.eps}
- \caption{}
+ \caption{Having walkers on 5\% of the meshpoints.}
  \label{errorplot_BE1D_walk_5_percent}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1603/results/errorplot.eps}
- \caption{}
+ \caption{Having walkers on 35\% of the meshpoints.}
  \label{errorplot_BE1D_walk_35_percent}
 \end{subfigure}
-\caption{}
-\label{}
+\caption{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.}
+\label{testing_walk_area_size_BE}
 \end{figure}
 
 These experiments have been done using the Backward Euler discretization so that we can simulate for a longer time and still see the effects to their full extent. 
 We have also investigated the effects of changing the timestep (also using the BE discretization to avoid instabilities and be able to do longer simulations). 
-The results are summarized in figures \ref{} to \ref{}.
+The results are summarized in figure \ref{testing_dt_size}. 
+We notice something a bit unexpected in figure \ref{errorplot_BE1D_walk_large_dt}. 
+Unlike almost all the other comparable plots, it seems that using the least ammount of walkers gives the best result here. 
+This might be because the system quickly reaches its steady state, and will then be very well described by the contiuum model. 
+Having a small conversion factor, Hc, will mean that very quickly there will be no walkers which sort of ruins the point. 
+This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is acchieved just as fast as for the other two simuations.
+
+
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1625/results/errorplot.eps}
- \caption{}
+ \caption{Using a normal $\Delta t = 0.0001$.}
  \label{errorplot_BE1D_small_dt}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_19112013_1627/results/errorplot.eps}
- \caption{}
+ \caption{Using a large $\Delta t = 0.01$.}
  \label{errorplot_BE1D_walk_large_dt}
 \end{subfigure}
 \caption{}
-\label{}
+\label{testing_dt_size}
 \end{figure}
 
 \subsection{The effects of adding drift to the walkers}\label{effect_of_drift_on_walkers}
