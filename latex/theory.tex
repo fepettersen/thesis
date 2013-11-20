@@ -155,45 +155,36 @@ We can model brownian motion simply by using equation \ref{brownian_motion}, and
 That beeing said, by the central limit theorem both models will after some timesteps be described by a gaussian distribution meaning that on the PDE scale we will not know the difference. 
 Hence it will make no sense to not use the simplest random walk model.
 
-\subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
-
-There are a few obvious difficulties we can expect to run into in our planned project. 
-Future ones will be added here as well.
-
-\begin{itemize}
- \item Different timescales\\
-  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definately have an impact on the error. 
-  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
-  Depending on the couplig chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
-  Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
-  It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
- \item Boundary conditions\\
- To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
- Finding a boundary condition that accurately models the actual system turns out to be quite straightforward, so long as the walk-domain is not on the actual boundary of the whole system. 
- We can assume that the number of walkers in the walk-domain is conserved for each PDE-timestep, and thus no walkers can escape the domain. 
- Implementing perfectly reflecting boundaries solves this quite well. 
- This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
- Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) untill we have the desired concentration of walkers.
- \item Negative concentration of walkers \\
- The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
- Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it might do). 
- The solution to this is simply to store the signs of the solution to the PDE in an array, and send only positive values to the random walk solver. 
- When we convert the number of walkers back to a PDE solution we still have the sign from before and can multiply the concentration by the sign it had in the last timestep. 
- \item Smooth solutions\\
- A diffusion process is very effective when it comes to dampig fast fluctuations, and so any solution of the diffusion equation will be smooth. 
- When we itroduce a stochastic process, we will potentially also introduce fast fluctutations from one timestep to the next. 
- In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
- The approach we use to this is to do some curve-fitting using both of the solutions. 
- This will give us some difference between the two models and some smoothness.
-
-\end{itemize}
 
 \subsection{Random walks and anisotropy}\label{random_walks_and_anisotropy}
 
 Any real problem where parts of the diffusion process cannot be modelled by the continuum approximation is bound to be anisotropic. 
 There is reason to belive that an anisotropic diffusion process on the PDE level will lead to an aisotropic random walk model as well, but how do we modell this. 
 Equation \ref{steplength} shows the step length as a function of the diffusion constant. 
-If we simply replace the diffusion constant by a function $D = D(\vec{x})$ we are at least started, but this will not quite be sufficient as 
+If we simply replace the diffusion constant by a function $D = D(\vec{x})$ we are at least started, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
+Through their experiments they found that only adjusting the steplength will not improve the error noticably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
+They went on to introduce an adjusted steplength and an adjusted step probability, a solution they landed on after trial and error. 
+The expressions they proposed are listed in equations \ref{farnell_and_gibson_1} to \ref{farnell_and_gibson_n}. 
+\begin{equation}\label{farnell_and_gibson_1}
+ \Delta_p(x) = \frac{1}{2}\left(L(x) + L(x +\Delta_p(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
+\end{equation}
+\begin{equation}\label{farnell_and_gibson_2}
+ \Delta_m(x) = \frac{1}{2}\left(L(x) + L(x -\Delta_m(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
+\end{equation}
+where $L(x)$ is defined in equation \ref{farnell_and_gibson_3} and $\Delta_p(x)$ and $\Delta_m(x)$ are the adjusted steplengths to the right and left, respectively.
+\begin{equation}\label{farnell_and_gibson_3}
+L(x) = \sqrt{2D(x)\Delta t}
+\end{equation}
+We also have the adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker in position x to jump right or left, respectively. 
+These are defined in equations \ref{farnell_and_gibson_4} and \ref{farnell_and_gibson_5}
+\begin{equation}\label{farnell_and_gibson_4}
+T_r(x) = \frac{1}{2} +\frac{1}{4}L'(x)
+\end{equation}
+\begin{equation}\label{farnell_and_gibson_5}
+T_l(x) = \frac{1}{2} -\frac{1}{4}L'(x)
+\end{equation}
+We notice that the adjusted steplength we proposed to start with is still a part of the final expressions.
+
 
 \subsection{Random walks and drift}\label{random_walks_and_drift}
 
@@ -406,6 +397,43 @@ A schematic of the algoritm is provided in figure \ref{schematic}.
 \label{schematic}
 \end{figure}
 
+\subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
+
+There are a few obvious difficulties we can expect to run into in our planned project. 
+Future ones will be added here as well.
+
+\begin{itemize}
+ \item Different timescales\\
+  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definately have an impact on the error. 
+  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
+  Depending on the couplig chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
+  Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
+  It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
+ \item Boundary conditions\\
+ To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
+ Finding a boundary condition that accurately models the actual system turns out to be quite straightforward, so long as the walk-domain is not on the actual boundary of the whole system. 
+ We can assume that the number of walkers in the walk-domain is conserved for each PDE-timestep, and thus no walkers can escape the domain. 
+ Implementing perfectly reflecting boundaries solves this quite well. 
+ This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
+ Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) untill we have the desired concentration of walkers.
+ \item Negative concentration of walkers \\
+ The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
+ Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it might do). 
+ The solution to this is simply to store the signs of the solution to the PDE in an array, and send only positive values to the random walk solver. 
+ When we convert the number of walkers back to a PDE solution we still have the sign from before and can multiply the concentration by the sign it had in the last timestep. 
+ \item Smooth solutions\\
+ A diffusion process is very effective when it comes to dampig fast fluctuations, and so any solution of the diffusion equation will be smooth. 
+ When we itroduce a stochastic process, we will potentially also introduce fast fluctutations from one timestep to the next. 
+ In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
+ The approach we use to this is to do some curve-fitting using both of the solutions. 
+ This will give us some difference between the two models and some smoothness.
+ \item Number of timesteps on the random walk level\\
+ As the timestep on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of wether or not to increase the number of timesteps on the RW level. 
+ Strictly speaking we do not have to do this, seeing as we adjust the steplength of the walkers wrt the timestep (see eq \ref{steplength}). 
+ As an initial value we put the number of timesteps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
+ The question really boils down to how we define our model, which we have yet to do in an accurate way.
+
+\end{itemize}
 
 \subsection{Probability distribution and timesteps}\label{probability_distribution_and_timesteps}
 As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the gaussian distribution. 
