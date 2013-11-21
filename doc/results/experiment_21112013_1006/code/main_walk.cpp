@@ -96,46 +96,39 @@ int main(int argc, char** argv)
 				C[i][j] = 0;
 				Up[i][j] = 0;
 			}
-			// wth = X[i]*PI;
-			// wty = Y[j]*PI;
+			wth = X[i]*PI;
+			wty = Y[j]*PI;
 			// Up[i][j] = cos(wth);//*cos(wty);
 			// Up[i][j] = 0;
-			// U[i][j] = 0;
-			// aD[i][j] = X[i]+Y[j];//i*dx*PI;
+			U[i][j] = 0;
+			aD[i][j] = X[i]+Y[j];//i*dx*PI;
 			// C[i][j] = 0;
 		}
 	}
 
-	// C[0][0] = conversion_factor;
-	// U[0][0] = 1.0;
+	C[0][0] = conversion_factor;
+	U[0][0] = 1.0;
 
 	string RWname = "RWname";
 
 	Walk walks(1,Dt);
 	walks.SetInitialCondition(C,m,n);
-	for(int i=0;i<m;i++){
-		for(int j=0;j<n;j++){
-			U[i][j] = C[i][j]/conversion_factor;
-		}
-	}
+
 	Combine BlackBox(m,n,0,1,0,1,1,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-	output(&outfile,Up,buffer,path,filename,m,n,conversion_factor,0);
-	output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,0);
-
-	// BlackBox.AddWalkArea(x,y);
+	BlackBox.AddWalkArea(x,y);
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
-		walks.InhomogenousAdvance(C,Dt);
+		walks.advance(C);
 		for(int i=0;i<m;i++){
 			for(int j=0;j<n;j++){
 				U[i][j] = C[i][j]/conversion_factor;
 			}
 		}
-		// walks.ResetInitialCondition(C);
+		walks.ResetInitialCondition(C);
 		if(tofile){
-			output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t+1);
-			output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,t+1);
+			output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
+			output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,t);
 		}
 	}
 	return 0;

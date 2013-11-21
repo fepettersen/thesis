@@ -276,13 +276,13 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 11
+	m = 101
 	n = 1
-	T = 9
+	T = 99
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/3.0
-	dt = 0.001
+	dt = 0.01
 	print 'Python: ',dt,' dx: ',dx
 	# Hc = [100,1000,10000]
 	Hc = [100]
@@ -297,13 +297,12 @@ if __name__ == '__main__':
 		print "Hc = %g"%i
 		run.RunSimulation(i)
 	time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
 	run.Visualize(filename='/RWname_n',viz_type=None)
-	# run.Visualize(viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')

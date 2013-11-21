@@ -35,7 +35,7 @@ Walk::Walk(int dimension, double _dt)
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
 	int D = 1;
-	dt = _dt/steps;
+	dt = _dt;
 	factor = sqrt(2*D*dt);
 	drift = factor/steps;
 	inhomogenous = false;
@@ -153,12 +153,12 @@ void Walk::advance(int **C){
 		}
 	}
 
-	for(int i=0;i<m; i++){
-		// Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
+	// for(int i=0;i<m; i++){
+	// 	Empty the array to conserve energy
+	// 	for(int j=0; j<n; j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
 	if(d==1){
 		for(int i=0;i<nwalkers;i++){
 			index = FindPosition(walkers[i]);
@@ -228,12 +228,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			walkers[i] = checkpos(newPos,stepvector);
 		}
 	}
-	for(int i=0;i<m; i++){
-		//Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
+
 	if(d==1){
 		for(int i=0;i<nwalkers;i++){
 			index = FindPosition(walkers[i]);
@@ -246,8 +241,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			C[index[0]][index[1]] += 1;
 		}
 	}
-
-	// delete [] newPos,index;
+	delete [] newPos,index;
 }
 
 double *Walk::Step(double *r,double *s){
