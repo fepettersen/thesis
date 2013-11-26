@@ -135,29 +135,18 @@ class Experiment:
 			mpl.savefig(self.result_path+'/errorplot.eps')
 		mpl.show()
 
-	def VerifyDeterministicError(self,save=True,DT=[]):
-		if len(DT)==0:
-			DT.append(self.dt)
+	def VerifyDeterministicError(self,save=True):
+		self.RunDeterministic()
 		self.error = []
-		leg = []
-		tmp = np.zeros(self.T+1)
-		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-x']
 		if self.n>=1:
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
 		else:
 			X = np.linspace(0,1,self.m)
 			Y = np.zeros(self.m)
-		for k in range(len(DT)):
-			self.dt = DT[k]
-			self.RunDeterministic()
-			self.walk = []
-			for i in range(self.T):
-				infile = np.loadtxt(self.result_path+'/Deterministic_n%04d.txt'%i)
-				tmp[i] = np.abs(np.linalg.norm(infile-self.exact(X,Y,(i+1)*self.dt)))
-			self.error.append(tmp.copy())
-			mpl.plot(self.error[k],color[k])
-			leg.append('dt = %g'%DT[k])
-		mpl.legend(leg)
+		for i in range(len(self.walk)):
+			self.error.append(np.abs(np.linalg.norm(self.walk[i]-self.exact(X,Y,(i+1)*self.dt))))
+			# print self.walk[i]
+		mpl.plot(self.error,'b-o')
 		mpl.xlabel('timestep #')
 		mpl.ylabel('errornorm')
 		mpl.title('dt = %g'%self.dt)
@@ -259,36 +248,19 @@ class Experiment:
 	def ConvergenceTest(self,Hc,save=True):
 		E = []
 		for i in xrange(len(Hc)):
-			E.append(np.sqrt(self.dt*np.sum(self.error[i])))
+			E.append(np.max(self.error[i]))
 		r = [0]*(len(E)-1)
 		for j in xrange(len(E)-1):
-			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
+			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])**-1/float(Hc[j])**-1)
 		print r
 		print E
-		mpl.plot(np.log(Hc[:-1]),r,'b-x')
+		mpl.plot(Hc[:-1],r,'b-x')
 		mpl.xlabel('Hc (conversion rate)')
 		mpl.ylabel('r')
 		mpl.title('Convergence rate')
 		if save:
 			mpl.savefig(self.result_path+'ConvergenceTest.eps')
 			mpl.savefig(self.result_path+'ConvergenceTest.png')
-		mpl.show()
-
-	def Compare(self,filename,func):
-		counter = 1
-		im = []
-		error = []
-		fig = mpl.figure()
-		x = np.linspace(0,1,self.m)
-		dx = x[1]-x[0]
-		for i in sorted(glob.glob(self.result_path+filename)):
-			infile = np.loadtxt(i)
-			im.append(mpl.plot(func(counter,x,dx,self.dt)-infile,'b-'))
-			error.append(np.linalg.norm(func(counter,x,dx,self.dt)-infile))
-			counter += 1
-		ani = animation.ArtistAnimation(fig,im)
-		mpl.show()
-		mpl.plot(error[1:])
 		mpl.show()
 
 
@@ -302,45 +274,23 @@ class Experiment:
 
 
 
-
 def f(x,y,t):
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
+	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
 	# return np.ones(np.shape(x))*1.5
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 
 def F(x,y,t):
 	tmp = np.zeros(np.shape(x))
-	j=0
-	for i in xrange(1,500,2):
-		tmp[:] += -2*(-1)**j/(i*np.pi)*np.exp(-(i*np.pi)*(i*np.pi)*t)*np.cos(i*np.pi*x)
-		j+=1
+	for i in xrange(1,1000):
+		tmp[:] += -2*np.sin(i*np.pi/2)/(i*np.pi)*np.exp(-(i*np.pi)*(i*np.pi)*t)*np.cos(i*np.pi*x)
 	tmp[:] += 0.5
 	return tmp
 
-from scipy.special import binom
-
-def numerical_exact(n,x,dx,dt,D=1):
-	u = np.zeros(len(x))
-	def u_xx(i,x):
-		#return (-1)**i*(np.pi**(2*i))*np.cos(np.pi*x)
-		if dx**(2*i)>0 and type(2**i)!=type(long()):
-			return 2**i/(dx**(2*i))*(np.cos(np.pi*dx)-1)**i*np.cos(np.pi*x)
-		else:
-			return 0
-	
-	for i in xrange(n+1):
-		if dt**i>0:
-			tmp = binom(n,i)*(D*dt)**i*u_xx(i,x)
-		else:
-			tmp = np.zeros(len(x))
-		u[:] += tmp
-	return u
-
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -353,39 +303,35 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 1
-	T = 130
+	T = 59
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
-	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	# dt = 0.001
+	dt = dx*dy/5.0 if n>1 else dx**2/3.0
+	dt = 0.001
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [100,500,1000,5000,10000]
+	Hc = [100,500,1000,5000,10000,50000]
 	# Hc = [200,800,1400,2000,2600,3200,3800,4400,5000]
-	# Hc = [1000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
-	run.exact = f
+	run.exact = F
 	run.compile()
-	# dt = [0.0001,0.00001,0.000001,0.00000001,0.00000001]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	run.VerifyDeterministicError()
-
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# # run.PlotError()
-	# run.ConvergenceTest(dt)
-	run.Compare('/Deterministic_n*',numerical_exact)
+	# run.VerifyDeterministicError()
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	run.ConvergenceTest(Hc)
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateSpecial()
-	# run.Visualize(viz_type=None)
+	run.Visualize(viz_type=None)
 
-	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n', viz_type='exact')
+	run.Visualize(viz_type='difference')
+	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 

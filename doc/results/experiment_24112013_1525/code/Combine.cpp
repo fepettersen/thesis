@@ -79,8 +79,8 @@ void Combine::Solve(){
 		(*it1)->drift = 0;
 		ConvertToWalkers(U,c[counter],indeces[counter]);
 		(*it1)->ResetInitialCondition(C);
-		(*it1)->advance(c[counter]);
-		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);	/**/
+		// (*it1)->advance(c[counter]);
+		(*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);	/**/
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}

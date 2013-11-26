@@ -288,7 +288,7 @@ class Experiment:
 			counter += 1
 		ani = animation.ArtistAnimation(fig,im)
 		mpl.show()
-		mpl.plot(error[1:])
+		mpl.plot(error)
 		mpl.show()
 
 
@@ -326,15 +326,17 @@ def numerical_exact(n,x,dx,dt,D=1):
 	u = np.zeros(len(x))
 	def u_xx(i,x):
 		#return (-1)**i*(np.pi**(2*i))*np.cos(np.pi*x)
-		if dx**(2*i)>0 and type(2**i)!=type(long()):
+		if dx**(2*i)>0:
 			return 2**i/(dx**(2*i))*(np.cos(np.pi*dx)-1)**i*np.cos(np.pi*x)
 		else:
 			return 0
 	
 	for i in xrange(n+1):
 		if dt**i>0:
+			print 'i = %d'%i
 			tmp = binom(n,i)*(D*dt)**i*u_xx(i,x)
 		else:
+			print 'i = %d, skipping'%i
 			tmp = np.zeros(len(x))
 		u[:] += tmp
 	return u

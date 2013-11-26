@@ -90,15 +90,15 @@ int main(int argc, char** argv)
 		for(int j=0; j<n; j++){
 			if(i>=m/2 && j<=n/2){
 				C[i][j] = (int) (conversion_factor);
-				// Up[i][j] = 1.0;
+				Up[i][j] = 1.0;
 			}
 			else{
 				C[i][j] = 0;
-				// Up[i][j] = 0;
+				Up[i][j] = 0;
 			}
-			wth = X[i]*PI;
+			// wth = X[i]*PI;
 			// wty = Y[j]*PI;
-			Up[i][j] = cos(wth);//*cos(wty);
+			// Up[i][j] = cos(wth);//*cos(wty);
 			// Up[i][j] = 0;
 			// U[i][j] = 0;
 			// aD[i][j] = X[i]+Y[j];//i*dx*PI;
@@ -110,8 +110,14 @@ int main(int argc, char** argv)
 	// U[0][0] = 1.0;
 
 	string RWname = "RWname";
-	bool test_convergence = false;
-
+	bool test_convergence = true;
+	// Walk walks(1,Dt);
+	// walks.SetInitialCondition(C,m,n);
+	// for(int i=0;i<m;i++){
+	// 	for(int j=0;j<n;j++){
+	// 		U[i][j] = C[i][j]/conversion_factor;
+	// 	}
+	// }
 	Combine BlackBox(m,n,0,1,0,1,1,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
@@ -119,12 +125,21 @@ int main(int argc, char** argv)
 		BlackBox.TestRWConvergence(T,path);
 	}
 	else{
-		//output(&outfile,Up,buffer,path,filename,m,n,conversion_factor,0);
-		BlackBox.AddWalkArea(x,y);
+		output(&outfile,Up,buffer,path,filename,m,n,conversion_factor,0);
+		// output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,0);
+		// BlackBox.AddWalkArea(x,y);
 		for(int t=0; t<T; t++){
 			BlackBox.Solve();
+			// walks.advance(C);
+			// for(int i=0;i<m;i++){
+			// 	for(int j=0;j<n;j++){
+			// 		U[i][j] = C[i][j]/conversion_factor;
+			// 	}
+			// }
+			// walks.ResetInitialCondition(C);
 			if(tofile){
-				output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
+				output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t+1);
+				// output(&outfile,U,buffer,path,RWname,m,n,conversion_factor,t+1);
 			}
 		}
 	}
