@@ -72,13 +72,15 @@ This is an abstract text.
 \include{Intro}
 
 \chapter{Basic Theory}
-\include{RandomWalks}
+\include{theory}
 
 
 \chapter{Analysis}
-\include{errors}
+\include{analysis}
 
 \chapter{Results}
+
+%-------Bibliography-------%
 \printbibliography
 \end{document}
 

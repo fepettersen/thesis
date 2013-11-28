@@ -340,7 +340,7 @@ def numerical_exact(n,x,dx,dt,D=1):
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 

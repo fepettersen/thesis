@@ -1,0 +1,4 @@
+\newglossaryentry{apc}{%
+name={APC},%
+description={antigeen-presenterende cel}%
+}

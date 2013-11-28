@@ -8,11 +8,11 @@ When a part of the solution acquired is replaced by the solution from another mo
 This might have a number of effects on our final solution. 
 When we solve a differential equation numerically we only get an approximation to the actual solution because we are using approximate derivatives (see figure \ref{illustrate_approximate_derivatives}). 
 To investigate the error we are introducing we will first need to test that the truncation error of the numerical PDE solver behaves as expected. 
-% This can be done by chosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
+% This can be done by choosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
 % As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
 % We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
 % Figure \ref{errorplot_1d} shows the error norm (\ref{}) of only the PDE solver done in 1 dimension plotted for each timestep of the simulation. 
-% The manifactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x)$ and its initial condition is shown in figure \ref{}.
+% The manufactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x)$ and its initial condition is shown in figure \ref{}.
 
 \begin{figure}[H]
  \centering
@@ -22,7 +22,7 @@ To investigate the error we are introducing we will first need to test that the 
  \label{initial_condition_1d}
 \end{figure}
 
-\section{The error estimate}
+\subsection{The error estimate}
 Before we do anything we should specify what we use to measure the error. 
 Throughout this thesis the term error is used quite lazily, but except something else is specified we refer to the expression 
 \begin{equation}
@@ -104,10 +104,26 @@ Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of t
 \label{errorplot_FE1D_Walk_first_attemt}
 \end{figure}
 
-As we can se from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the number of walkers that each ``unit concentration'' corresponds to has a positive effect on the error norm up to a certain point. 
+As we can see from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the number of walkers that each ``unit concentration'' corresponds to has a positive effect on the error norm up to a certain point. 
 After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of the Forward Euler scheme. 
 This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
 Meaning of course that the calculations in section \ref{} are not hopeless.
+
+We can also do a convergence test to see that the error is approximately of the expected order. 
+This is done by doing several simulations with different values for $\Delta t$ and comparing the errors by equation \ref{convergence_rate_def}. 
+A result of such an experiment for the FE scheme using the $\Delta t$ values listed below is found in figure \ref{convergence_test_FE}. 
+The expected value of r is approximately 1. The result is not perfect, but still close to 1.
+\begin{lstlisting}
+ dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
+\end{lstlisting}
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{../doc/results/experiment_27112013_1017/results/ConvergenceTest.eps}
+ \caption{Convergence test for the FE scheme. The x axis is $\ln(\Delta t)$.}
+ \label{convergence_test_FE}
+\end{figure}
+
+
 
 \subsection{Exact numerical solution}
 
@@ -416,31 +432,37 @@ which gives us the final solution
 \end{equation}
 
 We can now perform a convergence test to find the convergence rate for the random walkers, this is the order the error of the scheme goes as and it is defined in equation \ref{convergence_rate_def}. 
-We will modify it slightly by testing for the number of walkers rather than the timestep. 
+We will modify it slightly by testing for the number of walkers rather than the time step. 
 We must also use another error estimate $E_i$ which gives us one number for each simulation. 
-The candidates are either the maximum of the error we are allreday using, or an integrated error.
+The candidates are either the maximum of the error we are already using, or an integrated error.
 
 \begin{equation}\label{convergence_rate_def}
  r = \frac{\ln(E_{i+1}/E_i)}{\ln(\Delta t_{i+1}/\Delta t_i)}
 \end{equation}
 
-Using the maximum of the error measure allready in use, we have tested the gonvergence rate measure for the following measures of Hc:
+Using the maximum of the error measure already in use, we have tested the convergence rate measure for the following measures of Hc:
 \begin{lstlisting}
  Hc = [100,500,1000,5000,10000,50000]
 \end{lstlisting}
 Meaning that the largest value of Hc we will get an estimate for is $Hc = 10000$. 
-The convergence test does, unfortunately, not give us much innsight. 
-We have also included an errorplot of the same kind as the ones in  the previous figures. 
+The convergence test suggests that the convergence rate for random walks follows the proportionality in equation \ref{convergence_rate_RW}. 
+This relation tells us just what we have been expecting the whole time; while increasing the number of walkers will reduce the error, the convergence is slow. 
+Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $err\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $err\sim\mathcal{O}(\Delta t^2)$. Clearly we will have enough trouble for the simpler cases.
+
+\begin{equation}\label{convergence_rate_RW}
+err \propto Hc^{\frac{-1}{2}}
+\end{equation}
+
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.7]{../doc/results/experiment_24112013_1525/resultsConvergenceTest.eps}
- \caption[Convergence test RW]{A convergence test for the isotropic random walk implemetation using different conversion factors, Hc.}
+ \includegraphics[scale=0.7]{../doc/results/experiment_27112013_0837/resultsConvergenceTest.eps}
+ \caption[Convergence test RW]{A convergence test for the isotropic random walk implementation using different conversion factors, Hc. The x axis (conversion rate) is log transformed and ranges from 100 to 50000 in real numbers.}
  \label{ConvergenceTestRW}
 \end{figure}
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{../doc/results/experiment_24112013_1525/results/errorplot.eps}
- \caption[Errorplot RW]{A ``normal'' errorplot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to qouple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a steplength calculated from equation \ref{steplength}}
+ \caption[Error plot RW]{A ``normal'' error plot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to couple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a step length calculated from equation \ref{steplength}}
 \end{figure}
 

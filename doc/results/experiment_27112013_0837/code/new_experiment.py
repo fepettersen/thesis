@@ -265,13 +265,13 @@ class Experiment:
 			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
 		print r
 		print E
-		mpl.plot(np.log(Hc[:-1]),np.abs(r),'b-x')
+		mpl.plot(np.log(Hc[:-1]),r,'b-x')
 		mpl.xlabel('Hc (conversion rate)')
 		mpl.ylabel('r')
 		mpl.title('Convergence rate')
 		if save:
-			mpl.savefig(self.result_path+'/ConvergenceTest.eps')
-			mpl.savefig(self.result_path+'/ConvergenceTest.png')
+			mpl.savefig(self.result_path+'ConvergenceTest.eps')
+			mpl.savefig(self.result_path+'ConvergenceTest.png')
 		mpl.show()
 
 	def Compare(self,filename,func):
@@ -340,7 +340,7 @@ def numerical_exact(n,x,dx,dt,D=1):
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -367,19 +367,19 @@ if __name__ == '__main__':
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
 	run.compile()
-	dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
+	dt = [0.0001,0.00001,0.000001,0.0000001,0.00000001]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	run.VerifyDeterministicError(DT=dt)
+	# run.VerifyDeterministicError(DT=dt)
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
 	# # run.PlotError()
 	h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(h)
-	run.ConvergenceTest(dt)
+	run.ConvergenceTest(Hc)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
