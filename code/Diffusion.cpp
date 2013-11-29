@@ -24,8 +24,9 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	}
 	t=1;
 	v = _v;
-	cout<<"dt,dx = "<<dt<<","<<dx<<endl;
+	cout<<"dt,dx,dy = "<<dt<<","<<dx<<","<<dy<<	endl;
 };
+
 Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	dx = _dx;
 	dy = _dy;

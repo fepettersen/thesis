@@ -54,8 +54,9 @@ int main(int argc, char** argv)
     string path = argv[9];
     string filename = argv[10];
     double conversion_factor =atof(argv[11]);
-    double Dt = atof(argv[12]);
+    double Dt = strtod(argv[12],NULL);
 
+    cout<<"argv[12] = "<<argv[12]<<endl;
     string buffer;
     ofstream outfile;
 
@@ -96,7 +97,7 @@ int main(int argc, char** argv)
 				C[i][j] = 0;
 				// Up[i][j] = 0;
 			}
-			wth = X[i]*PI;
+			wth = X[j]*PI;
 			// wty = Y[j]*PI;
 			Up[i][j] = cos(wth);//*cos(wty);
 			// Up[i][j] = 0;
@@ -108,6 +109,7 @@ int main(int argc, char** argv)
 
 	// C[0][0] = conversion_factor;
 	// U[0][0] = 1.0;
+
 
 	string RWname = "RWname";
 	bool test_convergence = false;

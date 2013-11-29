@@ -153,12 +153,12 @@ void Walk::advance(int **C){
 		}
 	}
 
-	for(int i=0;i<m; i++){
-		// Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
+	// for(int i=0;i<m; i++){
+	// 	// Empty the array to conserve energy
+	// 	for(int j=0; j<n; j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
 	if(d==1){
 		for(int i=0;i<nwalkers;i++){
 			// index = FindPosition(walkers[i]);
@@ -179,7 +179,7 @@ void Walk::advance(int **C){
 void Walk::InhomogenousAdvance(int **C, double _dt){
 	/*This should now implement the normal advance-function as well*/
 	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
-	cout<<"nwalkers = "<<nwalkers<<endl;
+	// cout<<"nwalkers = "<<nwalkers<<endl;
 	dt = _dt/steps;
 	double *newPos, **s;
 	newPos = new double[d];			//delete at the end!
@@ -191,12 +191,12 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	// 		s[k][l] = 0;
 	// 	}
 	// }
-	for(int i=0;i<m; i++){
-		//Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
+	// for(int i=0;i<m; i++){
+	// 	//Empty the array to conserve energy
+	// 	for(int j=0; j<n; j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
 	double L = 0;
 	double L_deriv = 0;
 	double L0 = sqrt(2*dt);
@@ -237,7 +237,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			walkers[i] = checkpos(newPos,stepvector);
 		}
 		FindPosition(walkers[i],index);
-		cout<<"walkers["<<i<<"] = "<<walkers[i][0]<<" index = "<<index[0]<<endl;
+		// cout<<"walkers["<<i<<"] = "<<walkers[i][0]<<" index = "<<index[0]<<endl;
 		if(d==1){
 			C[index[0]][0] += 1;
 		}

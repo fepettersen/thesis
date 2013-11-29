@@ -72,7 +72,7 @@ class Experiment:
 
 	def RunDeterministic(self):
 		# self.walk = [0]*self.T
-		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %f'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0,self.dt))
+		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %g'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0,self.dt))
 		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
 			# self.walk.append(np.fromfile(step,sep=" "))
 			self.walk.append(np.loadtxt(step))		
@@ -84,7 +84,7 @@ class Experiment:
 		filename = self.filename
 		result_path = self.result_path
 		tmp = [0]*T
-		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %f'%(tofile,x0,x1,y0,y1,m,n,T,result_path,filename,Hc,self.dt))
+		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %g'%(tofile,x0,x1,y0,y1,m,n,T,result_path,filename,Hc,self.dt))
 		self.runcounter += 1
 
 	def CalculateError(self,Hc,exact=None):
@@ -155,7 +155,7 @@ class Experiment:
 				infile = np.loadtxt(self.result_path+'/Deterministic_n%04d.txt'%i)
 				tmp[i] = np.abs(np.linalg.norm(infile-self.exact(X,Y,(i+1)*self.dt)))
 			self.error.append(tmp.copy())
-			mpl.plot(self.error[k],color[k])
+			mpl.plot(self.error[k][:-1],color[k])
 			leg.append('dt = %g'%DT[k])
 		mpl.legend(leg)
 		mpl.xlabel('timestep #')
@@ -352,14 +352,14 @@ if __name__ == '__main__':
 	x1 = 0.6
 	y1 = 0.7
 	m = 51
-	n = 1
+	n = 51
 	T = 130
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
 	# dt = 0.001
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [100,500,1000,5000,10000]
+	Hc = [100]
 	# Hc = [200,800,1400,2000,2600,3200,3800,4400,5000]
 	# Hc = [1000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
@@ -367,7 +367,8 @@ if __name__ == '__main__':
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
 	run.compile()
-	dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
+	dt = [dx*dy/5.0*10**(-i) for i in range(4)]
+	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	run.VerifyDeterministicError(DT=dt)
 
@@ -376,8 +377,8 @@ if __name__ == '__main__':
 	# 	run.RunSimulation(i)
 	# time.sleep(1)
 	# run.CalculateError(Hc,exact=True)
-	# # run.PlotError()
-	h = [1./Hc[i] for i in range(len(Hc))]
+	# run.PlotError()
+	# h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(h)
 	run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
@@ -387,7 +388,7 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n', viz_type='exact')
+	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 

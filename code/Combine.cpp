@@ -79,8 +79,8 @@ void Combine::Solve(){
 		(*it1)->drift = 0;
 		ConvertToWalkers(U,c[counter],indeces[counter]);
 		(*it1)->ResetInitialCondition(C);
-		(*it1)->advance(c[counter]);
-		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);	/**/
+		// (*it1)->advance(c[counter]);
+		(*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);	/**/
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}
@@ -267,7 +267,8 @@ void Combine::TestRWConvergence(int steps,string path){
 	char *name = new char[120];
 	walks.SetInitialCondition(distr,m,n);
 	for(int t=0;t<steps;t++){
-		walks.advance(C);
+		walks.InhomogenousAdvance(C,pde_solver->dt);
+		// walks.advance(C);
 		// output...
 		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
 		ofile.open(name);
