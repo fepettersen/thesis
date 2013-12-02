@@ -5,3 +5,45 @@ It is the hope of Hans Petter that this thesis will be an introduction to a new 
 The very first approach was to simply try the problem on a bit. That is to try and substitute some small part of the mesh in a Finite Difference Diffusion solver (Froward Euler scheme) with a stochastic diffusion solver. A random walk method was implemented on part of the mesh to take over the equation-solving. This was done in 1 and 2 spatial dimensions with the aim of finding potential difficulties so that we can further investigate them. \\
 Upon switching length-scales a fundamental question arises almost immediately; what is the continuum limit? In our case this question takes a slightly different, and possibly more answerable form; what is the conversion rate between the continuum model and the microscopic model, and by extension, what does a walker correspond to?
 The first instinct of this candidate was to just try some conversion rate (say some value corresponds to some number of walkers), and this was implemented in both 1 and 2 dimensions.
+
+\section{Background}
+\emph{This is very much a first draft, and only my thoughts around what I understand as the basis of the thesis.}\\
+Though the scope of this thesis might seem a bit \emph{sought}, it is in fact a real world concern from the computational neuroscience group at UMB. 
+Their work contains network simulations of neurons, which they are trying to tweak with experimental data. 
+The experimental data come from measurements of voltage levels in the Extra Cellular Space (ECS). 
+The ECS is, essentially, the space which separates neurons and has an immensely complicated geometry as we can see from figure \ref{ECS_picture}. 
+The width of the ECS varies, but is in general $\sim1\mu$m. 
+Parts of the ECS is, however, much narrower. In the ECS there are a number of diffusion governed transport mechanisms which are vital for the function of the neurons. 
+In fact, there are examples of snake venom which have a shrinking effect on the ECS, and it is thought that this causes large scale neuronal death very quickly. 
+For the researchers at UMB, however, the ECS is of importance because the diffusion tensor in the ECS is related to the conductivity tensor through equation \ref{conductivity_diffusion_eq}, which in turn lets them teak parameters in their network models. \\
+\begin{equation}\label{einstein_viscosity}
+D = \frac{k_B T}{6\pi \eta r},
+\end{equation}
+Though there are several reasons to study diffusion processes in the ECS, this project has a specific goal in mind. 
+The Einstein relation, eq. (\ref{einstein_viscosity}), relates the diffusion constant to the viscosity of the medium in which the diffusion is taking place. 
+From the definition of viscosity, $\mu$, we have 
+\begin{equation}
+v_d = \mu F 
+\end{equation}
+where $F = qE$ is the standard electrical force acting on a charged particle. 
+We can also define the current from the drift velocity of the particles as 
+\begin{equation}
+J = cqv_d = \sigma E 
+\end{equation}
+where $\sigma = c\mu q^2$ is the electrical conductance, in this case, of the ECS. 
+Inserting this in the Einstein relation, eq. (\ref{einstein_viscosity}), lets us express the conductivity in terms of the diffusion constant as 
+\begin{equation}\label{conductivity_diffusion_eq}
+\sigma = \frac{cq}{k_B T}D 
+\end{equation}
+Equation (\ref{conductivity_diffusion_eq}) is trivially generalizable to tensor notation, where the conductance and diffusion ``constant'' are both 2. order tensors.\\
+
+\begin{equation}\label{stochastic_einstein}
+\langle r^2\rangle = 2dDt 
+\end{equation}
+
+The fundamental problem here is that, while diffusion in its own is a truly multi-scale process, we have no way of knowing for sure that the continuum models, and all they bring with them, are correct for this type of geometry. 
+In particular, the Einstein relation \ref{einstein_viscosity} has, to my knowledge, only been derived for diffusion in a homogeneous media. 
+The definition of a homogeneous media includes a mean free path close to infinity, which we will have trouble arguing for the existence of in the ECS. 
+On the other hand, I know that another Einstein relation \ref{stochastic_einstein} is widely used  in other fields of physics where the media in question is hardly homogeneous. 
+In molecular dynamics simulations, the two mentioned Einstein relations are used to measure the viscosity of fluids in nano-porous materials, and with success as far as I know.
+

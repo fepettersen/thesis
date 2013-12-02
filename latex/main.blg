@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2012/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main.aux
 The style file: biblatex.bst
@@ -18,13 +18,13 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Database file #1: main-blx.bib
 Database file #2: references.bib
-Biblatex version: 2.7
+Biblatex version: 1.7
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 You've used 3 entries,
-            6022 wiz_defined-function locations,
-            1143 strings with 8450 characters,
-and the built_in function-call counts, 7771 in all, are:
+            6019 wiz_defined-function locations,
+            1141 strings with 8419 characters,
+and the built_in function-call counts, 7761 in all, are:
 = -- 339
 > -- 269
 < -- 73
@@ -37,16 +37,16 @@ call.type$ -- 3
 change.case$ -- 44
 chr.to.int$ -- 34
 cite$ -- 4
-duplicate$ -- 743
-empty$ -- 775
+duplicate$ -- 741
+empty$ -- 773
 format.name$ -- 119
-if$ -- 1784
+if$ -- 1782
 int.to.chr$ -- 0
 int.to.str$ -- 6
 missing$ -- 0
 newline$ -- 71
 num.names$ -- 110
-pop$ -- 662
+pop$ -- 658
 preamble$ -- 1
 purify$ -- 48
 quote$ -- 0

@@ -121,7 +121,7 @@ class Experiment:
 
 	def PlotError(self,save=True):
 		# mpl.hold('on')
-		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-x']
+		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		for i in range(len(self.error)):
 			# mpl.plot(np.log(self.error[i]/self.dt))
 			mpl.plot(self.error[i],color[i],label='Hc = %d'%(int(np.round(self.legends[i]))))
@@ -280,11 +280,13 @@ class Experiment:
 		error = []
 		fig = mpl.figure()
 		x = np.linspace(0,1,self.m)
-		dx = x[1]-x[0]
+		x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+		dx = x[1,1]-x[0,0]
+		dy = y[1,1]-y[0,0]
 		for i in sorted(glob.glob(self.result_path+filename)):
 			infile = np.loadtxt(i)
-			im.append(mpl.plot(func(counter,x,dx,self.dt)-infile,'b-'))
-			error.append(np.linalg.norm(func(counter,x,dx,self.dt)-infile))
+			im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt)-infile,'b-'))
+			error.append(np.linalg.norm(func(counter,x,y,dx,dy,self.dt)-infile))
 			counter += 1
 		ani = animation.ArtistAnimation(fig,im)
 		mpl.show()
@@ -304,12 +306,12 @@ class Experiment:
 
 
 def f(x,y,t):
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
+	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)
 	# return np.ones(np.shape(x))*1.5
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	# return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 
 def F(x,y,t):
 	tmp = np.zeros(np.shape(x))
@@ -322,25 +324,25 @@ def F(x,y,t):
 
 from scipy.special import binom
 
-def numerical_exact(n,x,dx,dt,D=1):
-	u = np.zeros(len(x))
-	def u_xx(i,x):
+def numerical_exact(n,x,y,dx,dy,dt,D=1):
+	u = np.zeros(np.shape(x))
+	def u_xx(i,x,y):
 		#return (-1)**i*(np.pi**(2*i))*np.cos(np.pi*x)
 		if dx**(2*i)>0 and type(2**i)!=type(long()):
-			return 2**i/(dx**(2*i))*(np.cos(np.pi*dx)-1)**i*np.cos(np.pi*x)
+			return 2**(i-1)*np.cos(np.pi*y)*np.cos(np.pi*x)*((np.cos(np.pi*dx)-1)**i/(dx**(2*i)) +(np.cos(np.pi*dy)-1)**i/(dy**(2*i)))
 		else:
 			return 0
 	
 	for i in xrange(n+1):
 		if dt**i>0:
-			tmp = binom(n,i)*(D*dt)**i*u_xx(i,x)
+			tmp = binom(n,i)*(D*dt)**i*u_xx(i,x,y)
 		else:
-			tmp = np.zeros(len(x))
+			tmp = np.zeros(np.shape(u))
 		u[:] += tmp
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -352,35 +354,35 @@ if __name__ == '__main__':
 	x1 = 0.6
 	y1 = 0.7
 	m = 51
-	n = 51
-	T = 130
+	n = 1
+	T = 5830
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
 	# dt = 0.001
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [100]
-	# Hc = [200,800,1400,2000,2600,3200,3800,4400,5000]
-	# Hc = [1000]
+	# Hc = [100]
+	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
+	Hc = [1000,2000,4000,8000,16000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
 	run.compile()
-	dt = [dx*dy/5.0*10**(-i) for i in range(4)]
+	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
-	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	run.VerifyDeterministicError(DT=dt)
+	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
+	run.VerifyDeterministicError()
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(h)
-	run.ConvergenceTest(dt)
+	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])

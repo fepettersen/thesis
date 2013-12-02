@@ -260,6 +260,22 @@ This particular equation has steady state $u(t\to\infty,x) = 0$, and so not havi
 \label{testing_dt_size}
 \end{figure}
 
+\begin{figure}[H]
+ \centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot}.eps}
+ \caption{}
+ \label{errorplot_FE_walk_long:normal}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/deterministic_errorplot}.eps}
+\caption{}
+\label{errorplot_FE_walk_long:deterministic}
+ \end{subfigure}
+\caption[Errorplot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
+\label{errorplot_FE_walk_long}
+\end{figure}
+
 \subsection{The effects of adding drift to the walkers}\label{effect_of_drift_on_walkers}
 
 As shown in section \ref{random_walks_and_drift} adding drift to the walkers will modify our model to represent the convection diffusion equation (\ref{convection_diffusion_equation}) rather than the simple diffusion equation. 
@@ -359,19 +375,68 @@ Once again $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$. Figure \ref{anisotro
 \label{anisotropic_diffusion_verification}
 \end{figure}
 Again, the error is of the order of $\Delta t$ and is roughly halved by halving $\Delta t$.
+
 \section{2D}
 Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
 This can, however be tweaked by increasing the conversion parameters.
 
-\begin{equation}
- - \frac{\pi^{2} \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}}
+\begin{equation}\label{initial_condition_2d_numex}
+ u(x,y,t=0) = \cos(\pi x)\cos(\pi y)
 \end{equation}
-\begin{equation}
-- \frac{\pi^{2} \left(x + y\right) \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}} - \frac{\pi \operatorname{sin}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}}
+
+The exact numerical solution of the FE scheme can be found in equation \ref{exact_numerical_solution_2d}, and again we expect the scheme to be able to reproduce this to more or less machine precision. 
+The result of a test simulation of this, using the initial condition in equation \ref{initial_condition_2d_numex}, is shown in figure \ref{exact_numerical_2d_n130}. 
+Again, as in we did in 1d, we see that although the error is very small, and start out with machine precision, it does increase and even more than in the 1d case. 
+This is \emph{probably} because of the terms we have do drop in the exact numerical solution due to overflow and so on, which accumulate in the numerical solution from the scheme. 
+We should, in other words, be pleased that the error starts out with machine precision, and stays small for the ammount of time steps we can simulate and still have something to compare it with.
+
+\begin{equation}\label{exact_numerical_solution_2d}
+ u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
 \end{equation}
-\begin{equation}
-- \frac{\pi^{2} \left(x + y\right) \operatorname{cos}\left(\pi x\right) \operatorname{cos}\left(\pi y\right)}{e^{\pi^{2} t}} - \frac{\pi \operatorname{sin}\left(\pi y\right) \operatorname{cos}\left(\pi x\right)}{e^{\pi^{2} t}}
-\end{equation}
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
+ \caption{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8e-05$.}
+ \label{exact_numerical_2d_n130}
+\end{figure}
+
+We can also do a convergence test, equal to the one we did in 1d, to check that the scheme converges to 1 (by equation \ref{convergence_rate_def}) for smaller $\Delta t$. 
+The results of this test are shown in figure \ref{convergence_test_FE_2d} and it does converge nicely to one.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
+\caption[Convergence test FE 2d]{Convergence test for the FE scheme in 2d using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
+\label{convergence_test_FE_2d}
+\end{figure}
+
+\subsection{Including random walks}
+
+In the same way as in figure \ref{errorplot_FE1D_Walk_first_attemt} we can test the effect of introducing walkers in part of the mesh. 
+In figure \ref{errorplot_FE1D_Walk_first_attemt_2d} we have more or less recreated the plot from the 1d case, only simulating for more time steps and with more walkers. 
+First of all we note that we in 2d will need quite a lot more walkers than in 1d in order to get a decent error. 
+Secondly, and more importantly, because we have done longer simulations, we notice that the error is completely dominated by the walkers. 
+In the simulation in question the rectangle x0=0.4, x1=0.7 and y0=0.6 y1=0.7 has walkers on it.
+The error does in fact seem to behave like a square root function. 
+This is rather unnerving, and to check if this was the case in 1d as well a long simulation was run for a similar case. 
+Figure \ref{errorplot_FE_walk_long} shows that the error in the long term behaves similarly to the error from the deterministic simulations, but with a \emph{much} larger amplitude. For the ``best'' case the maximum amplitude seems to be about a factor 100 times the deterministic one.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1229/results/errorplot.eps}
+\caption{}
+\label{errorplot_FE1D_Walk_first_attemt_2d:few_walkers}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1223/results/errorplot.eps}
+\caption{}
+\label{errorplot_FE1D_Walk_first_attemt_2d:many_walkers}
+\end{subfigure}
+\caption[Verification of anisotropic diffusion equation implementation]{Verification of anisotropic diffusion equation implementation}
+\label{errorplot_FE1D_Walk_first_attemt_2d}
+\end{figure}
 
 
 \section{Testing Random walks}\label{testing_random_walks}
