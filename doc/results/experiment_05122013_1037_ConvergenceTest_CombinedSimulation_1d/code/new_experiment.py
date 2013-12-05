@@ -42,7 +42,7 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s'%self.datetime
+		self.parent_path = this_dir +'/doc/results/experiment_%s_ConvergenceTest_CombinedSimulation_1d'%self.datetime
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
 		self.result_path = self.parent_path+ '/results'
@@ -342,7 +342,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 

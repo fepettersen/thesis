@@ -42,7 +42,7 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s'%self.datetime
+		self.parent_path = this_dir +'/doc/results/experiment_%s_2d_RandomWalk_convergencetest'%self.datetime
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
 		self.result_path = self.parent_path+ '/results'
@@ -342,7 +342,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -354,14 +354,14 @@ if __name__ == '__main__':
 	x1 = 0.6
 	y1 = 0.7
 	m = 51
-	n = 1
-	T = 170
+	n = 51
+	T = 700
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	dt *= 0.01
+	# dt = 0.001
 	print 'Python: ',dt,' dx: ',dx
-	# Hc = [16000]
+	# Hc = [160]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
 	Hc = [1000,2000,4000,8000,16000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'

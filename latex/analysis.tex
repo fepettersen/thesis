@@ -438,6 +438,27 @@ Figure \ref{errorplot_FE_walk_long} shows that the error in the long term behave
 \label{errorplot_FE1D_Walk_first_attemt_2d}
 \end{figure}
 
+In fact, we can test the convergence rate for a simulation where we hold $\Delta t$, $\Delta x$ and the number of time steps constant, and then increase the conversion rate for the walkers. 
+The result of this is shown in figure \ref{Convergence_rate_diffusion_with_walk} and shows that introducing random walks reduces the convergence rate from 1 to $\frac{1}{2}$. 
+A result we actually expect since the convergence test, and the error measure in general, are sensitive to the largest error in the solution. 
+In chapter \ref{testing_random_walks} we will see that the random walk algorithm has a convergence which goes as $0.5$, and this makes the error larger than for the FE scheme alone. 
+
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d/results/ConvergenceTest.eps}
+  \caption{2D}
+  \label{Convergence_rate_diffusion_with_walk:2d}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_05122013_1037_ConvergenceTest_CombinedSimulation_1d/results/ConvergenceTest.eps}
+  \caption{1D}
+  \label{Convergence_rate_diffusion_with_walk:1d}
+ \end{subfigure}
+ \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, in varied (from 1000 to 16000) over 170 timesteps. Initial condition is given by $u(\vec{x},t=0) = H(x-0.5)$ in both 1d and 2d, and the time step is the same as well, $\Delta t = 8\cdot10^{-7}$ which by figure \ref{convergence_test_FE_2d} should give us perfect convergence.}
+ \label{Convergence_rate_diffusion_with_walk}
+\end{figure}
+
 
 \section{Testing Random walks}\label{testing_random_walks}
 

@@ -262,16 +262,18 @@ This particular equation has steady state $u(t\to\infty,x) = 0$, and so not havi
 
 \begin{figure}[H]
  \centering
-%  \includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot.eps}
-\begin{subfigure}[b][0.48\textwidth]
-\includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot.eps}
- \caption{blkasd}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot}.eps}
+ \caption{}
+ \label{errorplot_FE_walk_long:normal}
 \end{subfigure}
-\begin{subfigure}[b][0.48\textwidth]
- \includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot.eps}
-\caption{kni}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/deterministic_errorplot}.eps}
+\caption{}
+\label{errorplot_FE_walk_long:deterministic}
  \end{subfigure}
 \caption[Errorplot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
+\label{errorplot_FE_walk_long}
 \end{figure}
 
 \subsection{The effects of adding drift to the walkers}\label{effect_of_drift_on_walkers}
@@ -418,7 +420,7 @@ Secondly, and more importantly, because we have done longer simulations, we noti
 In the simulation in question the rectangle x0=0.4, x1=0.7 and y0=0.6 y1=0.7 has walkers on it.
 The error does in fact seem to behave like a square root function. 
 This is rather unnerving, and to check if this was the case in 1d as well a long simulation was run for a similar case. 
-Figure \ref{} shows that the error in the long term behaves similarly to the error from the deterministic simulations, but with a \emph{much} larger amplitude. For the ``best'' case the maximum amplitude seems to be about a factor 100 times the deterministic one.
+Figure \ref{errorplot_FE_walk_long} shows that the error in the long term behaves similarly to the error from the deterministic simulations, but with a \emph{much} larger amplitude. For the ``best'' case the maximum amplitude seems to be about a factor 100 times the deterministic one.
 
 \begin{figure}[H]
 \centering
@@ -434,6 +436,25 @@ Figure \ref{} shows that the error in the long term behaves similarly to the err
 \end{subfigure}
 \caption[Verification of anisotropic diffusion equation implementation]{Verification of anisotropic diffusion equation implementation}
 \label{errorplot_FE1D_Walk_first_attemt_2d}
+\end{figure}
+
+In fact, we can test the convergence rate for a simulation where we hold $\Delta t$, $\Delta x$ and the number of time steps constant, and then increase the conversion rate for the walkers. 
+The result of this is shown in figure \ref{Convergence_rate_diffusion_with_walk} and shows that introducing random walks reduces the convergence rate from 1 to $\frac{1}{2}$ (at least for $\Delta t=8\cdot10^{-5}$.
+
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d/results/ConvergenceTest.eps}
+  \caption{2D}
+  \label{Convergence_rate_diffusion_with_walk:2d}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_05122013_1037_ConvergenceTest_CombinedSimulation_1d/results/ConvergenceTest.eps}
+  \caption{1D}
+  \label{Convergence_rate_diffusion_with_walk:1d}
+ \end{subfigure}
+ \caption[]{Convergence rate for simulation where only the conversion faction, Hc, in varied (from 1000 to 16000) over 170 timesteps. }
+ \label{Convergence_rate_diffusion_with_walk}
 \end{figure}
 
 

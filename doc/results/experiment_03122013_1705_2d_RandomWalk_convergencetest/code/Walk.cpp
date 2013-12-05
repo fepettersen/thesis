@@ -343,9 +343,9 @@ void Walk::FindPosition(double *pos, int *indx){
 	// int indx[d];
 	if(d==1){
 		indx[0] = -1;
-		for(int q=0; q<m; q++){
-			if(fabs(pos[0]-x[q])<dx/2.0){
-				indx[0] = q;
+		for(int i=0; i<m; i++){
+			if(fabs(pos[0]-x[i])<dx/2.0){
+				indx[0] = i;
 				break;
 			}
 		}
@@ -356,21 +356,20 @@ void Walk::FindPosition(double *pos, int *indx){
 	}
 	else if(d==2){
 		indx[0] = indx[1] = -1;
-		for(int q=0; q<m; q++){
-			if(fabs(pos[0]-x[q])<dx/2.0){
-				indx[0] = q;
+		for(int i=0; i<m; i++){
+			if(fabs(pos[0]-x[i])<dx/2.0){
+				indx[0] = i;
 				break;
 			}
 		}
-		for(int h=0; h<n; h++){
-			if(fabs(pos[1]-y[h])<dy/2.0){
-				indx[1] = h;
+		for(int j=0; j<n; j++){
+			if(fabs(pos[1]-y[j])<dy/2.0){
+				indx[1] = j;
 				break;
 			}
 		}
 		if(indx[0]==-1||indx[1]==-1){
 			cout<<"panic!!"<<endl;
-			cout<<pos[0]<<","<<pos[1]<<endl;
 			exit(1);
 		}
 	}

@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
 
 	string RWname = "RWname";
-	bool test_convergence = false;
+	bool test_convergence = true;
 
 	Combine BlackBox(m,n,0,1,0,1,0.5,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);

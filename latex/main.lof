@@ -44,8 +44,10 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.16}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{39}{figure.caption.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.17}{\ignorespaces Convergence test RW}}{41}{figure.caption.22}
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Convergence test for combined simulation}}{39}{figure.caption.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.18}{\ignorespaces Error plot RW}}{42}{figure.caption.23}
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Convergence test RW}}{42}{figure.caption.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.19}{\ignorespaces Error plot RW}}{43}{figure.caption.24}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
