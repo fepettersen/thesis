@@ -17,6 +17,8 @@ class Diffusion
 		void advance(double **U,double **Up, int, int);
 		void boundary(double **,double **, int, int);
 		double f(double x,double y, double t);
+		void BE2D(double **U, double **Up, int m, int n);
+		void tridiag(double *u, double *up, int N, double *di, double *ab, double *bel);
 };
 
 #endif // DIFFUSION_H

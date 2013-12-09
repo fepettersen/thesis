@@ -42,7 +42,8 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s_ConvergenceTest_CombinedSimulation_1d'%self.datetime
+		# self.parent_path = this_dir +'/doc/results/experiment_%s'%self.datetime
+		self.parent_path = this_dir + '/doc/results/experiment_05122013_1037_ConvergenceTest_CombinedSimulation_1d'
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
 		self.result_path = self.parent_path+ '/results'
@@ -359,20 +360,20 @@ if __name__ == '__main__':
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	dt *= 0.01
+	# dt *= 0.01
 	print 'Python: ',dt,' dx: ',dx
-	# Hc = [16000]
+	# Hc = [160]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
 	Hc = [1000,2000,4000,8000,16000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
-	run.exact = F
+	run.exact = f
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
+	run.VerifyDeterministicError()
 
 	for i in Hc:
 		print "Hc = %g"%i

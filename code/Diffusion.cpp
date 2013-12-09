@@ -9,7 +9,7 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	dy = _dy;
 	D = _D;
 	d = (dy>0)?2:1;
-	solver = 0;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
+	solver = 3;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
 	if(d==2 && solver==0){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = D*dt/(dx*dx);
@@ -117,6 +117,10 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 		    boundary(U,Up,m,n);
 		    delete [] bv;
 		}
+		else if(d==2){
+			BE2D(U,Up,m,n);
+			// boundary(U,Up,m,n);
+		}
 	}
 	else{
 		/*Anisotropic convection diffusion - Forward Euler*/
@@ -223,6 +227,31 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 			// U[0][0] = 1.0;
 			// U[m-1][0] = -1.0;
 		}
+		if(d==2){
+			for(int j=1; j<(m-1); j++){
+				U[j][0] = _Dx*(Up[j+1][0]-2*Up[j][0]+Up[j-1][0]) + 
+				2*_Dy*(Up[j][1]-Up[j][0]) +Up[j][0];
+				U[j][n-1] = _Dx*(Up[j+1][n-1]-2*Up[j][n-1]+Up[j-1][n-1]) + 
+				2*_Dy*(Up[j][n-2]-Up[j][n-1]) +Up[j][n-1];
+			}
+			for(int i=1; i<(n-1); i++){
+				U[0][i] = 2*_Dx*(Up[1][i]-Up[0][i]) + 
+				_Dy*(Up[0][i+1]-2*Up[0][i] + Up[0][i-1]) + Up[0][i];
+				U[m-1][i] = 2*_Dx*(Up[m-2][i]-Up[m-1][i]) + 
+				_Dy*(Up[m-1][i+1]-2*Up[m-1][i] + Up[m-1][i-1]) + Up[m-1][i];
+			}
+			U[0][0] = 2*_Dx*(Up[1][0]-Up[0][0]) +Up[0][0] + 
+			2*_Dy*(Up[0][1]-Up[0][0]);
+
+			U[m-1][0] = 2*_Dx*(Up[m-2][0]-Up[m-1][0]) +Up[m-1][0] + 
+			2*_Dy*(Up[m-1][1]-Up[m-1][0]);
+			
+			U[0][n-1] = 2*_Dx*(Up[1][n-1]-Up[0][n-1]) + Up[0][n-1] + 
+			2*_Dy*(Up[0][n-2]-Up[0][n-1]);
+			
+			U[m-1][n-1] = 2*_Dx*(Up[m-2][n-1]-Up[m-1][n-1]) +Up[m-1][n-1] +
+			 2*_Dy*(Up[m-1][n-2]-Up[m-1][n-1]);
+		}
 	}
 }
 
@@ -236,4 +265,140 @@ double Diffusion::f(double x,double y, double t){
 	// double px = pi*x;
 	// return pi*exp(-t*pi*pi)*(2*pi*cos(px)*cos(py)*(x+y-0.5) + cos(px)*sin(py) +sin(px)*cos(py));
 	return 0.0;
+}
+
+void Diffusion::tridiag(double *u, double *up, int N, double *di, double *ab, double *bel){
+    double *temp = new double[N];
+    for(int i=0;i<N;i++){
+    	temp[i] = 0;
+    }
+    double btemp = di[0];
+
+    // bv[0]=2*ab[1]/btemp;
+    u[0] = up[0]/btemp;
+    for(int i=1; i<N-1; i++){
+        //forward substitution
+       	// btemp = 1.0/(di[i]-bel[i]*bv[i-1]);
+       	temp[i] = ab[i-1]/btemp;
+       	btemp = di[i]-bel[i]*temp[i];
+        // bv[i] = ab[i]*btemp;
+        // u[i] = (up[i] -bel[i]*u[i-1])*btemp;
+        u[i] = (up[i] -bel[i]*u[i-1])/btemp;
+    }
+    /*Boundary condition (Neumann)*/
+   	// btemp = 1.0/(1-ab[N-2]-bel[N-2]*bv[N-2]);
+    // bv[N-1] = ab[N-2]*btemp;
+    // u[N-1] = (up[N-1] -bel[N-2]*u[N-2])*btemp;
+    for(int i=(N-2);i>0;i--){
+        //Backward substitution 
+        // u[i] -= bv[i]*u[i+1];
+        u[i] -= temp[i+1]*u[i+1];
+    }
+}
+
+void Diffusion::BE2D(double **U, double **Up, int m, int n){
+	double Utmp[m*n];
+	double Uptmp[m*n];
+	double diag[m*n];
+	double lower[m*n-2];
+	double upper[m*n-2];
+	double alpha = D*dt/(2*dx*dx);
+	double beta = D*dt/(2*dy*dy);
+	int k=0;
+	double b = 2*(1+alpha);
+	double b1 = 2*(1-beta);
+
+	for(int ii=0; ii<n;ii++){
+		if(ii==0)
+			Uptmp[k] = Up[0][0]+2*beta*Up[0][1] + b1*Up[0][0];
+		else if(ii=n-1)
+			Uptmp[k] = Up[0][n-1]+2*beta*Up[0][n-2] + b1*Up[0][n-1];
+		else
+			Uptmp[k] = Up[0][ii]+beta*Up[0][ii+1] + b1*Up[0][ii] + beta*Up[0][ii-1];
+		upper[k] = -2*alpha; 	
+		lower[k] = 0;
+		diag[k] = b;
+		k++;
+	}
+	for(int i=1;i<(m-1);i++){
+		Uptmp[k] = Up[i][0]+2*beta*Up[i][1] + b1*Up[i][0];
+		upper[k] = -2*alpha; 	
+		lower[k] = 0;
+		diag[k] = b;
+		k++;
+		for(int j=1;j<(n-1);j++){
+			Uptmp[k] = Up[i][j]+beta*Up[i][j+1] + b1*Up[i][j] + beta*Up[i][j-1];
+			upper[k] = -alpha; 	
+			lower[k] = -alpha;
+			diag[k] = b;
+			k++;
+		}
+		Uptmp[k] = Up[i][n-1]+2*beta*Up[i][n-2] + b1*Up[i][n-1];
+		upper[k] = 0; 
+		lower[k] = -2*alpha;
+		diag[k] = b;
+		k++;
+	}
+	for(int ii=0; ii<n;ii++){
+		if(ii==0)
+			Uptmp[k] = Up[m-1][0]+2*beta*Up[m-1][1] + b1*Up[m-1][0];
+		else if(ii=n-1)
+			Uptmp[k] = Up[m-1][n-1]+2*beta*Up[m-1][n-2] + b1*Up[m-1][n-1];
+		else
+			Uptmp[k] = Up[m-1][ii]+beta*Up[m-1][ii+1] + b1*Up[m-1][ii] + beta*Up[m-1][ii-1];
+		upper[k] = 0; 
+		lower[k] = -2*alpha;
+		diag[k] = b;
+		k++;
+	}
+	tridiag(Utmp,Uptmp,m*n,diag,upper,lower);
+	b = 2*(1+beta);
+	b1 = 2*(1-alpha);
+	k=0;
+	int kk=0;
+	for(int i=1; i<(m-1);i++){
+		for(int l=1; l<(n-1); l++){
+			Up[i][l] = Utmp[kk];
+			kk++;
+		}
+	}
+	for(int ii=0; ii<n;ii++){
+		if(ii==0)
+			Uptmp[k] = Up[0][0]+2*alpha*Up[1][0] + b1*Up[0][0];
+		else if(ii=n-1)
+			Uptmp[k] = Up[m-2][0]+2*alpha*Up[m-2][0] + b1*Up[m-1][0];
+		else
+			Uptmp[k] = Up[ii][0]+alpha*Up[ii+1][0] + b1*Up[ii][0] + alpha*Up[ii-1][0];
+		upper[k] = -2*beta; 
+		lower[k] = 0;	
+		diag[k] = b;
+		k++;
+	}
+	for(int i=1;i<(m-1);i++){
+		Uptmp[k] = Up[0][i]+2*alpha*Up[1][i] + b1*Up[0][i];
+		upper[k] = -2*beta;
+		lower[k] = 0;
+		diag[k] = b;
+		k++;
+		for(int j=1;j<(n-1);j++){
+			Uptmp[k] = Up[i][j]+alpha*Up[i+1][j] + b1*Up[i][j] + alpha*Up[i-1][j];
+			upper[k] = -beta;
+			lower[k] = -beta;
+			diag[k] = b;
+			k++;
+		}
+		Uptmp[k] = Up[m-1][i]+2*alpha*Up[m-2][i] + b1*Up[m-1][i];
+		upper[k] = 0;
+		lower[k] = -2*beta;
+		diag[k] = b;
+		k++;
+	}
+	tridiag(Utmp,Uptmp,m*n,diag,upper,lower);
+	k=0;
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++){
+			Up[i][j]=Uptmp[k];
+			U[i][j] = Utmp[k];
+		}
+	}
 }

@@ -91,15 +91,15 @@ int main(int argc, char** argv)
 		for(int j=0; j<n; j++){
 			if(j>=m/2){
 				C[i][j] = (int) (conversion_factor);
-				Up[i][j] = 1.0;
+				// Up[i][j] = 1.0;
 			}
 			else{
 				C[i][j] = 0;
-				Up[i][j] = 0;
+				// Up[i][j] = 0;
 			}
-			wth = X[j]*PI;
+			wth = X[i]*PI;
 			wty = Y[i]*PI;
-			// Up[i][j] = cos(wth)*cos(wty);
+			Up[i][j] = cos(wth);//*cos(wty);
 			// Up[i][j] = 0;
 			// U[i][j] = 0;
 			// aD[i][j] = X[i]+Y[j];//i*dx*PI;
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 	string RWname = "RWname";
 	bool test_convergence = false;
 
-	Combine BlackBox(m,n,0,1,0,1,0.5,conversion_factor,Dt);
+	Combine BlackBox(m,n,0,1,0,1,1,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
 	if(test_convergence){
