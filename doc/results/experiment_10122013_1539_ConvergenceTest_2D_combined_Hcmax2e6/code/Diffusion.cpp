@@ -9,7 +9,7 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	dy = _dy;
 	D = _D;
 	d = (dy>0)?2:1;
-	solver = 3;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
+	solver = 0;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
 	if(d==2 && solver==0){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = D*dt/(dx*dx);
@@ -267,126 +267,133 @@ double Diffusion::f(double x,double y, double t){
 	return 0.0;
 }
 
-void Diffusion::tridiag(double *u, double *f, int N, double *b, double *c, double *a){
+void Diffusion::tridiag(double *u, double *up, int N, double *di, double *ab, double *bel){
     double *temp = new double[N];
     for(int i=0;i<N;i++){
     	temp[i] = 0;
     }
-    double btemp = b[0];
-    u[0] = f[0]/btemp;
-    for(int i=1; i<N; i++){
+    double btemp = di[0];
+
+    // bv[0]=2*ab[1]/btemp;
+    u[0] = up[0]/btemp;
+    for(int i=1; i<N-1; i++){
         //forward substitution
-       	temp[i] = c[i-1]/btemp;
-       	btemp = b[i]-a[i]*temp[i];
-        u[i] = (f[i] -a[i]*u[i-1])/btemp;
+       	// btemp = 1.0/(di[i]-bel[i]*bv[i-1]);
+       	temp[i] = ab[i-1]/btemp;
+       	btemp = di[i]-bel[i]*temp[i];
+        // bv[i] = ab[i]*btemp;
+        // u[i] = (up[i] -bel[i]*u[i-1])*btemp;
+        u[i] = (up[i] -bel[i]*u[i-1])/btemp;
     }
+    /*Boundary condition (Neumann)*/
+   	// btemp = 1.0/(1-ab[N-2]-bel[N-2]*bv[N-2]);
+    // bv[N-1] = ab[N-2]*btemp;
+    // u[N-1] = (up[N-1] -bel[N-2]*u[N-2])*btemp;
     for(int i=(N-2);i>0;i--){
         //Backward substitution 
+        // u[i] -= bv[i]*u[i+1];
         u[i] -= temp[i+1]*u[i+1];
     }
-    delete[] temp;
 }
 
 void Diffusion::BE2D(double **U, double **Up, int m, int n){
 	double Utmp[m*n];
 	double Uptmp[m*n];
-	double b[m*n];
-	double a[m*n];
-	double c[m*n];
+	double diag[m*n];
+	double lower[m*n-2];
+	double upper[m*n-2];
 	double alpha = D*dt/(2*dx*dx);
 	double beta = D*dt/(2*dy*dy);
-	double b1 = (1-2*beta);
 	int k=0;
+	double b = (1+alpha);
+	double b1 = (1-beta);
 
-	for(int i=0; i<m;i++){
-		Uptmp[k] = 2*beta*Up[i][1] + b1*Up[i][0];
-		if(i==0){
-			a[k] = 0;
-			c[k] = -2*alpha;
-		}
-		else if(i==m-1){
-			a[k] = -2*alpha;
-			c[k] = 0;
-		}
-		else{
-			a[k] = -alpha;
-			c[k] = -alpha;
-		}
-		b[k] = (1+2*alpha);
-		k++;
-		for(int j=1;j<(n-1);j++){
-			Uptmp[k] = beta*Up[i][j+1] + b1*Up[i][j] + beta*Up[i][j-1];
-			if(i==0){
-				a[k] = 0;
-				c[k] = -2*alpha;
-			}
-			else if(i==m-1){
-				a[k] = -2*alpha;
-				c[k] = 0;
-			}
-			else{
-				a[k] = -alpha;
-				c[k] = -alpha;
-			}
-			b[k] = (1+2*alpha);
-			k++;
-		}
-		Uptmp[k] = 2*beta*Up[i][n-2] + b1*Up[i][n-1];
-		if(i==0){
-			a[k] = 0;
-			c[k] = -2*alpha;
-		}
-		else if(i==m-1){
-			a[k] = -2*alpha;
-			c[k] = 0;
-		}
-		else{
-			a[k] = -alpha;
-			c[k] = -alpha;
-		}
-		b[k] = (1+2*alpha);
-		k++;
-	}
-	////////////////////////////////
-	tridiag(Utmp,Uptmp,m*n,b,c,a);//
-	////////////////////////////////
-	// b = (1+2*beta);
-	b1 = (1-2*alpha);
-	k=0;
-	for(int i=1; i<(m-1);i++){
-		for(int l=1; l<(n-1); l++){
-			Up[i][l] = Utmp[k];
-			k++;
-		}
-	}
-	k=0;
-	for(int i=0; i<n;i++){
-		Uptmp[k] = 2*alpha*Up[1][i]+b1*Up[0][i];
-		a[k] = 0;	
-		c[k] = -2*beta; 
-		b[k] = (1+2*beta);
+	for(int ii=0; ii<n;ii++){
+		if(ii==0)
+			Uptmp[k] = 2*beta*Up[0][1] + b1*Up[0][0];
+		else if(ii=n-1)
+			Uptmp[k] = 2*beta*Up[0][n-2] + b1*Up[0][n-1];
+		else
+			Uptmp[k] = beta*Up[0][ii+1] + b1*Up[0][ii] + beta*Up[0][ii-1];
+		upper[k] = -2*alpha; 	
+		lower[k] = 0;
+		diag[k] = b;
 		k++;
 	}
 	for(int i=1;i<(m-1);i++){
-		for(int j=0;j<n;j++){
-			Uptmp[k] = alpha*Up[i+1][j] + b1*Up[i][j] + alpha*Up[i-1][j];
-			c[k] = -beta;
-			a[k] = -beta;
-			b[k] = (1+2*beta);
+		Uptmp[k] = 2*beta*Up[i][1] + b1*Up[i][0];
+		upper[k] = -2*alpha; 	
+		lower[k] = 0;
+		diag[k] = b;
+		k++;
+		for(int j=1;j<(n-1);j++){
+			Uptmp[k] = beta*Up[i][j+1] + b1*Up[i][j] + beta*Up[i][j-1];
+			upper[k] = -alpha; 	
+			lower[k] = -alpha;
+			diag[k] = b;
 			k++;
 		}
-	}
-	for(int i=0; i<n;i++){
-		Uptmp[k] = 2*alpha*Up[m-2][i]+b1*Up[m-1][i];
-		a[k] = -2*beta; 
-		c[k] = 0;	
-		b[k] = (1+2*beta);
+		Uptmp[k] = 2*beta*Up[i][n-2] + b1*Up[i][n-1];
+		upper[k] = 0; 
+		lower[k] = -2*alpha;
+		diag[k] = b;
 		k++;
 	}
-
-	////////////////////////////////
-	tridiag(Utmp,Uptmp,m*n,b,c,a);//
-	////////////////////////////////
+	for(int ii=0; ii<n;ii++){
+		if(ii==0)
+			Uptmp[k] = 2*beta*Up[m-1][1] + b1*Up[m-1][0];
+		else if(ii=n-1)
+			Uptmp[k] = 2*beta*Up[m-1][n-2] + b1*Up[m-1][n-1];
+		else
+			Uptmp[k] = beta*Up[m-1][ii+1] + b1*Up[m-1][ii] + beta*Up[m-1][ii-1];
+		upper[k] = 0; 
+		lower[k] = -2*alpha;
+		diag[k] = b;
+		k++;
+	}
+	tridiag(Utmp,Uptmp,m*n,diag,upper,lower);
+	b = 2*(1+beta);
+	b1 = 2*(1-alpha);
+	k=0;
+	int kk=0;
+	for(int i=1; i<(m-1);i++){
+		for(int l=1; l<(n-1); l++){
+			Up[i][l] = Utmp[kk];
+			kk++;
+		}
+	}
+	for(int ii=0; ii<n;ii++){
+		if(ii==0)
+			Uptmp[k] = 2*alpha*Up[1][0] + b1*Up[0][0];
+		else if(ii=n-1)
+			Uptmp[k] = 2*alpha*Up[m-2][0] + b1*Up[m-1][0];
+		else
+			Uptmp[k] = alpha*Up[ii+1][0] + b1*Up[ii][0] + alpha*Up[ii-1][0];
+		upper[k] = -2*beta; 
+		lower[k] = 0;	
+		diag[k] = b;
+		k++;
+	}
+	for(int i=1;i<(m-1);i++){
+		Uptmp[k] = 2*alpha*Up[1][i] + b1*Up[0][i];
+		upper[k] = -2*beta;
+		lower[k] = 0;
+		diag[k] = b;
+		k++;
+		for(int j=1;j<(n-1);j++){
+			Uptmp[k] = alpha*Up[i+1][j] + b1*Up[i][j] + alpha*Up[i-1][j];
+			upper[k] = -beta;
+			lower[k] = -beta;
+			diag[k] = b;
+			k++;
+		}
+		Uptmp[k] = 2*alpha*Up[m-2][i] + b1*Up[m-1][i];
+		upper[k] = 0;
+		lower[k] = -2*beta;
+		diag[k] = b;
+		k++;
+	}
+	tridiag(Utmp,Uptmp,m*n,diag,upper,lower);
 	k=0;
 	for(int i=0;i<m;i++){
 		for(int j=0;j<n;j++){

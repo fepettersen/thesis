@@ -42,7 +42,7 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s'%self.datetime
+		self.parent_path = this_dir +'/doc/results/experiment_%s_ConvergenceTest_2D_combined_Hcmax2e6'%self.datetime
 		# self.parent_path = this_dir + '/doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d'
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
@@ -343,7 +343,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -354,13 +354,13 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 31
-	n = 31
-	T = 19
+	m = 41
+	n = 41
+	T = 300
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	# dt *= 0.1
+	dt *= 0.1
 	print 'Python: ',dt,' dx: ',dx
 	# Hc = [1600]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
@@ -375,14 +375,14 @@ if __name__ == '__main__':
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
 	run.VerifyDeterministicError()
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(h)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	h = [1./Hc[i] for i in range(len(Hc))]
+	run.ConvergenceTest(h)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
@@ -392,7 +392,7 @@ if __name__ == '__main__':
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
