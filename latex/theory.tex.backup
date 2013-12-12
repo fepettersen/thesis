@@ -46,7 +46,7 @@ This can also be calculated rather straightforwardly.
 \end{align*}
 Like before, the average net displacement is given as $S^2 = (2R-N)^2$ and we obtain
 \begin{align*}
- \langle S^2\rangle = 4\langle R^2\langle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
+ \langle S^2\rangle = 4\langle R^2\rangle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
  = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq.
 \end{align*}
 which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by instertion as
@@ -146,8 +146,8 @@ and see that they are equal, meaning that the diffusion equation is satisfied.
 
 \subsection{Choosing random walk algorithm}\label{choosing_random_walk_algorithm}
 
-As this article points out \cite{farnell2005monte} the simplest random walk model, which places walker on discrete mesh points and uses a fixed step length, has been used with great succsess to model diffusion processes. 
-However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length according to to position, thus effectively adjusting the diffusion constant of the walk as well. 
+As this article points out \cite{farnell2005monte} the simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great succsess to model diffusion processes. 
+However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length according to position, thus effectively adjusting the diffusion constant of the walk as well. 
 We see then that the simplest model is rather robust, and well tested. 
 However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
 Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
@@ -162,13 +162,35 @@ Any real problem where parts of the diffusion process cannot be modelled by the 
 There is reason to belive that an anisotropic diffusion process on the PDE level will lead to an aisotropic random walk model as well, but how do we modell this. 
 Equation \ref{steplength} shows the step length as a function of the diffusion constant. 
 If we simply replace the diffusion constant by a function $D = D(\vec{x})$ we are at least started, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
-Through their experiments they found that only adjusting the steplength will not improve the error noticably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same 
+Through their experiments they found that only adjusting the steplength will not improve the error noticably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
+They went on to introduce an adjusted steplength and an adjusted step probability, a solution they landed on after trial and error. 
+The expressions they proposed are listed in equations \ref{farnell_and_gibson_1} to \ref{farnell_and_gibson_5}. 
+\begin{equation}\label{farnell_and_gibson_1}
+ \Delta_p(x) = \frac{1}{2}\left(L(x) + L(x +\Delta_p(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
+\end{equation}
+\begin{equation}\label{farnell_and_gibson_2}
+ \Delta_m(x) = \frac{1}{2}\left(L(x) + L(x -\Delta_m(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
+\end{equation}
+where $L(x)$ is defined in equation \ref{farnell_and_gibson_3} and $\Delta_p(x)$ and $\Delta_m(x)$ are the adjusted steplengths to the right and left, respectively.
+\begin{equation}\label{farnell_and_gibson_3}
+L(x) = \sqrt{2D(x)\Delta t}
+\end{equation}
+We also have the adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker in position x to jump right or left, respectively. 
+These are defined in equations \ref{farnell_and_gibson_4} and \ref{farnell_and_gibson_5}
+\begin{equation}\label{farnell_and_gibson_4}
+T_r(x) = \frac{1}{2} +\frac{1}{4}L'(x)
+\end{equation}
+\begin{equation}\label{farnell_and_gibson_5}
+T_l(x) = \frac{1}{2} -\frac{1}{4}L'(x)
+\end{equation}
+We notice that the adjusted steplength we proposed to start with is still a part of the final expressions.
+
 
 \subsection{Random walks and drift}\label{random_walks_and_drift}
 
 Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
 Initially one thought that diffusion in the ECS of the brain was governed by a drift term , but the modern preception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
-The drift term might be of importance in other applications, however, and som we should look into it.\\
+The drift term might be of importance in other applications, however, and something we should look into it.\\
 How do we model random walks with drift? \\
 A first instinct is to simply add some vector to the brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
 This approach can also be used in the fixed steplength (or variable steplength in the anisotropic case)  if we express the new step, $\vec{s}$, as
@@ -231,7 +253,7 @@ The Dirac delta function often sought as an inital condition in experimental set
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/latex/Figures/convection_diffusion_eq_initial_condition.eps}
+ \includegraphics[scale=0.7]{Figures/convection_diffusion_eq_initial_condition.eps}
  \caption[Initial condition for convection diffusion]{Experiment to determine the initial condition of equation \ref{solution_convection_diffusion_eq}}
  \label{convection_diffusion_eq_initial_condition}
 \end{figure}
@@ -261,20 +283,20 @@ and insert for $\phi$
  \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x} = \frac{1}{\Delta x^2}\left(D_{i+1/2}(u^n_{i+1}-u^n_{i+1}) -D_{i-1/2}(u^n_{i}-u^n_{i-1})\right)
 \end{align*}
 Since we can only evaluate the diffusion constant at the mesh points (or strictly speaking since it is a lot simpler to do so) we must approximate $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$. 
-Inerting this gives us 
+Inserting this gives us 
 \begin{align*}
  \nabla D\nabla u\approx\frac{1}{2\Delta x^2}\left((D_{i+1,j}+D_{i,j})(u_{i+1,j}-u_{i,j})-(D_{i,j}+D_{i-1,j})(u_{i,j}-u_{i-1,j})\right) \\
  +\frac{1}{2\Delta y^2}\left((D_{i,j+1}+D_{i,j})(u_{i,j+1}-u_{i,j})-(D_{i,j}+D_{i,j-1})(u_{i,j}-u_{i,j-1})\right)
 \end{align*}
-The Forward Euler discretization has one drawaback which is its instability for ``large'' $\Delta t$. 
+The Forward Euler discretization has one drawback which is its instability for ``large'' $\Delta t$. 
 A common tradeoff for explicit numerical schemes. 
 We could sacrifice ease of implementation for unconditional stability in our scheme. 
-At least in 1d the implemetation is not that much worse either if we chose the Backward Euler discretisation for an isotropic (homogenous) equation. 
-The discretisation itself is found in equation \ref{BE_discretisation_isotropic}. 
+At least in 1d the implementation is not that much worse either if we chose the Backward Euler discretization for an isotropic (homogeneous) equation. 
+The discretization itself is found in equation \ref{BE_discretisation_isotropic}. 
 \begin{equation}\label{BE_discretisation_isotropic}
  \frac{u^n_i - u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i +u^n_{i-1}}{\Delta x^2}
 \end{equation}
-The advantage of this discretisation is that it results in a tridiagonal linear system, which we can easily find if we just insert the first couple of steps.
+The advantage of this discretization is that it results in a tridiagonal linear system, which we can easily find if we just insert the first couple of steps.
 \begin{align*}
  \frac{u^{n}_i-u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i + u^n_{i-1}}{\Delta x^2} \\
  u^n_i -\frac{D\Delta t}{\Delta x^2}\left(u^n_{i+1}-2u^n_i + u^n_{i-1}\right) = u^{n-1}_i \\
@@ -292,10 +314,42 @@ If we insert for a few steps we see that this takes the form of
        \end{array}\right)\mathbf{u}^n = \mathbf{u}^{n-1} 
 \end{align*}
 \begin{equation*}
- \mathbf{A}\mathbf{u}^n = \mathbf{u^{n-1}}
+ \mathbf{A}\mathbf{u}^n = \mathbf{u}^{n-1}
 \end{equation*}
-This can be solved vey efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
-We implement the Backward Euler discretisation in order to efficiently simlulate for longer times, and by extension to test the effects the longer timesteps will have on the random walk model.
+This can be solved very efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
+We implement the Backward Euler discretization in order to efficiently simulate for longer times, and by extension to test the effects the longer time steps will have on the random walk model. \\
+We would, of course, also like an implicit solver in 2 and 3d as well to make sure that we can take longer time steps here as well. 
+Doing the BE discretization in 2d gives us a slightly more difficult linear problem (eq \ref{backward_euler_2d}), which is still sparse, but we do not have any simple, efficient solver for five-band matrices. 
+There is another discretization which lets us utilize our tridiagonal solver, and is implicit and unconditionally stable in 2d, the Alternate Direction Implicit (ADI) scheme. 
+The ADI scheme divides the time step in two and only propagates one of the derivatives at a time, making it very similar to the Crank Nicholson scheme. 
+In fact, the truncation error in the ADI scheme is of second order, just as in the CN scheme, but this is (as discussed earlier) of small importance in this thesis. 
+Discretizing the simple diffusion equation by the ADI scheme is done as follows.
+\begin{align*}
+ \frac{u^{n+1/2}-u^n}{\Delta t/2} &= D\left(D_xD_xu^{n+1/2}+D_yD_yu^n\right)\\
+ \frac{u^{n+1}-u^{n+1/2}}{\Delta t/2} &= D\left(D_xD_xu^{n+1/2}+D_yD_yu^{n+1}\right)
+\end{align*}
+We can write this as two standard equations on the form 
+\begin{align*}
+\mathcal{A}_{1/2}\mathbf{u}^{n+1/2} = \mathbf{u}^n \\
+\mathcal{A}_{1}\mathbf{u}^{n+1} = \mathbf{u}^{n+1/2} 
+\end{align*}
+Note that the indices are only intended as labels. For a $3\times3$ mesh the equations are:
+\begin{align}
+  \left(\begin{array}{c c c c c c c c c}
+        1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0 &0\\
+        0 & 1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0\\
+        0& 0 & 1+2\alpha & -2\alpha & 0 & 0 &0&0\\
+        0& 0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0\\
+        0& 0&0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0\\
+        0& 0&0&0&-\alpha & 1+2\alpha & -\alpha & 0 &0\\
+        0& 0 &0 &0 &-2\alpha & 1+2\alpha & 0&0\\
+        0& 0 &0 &0 &0&-2\alpha & 1+2\alpha & 0\\
+         0&0 &0 &0&0 &0&-2\alpha & 1+2\alpha
+       \end{array}\right)\mathbf{u}^{n+1/2} = \mathbf{f}
+\end{align}
+
+
+
 
 \subsection{Stability}\label{stability}
 
@@ -312,7 +366,7 @@ Inserting \ref{von_neumann_fourier_solution} in the simplified version of the va
  \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= A^n\frac{D\Delta t}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
   A^n\exp(ikp\Delta x)\left(A-1\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
 \end{align*}
-Using the well known identies $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left((\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
+Using the well known identies $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
 \begin{equation}
  A-1 = \frac{D\Delta t}{\Delta x^2}\sin^2\left(\frac{k\Delta x}{2}\right)
 \end{equation}

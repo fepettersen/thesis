@@ -121,9 +121,9 @@ int main(int argc, char** argv)
 		BlackBox.TestRWConvergence(T,path);
 	}
 	else{
-		//output(&outfile,Up,buffer,path,filename,m,n,conversion_factor,0);
+		output(&outfile,Up,buffer,path,filename,m,n,conversion_factor,0);
 		BlackBox.AddWalkArea(x,y);
-		for(int t=0; t<T; t++){
+		for(int t=1; t<T; t++){
 			BlackBox.Solve();
 			if(tofile){
 				output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);

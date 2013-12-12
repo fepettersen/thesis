@@ -1,0 +1,101 @@
+\section{Appendix}
+
+In this appendix some more tedious and rather boring, but no less important calculations can be found. 
+We will also list some algorithms that are important, but not quite in the scope of this thesis.
+
+\subsection{Alternate Direction Implicit scheme}
+Starting with the discretization in equation \ref{} we can find the entire linear problem for a $3\times3$ grid with the no-flux Neumann boundary conditions
+\begin{equation*}
+ \frac{\d u}{\d n}|_{\d\Omega} = 0
+\end{equation*}
+which gives us $\frac{u^{n+1/2}-u^n}{\Delta t/2} = 0 \implies u^{n+1/2}=u^n$.
+The general discretization written out gives us
+\begin{align*}
+ -\alpha u_{i+1,j}^{n+1/2} +(1+2\alpha)u_{i,j}^{n+1/2} -\alpha u_{i-1,j}^{n+1/2} &= -\beta u_{i,j+1}^{n}+(1-2\beta)u_{i,j}^{n} +\beta u_{i,j-1}^{n} \\
+ -\beta u_{i,j+1}^{n+1} +(1+2\beta)u_{i,j}^{n+1} -\beta u_{i,j-1}^{n+1} &=\alpha u_{i+1,j}^{n+1/2} +(1-2\alpha)u_{i,j}^{n+1/2} +\alpha u_{i-1,j}^{n+1/2}
+\end{align*}
+Where 
+\begin{align*}
+ \alpha = \frac{D\Delta t}{2(\Delta x)^2}\text{,}\; \beta = \frac{D\Delta t}{2(\Delta y)^2}
+\end{align*}
+Solving the two equations above on the mentioned $3\times3$ grid gives us 18 equations which in turn can be written as two tridiagonal linear equations if we rewrite the unknown matrices $u^{n+1/2}$ and $u^n$ as column vectors (see eqs. \ref{ADI_vectors_step1} and \ref{ADI_vectors_step2}). 
+
+\begin{align}
+  \left(\begin{array}{c c c c c c c c c}
+        1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0 &0\\
+        0 & 1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0\\
+        0& 0 & 1+2\alpha & -2\alpha & 0 & 0 &0&0&0\\
+        0& 0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0&0\\
+        0& 0&0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0\\
+        0& 0&0&0&-\alpha & 1+2\alpha & -\alpha & 0 &0\\
+        0& 0 &0 &0 &0&-2\alpha & 1+2\alpha & 0&0\\
+        0& 0 &0 &0 &0&0&-2\alpha & 1+2\alpha &0\\
+         0&0 &0 &0&0 &0&0&-2\alpha & 1+2\alpha
+       \end{array}\right)\mathbf{u}^{n+1/2} = \mathbf{f}
+\end{align}
+and
+\begin{align}
+  \left(\begin{array}{c c c c c c c c c}
+        1+2\beta & -2\beta &0 &0 &0 &0 &0 &0 &0\\
+        -\beta & 1+2\beta & -\beta &0 &0 &0 &0 &0 &0\\
+        0& -2\beta & 1+2\beta & 0 & 0 & 0 &0&0&0\\
+        0& 0&0 & 1+2\beta & -2\beta & 0 & 0 &0&0\\
+        0& 0&0&-\beta & 1+2\beta & -\beta & 0 & 0 &0\\
+        0& 0&0&0&-2\beta & 1+2\beta & 0 & 0 &0\\
+        0& 0 &0 &0 &0&0 & 1+2\beta & -2\beta&0\\
+        0& 0 &0 &0 &0&0&-\beta & 1+2\beta &-\beta\\
+         0&0 &0 &0&0 &0&0&-2\beta & 1+2\beta
+       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{f}_2
+\end{align}
+The vectors $\mathbf{u}^{n+1/2}$, $\mathbf{f}$, $\mathbf{u}^{n+1}$ and $\mathbf{f}_2$ are shown in eqs. \ref{ADI_vectors_step1} and \ref{ADI_vectors_step2}
+\begin{align}
+  \mathbf{u}^{n+1/2} = 
+  \left(\begin{array}{c}
+        u^{n+1/2}_{0,0}\\u^{n+1/2}_{0,1}\\u^{n+1/2}_{0,2}\\
+        u^{n+1/2}_{1,0}\\u^{n+1/2}_{1,1}\\u^{n+1/2}_{1,2}\\
+        u^{n+1/2}_{2,0}\\u^{n+1/2}_{2,1}\\u^{n+1/2}_{2,2}
+       \end{array}\right)\text{,}\;
+ \mathbf{f} = 
+  \left(\begin{array}{c}
+        (1-2\beta)u^{n}_{0,0}+2\beta u^{n}_{0,1}\\ \beta u^{n}_{0,0}+ (1-2\beta)u^{n}_{0,1}+\beta u^{n}_{0,2} \\(1-2\beta)u^{n}_{0,2}+2\beta u^{n}_{0,1}\\
+        (1-2\beta)u^{n}_{1,0}+2\beta u^{n}_{1,1}\\ \beta u^{n}_{1,0}+ (1-2\beta)u^{n}_{1,1}+\beta u^{n}_{1,2}\\ (1-2\beta)u^{n}_{1,2}+2\beta u^{n}_{1,1}\\
+        (1-2\beta)u^{n}_{2,0}+2\beta u^{n}_{2,1}\\ \beta u^{n}_{2,0}+ (1-2\beta)u^{n}_{2,1}+\beta u^{n}_{2,2}\\(1-2\beta)u^{n}_{2,2}+2\beta u^{n}_{2,1}
+       \end{array}\right)\label{ADI_vectors_step1} \\
+ \mathbf{u}^{n+1} = 
+  \left(\begin{array}{c}
+        u^{n+1}_{0,0}\\u^{n+1}_{0,1}\\u^{n+1}_{0,2}\\
+        u^{n+1}_{1,0}\\u^{n+1}_{1,1}\\u^{n+1}_{1,2}\\
+        u^{n+1}_{2,0}\\u^{n+1}_{2,1}\\u^{n+1}_{2,2}
+       \end{array}\right)\text{,}\;
+ \mathbf{f}_2 = 
+  \left(\begin{array}{c}
+        (1-2\alpha)u^{n+1/2}_{0,0}+2\alpha u^{n+1/2}_{1,0}\\(1-2\alpha)u^{n+1/2}_{0,1}+2\alpha u^{n+1/2}_{1,1}\\(1-2\alpha)u^{n+1/2}_{0,2}+2\alpha u^{n+1/2}_{1,2}\\
+         \alpha u^{n+1/2}_{2,0}+ (1-2\alpha)u^{n+1/2}_{1,0}+\alpha u^{n+1/2}_{0,0} \\ \alpha u^{n+1/2}_{2,1}+ (1-2\alpha)u^{n+1/2}_{1,1}+\alpha u^{n+1/2}_{0,1}\\
+         \alpha u^{n+1/2}_{2,2}+ (1-2\alpha)u^{n+1/2}_{1,2}+\alpha u^{n+1/2}_{0,2}\\(1-2\alpha)u^{n+1/2}_{1,0}+2\alpha u^{n+1/2}_{2,0}\\
+	  (1-2\alpha)u^{n+1/2}_{1,1}+2\alpha u^{n}_{2,1}\\ (1-2\alpha)u^{n+1/2}_{1,2}+2\alpha u^{n+1/2}_{2,2}
+       \end{array}\right)\label{ADI_vectors_step2}
+\end{align}
+
+\subsection{Backward Euler scheme in 2D}
+Using the BE discretization on the simple 2D diffusion equation will yield the general scheme in equation \ref{general_scheme_BE2D}.
+\begin{equation}\label{general_scheme_BE2D}
+ u^{n}_{i,j} = \underbrace{\frac{-D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{n+1}_{i+1,j}+u^{n+1}_{i-1,j}\right) +
+ \underbrace{\left(1+\frac{2D\Delta t}{\Delta x^2} +\frac{2D\Delta t}{\Delta y^2}\right)}_{\gamma}u^{n+1}_{i,j} 
+ \underbrace{-\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{n+1}_{i,j+1}+u^{n+1}_{i,j-1}\right)
+\end{equation}
+This can, again, be written as a linear problem where the vectors are simply the matrices $u^n$ and $u^{n+1}$ written as column vectors. 
+The matrix is written out for a $3\times3$ grid with no-flux Neumann boundary conditions in equation \ref{linear_system_BE2D}. 
+We see that it is a five-band diagonal matrix, and so the tridiagonal solver cannot be used in this case. It is fully possible to use for example a Gaussian elimination in order to solve this equation, but it will require $\frac{2}{3}\mathcal{O}(n^3)$ operations per time step, where n is the size of the matrix (in this case $n=9$). Another way to solve this equation, and by extension use the BE scheme, is to use some form of sparse LU decomposition.
+\begin{align}\label{linear_system_BE2D}
+  \left(\begin{array}{c c c c c c c c c}
+        \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
+        -\beta & \gamma & -\beta &0 &-2\alpha &0 &0 &0 &0\\
+        0&-2\beta & \gamma & 0 & 0 & -2\alpha &0&0&0\\
+        -\alpha& 0&0 & \gamma & -2\beta & 0 & -\alpha &0&0\\
+        0& -\alpha&0&-\beta & \gamma & -\beta & 0 & -\alpha &0\\
+        0& 0& -\alpha&0&-2\beta & \gamma & 0 & 0 &-\alpha\\
+        0& 0 &0 &-2\alpha &0&0 & \gamma & -2\beta&0\\
+        0& 0 &0 &0 &-2\alpha&0&-\beta & \gamma &-\beta\\
+         0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
+       \end{array}\right)\mathbf{u}^{n} = \mathbf{u}^{n+1}
+\end{align}

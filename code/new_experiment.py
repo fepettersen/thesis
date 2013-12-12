@@ -240,6 +240,7 @@ class Experiment:
 			ax = fig.add_subplot(111,projection='3d')
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
+				# time.sleep(0.3)
 				tmp = np.loadtxt(step)
 				if viz_type=='difference':
 					wframe = ax.plot_wireframe(X,Y,(self.exact(X,Y,(counter*self.dt))-tmp))
@@ -249,8 +250,8 @@ class Experiment:
 					wframe = ax.plot_wireframe(X,Y,tmp)
 				mpl.draw()
 				if counter==1 and viz_type!='difference':
-					pass
-					# ax.set_autoscaley_on(False)
+					# pass
+					ax.set_autoscaley_on(False)
 				ax.collections.remove(wframe)
 				counter +=1
 			# ax.plot_wireframe(X,Y,self.exact(X,Y,0))
@@ -356,11 +357,11 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 31
 	n = 31
-	T = 19
+	T = 29
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
-	dt = dx*dy/5.0 if n>1 else dx**2/5.0
-	# dt *= 0.1
+	dt = dx*dy/4.0 if n>1 else dx**2/5.0
+	# dt = 0.001
 	print 'Python: ',dt,' dx: ',dx
 	# Hc = [1600]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
@@ -391,8 +392,8 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
