@@ -23,13 +23,13 @@ Solving the two equations above on the mentioned $3\times3$ grid gives us 18 equ
 \begin{align}
   \left(\begin{array}{c c c c c c c c c}
         1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0 &0\\
-        0 & 1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0\\
-        0& 0 & 1+2\alpha & -2\alpha & 0 & 0 &0&0&0\\
-        0& 0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0&0\\
+        -\alpha & 1+2\alpha & -\alpha &0 &0 &0 &0 &0 &0\\
+        0& -2\alpha & 1+2\alpha & 0 & 0 & 0 &0&0&0\\
+        0& 0&0 & 1+2\alpha & -2\alpha & 0 & 0 &0&0\\
         0& 0&0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0\\
-        0& 0&0&0&-\alpha & 1+2\alpha & -\alpha & 0 &0\\
-        0& 0 &0 &0 &0&-2\alpha & 1+2\alpha & 0&0\\
-        0& 0 &0 &0 &0&0&-2\alpha & 1+2\alpha &0\\
+        0& 0&0&0&-2\alpha & 1+2\alpha & 0 & 0 &0\\
+        0& 0 &0 &0 &0&0 & 1+2\alpha & -2\alpha&0\\
+        0& 0 &0 &0 &0&0&-\alpha & 1+2\alpha &-\alpha\\
          0&0 &0 &0&0 &0&0&-2\alpha & 1+2\alpha
        \end{array}\right)\mathbf{u}^{n+1/2} = \mathbf{f}
 \end{align}

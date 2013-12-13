@@ -320,6 +320,9 @@ This can be solved very efficiently by a sparse Gaussian elimination, which is q
 We implement the Backward Euler discretization in order to efficiently simulate for longer times, and by extension to test the effects the longer time steps will have on the random walk model. \\
 We would, of course, also like an implicit solver in 2 and 3d as well to make sure that we can take longer time steps here as well. 
 Doing the BE discretization in 2d gives us a slightly more difficult linear problem (eq \ref{backward_euler_2d}), which is still sparse, but we do not have any simple, efficient solver for five-band matrices. 
+Further difficulties arise when we attempt to implement Neumann boundary conditions of girds larger than $3\times3$ since the off-diagonal elements do not ``hit'' their intended matrix-elements. 
+In order to use the 2D BE scheme we must either invert a cubic matrix and multiply it by a normal matrix, or we will have to start rearranging the elements in the vectors (converted matrices) and the entries in the linear-problem matrix correspondingly. 
+All things considered, we will therefore try and find another implicit scheme for our 2D problem. 
 There is another discretization which lets us utilize our tridiagonal solver, and is implicit and unconditionally stable in 2d, the Alternate Direction Implicit (ADI) scheme. 
 The ADI scheme divides the time step in two and only propagates one of the derivatives at a time, making it very similar to the Crank Nicholson scheme. 
 In fact, the truncation error in the ADI scheme is of second order, just as in the CN scheme, but this is (as discussed earlier) of small importance in this thesis. 
