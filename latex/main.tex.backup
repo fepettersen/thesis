@@ -9,7 +9,7 @@
 \usepackage{amsfonts, amssymb, amsmath}
 \usepackage{listings}
 \usepackage{float}
-\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+% \usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
 \usepackage{hyperref}
 \usepackage{epstopdf}
 
@@ -80,6 +80,9 @@ This is an abstract text.
 \include{analysis}
 
 \chapter{Results}
+
+\appendix{A}
+\include{appendix}
 
 %-------Bibliography-------%
 \printbibliography

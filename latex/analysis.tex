@@ -24,12 +24,13 @@ To investigate the error we are introducing we will first need to test that the 
 
 \subsection{The error estimate}
 Before we do anything we should specify what we use to measure the error. 
-Throughout this thesis the term error is used quite lazily, but except something else is specified we refer to the expression 
+Throughout this thesis the term error is used quite lazily, but unless something else is specified we refer to the expression 
 \begin{equation}
  err = max\left(||u_e-u||_2\right)
 \end{equation}
-where $u_e$ is the exact (manufactured) solution to the equation. 
-This is not necessarily the best error measure, but as it lets us study the time evolution of the error it makes debugging a bit simpler. 
+where $u_e$ is the exact (manufactured) solution to the equation, and $u$ is the result from the numerical simulation. 
+We use this error-estimate because it is time-dependent, thus letting us explicitly see how the error evolves over time. 
+The error is calculated over the entire mesh, letting us see clearly if the error from the random-walk areas are dominating, or (otherwise) how the PDE-scheme is holding up.
 Other error measures that might come in handy later will be the integrated spatial error as a function of time
 \begin{equation}
  err = ||\sum u_e-u||_2
@@ -38,13 +39,12 @@ and the same error integrated in time as well
 \begin{equation}
  err = \sum||\sum u_e-u||_2
 \end{equation}
-The error will be calculated over the entire mesh, regardless of any random walk areas on the mesh.
 
 \section{Manufactured Solutions}
 A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
-As a first, simple implementation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation \ref{simple_diffusion_equation}. 
+As a first, simple implementation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation (eq. \ref{simple_diffusion_equation}). 
 This discretization is expected to have an error-term of the order of $\Delta t$, which again is limited by a stability criterion. 
-We can now decide that the solution to equation \ref{simple_diffusion_equation} should be
+We can now decide that the solution to equation (eq. \ref{simple_diffusion_equation}) should be
 \begin{equation}\label{manifactured_solution_1D}
  u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
 \end{equation}
@@ -54,7 +54,7 @@ which satisfies our equation if we set the diffusion constant to 1.
  -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1
 \end{align}
 As we saw in section \ref{truncation_error} the Forward Euler scheme is expected to have an error of the order of $\Delta t$ in time. 
-The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and the error term coming from the time derivative due to the stability criterion \ref{stability}, which is also of the order $\Delta x^2$. 
+The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. 
 Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation, showing us that the error is linear in the first part of a simulation. 
 For longer simulations, however, we expect the analytic solution to take a steady state which we find in the limit of large $t$. 
 \begin{equation}
@@ -340,7 +340,7 @@ The effect of
 \label{Errortest_convection_diffusion_walkers:more_walkers}
 \end{subfigure}
 \caption[Adding walkers influenced by drift]{The figure shows the effect adding walkers influenced by drift has on the error. 
-The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrong in relation to the steplength. $\Delta t =8e-5$}
+The drift term is the step length, which is quite large. The strangest thing is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrong in relation to the steplength. $\Delta t =8e-5$}
 \label{Errortest_convection_diffusion_walkers}
 \end{figure}
 
@@ -388,7 +388,7 @@ The exact numerical solution of the FE scheme can be found in equation \ref{exac
 The result of a test simulation of this, using the initial condition in equation \ref{initial_condition_2d_numex}, is shown in figure \ref{exact_numerical_2d_n130}. 
 Again, as in we did in 1d, we see that although the error is very small, and start out with machine precision, it does increase and even more than in the 1d case. 
 This is \emph{probably} because of the terms we have do drop in the exact numerical solution due to overflow and so on, which accumulate in the numerical solution from the scheme. 
-We should, in other words, be pleased that the error starts out with machine precision, and stays small for the ammount of time steps we can simulate and still have something to compare it with.
+We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
 
 \begin{equation}\label{exact_numerical_solution_2d}
  u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
@@ -457,6 +457,22 @@ In chapter \ref{testing_random_walks} we will see that the random walk algorithm
  \end{subfigure}
  \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, in varied (from 1000 to 16000) over 170 timesteps. Initial condition is given by $u(\vec{x},t=0) = H(x-0.5)$ in both 1d and 2d, and the time step is the same as well, $\Delta t = 8\cdot10^{-7}$ which by figure \ref{convergence_test_FE_2d} should give us perfect convergence.}
  \label{Convergence_rate_diffusion_with_walk}
+\end{figure}
+We argued earlier that for the error from the random walk part of the mesh not to dominate we will need to have some $\Delta t^{-2}$ walkers per unit concentration per mesh-point. Using an explicit scheme this will be an unreasonable demand, but if we use an implicit solver, we can at least check that this is the case for a larger $\Delta t$. Figure \ref{convergence_test_ADI_2d} shows the same convergence test as we see in figure \ref{convergence_test_FE_2d}, but using the ADI scheme and a rather large time-step, $\Delta t=0.001$. We see that as the conversion factor, Hc, increases beyond $10^6$ the convergence rate goes to 1. This proves the concept that we can include random walks as a viable part of the solver and still reproduce the exact solution to any desired error should we wish to do so.
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_13122013_1519_convergenceTest_combinedSimulation_2d/results/ConvergenceTest.eps}
+  \caption{Convergence rate}
+  \label{convergence_test_ADI_2d:2d}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_13122013_1519_convergenceTest_combinedSimulation_2d/results/errorplot.eps}
+  \caption{Error plot}
+  \label{convergence_test_ADI_2d:1d}
+ \end{subfigure}
+ \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, is varied over the values shown in the legend in figure b over 490 timesteps. Initial condition is given by $u(x,y,t=0) = \cos(\pi x)\cos(\pi y)$ and $\Delta t=0.001$. Note that the x-axis on figure a is wrong, and should be interpreted simply as Hc.}
+ \label{convergence_test_ADI_2d}
 \end{figure}
 
 

@@ -9,7 +9,6 @@
 \usepackage{amsfonts, amssymb, amsmath}
 \usepackage{listings}
 \usepackage{float}
-\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
 \usepackage{hyperref}
 \usepackage{epstopdf}
 
@@ -66,8 +65,8 @@ This is an abstract text.
 \tableofcontents
 \clearpage
 \listoffigures
-\clearpage
-\listoftables
+% \clearpage
+% \listoftables
 
 \chapter{Introduction}
 \include{Intro}
@@ -79,9 +78,10 @@ This is an abstract text.
 \chapter{Analysis}
 \include{analysis}
 
-\chapter{Results}
+% \chapter{Results}
 
-\appendix{A}
+\appendix
+\chapter{}
 \include{appendix}
 
 %-------Bibliography-------%

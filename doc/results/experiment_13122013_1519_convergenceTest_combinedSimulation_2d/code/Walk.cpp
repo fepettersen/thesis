@@ -179,11 +179,18 @@ void Walk::advance(int **C){
 void Walk::InhomogenousAdvance(int **C, double _dt){
 	/*This should now implement the normal advance-function as well*/
 	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
+	// cout<<"nwalkers = "<<nwalkers<<endl;
 	dt = _dt/steps;
 	double *newPos, **s;
 	newPos = new double[d];			//delete at the end!
 	int *index = new int[d];		//delete at the end!
-
+	// s = new double*[steps];			//delete at the end!
+	// for(int k=0; k<steps; k++){
+	// 	s[k] = new double[d];
+	// 	for(int l=0; l<d; l++){
+	// 		s[k][l] = 0;
+	// 	}
+	// }
 	// for(int i=0;i<m; i++){
 	// 	//Empty the array to conserve energy
 	// 	for(int j=0; j<n; j++){
@@ -205,6 +212,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
 		if(inhomogenous){
+			// index = FindPosition(walkers[i]);
 			FindPosition(walkers[i],index);
 			L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
 			L_deriv = (d>1)?(L_deriv0/sqrt(aD[index[0]][index[1]])*(aD[index[0]+1][index[1]]-aD[index[0]+1][index[1]])):(L_deriv0/sqrt(aD[index[0]][0])*(aD[index[0]+1][0]-aD[index[0]+1][0])); 	/*This should not work and is horrible programming*/
@@ -226,6 +234,8 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 				}
 			}
 			newPos = InhomogenousStep(walkers[i],stepvector);
+			// InhomogenousStep(walkers[i],stepvector,newPos);// walkers[i]+Delta_p; 	/*This will not work!*/
+			// checkpos2(newPos,stepvector,walkers[i]);
 			walkers[i] = checkpos(newPos,stepvector);
 		}
 		FindPosition(walkers[i],index);
@@ -233,9 +243,25 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			C[index[0]][0] += 1;
 		}
 		else if(d==2){
-			C[index[0]][index[1]] += 1;
+			C[index[0]][index[1]] += 1;	
+			// cout<<"Index = ["<<index[0]<<","<<index[1]<<"]"<<endl;
 		}
 	}
+	// if(d==1){
+	// 	for(int i=0;i<nwalkers;i++){
+	// 		FindPosition(walkers[i],index);
+	// 		// index = FindPosition(walkers[i]);
+	// 		C[index[0]][0] += 1;
+	// 	}
+	// }
+	// else if(d==2){
+	// 	for(int i=0; i<nwalkers; i++){
+	// 		FindPosition(walkers[i],index);
+	// 		// index = FindPosition(walkers[i]);
+	// 		C[index[0]][index[1]] += 1;
+	// 	}
+	// }
+
 	// delete [] newPos,index;
 }
 
@@ -270,6 +296,7 @@ double *Walk::Step(double *r,double *s){
 }
 
 double *Walk::InhomogenousStep(double *r, double *s){
+	// double tmp[d];
 	for(int l=0;l<d;l++){
 		r[l] += s[l];
 	}
@@ -296,6 +323,7 @@ void Walk::PutWalkers(int i, int j, int counter){
 	if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
 	for(int k=0; k<d; k++){
 		if(k==0){
+			/*Should this be something with the steplength? - cange factor in that case*/
 			walkers[counter][k] = x[i]+dx*(0.5-ran0(&Idum));
 		}
 		else if(k==1){
@@ -304,6 +332,11 @@ void Walk::PutWalkers(int i, int j, int counter){
 	}
 }
 
+double **Walk::ReturnBoundary(){
+	//should have a better name
+	double **tmp;
+	return tmp;
+}
 
 void Walk::FindPosition(double *pos, int *indx){
 	/*Maps the walkers position to its index*/
@@ -344,6 +377,11 @@ void Walk::FindPosition(double *pos, int *indx){
 	// return indx;
 }
 
+double **Walk::CalculateGradient(){
+	double **tmp;
+	return tmp;
+}
+
 double *Walk::checkpos(double *r,double *s){
 	/*Implements reflecting boundaries -- Need to adjust the boundaries by dx/2 so each thing has 
 	as much space*/
@@ -375,6 +413,33 @@ double *Walk::checkpos(double *r,double *s){
 				}
 			}
 		return r;
+	}
+}
+
+void Walk::checkpos2(double *r, double *s, double *walker){
+	if(HasLeftArea(r)){
+		if(d ==1){
+			if (r[0]<x0_){
+				walker[0] = x0_ - (r[0]-x0_);
+				}
+			else if(r[0]>x1_){
+				walker[0] = x1_ - (r[0]-x1_);
+				}
+			}
+		else if(d == 2){
+			if(r[0]<x0_){
+				walker[0] = x0_ - (r[0]-x0_);
+				}
+			else if( r[0]>x1_){
+				walker[0] = x1_ - (r[0]-x1_);
+				}
+			if (r[1]<y0_){
+				walker[1] = y0_ - (r[1]-y0_);
+				}
+			else if (r[1]>y1_){
+				walker[1] = y1_ - (r[1]-y1_);
+				}
+		}
 	}
 }
 

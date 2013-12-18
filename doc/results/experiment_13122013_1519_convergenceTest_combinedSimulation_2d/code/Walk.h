@@ -17,6 +17,7 @@ class Walk
 		double *y;
 		double dx,dy,drift;
 		bool inhomogenous;
+		// long Idum;
 		
 
 		bool HasLeftArea(double *);
@@ -26,12 +27,15 @@ class Walk
 		double *InhomogenousStep(double*, double*);
 		int InitializeTimestep(int **);
 		void PutWalkers(int, int, int);
+		double **ReturnBoundary();			//should have a better name
 		void FindPosition(double *, int*);
+		double **CalculateGradient();
 		double *checkpos(double*,double*);
 		void SetInitialCondition(int **, int, int);
 		void ResetInitialCondition(int **);
 		void SetDiffusionTensor(double **, int, int);
 		void SetDiffusionConstant(double);
+		void checkpos2(double *r, double *s, double *walker);
 
 		void ResetWalkers(){
 			for(int k=0;k<nwalkers;k++)

@@ -1,4 +1,4 @@
-\section{Appendix}
+\section{Various calculations}
 
 In this appendix some more tedious and rather boring, but no less important calculations can be found. 
 We will also list some algorithms that are important, but not quite in the scope of this thesis.
@@ -76,7 +76,43 @@ The vectors $\mathbf{u}^{n+1/2}$, $\mathbf{f}$, $\mathbf{u}^{n+1}$ and $\mathbf{
        \end{array}\right)\label{ADI_vectors_step2}
 \end{align}
 
+If we express the two timesteps as we have done in eq. \ref{} we can show that the ADI scheme is simply the 2d Crank Nicholson scheme with a correction term. 
+\begin{align}
+ (1-\frac{D\Delta t}{2}D_xD_x)u^{n+1/2} = (1+\frac{D\Delta t}{2} D_yD_y)u^n\\
+  (1-\frac{D\Delta t}{2} D_yD_y)u^{n+1} = (1+\frac{D\Delta t}{2} D_xD_x)u^{n+1/2}
+\end{align}
+Subtracting the two equations gives us
+\begin{equation}
+ 2u^{n+1/2} = (1+\frac{D\Delta t}{2}D_yD_y)u^{n} - (1-\frac{D\Delta t}{2}D_yD_y)u^{n+1}
+\end{equation}
+Which, inserted in eq \ref{} again gives us
+
+\begin{equation}
+ \frac{1}{2}(D_xD_x+D_yD_y)(u^{n+1}+u^n) = \frac{u^{n+1}-u^n}{\Delta t} +\frac{\Delta t}{4}D_xD_xD_yD_y(u^{n+1}-u^{n})
+\end{equation}
+This is obviously just the CN-scheme in 2d with a correction term of $\frac{\Delta t}{4}D_xD_xD_yD_y(u^{n+1}-u^{n})$. 
+The correction term is of order $\mathcal{O}(\Delta t^2)$, and we know the CN scheme to be of the same order. Implementing the scheme to second order is another story, however.
+\subsubsection{Generalizing the ADI scheme}
+We would, of course, also like to generalize the ADI scheme in order to do convection diffusion and support anisotropic diffusion. The first part is simple. All we need to do is to use the first order derivative approximation mentioned in chapter \ref{}, and remember that we are advancing the x-derivative in time first, and then the y-derivative. Everything will stay the same as earlier, except $\alpha$ and $\beta$ which will be slightly modified.
+\begin{equation}
+ \alpha = \frac{D\Delta t}{2\Delta x^2}+\frac{v\Delta t}{\Delta x}\text{,}\;\;  \beta = \frac{D\Delta t}{2\Delta y^2}+\frac{v\Delta t}{\Delta y}
+\end{equation}
+The diagonal of the matrix will not have the first order derivative term!\\
+If we look only at the implicit part of the first step (that is the x-direction) for the anisotropic diffusion equation without the convection term (we can simply add this afterwards) we can find the new matrix-entries. 
+The interesting part of the scheme is
+\begin{equation*}
+ u^{n+1/2}_{ij} -\frac{\Delta t}{\Delta x^2}\left( u^{n+1/2}_{i+1j}(D_{i+1j}+D_{ij}) - u^{n+1/2}_{ij}(D_{i+1}+2D_{ij}+D_{i-1j}) + u^{n+1/2}_{i-1j}(D_{ij}+D_{i-1j})\right) 
+\end{equation*}
+which makes the matrix-entries 
+\begin{align*}
+ c &= \frac{\Delta t}{\Delta x^2}(D_{i+1j}+D_{ij})\\
+ b &= 1+\frac{\Delta t}{\Delta x^2}(D_{i+1}+2D_{ij}+D_{i-1j})\\
+ a &= \frac{\Delta t}{\Delta x^2}(D_{i-1j}+D_{ij})
+\end{align*}
+As opposed to the simple case, we notice that the diagonal of the matrix will also be changing in order to accommodate boundary conditions.
+
 \subsection{Backward Euler scheme in 2D}
+
 Using the BE discretization on the simple 2D diffusion equation will yield the general scheme in equation \ref{general_scheme_BE2D}.
 \begin{equation}\label{general_scheme_BE2D}
  u^{n}_{i,j} = \underbrace{\frac{-D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{n+1}_{i+1,j}+u^{n+1}_{i-1,j}\right) +
@@ -85,7 +121,8 @@ Using the BE discretization on the simple 2D diffusion equation will yield the g
 \end{equation}
 This can, again, be written as a linear problem where the vectors are simply the matrices $u^n$ and $u^{n+1}$ written as column vectors. 
 The matrix is written out for a $3\times3$ grid with no-flux Neumann boundary conditions in equation \ref{linear_system_BE2D}. 
-We see that it is a five-band diagonal matrix, and so the tridiagonal solver cannot be used in this case. It is fully possible to use for example a Gaussian elimination in order to solve this equation, but it will require $\frac{2}{3}\mathcal{O}(n^3)$ operations per time step, where n is the size of the matrix (in this case $n=9$). Another way to solve this equation, and by extension use the BE scheme, is to use some form of sparse LU decomposition.
+We see that it is a five-band diagonal matrix, and so the tridiagonal solver cannot be used in this case. It is fully possible to use for example a Gaussian elimination in order to solve this equation, but it will require $\frac{2}{3}\mathcal{O}(n^3)$ operations per time step, where n is the size of the matrix (in this case $n=9$). 
+Another way to solve this equation, and by extension use the BE scheme, is to use some form of sparse LU decomposition.
 \begin{align}\label{linear_system_BE2D}
   \left(\begin{array}{c c c c c c c c c}
         \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
@@ -99,3 +136,59 @@ We see that it is a five-band diagonal matrix, and so the tridiagonal solver can
          0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
        \end{array}\right)\mathbf{u}^{n} = \mathbf{u}^{n+1}
 \end{align}
+When we try to implement Neumann boundary conditions for grids that are larger than $3\times3$ we come across a problem. 
+Doing the matrix-vector multiplication in equation \ref{linear_system_BE2D} reproduces the BE scheme with boundary conditions perfectly. 
+However, if we extend to a $4\times4$ grid using a matrix on the same form we will start producing equations which will not arise from the scheme. 
+This is illustrated in eqs. \ref{first_eq_BE2D_scheme} and \ref{first_eq_BE2D_linear_system}. 
+Moving the off-diagonal entries with $\alpha$ one more column to the right and left will solve the problem, but this will force us to use some more general solver of a sparse linear system. 
+All in all we will probably be better off using another scheme (at least in 2D).\\
+The first equation that arises from the BE scheme in 2D (where $i=j=0$) is
+\begin{equation}\label{first_eq_BE2D_scheme}
+ u^n_{0,0} = \gamma u^{n+1}_{0,0}-2\alpha u^{n+1}_{1,0} -2\beta u^{n+1}_{0,1}
+\end{equation}
+while the first equation produced by the linear system in the $4\times4$ case is 
+\begin{equation}\label{first_eq_BE2D_linear_system}
+ u^n_{0,0} = \gamma u^{n+1}_{0,0}-2\alpha u^{n+1}_{0,3} -2\beta u^{n+1}_{0,1}
+\end{equation}
+which is an equation that will never be produced by the BE scheme. 
+In the $3\times3$ grid-case the off-diagonal matrix entries with $\alpha$ are on the third column before and after the diagonal. 
+Moving the corresponding entries to the fourth column in the $4\times4$ case, and similarly to the n'th column in the $n\times n$ case will fix the problem, but also increase the complexity of the matrix seeing as it will be $n+2$ band diagonal.
+
+\subsection{Tridiagonal Gaussian Elimination}
+
+We can solve a normal linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}$ where $\mathbf{A}$ is not a sparse matrix, by Gaussian elimination.
+
+\begin{align}
+  \mathbf{A} = 
+ \left( \begin{array}{rrrr}
+ a_{11} & a_{12} & a_{13} & a_{14} \\
+ a_{21} & a_{22} & a_{23} & a_{24} \\
+ a_{31} & a_{32} & a_{33} & a_{34} \\
+ a_{41} & a_{42} & a_{43} & a_{44}
+ \end{array} \right)\mathbf{x} = \mathbf{b}
+\end{align}
+Is reduced to
+\begin{align}
+  \mathbf{A} = 
+ \left( \begin{array}{rrrr}
+ a_{11} & a_{12} & a_{13} & a_{14} \\
+ 0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
+ 0 & (a_{32}-\frac{a_{31}a_{12}}{a_{11}}) & (a_{33}-\frac{a_{31}a_{13}}{a_{11}}) & (a_{34}-\frac{a_{31}a_{14}}{a_{11}}) \\
+ 0 & (a_{42}-\frac{a_{41}a_{12}}{a_{11}}) & (a_{43}-\frac{a_{41}a_{13}}{a_{11}}) & (a_{44}-\frac{a_{41}a_{14}}{a_{11}})
+ \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
+\end{align}
+and further to
+\begin{align}
+  \mathbf{A} = 
+ \left( \begin{array}{rrrr}
+ a_{11} & a_{12} & a_{13} & a_{14} \\
+ 0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
+ 0 & 0 & (\tilde{a}_{33}-\frac{\tilde{a}_{32}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{34}-\frac{\tilde{a}_{32}\tilde{a}_{24}}{\tilde{a}_{22}}) \\
+ 0 & 0 & (\tilde{a}_{43}-\frac{\tilde{a}_{42}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{44}-\frac{\tilde{a}_{42}\tilde{a}_{34}}{\tilde{a}_{22}})
+ \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
+\end{align}
+through the well known Gaussian elimination scheme until we have an upper triangular matrix. We can then do a backwards sweep to solve for one element of the unknown vector, $\mathbf{x}$ at a time. If the matrix $\mathbf{A}$ is tridiagonal, most of the entries will be zero, and so we will not only be calculating a lot of zeros, we will also be saving a lot of them in the matrix (should we be so stupid as to save the matrix). We can easily get away with only doing one forward sweep down the matrix, eliminating all the sub-diagonal matrix-entries, and then one backward sweep, which calculates the unknown vector $\mathbf{x}$. The algorithm is listed below as a function.
+
+\lstinputlisting{Figures/tridiag.cpp}
+% \caption{Algorithm for Gaussian elimination of a tridiagonal linear system.}
+% \label{tridiag}

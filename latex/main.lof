@@ -6,48 +6,50 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Initial condition for convection diffusion}}{16}{figure.caption.4}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Initial condition for convection diffusion}}{16}{figure.caption.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Algorithm}}{20}{figure.caption.5}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Algorithm}}{21}{figure.caption.4}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Initial condition in 1d}}{24}{figure.caption.6}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Initial condition in 1d}}{27}{figure.caption.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Numerical error for 1D Forward Euler discretization}}{26}{figure.caption.7}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Numerical error for 1D Forward Euler discretization}}{29}{figure.caption.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Effect of increasing number of walkers}}{27}{figure.caption.8}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Effect of increasing number of walkers}}{30}{figure.caption.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence test for the FE scheme. The x axis is $\qopname \relax o{ln}(\Delta t)$.\relax }}{28}{figure.caption.9}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence test for the FE scheme. The x axis is $\qopname \relax o{ln}(\Delta t)$.\relax }}{31}{figure.caption.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{30}{figure.caption.10}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{33}{figure.caption.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Verification for exact numerical solution}}{31}{figure.caption.11}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Verification for exact numerical solution}}{34}{figure.caption.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{32}{figure.caption.12}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{35}{figure.caption.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.8}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{32}{figure.caption.13}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{35}{figure.caption.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.9}{\ignorespaces \relax }}{33}{figure.caption.14}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces \relax }}{36}{figure.caption.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Errorplot, long simulation}}{33}{figure.caption.15}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Errorplot, long simulation}}{36}{figure.caption.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Verification of Convection diffusion equation implementation}}{34}{figure.caption.16}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Verification of Convection diffusion equation implementation}}{38}{figure.caption.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.12}{\ignorespaces Adding walkers influenced by drift}}{35}{figure.caption.17}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Adding walkers influenced by drift}}{38}{figure.caption.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.13}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{36}{figure.caption.18}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{39}{figure.caption.17}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.14}{\ignorespaces Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac {\Delta x \Delta y}{5} = 8e-05$.\relax }}{37}{figure.caption.19}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac {\Delta x \Delta y}{5} = 8e-05$.\relax }}{41}{figure.caption.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.15}{\ignorespaces Convergence test FE 2d}}{38}{figure.caption.20}
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Convergence test FE 2d}}{42}{figure.caption.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.16}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{39}{figure.caption.21}
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{43}{figure.caption.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.17}{\ignorespaces Convergence test for combined simulation}}{39}{figure.caption.22}
+\contentsline {figure}{\numberline {3.17}{\ignorespaces Convergence test for combined simulation}}{43}{figure.caption.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.18}{\ignorespaces Convergence test RW}}{42}{figure.caption.23}
+\contentsline {figure}{\numberline {3.18}{\ignorespaces Convergence test for combined simulation}}{44}{figure.caption.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.19}{\ignorespaces Error plot RW}}{43}{figure.caption.24}
+\contentsline {figure}{\numberline {3.19}{\ignorespaces Convergence test RW}}{47}{figure.caption.23}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.20}{\ignorespaces Error plot RW}}{48}{figure.caption.24}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }

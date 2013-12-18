@@ -15,7 +15,7 @@ class Combine
 		void MapAreaToIndex(double *, double *, int **);
 		void SetInitialCondition(double**,int,int);
 		double abs_max(double **array,int m, int n);
-		double norm(double **U,double **Up,int m, int n);
+
 		void TestRWConvergence(int steps,std::string path);
 
 		double dx, dy, D;
