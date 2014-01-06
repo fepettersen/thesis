@@ -270,7 +270,6 @@ double *Walk::Step(double *r,double *s){
 }
 
 double *Walk::InhomogenousStep(double *r, double *s){
-	// double tmp[d];
 	for(int l=0;l<d;l++){
 		r[l] += s[l];
 	}
@@ -297,7 +296,6 @@ void Walk::PutWalkers(int i, int j, int counter){
 	if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
 	for(int k=0; k<d; k++){
 		if(k==0){
-			/*Should this be something with the steplength? - cange factor in that case*/
 			walkers[counter][k] = x[i]+dx*(0.5-ran0(&Idum));
 		}
 		else if(k==1){

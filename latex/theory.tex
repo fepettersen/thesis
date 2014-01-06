@@ -11,9 +11,10 @@ If $r\leq p$ the walker will take a step to the left, otherwise it will take a s
 After the N steps the walker will have taken R steps to the right, and $L = N-R$ steps to the left. 
 The net displacement from the origin will be $S = R-L$. \\
 This simple approach is easily generalizable to two and three dimensions by having $2d$ possible outcomes from the random number, where d is the dimensionality. 
-In two d the walker will step up if $r\in(0.75,1]$ and left if $r\in[0,0.25)$, for example.
+In two dimensions the walker will step up if $r\in(0.75,1]$ and left if $r\in[0,0.25)$, for example.
 
 \subsection{Further discussion and analysis of the introduction}\label{further_introduction}
+The following derivation is borrowed from a compendium in statistical mechanics by Finn Ravndal. \\
 If we do sufficiently many walks, the net displacement will vary from $S=+N$ to $S=-N$ representing all steps to the right and all steps to the left respectively. 
 The probability of all steps being to the right is $P_N(N) = p^N$. 
 Should one of the steps be to the left, and the rest to the right we will get a net displacement of $S = N-2$ with the probability $P_N(R = N-1) = Np^{N-1}q$. 
@@ -34,7 +35,7 @@ For example, the average number of steps to the right is
 \end{align*}
 From this we can also find the average value of the net displacement using $S = R-L = R-(N-R) = 2R-N$.
 \begin{align*}
- \langle S\rangle = \langle2R\rangle -N = 2Np-N\underbrace{(p+q)}_{=1} = N(2p-p-q) = N(p-q)
+ \langle S\rangle = \langle2R\rangle -N = 2Np-N(p+q) = N(2p-p-q) = N(p-q)
 \end{align*}
 We notice that the average net displacement is greatly dependent on the relationship between $p$ and $q$, and that any symmetric walk will have an expected net displacement of zero. 
 In many cases we will be more interested in the mean square displacement than the displacement itself, because many important large scale parameters can be related to the root-mean-square displacement. 
@@ -53,13 +54,21 @@ which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, 
 \begin{align}
  \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq 
 \end{align}
+<<<<<<< HEAD
 When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
+=======
+When the number of steps gets very large we can approximate the Bernoulli distribution (eq. \ref{bernoulli_distr}) by the Gaussian distribution. 
+>>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 This is most easily done in the symmetric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
 \begin{equation}
  P(S,N) = \left(\frac{1}{2}\right)^N\frac{N!}{R!L!}
 \end{equation}
+<<<<<<< HEAD
 on which we apply Stirling's famous formula for large factorials $n!\simeq\sqrt{2\pi n}n^ne^{-n}$.
+=======
+on which we apply Stirling's famous formula for large factorials $n!\simeq\sqrt{2\pi n}\cdot n^ne^{-n}$.
+>>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 \begin{align*}
  P(S,N) &= \left(\frac{1}{2}\right)^N\frac{N!}{R!L!} \\
  &= \exp\left(-N\ln2+\ln\sqrt{2\pi N}+N\ln N - \ln\sqrt{2\pi R} -R\ln R - \ln\sqrt{2\pi L} - L\ln L \right) \\
@@ -84,7 +93,11 @@ making the distribution
 \begin{equation}
  P(x,t) = \sqrt{\frac{1}{4\pi Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
+<<<<<<< HEAD
 Introducing $x$ also gives us the expected value and variance of x on a form which will be useful later. 
+=======
+Introducing $x$ also gives us the expectation value and variance of x on a form which will be useful later. 
+>>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 We have $x=Sa$ which means 
 $$\langle x\rangle=a\langle S\rangle$$ 
 and 
@@ -101,7 +114,7 @@ In the more general case, the position of a random walker,$\vec{r}$ at a time $t
 \begin{equation}\label{brownian_motion}
  \vec{r}(t_i)=\sum\limits_{j=0}^i \Delta \vec{x}(t_j)
 \end{equation}
-where $\Delta \vec{x}(t_j) = \left(\Delta x(t_j),\Delta y(t_j),\Delta z(t_j)\right)$ in 3D. Each $\Delta x,y,z$ is a random number drawn from a distribution with a finite variance $\sigma^2 = \langle\Delta x^2\rangle$. 
+where $\Delta \vec{x}(t_j) = \left(\Delta x(t_j),\Delta y(t_j),\Delta z(t_j)\right)$ in 3D. Each $\Delta x,\Delta y,\Delta z$ is a random number drawn from a distribution with a finite variance $\sigma^2 = \langle\Delta x^2\rangle$. 
 By the central limit theorem, any stochastic process with a well defined mean and variance can, given enough samples, be approximated by a Gaussian distribution. 
 This means that the probability of finding the walker at some position x after M steps is 
 \begin{equation}
@@ -111,8 +124,13 @@ Remember that the actual Gaussian distribution is
 $$
 \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{(n-\mu)^2}{2\sigma^2}\right)
 $$
+<<<<<<< HEAD
 We can introduce an Einstein relation $\sigma^2 = 2D\Delta t$ and the obvious relation $t = M\Delta t$ to get a more desirable exponent.
 We see that $\langle \Delta x^2\rangle = 2Dt$. 
+=======
+We can introduce an Einstein relation $\sigma^2 = 2dD\Delta t$ and the obvious relation $t = M\Delta t$ to get a more desirable exponent.
+We see that $\langle \Delta x^2\rangle = 2Dt$ in the one dimensional case where $d=1$. 
+>>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 \emph{The introduction of the Einstein relation might put some restrictions on our model.}
 Normalizing the expression gives us 
 \begin{equation}\label{rw_gaussian_distribution}
@@ -147,7 +165,11 @@ and see that they are equal, meaning that the diffusion equation is satisfied.
 \subsection{Choosing random walk algorithm}\label{choosing_random_walk_algorithm}
 
 As this article points out \cite{farnell2005monte} the simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great success to model diffusion processes. 
+<<<<<<< HEAD
 However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length according to position, thus effectively adjusting the diffusion constant of the walk as well. 
+=======
+However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length and probability according to position, thus effectively adjusting the diffusion constant of the walk as well. 
+>>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 We see then that the simplest model is rather robust, and well tested. 
 However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
 Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
@@ -189,7 +211,11 @@ We notice that the adjusted steplength we proposed to start with is still a part
 \subsection{Random walks and drift}\label{random_walks_and_drift}
 
 Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
+<<<<<<< HEAD
 Initially one thought that diffusion in the ECS of the brain was governed by a drift term , but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
+=======
+Initially one thought that diffusion in the Extra Cellular Space of the brain was governed by a drift term, but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
+>>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 The drift term might be of importance in other applications, however, and something we should look into it.\\
 How do we model random walks with drift? \\
 A first instinct is to simply add some vector to the Brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
@@ -306,25 +332,26 @@ The advantage of this discretization is that it results in a tridiagonal linear 
 If we insert for a few steps we see that this takes the form of
 \begin{align*}\label{BE}
  \left(\begin{array}{c c c c c c c c}
-        \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2} &0 &\dots & & &0 &0 \\
-        -\frac{D\Delta t}{\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2} &0 &\dots & & &0 \\
+        \Big(1+2\alpha\Big) & -\alpha &0 &\dots & & &0 &0 \\
+        -\alpha & \Big(1+2\alpha\Big) & -\alpha &0 &\dots & & &0 \\
         0& \ddots & \ddots & \ddots & 0 & \dots &  &0\\
-        0& \dots & & &0&-\frac{D\Delta t}{\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) & -\frac{D\Delta t}{\Delta x^2}\\
-         0& \dots & && &0&-\frac{\Delta t}{D\Delta x^2} & \Big(1+2\frac{D\Delta t}{\Delta x^2}\Big) 
+        0& \dots & & &0&-\alpha & \Big(1+2\alpha\Big) & -\alpha\\
+         0& \dots & && &0&-\alpha & \Big(1+2\alpha\Big) 
        \end{array}\right)\mathbf{u}^n = \mathbf{u}^{n-1} 
 \end{align*}
+where we have set $\alpha = \frac{\Delta t}{D\Delta x^2}$.
 \begin{equation*}
  \mathbf{A}\mathbf{u}^n = \mathbf{u}^{n-1}
 \end{equation*}
 This can be solved very efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
-We implement the Backward Euler discretization in order to efficiently simulate for longer times, and by extension to test the effects the longer time steps will have on the random walk model. \\
+We implement the Backward Euler discretization in order to efficiently simulate for longer times, and by extension to test the effects the longer time steps will have on the random walk model. More on the tridiagonal Gaussian elimination in the appendix.\\
 We would, of course, also like an implicit solver in 2 and 3d as well to make sure that we can take longer time steps here as well. 
 Doing the BE discretization in 2d gives us a slightly more difficult linear problem (eq \ref{linear_system_BE2D}), which is still sparse, but we do not have any simple, efficient solver for five-band matrices. 
 Further difficulties arise when we attempt to implement Neumann boundary conditions of girds larger than $3\times3$ since the off-diagonal elements do not ``hit'' their intended matrix-elements. 
 In order to use the 2D BE scheme we must either invert a cubic matrix and multiply it by a normal matrix, or we will have to start rearranging the elements in the vectors (converted matrices) and the entries in the linear-problem matrix correspondingly. 
 All things considered, we will therefore try and find another implicit scheme for our 2D problem. 
 There is another discretization which lets us utilize our tridiagonal solver, and is implicit and unconditionally stable in 2d, the Alternate Direction Implicit (ADI) scheme. 
-The ADI scheme divides the time step in two and only propagates one of the derivatives at a time, making it very similar to the Crank Nicholson scheme. 
+The ADI scheme divides the time step in two and only propagates one of the spatial derivatives at a time, making it very similar to the Crank Nicholson scheme. 
 In fact, the truncation error in the ADI scheme is of second order, just as in the CN scheme, but this is (as discussed earlier) of small importance in this thesis. 
 Discretizing the simple diffusion equation by the ADI scheme is done as follows.
 \begin{align*}
@@ -333,8 +360,8 @@ Discretizing the simple diffusion equation by the ADI scheme is done as follows.
 \end{align*}
 We can write this as two standard equations on the form 
 \begin{align*}
-\mathcal{A}_{1/2}\mathbf{u}^{n+1/2} = \mathbf{u}^n \\
-\mathcal{A}_{1}\mathbf{u}^{n+1} = \mathbf{u}^{n+1/2} 
+\mathbf{A}_{1/2}\mathbf{u}^{n+1/2} = \mathbf{u}^n \\
+\mathbf{A}_{1}\mathbf{u}^{n+1} = \mathbf{u}^{n+1/2} 
 \end{align*}
 Note that the indices are only intended as labels. For a $3\times3$ mesh the equations are shown in the appendix.\\
 After more carefull calculations, we find that the ADI discretization does not, in fact, produce a tridiagonal linear problem when we introduce the Neumann boudary conditions. 
@@ -476,11 +503,11 @@ This makes the concentration of walkers $C(x,t) = MP(x,t)$
  C(x_i\pm\Delta x,t_{n+1}) = \frac{M}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
 \end{equation}
 For each PDE-timestep we reset the walkers to have some new initial condition. 
-This is done to make sure that statistical fluctuations will not put the diffusive process ``off course''. 
+We do this because the concentration over the ``walk-area'' will change with each PDE-timestep.
 The point is that $ C(x_i\pm\Delta x,t_{n+1})$ will be dependent on the initial condition $ C(x_i\pm\Delta x,t_{n})$.
 
 
-Looking at the difference in timestep size between the two lengthscales we see from equation \ref{descrete_gaussian_distr} that the stepsize on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
+Looking at the difference in timestep size between the two length scales we see from equation \ref{descrete_gaussian_distr} that the stepsize on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
 \begin{equation}
  \sigma^2 = \langle\Delta x^2\rangle = 2DN\Delta\tilde{t} \implies \Delta\tilde{t} = \frac{\langle\Delta x^2\rangle}{2DN}
 \end{equation}

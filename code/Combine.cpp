@@ -75,6 +75,7 @@ void Combine::Solve(){
 	if(debug){cout<<"Combine::Solve"<<endl;}
 	int counter = 0;
 	pde_solver->advance(U,Up,m,n);
+	double diffnorm = norm(U,Up,m,n);
 	for(vector<Walk*>::iterator it1 = walk_solvers.begin(); it1 != walk_solvers.end(); it1++){
 		(*it1)->drift = 0;
 		ConvertToWalkers(U,c[counter],indeces[counter]);
@@ -84,11 +85,15 @@ void Combine::Solve(){
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}
-
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
 			Up[k][l] = U[k][l];
 		}
+	}
+	if (diffnorm<pde_solver->dt && pde_solver->dt <0.01)
+	{
+		pde_solver->dt *=10;
+		cout<<"changing dt"<<endl;
 	}
 }
 
@@ -298,3 +303,12 @@ double Combine::abs_max(double **array,int m, int n){
 	return max;
 }
 
+double Combine::norm(double **U,double **Up,int m, int n){
+	double norm = 0;
+	for (int i = 0; i < m; ++i){
+		for (int j = 0; j < n; ++j){
+			norm += (U[i][j]-Up[i][j])*(U[i][j]-Up[i][j]);
+		}
+	}
+	return sqrt(norm);
+}
