@@ -1,11 +1,11 @@
 
 In this chapter we will take a closer look at random walks, both in general and the transition from the statistical view to partial differential equations. 
 We will take a look at different algorithms to produce random walks, and discuss their pros and cons in light of this project. 
-Then we will take a quick look at partial diffential equations and numerical solution of them.
+Then we will take a quick look at partial differential equations and numerical solution of them.
 
 \section{Introduction to random walks}\label{introduction_to_random_walks}
 The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
-Using (pseudo-) random numbers on a computer we can simulate the outturn of a random walk. 
+Using (pseudo-) random numbers on a computer we can simulate the outcomes of a random walk. 
 For each step (of which there are N) we draw a random number, r, between 0 and 1 from some distribution (say a uniform one) which will be the probability. 
 If $r\leq p$ the walker will take a step to the left, otherwise it will take a step to the right. 
 After the N steps the walker will have taken R steps to the right, and $L = N-R$ steps to the left. 
@@ -15,7 +15,7 @@ In two d the walker will step up if $r\in(0.75,1]$ and left if $r\in[0,0.25)$, f
 
 \subsection{Further discussion and analysis of the introduction}\label{further_introduction}
 If we do sufficiently many walks, the net displacement will vary from $S=+N$ to $S=-N$ representing all steps to the right and all steps to the left respectively. 
-The probability of all steps beeing to the right is $P_N(N) = p^N$. 
+The probability of all steps being to the right is $P_N(N) = p^N$. 
 Should one of the steps be to the left, and the rest to the right we will get a net displacement of $S = N-2$ with the probability $P_N(R = N-1) = Np^{N-1}q$. 
 We can generalize this to finding the probability of a walk with a R steps to the right as 
 \begin{equation}\label{bernoulli_distr}
@@ -37,7 +37,7 @@ From this we can also find the average value of the net displacement using $S = 
  \langle S\rangle = \langle2R\rangle -N = 2Np-N\underbrace{(p+q)}_{=1} = N(2p-p-q) = N(p-q)
 \end{align*}
 We notice that the average net displacement is greatly dependent on the relationship between $p$ and $q$, and that any symmetric walk will have an expected net displacement of zero. 
-In many cases we will be more interrested in the mean square displacement than the displacement itself, because many important large scale parameters can be related to the root-mean-sqare displacement. 
+In many cases we will be more interested in the mean square displacement than the displacement itself, because many important large scale parameters can be related to the root-mean-square displacement. 
 This can also be calculated rather straightforwardly. 
 \begin{align*}
   \langle R^2\rangle =  \sum\limits_{R=0}^N R^2P_N(R) &=  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
@@ -49,17 +49,17 @@ Like before, the average net displacement is given as $S^2 = (2R-N)^2$ and we ob
  \langle S^2\rangle = 4\langle R^2\rangle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
  = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq.
 \end{align*}
-which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by instertion as
+which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by insertion as
 \begin{align}
  \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq 
 \end{align}
 When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
-This is most easily done in the symmertric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
+This is most easily done in the symmetric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
 \begin{equation}
  P(S,N) = \left(\frac{1}{2}\right)^N\frac{N!}{R!L!}
 \end{equation}
-on which we apply Stirlings famous formula for large factorials $n!\simeq\sqrt{2\pi n}n^ne^{-n}$.
+on which we apply Stirling's famous formula for large factorials $n!\simeq\sqrt{2\pi n}n^ne^{-n}$.
 \begin{align*}
  P(S,N) &= \left(\frac{1}{2}\right)^N\frac{N!}{R!L!} \\
  &= \exp\left(-N\ln2+\ln\sqrt{2\pi N}+N\ln N - \ln\sqrt{2\pi R} -R\ln R - \ln\sqrt{2\pi L} - L\ln L \right) \\
@@ -69,13 +69,13 @@ Where we have used $R+L=N$. We now insert for $\frac{2R}{N}=1+\frac{S}{N}$ and $
 \begin{equation}\label{descrete_gaussian_distr}
  P(S,N) =\sqrt{\frac{2}{\pi N}}\exp\left(\frac{-S^2}{2N}\right)
 \end{equation}
-which is an ordinary, descrete Gaussian distribution with $\langle S\rangle = 0$  and $\langle S^2\rangle = N$. 
-If we keep assuming that the walker is on the x-axis, and let the step length, a, get small the final position will be $x=Sa$ which we can assume is a continous variable. 
-Similarly, we let the time interval between each step, $\tau$, be small and let the walk run for a contious time $t=N\tau$. This changes the distribution \ref{descrete_gaussian_distr} to
+which is an ordinary, discrete Gaussian distribution with $\langle S\rangle = 0$  and $\langle S^2\rangle = N$. 
+If we keep assuming that the walker is on the x-axis, and let the step length, a, get small the final position will be $x=Sa$ which we can assume is a continuous variable. 
+Similarly, we let the time interval between each step, $\tau$, be small and let the walk run for a continuous time $t=N\tau$. This changes the distribution \ref{descrete_gaussian_distr} to
 \begin{equation}
  P(x,t) = \frac{1}{2a}\sqrt{\frac{2\tau}{\pi t}}\exp\left(-\frac{x^2\tau}{2a^2t}\right). 
 \end{equation}
-The prefactor $\frac{1}{2a}$ is needed to normalize the continous probability distribution since the sepatation between each possible final position in walks with the same number of steps is $\Delta x=2a$. 
+The prefactor $\frac{1}{2a}$ is needed to normalize the continuous probability distribution since the separation between each possible final position in walks with the same number of steps is $\Delta x=2a$. 
 We also introduce the diffusion constant
 \begin{equation}
 D = \frac{a^2}{2\tau} 
@@ -84,7 +84,7 @@ making the distribution
 \begin{equation}
  P(x,t) = \sqrt{\frac{1}{4\pi Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
-Introducing $x$ also gives us the expected value and variance of x on a form which will be usefull later. 
+Introducing $x$ also gives us the expected value and variance of x on a form which will be useful later. 
 We have $x=Sa$ which means 
 $$\langle x\rangle=a\langle S\rangle$$ 
 and 
@@ -107,11 +107,11 @@ This means that the probability of finding the walker at some position x after M
 \begin{equation}
  P(x,M)\propto e^{-\frac{x^2}{2M\sigma^2}}
 \end{equation}
-Remember that the actual gaussian distribution is 
+Remember that the actual Gaussian distribution is 
 $$
 \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{(n-\mu)^2}{2\sigma^2}\right)
 $$
-We can introduce an Einstein relation $\sigma^2 = 2D\Delta t$ and the obvios relation $t = M\Delta t$ to get a more desirable exponent.
+We can introduce an Einstein relation $\sigma^2 = 2D\Delta t$ and the obvious relation $t = M\Delta t$ to get a more desirable exponent.
 We see that $\langle \Delta x^2\rangle = 2Dt$. 
 \emph{The introduction of the Einstein relation might put some restrictions on our model.}
 Normalizing the expression gives us 
@@ -131,7 +131,7 @@ From Fick's first law we know that $\vec{J} = -D\nabla C$. Inserting this gives 
  \frac{\d C}{\d t} = \nabla\cdot \left(D\cdot\nabla C\right)
 \end{equation}
 which is the diffusion equation.
-By insertion we can check that this version (\ref{rw_gaussian_distribution}) of the gaussian distribution fulfills the diffusion eqution. 
+By insertion we can check that this version (\ref{rw_gaussian_distribution}) of the Gaussian distribution fulfills the diffusion equation. 
 Starting with only the time derivative gives us
 \begin{align*}
  \frac{\d P}{\d t} = -\frac{4\pi D\exp\left(-\frac{x^2}{4Dt}\right)}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2\exp\left(-\frac{x^2}{4Dt}\right)}{4Dt^2\sqrt{4\pi Dt}} \\
@@ -146,23 +146,23 @@ and see that they are equal, meaning that the diffusion equation is satisfied.
 
 \subsection{Choosing random walk algorithm}\label{choosing_random_walk_algorithm}
 
-As this article points out \cite{farnell2005monte} the simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great succsess to model diffusion processes. 
+As this article points out \cite{farnell2005monte} the simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great success to model diffusion processes. 
 However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length according to position, thus effectively adjusting the diffusion constant of the walk as well. 
 We see then that the simplest model is rather robust, and well tested. 
 However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
 Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
-We can model brownian motion simply by using equation \ref{brownian_motion}, and we can with a bit of work expand it to model collisions between walkers as well. \\
-That beeing said, by the central limit theorem both models will after some timesteps be described by a gaussian distribution meaning that on the PDE scale we will not know the difference. 
+We can model Brownian motion simply by using equation \ref{brownian_motion}, and we can with a bit of work expand it to model collisions between walkers as well. \\
+That being said, by the central limit theorem both models will after some timesteps be described by a Gaussian distribution meaning that on the PDE scale we will not know the difference. 
 Hence it will make no sense to not use the simplest random walk model.
 
 
 \subsection{Random walks and anisotropy}\label{random_walks_and_anisotropy}
 
 Any real problem where parts of the diffusion process cannot be modelled by the continuum approximation is bound to be anisotropic. 
-There is reason to belive that an anisotropic diffusion process on the PDE level will lead to an aisotropic random walk model as well, but how do we modell this. 
+There is reason to believe that an anisotropic diffusion process on the PDE level will lead to an anisotropic random walk model as well, but how do we model this. 
 Equation \ref{steplength} shows the step length as a function of the diffusion constant. 
 If we simply replace the diffusion constant by a function $D = D(\vec{x})$ we are at least started, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
-Through their experiments they found that only adjusting the steplength will not improve the error noticably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
+Through their experiments they found that only adjusting the steplength will not improve the error noticeably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
 They went on to introduce an adjusted steplength and an adjusted step probability, a solution they landed on after trial and error. 
 The expressions they proposed are listed in equations \ref{farnell_and_gibson_1} to \ref{farnell_and_gibson_5}. 
 \begin{equation}\label{farnell_and_gibson_1}
@@ -189,10 +189,10 @@ We notice that the adjusted steplength we proposed to start with is still a part
 \subsection{Random walks and drift}\label{random_walks_and_drift}
 
 Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
-Initially one thought that diffusion in the ECS of the brain was governed by a drift term , but the modern preception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
+Initially one thought that diffusion in the ECS of the brain was governed by a drift term , but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
 The drift term might be of importance in other applications, however, and something we should look into it.\\
 How do we model random walks with drift? \\
-A first instinct is to simply add some vector to the brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
+A first instinct is to simply add some vector to the Brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
 This approach can also be used in the fixed steplength (or variable steplength in the anisotropic case)  if we express the new step, $\vec{s}$, as
 \begin{align*}
  \vec{s} = (\pm l \text{ or }0,\pm l \text{ or }0) +\vec{d}
@@ -206,7 +206,7 @@ Where $\vec{j}$ denotes the total flux of walkers through some enclosed volume a
 Since the walkers are affected by drift the flux will consist of two terms; $\vec{j} = \vec{j}_{diff}+\vec{j}_{drift}$. 
 From Fick's first law we know that $\vec{j}_{diff} = -D\nabla C$. 
 The second flux term is the advective flux which will be equal to the average velocity of the system; $\vec{j}_{drift} = \vec{v}C$. 
-Inserting this in the continuity equation gives us the well known convection diffusion eqution (\ref{convection_diffusion_equation}).
+Inserting this in the continuity equation gives us the well known convection diffusion equation (\ref{convection_diffusion_equation}).
 \begin{equation}\label{convection_diffusion_equation}
  \frac{\d C}{\d t} = \nabla\cdot\left(D\nabla C\right)-\nabla\cdot\left(\vec{v}C\right) + S
 \end{equation}
@@ -231,8 +231,8 @@ which in turn gives us the variance
  &= N^2(p-q)^2 +4Npq +(Nd)^2 - N^2(p-q)^2 -(Nd)^2 \\
 \langle \Delta S^2\rangle &= 4Npq
 \end{align*}
-This shows us that the variance is untouched by the drift term, but not the mean which for the symmertric case is $\langle S\rangle = Nd$. 
-When we convert this to the continous variables $x$ and $t$ we get the solution shown in equation \ref{solution_convection_diffusion_eq}.
+This shows us that the variance is untouched by the drift term, but not the mean which for the symmetric case is $\langle S\rangle = Nd$. 
+When we convert this to the continuous variables $x$ and $t$ we get the solution shown in equation \ref{solution_convection_diffusion_eq}.
 \begin{equation}\label{solution_convection_diffusion_eq}
  C(x,t) = \frac{N}{\sqrt{4\pi Dt}}\exp\left(-\frac{(x-vt)^2}{4Dt}\right)
 \end{equation}
@@ -241,7 +241,7 @@ The only problem with the solution \ref{solution_convection_diffusion_eq} is tha
 In order to use it we will need an initial condition which fits the rest of the solution. 
 We try and find this by first checking by simulation if it converges towards some initial solution as $t\to0$ and if so, extrapolate this to $t=0$ as the initial condition. 
 Figure \ref{convection_diffusion_eq_initial_condition} shows the result of this little experiment, and as we clearly see it does diverge as $t\to0$. 
-However, it also converges to a Dirac deltafunction, $\delta(x)$ which is defined by its properties
+However, it also converges to a Dirac delta function, $\delta(x)$ which is defined by its properties
 \begin{align*}
 \delta(x) = \begin{cases} +\infty, & x = 0 \\ 0, & x \ne 0 \end{cases}
 \end{align*}
@@ -249,7 +249,7 @@ and
 \begin{equation*}
  \int_{-\infty}^\infty \delta(x) \, dx = 1
 \end{equation*}
-The Dirac delta function often sought as an inital condition in experimental setups for measurements on diffusion processes because of its compatibility with a variety of diffusion equations, and should do a very good job in our numerical setup as well. 
+The Dirac delta function often sought as an initial condition in experimental setups for measurements on diffusion processes because of its compatibility with a variety of diffusion equations, and should do a very good job in our numerical setup as well. 
 
 \begin{figure}[H]
  \centering
@@ -269,7 +269,7 @@ To maintain a bit of generality we will look at the (potentially) anisotropic di
 where f is some source term. 
 The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will mostly have the same approximation. \\
 We start off by doing the innermost derivative in one dimension. 
-The generalization to more dimesions is trivial, and will consist of adding the same terms for the y and z derivatives. 
+The generalization to more dimensions is trivial, and will consist of adding the same terms for the y and z derivatives. 
 \begin{align*}
  \left[\frac{d}{dx}u\right]^n \approx \frac{u^n_{i+1/2}-u^n_{i-1/2}}{\Delta x}
 \end{align*}
@@ -319,7 +319,7 @@ If we insert for a few steps we see that this takes the form of
 This can be solved very efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
 We implement the Backward Euler discretization in order to efficiently simulate for longer times, and by extension to test the effects the longer time steps will have on the random walk model. \\
 We would, of course, also like an implicit solver in 2 and 3d as well to make sure that we can take longer time steps here as well. 
-Doing the BE discretization in 2d gives us a slightly more difficult linear problem (eq \ref{backward_euler_2d}), which is still sparse, but we do not have any simple, efficient solver for five-band matrices. 
+Doing the BE discretization in 2d gives us a slightly more difficult linear problem (eq \ref{linear_system_BE2D}), which is still sparse, but we do not have any simple, efficient solver for five-band matrices. 
 Further difficulties arise when we attempt to implement Neumann boundary conditions of girds larger than $3\times3$ since the off-diagonal elements do not ``hit'' their intended matrix-elements. 
 In order to use the 2D BE scheme we must either invert a cubic matrix and multiply it by a normal matrix, or we will have to start rearranging the elements in the vectors (converted matrices) and the entries in the linear-problem matrix correspondingly. 
 All things considered, we will therefore try and find another implicit scheme for our 2D problem. 
@@ -336,7 +336,10 @@ We can write this as two standard equations on the form
 \mathcal{A}_{1/2}\mathbf{u}^{n+1/2} = \mathbf{u}^n \\
 \mathcal{A}_{1}\mathbf{u}^{n+1} = \mathbf{u}^{n+1/2} 
 \end{align*}
-Note that the indices are only intended as labels. For a $3\times3$ mesh the equations are shown in the appendix.
+Note that the indices are only intended as labels. For a $3\times3$ mesh the equations are shown in the appendix.\\
+After more carefull calculations, we find that the ADI discretization does not, in fact, produce a tridiagonal linear problem when we introduce the Neumann boudary conditions. 
+While the scheme is still a viable alternative for other applications, considering its second order convergence, there is no benefit in using it for our application and we can concentrate on the normal Bacward Euler discretization using a pre-exisiting solver for the linear problem as a first approach. 
+
 
 
 
@@ -349,14 +352,14 @@ We start out by assuming that the solution $u(x,t)$ is on the form
 \begin{equation}\label{von_neumann_fourier_solution}
  u(x,t) = A^n\exp(ikp\Delta x)
 \end{equation}
-where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which, for the solution \ref{} ideally should be $\exp(-\pi^2t)$, but will be something else in the numerical case. 
+where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which, for the solution \ref{von_neumann_fourier_solution} ideally should be $\exp(-\pi^2t)$, but will be something else in the numerical case. 
 We notice that we must have $\left|A\right|\leq 1$ if $u$ is to not blow up. 
 Inserting \ref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives us the following
 \begin{align*}
  \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= A^n\frac{D\Delta t}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
   A^n\exp(ikp\Delta x)\left(A-1\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
 \end{align*}
-Using the well known identies $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
+Using the well known identities $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
 \begin{equation}
  A-1 = \frac{D\Delta t}{\Delta x^2}\sin^2\left(\frac{k\Delta x}{2}\right)
 \end{equation}
@@ -384,7 +387,7 @@ We can do better than this by using another discretization scheme for the PDE, b
 Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
 Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per meshpoint in the walk-area. 
-This will be such a costly operation that it will not necesarily be worth it.\\
+This will be such a costly operation that it will not necessarily be worth it.\\
 The spatial derivative also has a well defined residual which is found by Taylor expansion.
 \begin{equation}
 R = \frac{u(x_{i+1})-2u(x_i)+u(x_{i-1})}{\Delta x^2}-u''(x_i) 
@@ -395,7 +398,7 @@ Remember Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac
  &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} -u'(x_i)\\
 R &= u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
 \end{align*}
-There are discretisations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will allways be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative.
+There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative.
 
 
 \section{Combining the two solvers}\label{combining_the_solvers}
@@ -409,8 +412,8 @@ The method for adding walk-areas will map them to an index and set the initial c
 In the future we plan to add the possibility of setting boundary conditions and having anisotropy follow into the random walk solvers as well.
 At each timestep we call the solve-method of the combined solver, which in turn calls the solve method for the PDE-solver. 
 We then loop over the random walk solvers and call their solve-methods. 
-The results of these are inserted in the solution from the PDE using some rutine (e.g. the average of the two) and the timestep is done. 
-A schematic of the algoritm is provided in figure \ref{schematic}.
+The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the timestep is done. 
+A schematic of the algorithm is provided in figure \ref{schematic}.
 
 \begin{figure}[H]
 \centering
@@ -418,7 +421,7 @@ A schematic of the algoritm is provided in figure \ref{schematic}.
 \caption[Algorithm]{Schematic diagram of the algorithm.}
 \label{schematic}
 \end{figure}
-
+section
 \subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
 
 There are a few obvious difficulties we can expect to run into in our planned project. 
@@ -426,9 +429,9 @@ Future ones will be added here as well.
 
 \begin{itemize}
  \item Different timescales\\
-  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definately have an impact on the error. 
+  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
   The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
-  Depending on the couplig chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
+  Depending on the coupling chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
   Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
   It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
  \item Boundary conditions\\
@@ -437,29 +440,31 @@ Future ones will be added here as well.
  We can assume that the number of walkers in the walk-domain is conserved for each PDE-timestep, and thus no walkers can escape the domain. 
  Implementing perfectly reflecting boundaries solves this quite well. 
  This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
- Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) untill we have the desired concentration of walkers.
+ Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until we have the desired concentration of walkers.
  \item Negative concentration of walkers \\
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
  Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it might do). 
  The solution to this is simply to store the signs of the solution to the PDE in an array, and send only positive values to the random walk solver. 
  When we convert the number of walkers back to a PDE solution we still have the sign from before and can multiply the concentration by the sign it had in the last timestep. 
  \item Smooth solutions\\
- A diffusion process is very effective when it comes to dampig fast fluctuations, and so any solution of the diffusion equation will be smooth. 
- When we itroduce a stochastic process, we will potentially also introduce fast fluctutations from one timestep to the next. 
+ A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
+ When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one timestep to the next. 
  In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
  The approach we use to this is to do some curve-fitting using both of the solutions. 
  This will give us some difference between the two models and some smoothness.
  \item Number of timesteps on the random walk level\\
- As the timestep on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of wether or not to increase the number of timesteps on the RW level. 
- Strictly speaking we do not have to do this, seeing as we adjust the steplength of the walkers wrt the timestep (see eq \ref{steplength}). 
+ As the timestep on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of timesteps on the RW level. 
+ Strictly speaking we do not have to do this, seeing as we adjust the steplength of the walkers with respect to the timestep (see eq \ref{steplength}). 
  As an initial value we put the number of timesteps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
  The question really boils down to how we define our model, which we have yet to do in an accurate way.
-
+ \item Random walks in 3D\\
+ Both 1 and 2 dimensional space are spanned completely by a random walk, but space of 3 or more dimensions is not. 
+ This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
 \end{itemize}
 
 \subsection{Probability distribution and timesteps}\label{probability_distribution_and_timesteps}
-As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the gaussian distribution. 
-In our application, however, we are not interrested in finding the walker at an exact position, but in an interval around the meshpoints sent to the walk-solver. 
+As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
+In our application, however, we are not interested in finding the walker at an exact position, but in an interval around the mesh-points sent to the walk-solver. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
 We will also run the walk solver for some $N$ timesteps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
 This slightly modifies our distribution into

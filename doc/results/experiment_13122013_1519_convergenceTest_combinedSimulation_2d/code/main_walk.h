@@ -12,7 +12,7 @@
 #include <fstream>
 
 #include <time.h>
-#include <armadillo>
+// #include <armadillo>
 
 #include "Walk.h"
 #include "Diffusion.h"

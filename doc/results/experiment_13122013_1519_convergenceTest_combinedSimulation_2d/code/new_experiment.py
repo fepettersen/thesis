@@ -64,8 +64,7 @@ class Experiment:
 		self.samples = 0
 
 	def compile(self):
-		# os.system('g++ *.cpp -O2 -o -larmadillo -llapack -lblas main_walk')
-		os.system('g++ *.cpp -o main_walk -O2 -larmadillo -llapack -lblas')
+		os.system('g++ *.cpp -O2 -o main_walk')
 
 	def SetupRun(self,x0,x1,y0,y1,m,n,T,dt,filename="a"):
 		self.x0 = x0; self.x1 = x1; self.y0 = y0; self.y1 = y1
@@ -345,7 +344,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return u
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -358,15 +357,15 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 41
 	n = 41
-	T = 100
+	T = 490
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
 	dt = 0.001
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [1600]
+	# Hc = [1600]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
-	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
+	Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
@@ -377,14 +376,14 @@ if __name__ == '__main__':
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
 	run.VerifyDeterministicError()
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(h)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	h = [1./Hc[i] for i in range(len(Hc))]
+	run.ConvergenceTest(h)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
@@ -393,7 +392,7 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
-	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')

@@ -340,7 +340,7 @@ The effect of
 \label{Errortest_convection_diffusion_walkers:more_walkers}
 \end{subfigure}
 \caption[Adding walkers influenced by drift]{The figure shows the effect adding walkers influenced by drift has on the error. 
-The drift term is the step length, which is quite large. The strangest thig is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrong in relation to the steplength. $\Delta t =8e-5$}
+The drift term is the step length, which is quite large. The strangest thing is, however, that changing the direction of the drift has little effect on the error, suggesting that the drift term is completely wrong in relation to the steplength. $\Delta t =8e-5$}
 \label{Errortest_convection_diffusion_walkers}
 \end{figure}
 
@@ -388,7 +388,7 @@ The exact numerical solution of the FE scheme can be found in equation \ref{exac
 The result of a test simulation of this, using the initial condition in equation \ref{initial_condition_2d_numex}, is shown in figure \ref{exact_numerical_2d_n130}. 
 Again, as in we did in 1d, we see that although the error is very small, and start out with machine precision, it does increase and even more than in the 1d case. 
 This is \emph{probably} because of the terms we have do drop in the exact numerical solution due to overflow and so on, which accumulate in the numerical solution from the scheme. 
-We should, in other words, be pleased that the error starts out with machine precision, and stays small for the ammount of time steps we can simulate and still have something to compare it with.
+We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
 
 \begin{equation}\label{exact_numerical_solution_2d}
  u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]

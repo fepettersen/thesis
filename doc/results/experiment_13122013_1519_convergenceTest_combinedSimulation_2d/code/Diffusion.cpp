@@ -1,7 +1,6 @@
 #include "main_walk.h"
 // #include "armadillo"
 using namespace std;
-using namespace arma;
 
 
 
@@ -289,172 +288,110 @@ void Diffusion::tridiag(double *u, double *f, int N, double *a, double *b, doubl
 }
 
 void Diffusion::BE2D(double **U, double **Up, int m, int n){
-	/*We will need Armadillo!*/
-	int N = m*n;
-	vec Uptmp = zeros(N);
-	// double *b = new double[N];
-	// double *a = new double[m*n];
-	// double *c = new double[m*n];
+	double *Utmp = new double[m*n];
+	double Uptmp[m*n];
+	double *b = new double[m*n];
+	double *a = new double[m*n];
+	double *c = new double[m*n];
+	double alpha = D*dt/(2*dx*dx);
 	double beta = D*dt/(2*dy*dy);
-	double alpha = 	D*dt/(2*dx*dx);
-	double gamma = 1+2*alpha+2*beta;
-	vec Utmp = zeros(N);
+	double b1 = (1-2*beta);
+	int k=0;
+	for(int i=0; i<m;i++){
+		Uptmp[k] = 2*beta*Up[i][1] + (1-2*beta)*Up[i][0];
+		a[k] = 0;
+		c[k] = -2*alpha;
+		b[k] = (1.+2*alpha);
+		k++;
+		for(int j=1;j<(n-1);j++){
+			Uptmp[k] = beta*Up[i][j+1] + (1.-2*beta)*Up[i][j] + beta*Up[i][j-1];
+			a[k] = -alpha;
+			c[k] = -alpha;
+			b[k] = (1.+2*alpha);
+			k++;
+		}
+		Uptmp[k] = 2*beta*Up[i][n-2] + (1-2*beta)*Up[i][n-1];
+		a[k] = -2*alpha;
+		c[k] = 0;
+		b[k] = (1+2*alpha);
+		k++;
+	}
+	////////////////////////////////
+	tridiag(Utmp,Uptmp,m*n,a,b,c);//
+	////////////////////////////////
 
-	mat A = eye(m*n,m*n);
-	A *= gamma;
-	// fill_diagonal(A,gamma);
-	for (int i=0;i<m;i++){
-		A(i,i+n) = -2*alpha;
-		A(N-i-1,N-i-n-1) = -2*alpha;
-	}
-	int k = 0;
-	for (int i=0;i<m;i++){
-		A(k,k+1) = -2*beta;
-		if (k>(m-1) && k<(N-m)){
-			A(k,k+m) = -alpha;
-			A(k,k-m) = -alpha;
+	k=0;
+	for(int i=0; i<m;i++){
+		for(int j=0; j<n; j++){
+			Up[i][j] = Utmp[k];
+			k++;
 		}
+	}
+
+	k=0;
+	for(int i=0; i<n;i++){
+		Uptmp[k] = 2*alpha*Up[1][i]+(1-2*alpha)*Up[0][i];
+		if(i==0){
+			a[k] = 0;
+			c[k] = -2*beta;
+		}
+		else if (i==m-1){
+			a[k] = -2*beta;
+			c[k] = 0;
+		}
+		else{
+			a[k] = -beta;
+			c[k] = -beta;
+		}
+		b[k] = (1+2*beta);
 		k++;
-		for (int j=1;j<(n-1);j++){
-			A(k,k+1) = -beta;
-			A(k,k-1) = -beta;
-			if (k>(m-1) && k<(N-m)){
-				A(k,k+m) = -alpha;
-				A(k,k-m) = -alpha;
+	}
+	for(int i=1;i<(m-1);i++){
+		for(int j=0;j<n;j++){
+			Uptmp[k] = alpha*Up[i+1][j] + (1-2*alpha)*Up[i][j] + alpha*Up[i-1][j];
+			if(j==0){
+				a[k] = 0;
+				c[k] = -2*beta;
 			}
+			else if(j==n-1){
+				a[k] = -2*beta;
+				c[k] = 0;
+			}
+			else{
+				a[k] = -beta;
+				c[k] = -beta;
+			}
+			b[k] = (1+2*beta);
 			k++;
 		}
-		A(k,k-1) = -2*beta;
-		if(k>(m-1) && k<(N-m)){
-			A(k,k+m) = -alpha;
-			A(k,k-m) = -alpha;
+	}
+	for(int i=0; i<n;i++){
+		Uptmp[k] = 2*alpha*Up[m-2][i]+(1-2*alpha)*Up[m-1][i];
+		if(i==0){
+			a[k] = 0;
+			c[k] = -2*beta;
 		}
+		else if (i==m-1){
+			a[k] = -2*beta;
+			c[k] = 0;
+		}
+		else{
+			a[k] = -beta;
+			c[k] = -beta;
+		}
+		b[k] = (1+2*beta);
 		k++;
 	}
+
+	////////////////////////////////
+	tridiag(Utmp,Uptmp,m*n,a,b,c);//
+	////////////////////////////////
 	k=0;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n; j++){
-			Uptmp[k] = Up[i][j];
-			k++;
-		}
-	}
-	// A.print();
-	Utmp = solve(A,Uptmp);
-	k=0;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n; j++){
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++){
+			Up[i][j]=Uptmp[k];
 			U[i][j] = Utmp[k];
 			k++;
 		}
 	}
 }
-
-// void Diffusion::BE2D(double **U, double **Up, int m, int n){
-// 	double *Utmp = new double[m*n];
-// 	double Uptmp[m*n];
-// 	double *b = new double[m*n];
-// 	double *a = new double[m*n];
-// 	double *c = new double[m*n];
-// 	double alpha = D*dt/(2*dx*dx);
-// 	double beta = D*dt/(2*dy*dy);
-// 	double b1 = (1-2*beta);
-// 	int k=0;
-// 	for(int i=0; i<m;i++){
-// 		Uptmp[k] = 2*beta*Up[i][1] + (1-2*beta)*Up[i][0];
-// 		a[k] = 0;
-// 		c[k] = -2*alpha;
-// 		b[k] = (1.+2*alpha);
-// 		k++;
-// 		for(int j=1;j<(n-1);j++){
-// 			Uptmp[k] = beta*Up[i][j+1] + (1.-2*beta)*Up[i][j] + beta*Up[i][j-1];
-// 			a[k] = -alpha;
-// 			c[k] = -alpha;
-// 			b[k] = (1.+2*alpha);
-// 			k++;
-// 		}
-// 		Uptmp[k] = 2*beta*Up[i][n-2] + (1-2*beta)*Up[i][n-1];
-// 		a[k] = -2*alpha;
-// 		c[k] = 0;
-// 		b[k] = (1+2*alpha);
-// 		k++;
-// 	}
-// 	////////////////////////////////
-// 	tridiag(Utmp,Uptmp,m*n,a,b,c);//
-// 	////////////////////////////////
-
-// 	k=0;
-// 	for(int i=0; i<m;i++){
-// 		for(int j=0; j<n; j++){
-// 			Up[i][j] = Utmp[k];
-// 			k++;
-// 		}
-// 	}
-
-// 	k=0;
-// 	for(int i=0; i<n;i++){
-// 		Uptmp[k] = 2*alpha*Up[1][i]+(1-2*alpha)*Up[0][i];
-// 		if(i==0){
-// 			a[k] = 0;
-// 			c[k] = -2*beta;
-// 		}
-// 		else if (i==m-1){
-// 			a[k] = -2*beta;
-// 			c[k] = 0;
-// 		}
-// 		else{
-// 			a[k] = -beta;
-// 			c[k] = -beta;
-// 		}
-// 		b[k] = (1+2*beta);
-// 		k++;
-// 	}
-// 	for(int i=1;i<(m-1);i++){
-// 		for(int j=0;j<n;j++){
-// 			Uptmp[k] = alpha*Up[i+1][j] + (1-2*alpha)*Up[i][j] + alpha*Up[i-1][j];
-// 			if(j==0){
-// 				a[k] = 0;
-// 				c[k] = -2*beta;
-// 			}
-// 			else if(j==n-1){
-// 				a[k] = -2*beta;
-// 				c[k] = 0;
-// 			}
-// 			else{
-// 				a[k] = -beta;
-// 				c[k] = -beta;
-// 			}
-// 			b[k] = (1+2*beta);
-// 			k++;
-// 		}
-// 	}
-// 	for(int i=0; i<n;i++){
-// 		Uptmp[k] = 2*alpha*Up[m-2][i]+(1-2*alpha)*Up[m-1][i];
-// 		if(i==0){
-// 			a[k] = 0;
-// 			c[k] = -2*beta;
-// 		}
-// 		else if (i==m-1){
-// 			a[k] = -2*beta;
-// 			c[k] = 0;
-// 		}
-// 		else{
-// 			a[k] = -beta;
-// 			c[k] = -beta;
-// 		}
-// 		b[k] = (1+2*beta);
-// 		k++;
-// 	}
-
-// 	////////////////////////////////
-// 	tridiag(Utmp,Uptmp,m*n,a,b,c);//
-// 	////////////////////////////////
-// 	k=0;
-// 	for(int i=0;i<m;i++){
-// 		for(int j=0;j<n;j++){
-// 			Up[i][j]=Uptmp[k];
-// 			U[i][j] = Utmp[k];
-// 			k++;
-// 		}
-// 	}
-// }
-// 	double alpha = D*dt/(2*dx*dx);

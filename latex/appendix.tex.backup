@@ -23,13 +23,13 @@ Solving the two equations above on the mentioned $3\times3$ grid gives us 18 equ
 \begin{align}
   \left(\begin{array}{c c c c c c c c c}
         1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0 &0\\
-        0 & 1+2\alpha & -2\alpha &0 &0 &0 &0 &0 &0\\
-        0& 0 & 1+2\alpha & -2\alpha & 0 & 0 &0&0&0\\
-        0& 0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0&0\\
+        -\alpha & 1+2\alpha & -\alpha &0 &0 &0 &0 &0 &0\\
+        0& -2\alpha & 1+2\alpha & 0 & 0 & 0 &0&0&0\\
+        0& 0&0 & 1+2\alpha & -2\alpha & 0 & 0 &0&0\\
         0& 0&0&-\alpha & 1+2\alpha & -\alpha & 0 & 0 &0\\
-        0& 0&0&0&-\alpha & 1+2\alpha & -\alpha & 0 &0\\
-        0& 0 &0 &0 &0&-2\alpha & 1+2\alpha & 0&0\\
-        0& 0 &0 &0 &0&0&-2\alpha & 1+2\alpha &0\\
+        0& 0&0&0&-2\alpha & 1+2\alpha & 0 & 0 &0\\
+        0& 0 &0 &0 &0&0 & 1+2\alpha & -2\alpha&0\\
+        0& 0 &0 &0 &0&0&-\alpha & 1+2\alpha &-\alpha\\
          0&0 &0 &0&0 &0&0&-2\alpha & 1+2\alpha
        \end{array}\right)\mathbf{u}^{n+1/2} = \mathbf{f}
 \end{align}
@@ -84,7 +84,9 @@ Using the BE discretization on the simple 2D diffusion equation will yield the g
  \underbrace{-\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{n+1}_{i,j+1}+u^{n+1}_{i,j-1}\right)
 \end{equation}
 This can, again, be written as a linear problem where the vectors are simply the matrices $u^n$ and $u^{n+1}$ written as column vectors. 
-The matrix is written out for a $3\times3$ grid with no-flux Neumann boundary conditions in equation \ref{linear_system_BE2D}.
+The matrix is written out for a $3\times3$ grid with no-flux Neumann boundary conditions in equation \ref{linear_system_BE2D}. 
+We see that it is a five-band diagonal matrix, and so the tridiagonal solver cannot be used in this case. It is fully possible to use for example a Gaussian elimination in order to solve this equation, but it will require $\frac{2}{3}\mathcal{O}(n^3)$ operations per time step, where n is the size of the matrix (in this case $n=9$). 
+Another way to solve this equation, and by extension use the BE scheme, is to use some form of sparse LU decomposition.
 \begin{align}\label{linear_system_BE2D}
   \left(\begin{array}{c c c c c c c c c}
         \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
@@ -98,3 +100,4 @@ The matrix is written out for a $3\times3$ grid with no-flux Neumann boundary co
          0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
        \end{array}\right)\mathbf{u}^{n} = \mathbf{u}^{n+1}
 \end{align}
+When we try to implement Neumann 

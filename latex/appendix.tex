@@ -1,4 +1,4 @@
-\section{Appendix}
+\section{Various calculations}
 
 In this appendix some more tedious and rather boring, but no less important calculations can be found. 
 We will also list some algorithms that are important, but not quite in the scope of this thesis.
@@ -77,6 +77,7 @@ The vectors $\mathbf{u}^{n+1/2}$, $\mathbf{f}$, $\mathbf{u}^{n+1}$ and $\mathbf{
 \end{align}
 
 \subsection{Backward Euler scheme in 2D}
+
 Using the BE discretization on the simple 2D diffusion equation will yield the general scheme in equation \ref{general_scheme_BE2D}.
 \begin{equation}\label{general_scheme_BE2D}
  u^{n}_{i,j} = \underbrace{\frac{-D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{n+1}_{i+1,j}+u^{n+1}_{i-1,j}\right) +
@@ -85,7 +86,8 @@ Using the BE discretization on the simple 2D diffusion equation will yield the g
 \end{equation}
 This can, again, be written as a linear problem where the vectors are simply the matrices $u^n$ and $u^{n+1}$ written as column vectors. 
 The matrix is written out for a $3\times3$ grid with no-flux Neumann boundary conditions in equation \ref{linear_system_BE2D}. 
-We see that it is a five-band diagonal matrix, and so the tridiagonal solver cannot be used in this case. It is fully possible to use for example a Gaussian elimination in order to solve this equation, but it will require $\frac{2}{3}\mathcal{O}(n^3)$ operations per time step, where n is the size of the matrix (in this case $n=9$). Another way to solve this equation, and by extension use the BE scheme, is to use some form of sparse LU decomposition.
+We see that it is a five-band diagonal matrix, and so the tridiagonal solver cannot be used in this case. It is fully possible to use for example a Gaussian elimination in order to solve this equation, but it will require $\frac{2}{3}\mathcal{O}(n^3)$ operations per time step, where n is the size of the matrix (in this case $n=9$). 
+Another way to solve this equation, and by extension use the BE scheme, is to use some form of sparse LU decomposition.
 \begin{align}\label{linear_system_BE2D}
   \left(\begin{array}{c c c c c c c c c}
         \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
@@ -99,3 +101,20 @@ We see that it is a five-band diagonal matrix, and so the tridiagonal solver can
          0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
        \end{array}\right)\mathbf{u}^{n} = \mathbf{u}^{n+1}
 \end{align}
+When we try to implement Neumann boundary conditions for grids that are larger than $3\times3$ we come across a problem. 
+Doing the matrix-vector multiplication in equation \ref{linear_system_BE2D} reproduces the BE scheme with boundary conditions perfectly. 
+However, if we extend to a $4\times4$ grid using a matrix on the same form we will start producing equations which will not arise from the scheme. 
+This is illustrated in eqs. \ref{first_eq_BE2D_scheme} and \ref{first_eq_BE2D_linear_system}. 
+Moving the off-diagonal entries with $\alpha$ one more column to the right and left will solve the problem, but this will force us to use some more general solver of a sparse linear system. 
+All in all we will probably be better off using another scheme (at least in 2D).\\
+The first equation that arises from the BE scheme in 2D (where $i=j=0$) is
+\begin{equation}\label{first_eq_BE2D_scheme}
+ u^n_{0,0} = \gamma u^{n+1}_{0,0}-2\alpha u^{n+1}_{1,0} -2\beta u^{n+1}_{0,1}
+\end{equation}
+while the first equation produced by the linear system in the $4\times4$ case is 
+\begin{equation}\label{first_eq_BE2D_linear_system}
+ u^n_{0,0} = \gamma u^{n+1}_{0,0}-2\alpha u^{n+1}_{0,3} -2\beta u^{n+1}_{0,1}
+\end{equation}
+which is an equation that will never be produced by the BE scheme. 
+In the $3\times3$ grid-case the off-diagonal matrix entries with $\alpha$ are on the third column before and after the diagonal. 
+Moving the corresponding entries to the fourth column in the $4\times4$ case, and similarly to the n'th column in the $n\times n$ case will fix the problem, but also increase the complexity of the matrix seeing as it will be $n+2$ band diagonal.
