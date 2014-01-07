@@ -296,9 +296,13 @@ class Experiment:
 		mpl.plot(error[1:])
 		mpl.show()
 
-	def SetInitialCondition(initial):
+	def SetInitialCondition(self,initial):
 		init = initial(x,y,0)
 		np.savetxt(init,'InitialCondition.txt')
+
+	def SetDiffusionTensor(self,expression):
+		tensor = expression(x,y)
+		np.savetxt(tensor,'DiffusionTensor.txt')
 
 	def exact(self,x,y,t):
 		return 0
@@ -360,13 +364,8 @@ if __name__ == '__main__':
 	x1 = 0.6
 	y1 = 0.7
 	m = 41
-<<<<<<< HEAD
 	n = 41
 	T = 100
-=======
-	n = 1
-	T = 490
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0

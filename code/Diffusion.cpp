@@ -1,5 +1,4 @@
 #include "main_walk.h"
-// #include "armadillo"
 using namespace std;
 using namespace arma;
 
@@ -265,21 +264,76 @@ void Diffusion::tridiag(double *u, double *f, int N, double *a, double *b, doubl
 }
 
 void Diffusion::BE2D(double **U, double **Up, int m, int n){
-	/*We will need Armadillo!*/
+	
+	if(t==0 || beta != D*dt/(2*dy*dy) ){
+		beta = D*dt/(2*dy*dy);
+		alpha = D*dt/(2*dx*dx);
+		mat A = Assemble_and_Decompose(Lower,Upper,Permutation,alpha,beta,m,n);
+	    lu(Lower, Upper, Permutation, A);
+
+	}
 	int N = m*n;
 	vec Uptmp = zeros(N);
-	// double *b = new double[N];
-	// double *a = new double[m*n];
-	// double *c = new double[m*n];
-	double beta = D*dt/(2*dy*dy);
-	double alpha = 	D*dt/(2*dx*dx);
-	double gamma = 1+2*alpha+2*beta;
+	
 	vec Utmp = zeros(N);
+    
+    double y[N];		/*Not needed??*/
+    double LUtemp;
 
-	mat A = eye(m*n,m*n);
+	int k=0;
+	for(int i=0; i<m;i++){
+		for(int j=0; j<n; j++){
+			Uptmp[k] = Up[i][j];
+			k++;
+		}
+	}
+    y[0] = Uptmp[0];
+    for(int i=1;i<N;i++){
+        /* This loop calculates y from L*y = f. It does not consider calculations
+        with 0. Results are only valid for L matrix in LU decomposition. */
+        LUtemp=0;
+        for(int j=0;j<i;j++){
+            LUtemp += Lower(i,j)*y[j];
+        }
+        y[i] = Uptmp[i] -LUtemp;
+    }
+    
+    double factor = 0;
+    Utmp[N-1] = y[N-1]/Upper(N-1,N-1);
+   
+    for(int i=N-2;i>=0;i--){
+        /*This loop continues the calculations from the previous one.
+         Calculates U*z = y, where z = v from earlier in the program.
+         Resluts are only valid for U matrix in LU decomposition. */
+        LUtemp=0;
+        for(int j=(N-1);j>=0;j--){
+            if(j==i){
+                factor = 1.0/Upper(i,j);
+                break;
+            }
+            LUtemp += Upper(i,j)*Utmp[j];
+        }
+        Utmp[i] =(y[i] -LUtemp)*factor;
+    }
+	// Utmp = solve(A,Uptmp);
+	k=0;
+	for(int i=0; i<m;i++){
+		for(int j=0; j<n; j++){
+			U[i][j] = Utmp[k];
+			k++;
+		}
+	}
+}
+
+mat Diffusion::Assemble_and_Decompose(mat Lower, mat Upper, mat Permutation,double alpha, double beta, int m, int n){
+    /*Assemble the matrix A which will be constant as long as dt is constant, 
+    and make a LU decomposition of A*/
+    double gamma = 1+2*alpha+2*beta;
+    int N = m*n;
+	mat A = eye(N,N);
 	A *= gamma;
 	// fill_diagonal(A,gamma);
-	for (int i=0;i<m;i++){
+	for(int i=0;i<m;i++){
 		A(i,i+n) = -2*alpha;
 		A(N-i-1,N-i-n-1) = -2*alpha;
 	}
@@ -307,23 +361,10 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 		}
 		k++;
 	}
-	k=0;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n; j++){
-			Uptmp[k] = Up[i][j];
-			k++;
-		}
-	}
-	// A.print();
-	Utmp = solve(A,Uptmp);
-	k=0;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n; j++){
-			U[i][j] = Utmp[k];
-			k++;
-		}
-	}
+    // lu(Lower, Upper, Permutation, A);
+	return A;
 }
+
 
 // void Diffusion::BE2D(double **U, double **Up, int m, int n){
 // 	double *Utmp = new double[m*n];

@@ -364,9 +364,10 @@ We can write this as two standard equations on the form
 \mathbf{A}_{1}\mathbf{u}^{n+1} = \mathbf{u}^{n+1/2} 
 \end{align*}
 Note that the indices are only intended as labels. For a $3\times3$ mesh the equations are shown in the appendix.\\
-After more carefull calculations, we find that the ADI discretization does not, in fact, produce a tridiagonal linear problem when we introduce the Neumann boudary conditions. 
-While the scheme is still a viable alternative for other applications, considering its second order convergence, there is no benefit in using it for our application and we can concentrate on the normal Bacward Euler discretization using a pre-exisiting solver for the linear problem as a first approach. 
-
+After more careful calculations, we find that the ADI discretization does not, in fact, produce a tridiagonal linear problem when we introduce the Neumann boundary conditions. 
+While the scheme is still a viable alternative for other applications, considering its second order convergence, there is no benefit in using it for our application and we can concentrate on the normal Backward Euler discretization using a pre-exisiting solver for the linear problem as a first approach. \\
+As an improvement we note that the Matrix in the linear problem stays the same as long as $\Delta t$ is unchanged. This means that we can get away with assembling the matrix once, and it lets us do an LU decomposition which will reduce the number of FLOPS needed per time-step from $\mathcal{O}(N^3)$ to $\mathcal{O}(N^2)$ where $N$ is the product of the number of mesh-points in x and y direction. 
+In other words, since we have chosen the same resolution in x and y direction (and the time dependence can be related to this resolution as well for the explicit schemes) if we chose a resolution of $n$ we will need $n^4$ FLOPS per time-step as opposed to the $n^2$ for the explicit scheme.
 
 
 
@@ -394,9 +395,17 @@ We now insert for the ``worst case scenario'' $max(\sin^2\left(\frac{k\Delta x}{
 \begin{equation}
  A = \frac{D\Delta t}{2\Delta x^2}+1 \implies \Delta t\leq\frac{\Delta x^2}{2D}
 \end{equation}
-In 2d this criterion is halved, and for the anisotropic case we must insert for the maximum value of D which, again, will be the ``worst case scenario''.
-
-
+In 2d this criterion is halved, and for the anisotropic case we must insert for the maximum value of D which, again, will be the ``worst case scenario''.\\
+If we insert the same solution (eq. \ref{von_neumann_fourier_solution}) in the BE scheme we get
+\begin{align*}
+ \exp(ikp\Delta x)\left(A^{n}-A^{n-1}\right) &= A^n\frac{D\Delta t}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
+  A^n\exp(ikp\Delta x)\left(1-A^{-1}\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
+\end{align*}
+which leads to 
+\begin{equation}\label{stability_BE}
+A = \frac{1}{ 1+\frac{D\Delta t}{\Delta x^2}}
+\end{equation}
+Equation \ref{stability_BE} is smaller than 1 for all $\Delta t>0$ which means that the scheme is unconditionally stable.
 
 \subsection{Truncation error}\label{truncation_error}
 

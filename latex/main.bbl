@@ -37,8 +37,8 @@
   \field{sortinit}{F}
   \field{number}{1}
   \field{pages}{253\bibrangedash 265}
-  \field{title}{Monte Carlo simulation of diffusion in a spatially
-  nonhomogeneous medium: A biased random walk on an asymmetrical lattice}
+  \field{title}{{Monte Carlo simulation of diffusion in a spatially
+  nonhomogeneous medium: A biased random walk on an asymmetrical lattice}}
   \field{volume}{208}
   \field{journaltitle}{Journal of Computational Physics}
   \field{year}{2005}
@@ -60,7 +60,7 @@
   \field{sortinit}{N}
   \field{number}{7}
   \field{pages}{815}
-  \field{title}{Diffusion and related transport mechanisms in brain tissue}
+  \field{title}{{Diffusion and related transport mechanisms in brain tissue}}
   \field{volume}{64}
   \field{journaltitle}{Reports on progress in Physics}
   \field{year}{2001}
