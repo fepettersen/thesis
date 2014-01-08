@@ -36,21 +36,20 @@ void output(ofstream* outfile, double **u, string buffer, string path,string fil
     // delete(&tmp);
 }
 
-void FromFile(double **array, string filename,int m, int n){
-	ifstream infile (filename.c_str());
+void FromFile(double **array, string filename){
+	ifstream infile (filename);
 	string sub;
 	string line;
 	int k = 0;
 	for(int i=0;i<m;i++){
 		getline(infile,line);
-		istringstream iss(line);
 		k =0;
-		for(int j=0;j<n;j++){
-			sub = "";
+		do{
+			sub = ""
 			iss >>sub;
 			array[i][k] = atof(sub.c_str());
 			k++;
-		}
+		}while(iss)
 	}
 }
 #define PI 3.1415926535897932;
@@ -126,12 +125,11 @@ int main(int argc, char** argv)
 			// C[i][j] = 0;
 		}
 	}
-	cout<<"balle"<<endl;
-	FromFile(Up,"InitialCondition.txt",m,n);
-	FromFile(aD,"DiffusionTensor.txt",m,n);
+	FromFile(Up,"InitialCondition.txt");
+	FromFile(aD,"DiffusionTensor.txt");
 	// C[0][0] = conversion_factor;
 	// U[0][0] = 1.0;
-	cout<<"balle2"<<endl;
+
 
 	string RWname = "RWname";
 	bool test_convergence = false;

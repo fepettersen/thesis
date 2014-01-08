@@ -42,15 +42,17 @@ void FromFile(double **array, string filename,int m, int n){
 	string line;
 	int k = 0;
 	for(int i=0;i<m;i++){
+		cout<<"i = "<<i<<endl;
 		getline(infile,line);
 		istringstream iss(line);
 		k =0;
-		for(int j=0;j<n;j++){
+		do{
 			sub = "";
 			iss >>sub;
 			array[i][k] = atof(sub.c_str());
+			cout<<"sub = "<<sub<<endl;
 			k++;
-		}
+		}while(iss);
 	}
 }
 #define PI 3.1415926535897932;

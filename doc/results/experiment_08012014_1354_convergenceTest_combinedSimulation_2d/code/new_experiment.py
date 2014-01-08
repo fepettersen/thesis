@@ -296,11 +296,13 @@ class Experiment:
 		mpl.plot(error[1:])
 		mpl.show()
 
-	def SetInitialCondition(self,init):
-		np.savetxt('InitialCondition.txt',init)
+	def SetInitialCondition(self,initial):
+		init = initial(x,y,0)
+		np.savetxt(init,'InitialCondition.txt')
 
-	def SetDiffusionTensor(self,tensor):
-		np.savetxt('DiffusionTensor.txt',tensor)
+	def SetDiffusionTensor(self,expression):
+		tensor = expression(x,y)
+		np.savetxt(tensor,'DiffusionTensor.txt')
 
 	def exact(self,x,y,t):
 		return 0
@@ -362,15 +364,13 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 31
-	n = 31
-	T = 51
+	m = 3
+	n = 3
+	T = 1
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
 	dt = 0.01
-
-	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
 	Hc = [1600]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
@@ -379,8 +379,8 @@ if __name__ == '__main__':
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
-	run.SetInitialCondition(f(x,y,0))
-	run.SetDiffusionTensor(D(x,y))
+	run.SetInitialCondition(f)
+	run.SetDiffusionTensor(D)
 	run.compile()
 	# run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
