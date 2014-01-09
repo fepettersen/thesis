@@ -37,6 +37,8 @@ void output(ofstream* outfile, double **u, string buffer, string path,string fil
 }
 
 void FromFile(double **array, string filename,int m, int n){
+	/*Reads a .txt file containing a m*n matrix and saves the 
+	matrix to array.*/
 	ifstream infile (filename.c_str());
 	string sub;
 	string line;
@@ -52,6 +54,7 @@ void FromFile(double **array, string filename,int m, int n){
 			k++;
 		}
 	}
+	infile.close();
 }
 #define PI 3.1415926535897932;
 
@@ -74,7 +77,6 @@ int main(int argc, char** argv)
     double conversion_factor =atof(argv[11]);
     double Dt = strtod(argv[12],NULL);
 
-    cout<<"argv[12] = "<<argv[12]<<endl;
     string buffer;
     ofstream outfile;
 
@@ -84,54 +86,17 @@ int main(int argc, char** argv)
 	y[0] = y0; y[1] = y1;
 	double dx = 1.0/(m-1);
 	double dy = 1.0/(n-1);
-	double wth = 0;
-	double wty = 0;
 
-	int **C = new int*[m];
 	double **Up = new double*[m];
-	double **U = new double*[m];
 	double **aD = new double*[m];
-	double *X = new double[m];
-	double *Y = new double[n];
 
 	for(int i=0; i<m; i++){
-		C[i] = new int[n];
 		Up[i] = new double[n];
-		U[i] = new double[n];
 		aD[i] = new double[n];
-		X[i] = i*dx;
-	}
-	for(int j=0; j<n; j++){
-		Y[j] = j*dy;
 	}
 
-	for(int i=0; i<m; i++){
-		for(int j=0; j<n; j++){
-			if(j>=m/2){
-				C[i][j] = (int) (conversion_factor);
-				// Up[i][j] = 1.0;
-			}
-			else{
-				C[i][j] = 0;
-				// Up[i][j] = 0;
-			}
-			wth = X[j]*PI;
-			wty = Y[i]*PI;
-			Up[i][j] = cos(wth)*cos(wty);
-			// wth = X[i]*PI;
-			// Up[i][j] = cos(wth);
-			// Up[i][j] = 0;
-			// U[i][j] = 0;
-			aD[i][j] = X[i]+Y[j];//i*dx*PI;
-			// C[i][j] = 0;
-		}
-	}
-	cout<<"balle"<<endl;
 	FromFile(Up,"InitialCondition.txt",m,n);
 	FromFile(aD,"DiffusionTensor.txt",m,n);
-	// C[0][0] = conversion_factor;
-	// U[0][0] = 1.0;
-	cout<<"balle2"<<endl;
 
 	string RWname = "RWname";
 	bool test_convergence = false;
@@ -143,7 +108,6 @@ int main(int argc, char** argv)
 		BlackBox.TestRWConvergence(T,path);
 	}
 	else{
-		// output(&outfile,Up,buffer,path,filename,m,n,conversion_factor,0);
 		BlackBox.AddWalkArea(x,y);
 		for(int t=0; t<T; t++){
 			BlackBox.Solve();

@@ -5,6 +5,9 @@ using namespace arma;
 
 
 Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
+	/*Initializer for Isotropic diffusion
+	_Dx and _Dy are collections of variables to save some FLOPs
+	v is for the advection term vC*du/dx*/
 	dx = _dx;
 	dy = _dy;
 	D = _D;
@@ -27,14 +30,17 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 };
 
 Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
+	/*Initializer for anisotropic diffusion. 
+	aD denotes the diffusion "tensor" 
+	other variables are as before or collections of variables to save FLOPs*/
 	dx = _dx;
 	dy = _dy;
 	dt = Dt;
 	_Dx = dt/(dx*dx);
 	aD = D;
 	d = (dy>0)?2:1;
-	solver = 2;
-	if(d==2){
+	solver = 3;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
+	if(d==2 && solver==2){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = dt/(dx*dx);
 		_Dy = dt/(dy*dy);
@@ -51,8 +57,11 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 }
 
 void Diffusion::advance(double **U,double **Up, int m, int n){
+	/*Advaces the previous solution one timestep using the solvers 
+	specified earlier. 
+	TODO: It should be possible to change solver from python script...*/
 	if (solver==0){
-		/*Forward Euler*/
+		/*Isotropic Forward Euler*/
 		_Dx = dt/(dx*dx);
 		if(d==2){
 			_Dy = dt/(dy*dy);
@@ -73,21 +82,12 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 			boundary(U,Up,m,n);
 		}
 	}
-	else if(solver==1){
-		/*Anisotropy - Forward Euler -- use the anisotropic advection diffusion instead*/
-		_Dx = dt/(dx*dx);
-		if(d==1){
-			for(int i=1;i<(m-1);i++)
-				for(int j=0;j<1;j++){
-					U[i][j] = (_Dx/2.0)*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
-						(aD[i][j]+aD[i-1][j])*(Up[i][j]-Up[i-1][j])) + Up[i][j] + dt*f(i*dx,0,t*dt);
-				}
-			boundary(U,Up,m,n);
-		}
-	}
 	else if(solver==3){
-		/*Isotropic Bacward Euler discretization (1d)*/
+		/*Isotropic Bacward Euler discretization (1d)
+		Anisotropic BE in 2d is under development and may not work*/
 		if(d==1){
+			/*should call tridiag in stead of this mess!
+			should also support anisotropy*/
 			double a = -dt/(dx*dx);
 			double c = a;
 			double b = 1.0-2.0*a;
@@ -152,7 +152,9 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 }
 
 void Diffusion::boundary(double **U,double **Up,int m, int n){
+	/*Boundary conditions for the explicit schemes.*/
 	if(solver==0){
+		/*Isotropic FE*/
 		if(d==2){
 			for(int j=1; j<(m-1); j++){
 				U[j][0] = _Dx*(Up[j+1][0]-2*Up[j][0]+Up[j-1][0]) + 
@@ -166,6 +168,7 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 				U[m-1][i] = 2*_Dx*(Up[m-2][i]-Up[m-1][i]) + 
 				_Dy*(Up[m-1][i+1]-2*Up[m-1][i] + Up[m-1][i-1]) + Up[m-1][i];
 			}
+			/*corners*/
 			U[0][0] = 2*_Dx*(Up[1][0]-Up[0][0]) +Up[0][0] + 
 			2*_Dy*(Up[0][1]-Up[0][0]);
 
@@ -184,6 +187,7 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 		}
 	}
 	else if(solver==1 || solver==2){
+		/*Anisotropic FE (with advection)*/
 		if(d==1){
 			U[0][0] =  _Dx*((aD[1][0]+aD[0][0])*(Up[1][0]-Up[0][0])) +Up[0][0]+dt*f(0,0,t*dt);
 			U[m-1][0] = _Dx*((aD[m-2][0]+aD[m-1][0])*(Up[m-2][0]-Up[m-1][0])) +Up[m-1][0] +dt*f((m-1)*dx,0,t*dt);
@@ -205,6 +209,7 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 				(_Dy/2.0)*((aD[m-1][i+1]+aD[m-1][i])*(Up[m-1][i+1]-Up[m-1][i])-(aD[m-1][i]+aD[m-1][i-1])*(Up[m-1][i]-Up[m-1][i-1])) + 
 				Up[m-1][i]+vdtdy2*(Up[m-1][i+1]-Up[m-1][i-1])+dt*f((m-1)*dx,i*dy,t*dt);
 			}
+			/*Corners*/
 			U[0][0] = _Dx*(aD[1][0]+aD[0][0])*(Up[1][0]-Up[0][0]) +Up[0][0] + 
 			_Dy*(aD[0][1]+aD[0][0])*(Up[0][1]-Up[0][0])+dt*f(0,0,t*dt);
 
@@ -219,7 +224,7 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 		}
 	}
 	else if(solver==3){
-		/*Backward Euler*/
+		/*Backward Euler (not needed?)*/
 		if(d==1){
 			double Q = (2.0*D*dt/(dx*dx));
 			U[0][0] = (Q*U[1][0]+Up[0][0])/(1.0+Q);
@@ -234,6 +239,8 @@ void Diffusion::boundary(double **U,double **Up,int m, int n){
 
 
 double Diffusion::f(double x,double y, double t){
+	/*Source term. This should be possible to specify from somewhere. 
+	Perhaps by inheritence*/
 	double pi = 3.1415926535897932;
 	// return exp(-t*pi*pi)*pi*pi*(sin(pi*x)+cos(pi*x)*(pi*x-1));
 	// return -pi*sin(pi*x)*exp(-t*pi*pi);
@@ -244,6 +251,7 @@ double Diffusion::f(double x,double y, double t){
 }
 
 void Diffusion::tridiag(double *u, double *f, int N, double *a, double *b, double *c){
+	/*Specialized gaussian elimination for tridiagonal matrices (BE1D)*/
     double *temp = new double[N];
     for(int i=0;i<N;i++){
     	temp[i] = 0;
@@ -264,29 +272,30 @@ void Diffusion::tridiag(double *u, double *f, int N, double *a, double *b, doubl
 }
 
 void Diffusion::BE2D(double **U, double **Up, int m, int n){
-	
+	/*Backward Euler scheme in 2d. Assembles a matrix if necessary and 
+	saves a LU decomposition for further use. This will reduce the number of 
+	FLOPs needed by m*m (m must be equal to n) or one order.*/
 	int N = m*n;
-	if(t==0 || beta != D*dt/(dy*dy) ){
+	if(t==1 || beta != D*dt/(dy*dy) ){
 		beta = D*dt/(dy*dy);
 		alpha = D*dt/(dx*dx);
 		mat A = zeros(N,N);
-		if(solver==2){
+		if(solver==3){
 			A = AssembleAnisotropic(dt/(2*dx*dx),dt/(2*dx*dx),m,n);
 		}
 		else{
 			A = Assemble(alpha,beta,m,n);
 		}
-		// A.print("balle:");
 	    lu(Lower, Upper, Permutation, A);
-
 	}
 	vec Uptmp = zeros(N);
-	
 	vec Utmp = zeros(N);
+    /*Backward substitution for the equations 
+    Lower*y = Uptmp(+f)
+    Upper*Utmp = y*/
     
-    double y[N];		/*Not needed??*/
+    double y[N];
     double LUtemp;
-
 	int k=0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n; j++){
@@ -333,12 +342,12 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 }
 
 mat Diffusion::Assemble(double alpha, double beta, int m, int n){
-    /*Assemble the matrix A which will be constant as long as dt is constant*/
+    /*Assemble the matrix A which will be constant as long as dt is constant
+    Note that this matrix will implement Neumann boundary conditions*/
     double gamma = 1+2*alpha+2*beta;
     int N = m*n;
 	mat A = eye(N,N);
 	A *= gamma;
-	// fill_diagonal(A,gamma);
 	for(int i=0;i<m;i++){
 		A(i,i+n) = -2*alpha;
 		A(N-i-1,N-i-n-1) = -2*alpha;
@@ -371,21 +380,26 @@ mat Diffusion::Assemble(double alpha, double beta, int m, int n){
 }
 
 mat Diffusion::AssembleAnisotropic(double a, double b, int m, int n){
+	/*Assembles the matrix for further use in the anisotropic BE2D solver.
+	Note that this assembler implements Neumann boundary conditions.*/
 	int N = m*n;
 	mat A = zeros(N,N);
 	int k=0;
 	for (int i=0;i<m;i++){
+		A(i,i+n) = -2*a*(aD[0][i]+aD[1][i]);
+		A(N-i-1,N-i-n-1) = -2*a*(aD[m-1][i]+aD[m-2][i]);
 		for (int j=0;j<n;j++){
 			if (j==0){
 				A(k,k+1) = -2*b*(aD[i][j+1]+aD[i][j]);
-				A(k,k-1) = 0;
 				if (i==0){
 					A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
 				}
 				else if(i==m-1){
+					A(k,k-1) = 0;
 					A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
 				}
 				else{
+					A(k,k-1) = 0;
 					A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
 				}
 			}
@@ -417,32 +431,12 @@ mat Diffusion::AssembleAnisotropic(double a, double b, int m, int n){
 					A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
 				}
 			}
-			k+=1;
-		}
-	}
-	for(int i=0; i<m; i++){
-		A(i,i+n) = -2*a*(aD[0][i]+aD[1][i]);
-		A(N-i-1,N-i-n-1) = -2*a*(aD[m-1][i]+aD[m-2][i]);
-	}
-	k = 0;
-	for(int i=0; i<m; i++){
-		if (k>(m-1) && k<(N-m)){
-			A(k,k+m) = -a*(aD[i+1][0]+aD[i][0]);
-			A(k,k-m) = -a*(aD[i-1][0]+aD[i][0]);
-		}
-		k+=1;
-		for(int j=1; j<(n-1); j++){
 			if (k>(m-1) && k<(N-m)){
 				A(k,k+m) = -a*(aD[i+1][j]+aD[i][j]);
 				A(k,k-m) = -a*(aD[i-1][j]+aD[i][j]);
 			}
 			k+=1;
 		}
-		if(k>(m-1) && k<(N-m)){
-			A(k,k+m) = -a*(aD[i+1][n-1]+aD[i][n-1]);
-			A(k,k-m) = -a*(aD[i-1][n-1]+aD[i][n-1]);
-		}
-		k+=1;
 	}
 	return A;
 }

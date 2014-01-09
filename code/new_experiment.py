@@ -42,7 +42,7 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s_convergenceTest_combinedSimulation_2d'%self.datetime
+		self.parent_path = this_dir +'/doc/results/experiment_%s'%self.datetime
 		# self.parent_path = this_dir + '/doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d'
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
@@ -310,6 +310,7 @@ class Experiment:
 		if self.debug:
 			os.system('rm -rf %s'%self.parent_path)
 
+# End of class Experiment
 
 
 
@@ -348,8 +349,11 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 			tmp = np.zeros(np.shape(u))
 		u[:] += tmp
 	return u
+
 def D(x,y,t=0):
-	return x+y
+	return x
+	# return np.ones(np.shape(x))*0.5
+
 if __name__ == '__main__':
 	DEBUG = True
 	save_files = True
@@ -362,13 +366,13 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 31
-	n = 31
-	T = 51
+	m = 23
+	n = 23
+	T = 25
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = 0.01
+	dt = 0.001
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx

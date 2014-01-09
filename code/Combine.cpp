@@ -61,10 +61,10 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 		Y[j] = j*dy;
 	}
 
-	double stabilitycriteria = dx*dx/(4*abs_max(aD,m,n));
-	if(Dt>stabilitycriteria){
-		Dt = stabilitycriteria;
-	}
+	// double stabilitycriteria = dx*dx/(4*abs_max(aD,m,n));
+	// if(Dt>stabilitycriteria){
+	// 	Dt = stabilitycriteria;
+	// }
 	pde_solver = new Diffusion(dx,dy,aD,Dt);
 	Hc = factor;
 	inhomogenous = true;
@@ -221,7 +221,6 @@ void Combine::MapAreaToIndex(double *x,double *y, int **index){
 			if(fabs(x[1]-X[k])<eps)
 				index[1][0] = k;
 		}
-		/*Test that this worked*/
 	}
 	else if(d==2){
 		for(int k=0; k<m;k++){
@@ -240,8 +239,6 @@ void Combine::MapAreaToIndex(double *x,double *y, int **index){
 			}
 		}
 	}
-	// cout<<"MapAreaToIndex:"<<endl;
-	// cout<<index[0][0]<<","<<index[0][1]<<" , "<<index[1][0]<<","<<index[1][1]<<endl;
 }
 
 void Combine::SetInitialCondition(double** U0,int x,int y){	
@@ -273,8 +270,6 @@ void Combine::TestRWConvergence(int steps,string path){
 	walks.SetInitialCondition(distr,m,n);
 	for(int t=0;t<steps;t++){
 		walks.InhomogenousAdvance(C,pde_solver->dt);
-		// walks.advance(C);
-		// output...
 		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
 		ofile.open(name);
 		for(int i=0;i<m;i++){

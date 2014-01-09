@@ -30,7 +30,7 @@ Walk::Walk(int dimension, double _dt)
 {
 	if(debug_walk){cout<<"Walk::Walk"<<endl;}
 	d = dimension;
-	steps = 100;
+	steps = 100;		/*Should not be specified here!*/
 	x0 = 0; x1 = 1;
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
