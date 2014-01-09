@@ -13,6 +13,7 @@ class Diffusion
 		double D,_Dx,_Dy,vdtdx2,vdtdy2;
 		int solver; 							/*Which solver to use*/
 		int t; 									/*Timestep number*/
+		int isotropic;							/*set to zero if not*/
 		arma::mat Lower, Upper, Permutation;	/*used for the LU decomposition*/
 		double alpha,beta;						/*Saved in case dt is changed*/
 

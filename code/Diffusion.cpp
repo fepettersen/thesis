@@ -27,6 +27,7 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	}
 	t=1;
 	v = _v;
+	isotropic = 1;
 };
 
 Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
@@ -54,6 +55,7 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	v = _v;
 	vdtdx2 = (v*dt)/(2*dx);
 	vdtdy2 = (v*dt)/(2*dy);
+	isotropic = 0;
 }
 
 void Diffusion::advance(double **U,double **Up, int m, int n){
@@ -83,11 +85,10 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 		}
 	}
 	else if(solver==3){
-		/*Isotropic Bacward Euler discretization (1d)
-		Anisotropic BE in 2d is under development and may not work*/
-		if(d==1){
-			/*should call tridiag in stead of this mess!
-			should also support anisotropy*/
+		/*anisotropic BE in 2d is under development and may not work
+		1D version seems to work perfectly*/
+		if(isotropic && d==1){
+			/*should call tridiag in stead of this mess!*/
 			double a = -dt/(dx*dx);
 			double c = a;
 			double b = 1.0-2.0*a;
@@ -116,7 +117,7 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 		    boundary(U,Up,m,n);
 		    delete [] bv;
 		}
-		else if(d==2){
+		else{
 			BE2D(U,Up,m,n);
 		}
 	}
@@ -382,60 +383,75 @@ mat Diffusion::Assemble(double alpha, double beta, int m, int n){
 mat Diffusion::AssembleAnisotropic(double a, double b, int m, int n){
 	/*Assembles the matrix for further use in the anisotropic BE2D solver.
 	Note that this assembler implements Neumann boundary conditions.*/
+	
 	int N = m*n;
 	mat A = zeros(N,N);
-	int k=0;
-	for (int i=0;i<m;i++){
-		A(i,i+n) = -2*a*(aD[0][i]+aD[1][i]);
-		A(N-i-1,N-i-n-1) = -2*a*(aD[m-1][i]+aD[m-2][i]);
-		for (int j=0;j<n;j++){
-			if (j==0){
-				A(k,k+1) = -2*b*(aD[i][j+1]+aD[i][j]);
-				if (i==0){
-					A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
+	if(d==1){
+		int k=0;
+		A(k,k) = 1+2*a*(aD[1][0]+aD[0][0]);
+		A(k,k+1) = -2*a*(aD[0][0]+aD[1][0]);
+		for(k=1;k<(m-1);k++){
+			A(k,k) = 1+a*aD[k+1][0]+2*a*aD[k][0] +a*aD[k-1][0];
+			A(k,k+1) = -a*(aD[k+1][0]+aD[k][0]);
+			A(k,k-1) = -a*(aD[k-1][0]+aD[k][0]);
+		}
+		A(k,k) = 1+2*a*(aD[m-2][0]+aD[m-1][0]);
+		A(k,k-1) = -2*a*(aD[m-1][0]+aD[m-2][0]);
+	}
+	else if(d==2){
+		int k=0;
+		for (int i=0;i<m;i++){
+			A(i,i+n) = -2*a*(aD[0][i]+aD[1][i]);
+			A(N-i-1,N-i-n-1) = -2*a*(aD[m-1][i]+aD[m-2][i]);
+			for (int j=0;j<n;j++){
+				if (j==0){
+					A(k,k+1) = -2*b*(aD[i][j+1]+aD[i][j]);
+					if (i==0){
+						A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
+					}
+					else if(i==m-1){
+						A(k,k-1) = 0;
+						A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
+					}
+					else{
+						A(k,k-1) = 0;
+						A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
+					}
 				}
-				else if(i==m-1){
-					A(k,k-1) = 0;
-					A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
+				else if (j==n-1){
+					if(k != (m*n-1)){
+						A(k,k+1) = 0;
+					}
+					A(k,k-1) = -2*b*(aD[i][j-1]+aD[i][j]);
+					if (i==0){
+						A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][j-1];
+					}
+					else if (i==m-1){
+						A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) +2*b*aD[i][j-1];
+					}
+					else{
+						A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) +2*b*aD[i][j-1];
+					}
 				}
-				else{
-					A(k,k-1) = 0;
-					A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][1];
+				else if(j!=0){
+					A(k,k+1) = -b*(aD[i][j+1]+aD[i][j]);
+					A(k,k-1) = -b*(aD[i][j-1]+aD[i][j]);
+					if (i==0){
+						A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
+					}
+					else if( i==m-1){
+						A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
+					}
+					else{
+						A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
+					}
 				}
+				if (k>(m-1) && k<(N-m)){
+					A(k,k+m) = -a*(aD[i+1][j]+aD[i][j]);
+					A(k,k-m) = -a*(aD[i-1][j]+aD[i][j]);
+				}
+				k+=1;
 			}
-			else if (j==n-1){
-				if(k != (m*n-1)){
-					A(k,k+1) = 0;
-				}
-				A(k,k-1) = -2*b*(aD[i][j-1]+aD[i][j]);
-				if (i==0){
-					A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + 2*b*aD[i][j-1];
-				}
-				else if (i==m-1){
-					A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) +2*b*aD[i][j-1];
-				}
-				else{
-					A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) +2*b*aD[i][j-1];
-				}
-			}
-			else if(j!=0){
-				A(k,k+1) = -b*(aD[i][j+1]+aD[i][j]);
-				A(k,k-1) = -b*(aD[i][j-1]+aD[i][j]);
-				if (i==0){
-					A(k,k) = 1+2*a*aD[1][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
-				}
-				else if( i==m-1){
-					A(k,k) = 1+2*a*aD[m-2][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
-				}
-				else{
-					A(k,k) = 1+a*aD[i+1][j]+a*aD[i-1][j] + aD[i][j]*(2*a+2*b) + b*aD[i][j+1]+b*aD[i][j-1];
-				}
-			}
-			if (k>(m-1) && k<(N-m)){
-				A(k,k+m) = -a*(aD[i+1][j]+aD[i][j]);
-				A(k,k-m) = -a*(aD[i-1][j]+aD[i][j]);
-			}
-			k+=1;
 		}
 	}
 	return A;

@@ -385,8 +385,9 @@ if __name__ == '__main__':
 	run.exact = f
 	run.SetInitialCondition(f(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
-	run.compile()
 	# run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
+	# run.SetDiffusionTensor(D(np.linspace(0,1,m),np.zeros(m)))
+	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
