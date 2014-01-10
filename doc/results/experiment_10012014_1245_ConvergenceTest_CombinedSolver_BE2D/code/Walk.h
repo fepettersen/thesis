@@ -8,8 +8,7 @@ class Walk
 
 		int nwalkers, steps;
 		double **area, **aD;
-		// double **walkers;	//Array of the positions of all the walkers
-		std::vector<double*> walkers;
+		double **walkers;	//Array of the positions of all the walkers [[0.1,0.2],[0.2,0.3],...]
 		int d,m,n;
 		double factor,dt,D;
 		double x0, x1, y0, y1, z0, z1;
@@ -35,13 +34,9 @@ class Walk
 		void SetDiffusionConstant(double);
 
 		void ResetWalkers(){
-			std::cout<<"Walk::ResetWalkers"<<std::endl;
-			walkers.clear();
-			// for(int k=0;k<nwalkers;k++)
-			// 	delete [] walkers[k];
-				// for(int l=0; l<d; l++)
-				// 	walkers[k][l] = 0;
-			// delete [] walkers;
+			for(int k=0;k<nwalkers;k++)
+				for(int l=0; l<d; l++)
+					walkers[k][l] = 0;
 		};
 		// double ran0(long*);
 

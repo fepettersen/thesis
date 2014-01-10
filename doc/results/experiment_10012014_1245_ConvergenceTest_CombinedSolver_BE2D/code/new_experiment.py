@@ -42,7 +42,7 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s'%self.datetime
+		self.parent_path = this_dir +'/doc/results/experiment_%s_ConvergenceTest_CombinedSolver_BE2D'%self.datetime
 		# self.parent_path = this_dir + '/doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d'
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
@@ -362,7 +362,7 @@ def D(x,y,t=0):
 	# return np.ones(np.shape(x))*0.5
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -373,9 +373,9 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 41
-	n = 41
-	T = 66
+	m = 42
+	n = 42
+	T = 2560
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
@@ -385,7 +385,7 @@ if __name__ == '__main__':
 	print 'Python: ',dt,' dx: ',dx
 	Hc = [1600]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
-	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
+	Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
@@ -398,20 +398,20 @@ if __name__ == '__main__':
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
+	run.VerifyDeterministicError()
 
 	for i in Hc:
 		print "Hc = %g"%i
 		run.RunSimulation(i)
 	time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
 	h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(h)
+	run.ConvergenceTest(h)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
-	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
+	run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
 	# run.Visualize(viz_type=None)
 
@@ -423,4 +423,3 @@ if __name__ == '__main__':
 
 	run.Finish()
 # g++ *.cpp -O2 -Wall -o main_walk
-

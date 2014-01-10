@@ -52,11 +52,8 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 		for(int j=0; j<n;j++){
 			nwalkers += C[i][j];
 		}
-	}	
-	cout<<"nwalkers = "<<nwalkers<<endl;
-
-	// walkers = new double*[nwalkers];
-	walkers.resize(nwalkers);
+	}
+	walkers = new double*[nwalkers];
 	for(int i=0; i<nwalkers;i++){
 		walkers[i] = new double[d];
 		for(int l=0; l<d;l++){
@@ -91,27 +88,16 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 
 void Walk::ResetInitialCondition(int **C){
 	if(debug_walk){cout<<"Walk:ResetInitialCondition"<<endl;}
-	cout<<"pointer = "<<C<<endl;
 	ResetWalkers();
 	nwalkers = 0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n;j++){
 			nwalkers += C[i][j];
-			// cout<<C[i][j]<<"  ";
 		}
-		// cout<<endl;
 	}
-	walkers.resize(nwalkers);
-	// walkers = new double*[nwalkers];
-	for(int i=0;i<nwalkers;i++)
-		walkers[i] = new double[d];
-	// walkers[nwalkers-41][0] = 3.14;
-	cout<<"nwalkers = "<<nwalkers<<endl;
-	// cout<<"?? = "<<walkers[nwalkers-41][0]<<endl;
 	int counter = 0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n;j++){
-			// cout<<"counter,C["<<i<<","<<j<<"] = "<<counter<<","<<C[i][j]<<endl;
 			for(int l=0; l<C[i][j]; l++){
 				PutWalkers(i,j,counter);
 				counter ++;
@@ -120,7 +106,7 @@ void Walk::ResetInitialCondition(int **C){
 	}
 }
 bool Walk::HasLeftArea(double *pos){
-	// if(debug_walk){cout<<"Walk::HasLeftArea"<<endl;}
+	if(debug_walk){cout<<"Walk::HasLeftArea"<<endl;}
 	/*pos = [x] in 1d;
 	pos = [x,y] in 2d etc*/
 	if(d==1){
@@ -198,12 +184,12 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	newPos = new double[d];			//delete at the end!
 	int *index = new int[d];		//delete at the end!
 
-	for(int i=0;i<m; i++){
-		//Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
+	// for(int i=0;i<m; i++){
+	// 	//Empty the array to conserve energy
+	// 	for(int j=0; j<n; j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
 	double L = 0;
 	double L_deriv = 0;
 	double L0 = sqrt(2*dt);
@@ -307,7 +293,7 @@ void Walk::SetDiffusionConstant(double Diff){
 }
 
 void Walk::PutWalkers(int i, int j, int counter){
-	// if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
+	if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
 	for(int k=0; k<d; k++){
 		if(k==0){
 			walkers[counter][k] = x[i]+dx*(0.5-ran0(&Idum));
