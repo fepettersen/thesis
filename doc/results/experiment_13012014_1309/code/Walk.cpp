@@ -96,7 +96,6 @@ void Walk::ResetInitialCondition(int **C){
 			nwalkers += C[i][j];
 		}
 	}
-	cout<<"nwalkers = "<<nwalkers<<endl;
 	walkers.resize(nwalkers);
 	for(int i=0;i<nwalkers;i++)
 		walkers[i] = new double[d];

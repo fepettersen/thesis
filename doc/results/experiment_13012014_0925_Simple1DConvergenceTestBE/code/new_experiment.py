@@ -35,14 +35,14 @@ class Experiment:
 	obj.PlotError()
 	obj.Finish()
 	"""
-	def __init__(self,path, DEBUG=False, save=True, info = ''):
+	def __init__(self,path, DEBUG=False, save=True):
 		self.debug = DEBUG
 		this_dir = path
 
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		self.parent_path = this_dir +'/doc/results/experiment_%s%s'%(self.datetime,info)
+		self.parent_path = this_dir +'/doc/results/experiment_%s_Simple1DConvergenceTestBE'%self.datetime
 		# self.parent_path = this_dir + '/doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d'
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
@@ -62,7 +62,7 @@ class Experiment:
 		self.x0 = self.x1 = self.y0 = self.y1 = 0
 		self.runcounter =0
 		self.samples = 0
-		if not DEBUG:
+		if DEBUG:
 			print self.parent_path
 
 	def compile(self):
@@ -96,7 +96,7 @@ class Experiment:
 	def CalculateError(self,Hc,exact=None):
 		# Calculates an error estimate
 		self.legends = Hc
-		# self.error = []
+		self.error = []
 		tmp = np.zeros(self.T)
 		if exact is None:
 			for i in xrange(self.runcounter):
@@ -129,16 +129,10 @@ class Experiment:
 	def PlotError(self,save=True):
 		# mpl.hold('on')
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
-		if self.runcounter!=len(self.error):
-			# print 'balle'
-			mpl.plot(self.error[0],color[0],label='Deterministic')
-			for i in range(self.runcounter):
-				# mpl.plot(np.log(self.error[i]/self.dt))
-				mpl.plot(self.error[i+1],color[i+1],label='Hc = %d'%(int(np.round(self.legends[i]))))
-		else:
-			for i in range(self.runcounter):
-				# mpl.plot(np.log(self.error[i]/self.dt))
-				mpl.plot(self.error[i+1],color[i+1],label='Hc = %d'%(int(np.round(self.legends[i]))))
+		for i in range(len(self.error)):
+			# mpl.plot(np.log(self.error[i]/self.dt))
+			mpl.plot(self.error[i],color[i],label='Hc = %d'%(int(np.round(self.legends[i]))))
+			# print self.error[i]
 		mpl.legend(loc=0)
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('max(abs(simulation-exact))')
@@ -236,7 +230,6 @@ class Experiment:
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
-				mpl.title('t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt))
 				if viz_type=='difference':
 					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
 				elif viz_type=='exact':
@@ -371,7 +364,7 @@ def D(x,y,t=0):
 	# return np.ones(np.shape(x))*0.5
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -382,9 +375,9 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 51
+	m = 41
 	n = 1
-	T = 1500
+	T = 1000
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
@@ -392,9 +385,10 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [1000]
+	Hc = [1600]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
+	name = '/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_18102013_1337/results/'
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
@@ -404,9 +398,9 @@ if __name__ == '__main__':
 	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
-	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
+	dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	run.VerifyDeterministicError()
+	run.VerifyDeterministicError(DT =dt)
 
 	# for i in Hc:
 	# 	print "Hc = %g"%i
@@ -414,9 +408,9 @@ if __name__ == '__main__':
 	# time.sleep(1)
 	# run.CalculateError(Hc,exact=True)
 	# run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
+	h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(h)
-	# run.ConvergenceTest(dt)
+	run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
@@ -426,7 +420,7 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	run.Visualize(filename='/Deterministic_n',viz_type='difference')
+	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
 	run.Finish()

@@ -236,13 +236,12 @@ class Experiment:
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
-				mpl.title('t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt))
 				if viz_type=='difference':
-					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
+					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-',title='t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt)))
 				elif viz_type=='exact':
-					im.append(mpl.plot(x,self.exact(x,np.zeros(self.m),counter*self.dt),'-b'))
+					im.append(mpl.plot(x,self.exact(x,np.zeros(self.m),counter*self.dt),'-b',title='t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt)))
 				else:
-					im.append(mpl.plot(x,tmp,'b-'))
+					im.append(mpl.plot(x,tmp,'b-',title='t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt)))
 				counter += 1
 			ani = animation.ArtistAnimation(fig,im)
 			mpl.show()
@@ -384,7 +383,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 1
-	T = 1500
+	T = 100
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
@@ -392,7 +391,7 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [1000]
+	Hc = [100,1000,10000]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
@@ -408,13 +407,13 @@ if __name__ == '__main__':
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
 	run.VerifyDeterministicError()
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
 	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(h)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
@@ -424,9 +423,9 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n',viz_type=None)
+	run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	run.Visualize(filename='/Deterministic_n',viz_type='difference')
+	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
 	run.Finish()
