@@ -1,0 +1,38 @@
+\section{About}
+
+\section{Adaptivity}
+
+\section{Computational cost}
+This chapter will consider the expensive parts of the code and look at possible improvements.
+
+\subsection{Memory}
+The memory-expensive parts of the code include storing the decomposed matrices, and storing the random walkers.
+
+\subsection{CPU time}
+There are four expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
+\begin{itemize}
+\item Performing the LU decomposition is very expensive. There might be a way to make this step more efficient by utilizing the sparsity of the linear system.
+\item The cost of solving the PDE increases drastically with the spatial dimension, at least as long as we use an implicit scheme. The FE scheme will actually save us $d$ orders of operations in $d$ dimensions, at least with the BE discretization using the standard LU decomposition. If we could utilize some specialized Gaussian elimination like the one we have for tridiagonal matrices we might be able to improve this.
+\item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \ref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost.
+\item De- and re-allocation of random walkers each time-step is also an immensely costly procedure. An alternative might be to keep the number of walkers constant and rather change the conversion-factor, Hc, although this approach sacrifices physical meaning.
+\item Writing the results to file will require $\mathcal{O}(n^d)$ operations where the operations are quite slow. We can get some speed-up by writing in binary, but as of now it has proved problematic to make python interpret the result-files. 
+\end{itemize}
+
+\begin{equation}\label{calls_to_ran}
+ N_{\text{calls}} \propto Hc\frac{(x_1-x_0)}{\Delta x}\frac{(y_1-y_0)}{\Delta y}\tilde{T}
+\end{equation}
+where $\tilde{T}$ denotes the number of timesteps on the PDE level times the number of time-steps one PDE-step corresponds to on the RW level. Note that this expression will NOT be zero in 1d, and that it is dependent on the PDE-solution.
+
+\subsection{Parallelizability}
+In the final algorithm there are the following stages
+\begin{itemize}
+ \item Initialization\\
+ Read parameters from command-line, initial condition and diffusion ``tensor'' from file. Setup instances of solvers etc. Practically no point in parallelizing this.
+ \item LU-decomposition\\
+ The actual LU-decomposition is a sort of Gaussian Elimination which is costly ($\mathcal{O}(N^3)$). Although the decomposition is pre-implemented at this point, the plan is to implement my own version of this. This step should be possible to parallelize.
+ \item Solving\\
+ This step includes a back-transform of the decomposed matrix which is expensive for $d>1$. This step should be parallelizable. It also includes the random walk part which is both expensive (depending on the number of walkers left) and highly parallelizable. We also write stuff to file which is quite costly. This is probably not possible to parallelize.
+\end{itemize}
+
+Parallelization of the random walk solver should scale linearly because the only form of communication required is shared memory. 
+The LU decomposition and back-substitution require some communication and will not scale linearly, but will still benefit from parallelizing. 

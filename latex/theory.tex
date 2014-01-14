@@ -54,21 +54,14 @@ which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, 
 \begin{align}
  \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq 
 \end{align}
-<<<<<<< HEAD
-When the number of steps gets very large we can approximate the Bernoulli distribution \ref{bernoulli_distr} by the Gaussian distribution. 
-=======
+
 When the number of steps gets very large we can approximate the Bernoulli distribution (eq. \ref{bernoulli_distr}) by the Gaussian distribution. 
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 This is most easily done in the symmetric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
 \begin{equation}
  P(S,N) = \left(\frac{1}{2}\right)^N\frac{N!}{R!L!}
 \end{equation}
-<<<<<<< HEAD
-on which we apply Stirling's famous formula for large factorials $n!\simeq\sqrt{2\pi n}n^ne^{-n}$.
-=======
 on which we apply Stirling's famous formula for large factorials $n!\simeq\sqrt{2\pi n}\cdot n^ne^{-n}$.
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 \begin{align*}
  P(S,N) &= \left(\frac{1}{2}\right)^N\frac{N!}{R!L!} \\
  &= \exp\left(-N\ln2+\ln\sqrt{2\pi N}+N\ln N - \ln\sqrt{2\pi R} -R\ln R - \ln\sqrt{2\pi L} - L\ln L \right) \\
@@ -93,11 +86,9 @@ making the distribution
 \begin{equation}
  P(x,t) = \sqrt{\frac{1}{4\pi Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
-<<<<<<< HEAD
-Introducing $x$ also gives us the expected value and variance of x on a form which will be useful later. 
-=======
+
 Introducing $x$ also gives us the expectation value and variance of x on a form which will be useful later. 
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
+
 We have $x=Sa$ which means 
 $$\langle x\rangle=a\langle S\rangle$$ 
 and 
@@ -124,13 +115,10 @@ Remember that the actual Gaussian distribution is
 $$
 \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{(n-\mu)^2}{2\sigma^2}\right)
 $$
-<<<<<<< HEAD
-We can introduce an Einstein relation $\sigma^2 = 2D\Delta t$ and the obvious relation $t = M\Delta t$ to get a more desirable exponent.
-We see that $\langle \Delta x^2\rangle = 2Dt$. 
-=======
+
 We can introduce an Einstein relation $\sigma^2 = 2dD\Delta t$ and the obvious relation $t = M\Delta t$ to get a more desirable exponent.
 We see that $\langle \Delta x^2\rangle = 2Dt$ in the one dimensional case where $d=1$. 
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
+
 \emph{The introduction of the Einstein relation might put some restrictions on our model.}
 Normalizing the expression gives us 
 \begin{equation}\label{rw_gaussian_distribution}
@@ -165,11 +153,8 @@ and see that they are equal, meaning that the diffusion equation is satisfied.
 \subsection{Choosing random walk algorithm}\label{choosing_random_walk_algorithm}
 
 As this article points out \cite{farnell2005monte} the simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great success to model diffusion processes. 
-<<<<<<< HEAD
-However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length according to position, thus effectively adjusting the diffusion constant of the walk as well. 
-=======
+
 However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length and probability according to position, thus effectively adjusting the diffusion constant of the walk as well. 
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 We see then that the simplest model is rather robust, and well tested. 
 However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
 Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
@@ -211,11 +196,8 @@ We notice that the adjusted steplength we proposed to start with is still a part
 \subsection{Random walks and drift}\label{random_walks_and_drift}
 
 Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
-<<<<<<< HEAD
-Initially one thought that diffusion in the ECS of the brain was governed by a drift term , but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
-=======
+
 Initially one thought that diffusion in the Extra Cellular Space of the brain was governed by a drift term, but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
->>>>>>> 5c5037ade39e1aacd97e655ab856f7981aebbe61
 The drift term might be of importance in other applications, however, and something we should look into it.\\
 How do we model random walks with drift? \\
 A first instinct is to simply add some vector to the Brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
@@ -436,6 +418,20 @@ R &= u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u'
 \end{align*}
 There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative.
 
+\subsection{Extension to 3 spatial dimensions}
+
+As we see in the appendix the assembly of the linear problem that arises from the BE discretization in 2d with a variable diffusion constant is a rather messy thing. 
+While a 2d simulation might tell us a great deal, and be sufficient for many applications such as modeling of experimental setups of diffusion in the ECS (in vitro experiments on very thin slices), we should at least look into an extension of our model to 3 dimensions. 
+The BE discretization is very similar in 3d to the 2d case. In fact we must only add a term for the z-direction. 
+If we translate the resulting expression to a linear problem we immediately come across the problem that our solution, U, is a cubic matrix and so we must have a 4-dimensional matrix to describe to system. 
+The problem is solved by first of all describing the solution as a vector of matrices, and in turn as a vector of vectors (which is a matrix). 
+We now have the same situation as we had in the 2d case, and by following the same procedure as before we arrive at exactly the same situation which is a normal linear problem. 
+In fact, using block-matrix notation we can even write the problem in an identical way, as we have done in the appendix (eq. \ref{BE3D_linear_problem}). 
+The matrix is now 7-band diagonal, but the LU-decomposition still does the trick.\\
+Just as for the 2d case, the computiational cost per time step is of the order of $\mathcal{O}(N^2)$ where $N$ is now the spatial resolution cubed ($N = n^3$). 
+In other words the computiational cost is now quite high ($\mathcal{O}(n^6)$).
+For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
+
 
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\
@@ -526,3 +522,11 @@ Equating this with \ref{random_walk_variance} gives us a first order approximati
  l &= \sqrt{2D\Delta\tilde{t}}. \label{steplength}
 \end{align}
 Of course this is assuming that we use a random walk algorithm of fixed steplength.
+
+\section{Geometry}
+Any finite difference method is problematic to solve on anything else than a rectangular grid. 
+When we additionally use an implicit FD method we will add a ``demand'' of having a square grid as well. 
+Fortunately the implicit solvers we use are stable. \\
+In the physical scope of this thesis we do not find any rectangular shapes to apply our system to. 
+Actually we do not have any well defined geometry to apply our system on, but that is of less importance. 
+The developed software lets us specify an initial condition
