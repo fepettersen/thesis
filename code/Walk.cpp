@@ -53,9 +53,7 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 			nwalkers += C[i][j];
 		}
 	}	
-	cout<<"nwalkers = "<<nwalkers<<endl;
 
-	// walkers = new double*[nwalkers];
 	walkers.resize(nwalkers);
 	for(int i=0; i<nwalkers;i++){
 		walkers[i] = new double[d];
@@ -91,27 +89,20 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 
 void Walk::ResetInitialCondition(int **C){
 	if(debug_walk){cout<<"Walk:ResetInitialCondition"<<endl;}
-	cout<<"pointer = "<<C<<endl;
 	ResetWalkers();
 	nwalkers = 0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n;j++){
 			nwalkers += C[i][j];
-			// cout<<C[i][j]<<"  ";
 		}
-		// cout<<endl;
 	}
 	walkers.resize(nwalkers);
-	// walkers = new double*[nwalkers];
 	for(int i=0;i<nwalkers;i++)
 		walkers[i] = new double[d];
-	// walkers[nwalkers-41][0] = 3.14;
-	cout<<"nwalkers = "<<nwalkers<<endl;
-	// cout<<"?? = "<<walkers[nwalkers-41][0]<<endl;
+
 	int counter = 0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n;j++){
-			// cout<<"counter,C["<<i<<","<<j<<"] = "<<counter<<","<<C[i][j]<<endl;
 			for(int l=0; l<C[i][j]; l++){
 				PutWalkers(i,j,counter);
 				counter ++;

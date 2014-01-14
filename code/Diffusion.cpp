@@ -236,8 +236,8 @@ double Diffusion::f(double x,double y, double t){
 	// return -pi*sin(pi*x)*exp(-t*pi*pi);
 	double py = pi*y;
 	double px = pi*x;
-	return pi*exp(-t*pi*pi)*(2*pi*cos(px)*cos(py)*(x+y-0.5) + cos(px)*sin(py) +sin(px)*cos(py));
-	// return 0.0;
+	// return pi*exp(-t*pi*pi)*(2*pi*cos(px)*cos(py)*(x+y-0.5) + cos(px)*sin(py) +sin(px)*cos(py));
+	return 0.0;
 }
 
 void Diffusion::tridiag(double *u, double *f, int N, double *a, double *b, double *c){

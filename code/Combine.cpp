@@ -183,7 +183,6 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 		}
 		// cout<<endl;
 	}
-	cout<<"pointer in combine = "<<Conc<<endl;
 }
 
 void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){

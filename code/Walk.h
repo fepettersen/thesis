@@ -35,10 +35,9 @@ class Walk
 		void SetDiffusionConstant(double);
 
 		void ResetWalkers(){
-			std::cout<<"Walk::ResetWalkers"<<std::endl;
+			for(int k=0;k<nwalkers;k++)
+				delete [] walkers[k];
 			walkers.clear();
-			// for(int k=0;k<nwalkers;k++)
-			// 	delete [] walkers[k];
 				// for(int l=0; l<d; l++)
 				// 	walkers[k][l] = 0;
 			// delete [] walkers;
