@@ -21,9 +21,7 @@ class Walk
 		
 
 		bool HasLeftArea(double *);
-		void advance(int **);
 		void InhomogenousAdvance(int **C, double _dt);
-		double *Step(double*, double*);
 		double *InhomogenousStep(double*, double*);
 		int InitializeTimestep(int **);
 		void PutWalkers(int, int, int);

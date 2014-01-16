@@ -96,6 +96,7 @@ void Walk::ResetInitialCondition(int **C){
 			nwalkers += C[i][j];
 		}
 	}
+	// cout<<"nwalkers = "<<nwalkers<<endl;
 	walkers.resize(nwalkers);
 	for(int i=0;i<nwalkers;i++)
 		walkers[i] = new double[d];
@@ -128,57 +129,6 @@ bool Walk::HasLeftArea(double *pos){
 		}
 	}
 	return false;
-}
-
-void Walk::advance(int **C){
-	if(debug_walk){cout<<"Walk::advance"<<endl;}
-	// cout<<"nwalkers = "<<nwalkers<<endl;
-	double *newPos, **s;
-	newPos = new double[d];			//delete at the end!
-	s = new double*[steps];			//delete at the end!
-	int *index = new int[d];		//delete at the end!
-	for(int k=0; k<steps; k++){
-		s[k] = new double[d];
-		for(int l=0; l<d; l++){
-			s[k][l] = 0;
-		}
-	}
-	for(int i=0; i<nwalkers; i++){
-		/*For every walker: */
-		for(int k=0; k<steps; k++){
-			/*Fill array s with steps*d random numbers*/
-			for(int l=0; l<d; l++){
-				s[k][l] = factor*(0.5-ran0(&Idum));
-			}
-		}
-		for(int j=0;j<steps;j++){
-			/*Advance n steps*/
-			newPos = Step(walkers[i],s[j]);
-			walkers[i] = checkpos(newPos,s[j]);
-		}
-	}
-
-	for(int i=0;i<m; i++){
-		// Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
-	if(d==1){
-		for(int i=0;i<nwalkers;i++){
-			// index = FindPosition(walkers[i]);
-			FindPosition(walkers[i],index);
-			C[index[0]][0] += 1;
-		}
-	}
-	else if(d==2){
-		for(int i=0; i<nwalkers; i++){
-			// index = FindPosition(walkers[i]);
-			FindPosition(walkers[i],index);
-			C[index[0]][index[1]] += 1;
-		}
-	}
-	// delete [] s,newPos, index;
 }
 
 void Walk::InhomogenousAdvance(int **C, double _dt){
@@ -244,35 +194,6 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	// delete [] newPos,index;
 }
 
-double *Walk::Step(double *r,double *s){
-	/*Possibility of changing the algorithm*/
-	if(debug_walk){cout<<"Walk::Step"<<endl;}
-	if(false){
-		for(int i=0; i<d; i++){
-			r[i] += s[i];
-		}
-	}
-	else if(false){
-		for(int i=0; i<d; i++){
-			r[i] += dt*dt*s[i];		//Need velocity as well
-		}
-	}
-	else if(true){
-		if(d==1){
-			r[0] = (s[0]>0) ?(r[0]+factor):(r[0]-factor);
-		}
-		else if(d==2){
-			if(s[0]>s[1]){
-				r[0] = (s[0]>0) ?(r[0]+factor):(r[0]-factor);
-			}
-			else{
-				r[1] = (s[1]>0) ?(r[1]+factor):(r[1]-factor);
-			}
-		}
-	}
-	// r[0] += drift;		//slight drift in x direction
-	return r;
-}
 
 double *Walk::InhomogenousStep(double *r, double *s){
 	for(int l=0;l<d;l++){

@@ -236,12 +236,13 @@ class Experiment:
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
+				mpl.title('t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt))
 				if viz_type=='difference':
-					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'),title='t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt))
+					im.append(mpl.plot(x,(self.exact(x,np.zeros(self.m),counter*self.dt)-tmp),'b-'))
 				elif viz_type=='exact':
-					im.append(mpl.plot(x,self.exact(x,np.zeros(self.m),counter*self.dt),'-b'),title='t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt))
+					im.append(mpl.plot(x,self.exact(x,np.zeros(self.m),counter*self.dt),'-b'))
 				else:
-					im.append(mpl.plot(x,tmp,'b-'),title='t=%.3f/%.3f'%(counter*self.dt,self.T*self.dt))
+					im.append(mpl.plot(x,tmp,'b-'))
 				counter += 1
 			ani = animation.ArtistAnimation(fig,im)
 			mpl.show()
@@ -366,11 +367,11 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return u
 
 def D(x,y,t=0):
-	return x+y
-	# return np.ones(np.shape(x))*0.5
+	# return x+y
+	return np.ones(np.shape(x))*0.5
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -382,25 +383,25 @@ if __name__ == '__main__':
 	x1 = 0.6
 	y1 = 0.7
 	m = 51
-	n = 1
-	T = 100
+	n = 51
+	T = 500
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = 0.001
+	dt = 0.0025
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [100,1000,10000]
+	# Hc = [100,1000,10000]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
-	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
+	Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
-	run = Experiment(this_dir,DEBUG,save_files)
+	run = Experiment(this_dir,DEBUG,save_files,info="_NewConvergenceTestCombinedSolver2d")
 	run.exact = f
-	# run.SetInitialCondition(f(x,y,0))
-	# run.SetDiffusionTensor(D(x,y))
-	run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
-	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
+	run.SetInitialCondition(f(x,y,0))
+	run.SetDiffusionTensor(D(x,y))
+	# run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
+	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
@@ -410,11 +411,11 @@ if __name__ == '__main__':
 	for i in Hc:
 		print "Hc = %g"%i
 		run.RunSimulation(i)
-	# time.sleep(1)
+	time.sleep(1)
 	run.CalculateError(Hc,exact=True)
 	run.PlotError()
 	h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(h)
+	run.ConvergenceTest(h)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
@@ -423,7 +424,7 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
-	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')

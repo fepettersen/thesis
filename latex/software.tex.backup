@@ -1,6 +1,9 @@
 \section{About}
 
 \section{Adaptivity}
+There are two adaptive parts of the software. First of all, the number of walkers which depend on the concentration, or the solution the the PDE in the relevant area. This must change in order to keep physical meaning and give results. Without this adaptivity, the results would either be wrong, or the model would not make physical sense.\\
+Since a diffusion process in general has rapid changes in the beginning where for example high frequency variations are dampened and very slow convergence to a steady state later, we have introduced a test of the amount of change between two subsequent time-steps. If this amount is smaller than some limit, we will increase the time-step.\\
+\emph{This increase should be done in a more elegant manner(linearly?)}
 
 \section{Computational cost}
 This chapter will consider the expensive parts of the code and look at possible improvements.

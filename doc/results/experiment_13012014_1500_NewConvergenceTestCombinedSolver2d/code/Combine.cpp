@@ -90,10 +90,11 @@ void Combine::Solve(){
 			Up[k][l] = U[k][l];
 		}
 	}
-	if (diffnorm<pde_solver->dt && pde_solver->dt <0.01)
+	if (diffnorm<0.1*pde_solver->dt && pde_solver->dt <0.01)
 	{
+		int lkjh=0;
 		// pde_solver->dt *=10;
-		cout<<"changing dt"<<endl;
+		// cout<<"changing dt"<<endl;
 	}
 }
 

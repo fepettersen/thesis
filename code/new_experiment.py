@@ -232,7 +232,7 @@ class Experiment:
 		im = []
 		if self.n<=1:
 			fig = mpl.figure()
-			x = np.linspace(0,1,self.m)
+			x = np.exp(np.linspace(0,1,self.m)+1)
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
@@ -384,7 +384,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 1
-	T = 1500
+	T = 250
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -401,7 +401,7 @@ if __name__ == '__main__':
 	run.exact = f
 	# run.SetInitialCondition(f(x,y,0))
 	# run.SetDiffusionTensor(D(x,y))
-	run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
+	run.SetInitialCondition(f(np.exp(np.linspace(0,1,m)),np.zeros(m),0))
 	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
@@ -426,8 +426,8 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n',viz_type=None)
-	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
+	run.Visualize(filename='/Deterministic_n',viz_type=None)
+	run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
