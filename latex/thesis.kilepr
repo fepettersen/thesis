@@ -4,7 +4,11 @@ img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
 kileversion=2.1.0
+<<<<<<< HEAD
 lastDocument=Intro.tex
+=======
+lastDocument=main.tex
+>>>>>>> 17ad20a483fa818d789021a9432d60bcc582b65f
 masterDocument=
 name=thesis
 pkg_extIsRegExp=false
@@ -157,12 +161,15 @@ ViMarks=a,48,0
 [view-settings,view=0,item:main.tex]
 CursorColumn=44
 CursorLine=26
+<<<<<<< HEAD
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:software.tex]
 CursorColumn=71
 CursorLine=5
+=======
+>>>>>>> 17ad20a483fa818d789021a9432d60bcc582b65f
 JumpList=
 ViMarks=
 
