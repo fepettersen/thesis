@@ -24,7 +24,6 @@ class Diffusion
 		void tridiag(double *u, double *up, int N, double *di, double *ab, double *bel);
 		arma::mat Assemble(double, double, int, int);
 		arma::mat AssembleAnisotropic(double a, double b, int m, int n);
-		arma::vec BlockTridiag(arma::mat, arma::vec,int, int);
 };
 
 #endif // DIFFUSION_H

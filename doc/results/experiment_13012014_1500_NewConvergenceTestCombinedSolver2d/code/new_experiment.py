@@ -48,7 +48,6 @@ class Experiment:
 		self.parameter_path = self.parent_path+'/parameters'
 		self.result_path = self.parent_path+ '/results'
 		self.tofile = 1 if save else 0;
-		self.error = []
 
 		os.system('mkdir %s'%self.parent_path)
 		os.system('mkdir %s'%self.parameter_path)
@@ -233,7 +232,7 @@ class Experiment:
 		im = []
 		if self.n<=1:
 			fig = mpl.figure()
-			x = np.exp(np.linspace(0,1,self.m)+1)
+			x = np.linspace(0,1,self.m)
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
@@ -371,11 +370,8 @@ def D(x,y,t=0):
 	# return x+y
 	return np.ones(np.shape(x))*0.5
 
-def Heaviside(x,y):
-	return 0
-
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -388,31 +384,29 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 51
-	T = 100
-
+	T = 500
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = 0.001
+	dt = 0.0025
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [500]
+	# Hc = [100,1000,10000]
 	# Hc = [1400,2000,3200,4400,5600,6800,8000,9200,10400,11600,13000]
-	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
+	Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
-	run = Experiment(this_dir,DEBUG,save_files)
+	run = Experiment(this_dir,DEBUG,save_files,info="_NewConvergenceTestCombinedSolver2d")
 	run.exact = f
-	run.SetInitialCondition(F(x,y,0))
+	run.SetInitialCondition(f(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
-	# run.SetInitialCondition(f(np.exp(np.linspace(0,1,m)),np.zeros(m),0))
+	# run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
 	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
-
+	run.VerifyDeterministicError()
 
 	for i in Hc:
 		print "Hc = %g"%i
@@ -420,8 +414,8 @@ if __name__ == '__main__':
 	time.sleep(1)
 	run.CalculateError(Hc,exact=True)
 	run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(h)
+	h = [1./Hc[i] for i in range(len(Hc))]
+	run.ConvergenceTest(h)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
@@ -429,7 +423,7 @@ if __name__ == '__main__':
 	# run.UpdateWebpageSpecial()
 	# run.Visualize(viz_type=None)
 
-	run.Visualize(viz_type='difference')
+	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
 	# run.Visualize(filename='/Deterministic_n',viz_type='difference')

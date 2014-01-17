@@ -260,70 +260,6 @@ void Diffusion::tridiag(double *u, double *f, int N, double *a, double *b, doubl
     }
     delete[] temp;
 }
-vec Diffusion::BlockTridiag(mat A, vec Up, int m, int n){
-	/*Specialized Gaussian elimination for block-tridiagonal systems A*x = Up. 
-	Input is the block-tridiagonal matrix A, the solution in the vector Up 
-	and the unknown x which will be filled with the solution*/
-	std::vector<mat> tmp;
-	std::vector<mat> H;
-	std::vector<vec> g;
-	mat a = zeros(m,n);
-	mat b = zeros(m,n);
-	mat c = zeros(m,n);
-	vec K = zeros(m);
-	vec gtmp;
-	int i = 0;
-	for(int j=0;j<m;j++){
-		for(int k=0;k<n;k++){
-			b(j,k) = A(i*n+j,i*n+k);
-			c(j,k) = A(i*n+j,(i+1)*n+k);
-		}
-		K(j) = Up[i*n+j];
-	}
-	tmp.push_back(inv(b));
-	H.push_back(-1*tmp[i]*c);
-	g.push_back(tmp[i]*K);
-	for(i=1;i<m-1;i++){
-		for(int j=0;j<m;j++){
-			for(int k=0;k<n;k++){
-				a(j,k) = A(i*n+j,(i-1)*n+k);
-				b(j,k) = A(i*n+j,i*n+k);
-				c(j,k) = A(i*n+j,(i+1)*n+k);
-			}
-			K(j) = Up[i*n+j];
-		}
-		tmp.push_back(inv(b+a*H[i-1]));
-		H.push_back(-1*tmp[i]*c);
-		gtmp = g[i-1];
-		g.push_back(tmp[i]*(K-a*gtmp));
-	}
-	i = m-1;
-	for(int j=0;j<m;j++){
-		for(int k=0;k<n;k++){
-			a(j,k) = A(i*n+j,(i-1)*n+k);
-			b(j,k) = A(i*n+j,i*n+k);
-		}
-		K(j) = Up[i*n+j];
-	}
-	tmp.push_back(inv(b+a*H[i-1]));
-	gtmp = g[i-1];
-	g.push_back(tmp[i]*(K-a*gtmp));
-	gtmp = g[i];
-
-	vec x = zeros(m*n);
-	for(int j=0;j<m;j++){
-		x(i*n+j) = gtmp(j);
-	}
-	vec xtmp;
-	for(i=n-2;i>-1;i--){
-		xtmp = g[i]+H[i]*gtmp;
-		for(int j=0;j<m;j++){
-			x(i*n+j) = xtmp(j);
-			gtmp(j) = xtmp(j);
-		}
-	}
-	return x;
-}
 
 void Diffusion::BE2D(double **U, double **Up, int m, int n){
 	/*Backward Euler scheme in 1d & 2d. Assembles a matrix if necessary and 
@@ -337,13 +273,12 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 		alpha = D*dt/(dx*dx);
 		mat A = zeros(N,N);
 		if(solver==3){
-			Lower = AssembleAnisotropic(dt/(2*dx*dx),dt/(2*dx*dx),m,n);
+			A = AssembleAnisotropic(dt/(2*dx*dx),dt/(2*dx*dx),m,n);
 		}
 		else{
-			Lower = Assemble(alpha,beta,m,n);
+			A = Assemble(alpha,beta,m,n);
 		}
-		// lu(Lower, Upper, Permutation, A);
-		// Lower = A.copy();
+		lu(Lower, Upper, Permutation, A);
 	}
 	vec Uptmp = zeros(N);
 	vec Utmp = zeros(N);
@@ -360,35 +295,34 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 			k++;
 		}
 	}
-	Utmp = BlockTridiag(Lower,Uptmp,m,n);
-    // y[0] = Uptmp[0];
-    // for(int i=1;i<N;i++){
-    //     /* This loop calculates y from L*y = f. It does not consider calculations
-    //     with 0. Results are only valid for L matrix in LU decomposition. */
-    //     LUtemp=0;
-    //     for(int j=0;j<i;j++){
-    //         LUtemp += Lower(i,j)*y[j];
-    //     }
-    //     y[i] = Uptmp[i] -LUtemp;
-    // }
+    y[0] = Uptmp[0];
+    for(int i=1;i<N;i++){
+        /* This loop calculates y from L*y = f. It does not consider calculations
+        with 0. Results are only valid for L matrix in LU decomposition. */
+        LUtemp=0;
+        for(int j=0;j<i;j++){
+            LUtemp += Lower(i,j)*y[j];
+        }
+        y[i] = Uptmp[i] -LUtemp;
+    }
     
-    // double factor = 0;
-    // Utmp[N-1] = y[N-1]/Upper(N-1,N-1);
+    double factor = 0;
+    Utmp[N-1] = y[N-1]/Upper(N-1,N-1);
    
-    // for(int i=N-2;i>=0;i--){
-    //     /*This loop continues the calculations from the previous one.
-    //      Calculates U*z = y, where z = v from earlier in the program.
-    //      Resluts are only valid for U matrix in LU decomposition. */
-    //     LUtemp=0;
-    //     for(int j=(N-1);j>=0;j--){
-    //         if(j==i){
-    //             factor = 1.0/Upper(i,j);
-    //             break;
-    //         }
-    //         LUtemp += Upper(i,j)*Utmp[j];
-    //     }
-    //     Utmp[i] =(y[i] -LUtemp)*factor;
-    // }
+    for(int i=N-2;i>=0;i--){
+        /*This loop continues the calculations from the previous one.
+         Calculates U*z = y, where z = v from earlier in the program.
+         Resluts are only valid for U matrix in LU decomposition. */
+        LUtemp=0;
+        for(int j=(N-1);j>=0;j--){
+            if(j==i){
+                factor = 1.0/Upper(i,j);
+                break;
+            }
+            LUtemp += Upper(i,j)*Utmp[j];
+        }
+        Utmp[i] =(y[i] -LUtemp)*factor;
+    }
 	// Utmp = solve(A,Uptmp);
 	k=0;
 	for(int i=0; i<m;i++){

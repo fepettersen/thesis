@@ -274,14 +274,13 @@ void Combine::TestRWConvergence(int steps,string path){
 	ofstream ofile;
 	char *name = new char[120];
 	walks.SetInitialCondition(distr,m,n);
-	walks.SetDiffusionTensor(aD,m,n);
 	for(int t=0;t<steps;t++){
-		walks.InhomogenousAdvance(distr,pde_solver->dt);
+		walks.InhomogenousAdvance(C,pde_solver->dt);
 		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
 		ofile.open(name);
 		for(int i=0;i<m;i++){
 			for(int j=0;j<n;j++){
-				U[i][j] = distr[i][j]/Hc;
+				U[i][j] = C[i][j]/Hc;
 				ofile<<U[i][j]<<" ";
 			}
 			ofile<<endl;

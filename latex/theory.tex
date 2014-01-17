@@ -432,6 +432,47 @@ Just as for the 2d case, the computiational cost per time step is of the order o
 In other words the computiational cost is now quite high ($\mathcal{O}(n^6)$).
 For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
+\subsection{Some linear algebra}
+The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
+The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
+The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by a specialized Gaussian elimination. This algorithm is described in the appendix, \emph{but should be described here?} 
+In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. We can actually modify the tridiagonal solver from the one-dimensional case so we can use it on the block-tridiagonal system. 
+The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{}.
+
+\begin{align}\label{block_tridiagonal_matrix}
+   \left(\begin{array}{c c c c c c c c c}
+        B_0 & C_0 &0 &0 &0 &0 &0 &0 &0\\
+        A_1 & B_1 & C_1 &0 &0 &0 &0 &0 &0\\
+        0&\ddots & \ddots & 0 & 0 & \ddots &0&0&0\\
+        0 & 0&A_i & B_i & C_i& 0 &  &0&0\\
+        0& \ddots&0&\ddots & \ddots & \ddots & 0 & \ddots &0\\
+         0&0 &0 &0&0 &0&0&A_{n-1} & B_{n-1}
+       \end{array}\right) \left(\begin{array}{c}
+             \mathbf{u}^{n+1}_{0}\\
+             \mathbf{u}^{n+1}_{1}\\
+             \vdots\\
+             \mathbf{u}^{n+1}_{i}\\
+             \vdots\\
+             \mathbf{u}^{n+1}_{n}
+             \end{array}\right) = \mathbf{u}^{n}
+\end{align}
+which we can also express as $M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
+The block-tridiagonal solver is taken from \cite{}, and is listed in \ref{}.\\
+There is a forward substitution
+\begin{align*}
+ H_1 &= -B_1^{-1}C_1\nonumber \\
+ H_i &= -\left(B_i+A_iH_{i-1}\right)^{-1}C_i \nonumber \\
+ \mathbf{g}_1 &= B_1^{-1}\mathbf{k}_1 \nonumber\\
+ \mathbf{g}_1 &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{k}_i-A_i\mathbf{g}_{i-1}\right)\nonumber
+ \end{align*}
+ Followed by a backward substitution
+ \begin{align*}
+  \mathbf{x}_{n-1} &= \mathbf{g}_{n-1}\nonumber\\
+  \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
+ \end{align*}
+The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. However, the matrices are at most tridiagonal themselves, and so the cost of inverting them is greatly reduced, and we only need to to the inversion once as long as the mass-matrix, $M$ is unchanged. This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme better than the implicit FE scheme.
+
+In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. There are probably ways of improving this beyond the benchmark LU decomposition method which will take some $\mathcal{O}(n^6)$ operations per time-step
 
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\

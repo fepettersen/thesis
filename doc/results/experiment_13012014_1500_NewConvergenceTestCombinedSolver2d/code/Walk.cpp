@@ -52,7 +52,8 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 		for(int j=0; j<n;j++){
 			nwalkers += C[i][j];
 		}
-	}
+	}	
+
 	walkers.resize(nwalkers);
 	for(int i=0; i<nwalkers;i++){
 		walkers[i] = new double[d];
@@ -135,8 +136,8 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
 	dt = _dt/steps;
 	double *newPos, **s;
-	newPos = new double[d];
-	int *index = new int[d];
+	newPos = new double[d];			//delete at the end!
+	int *index = new int[d];		//delete at the end!
 
 	for(int i=0;i<m; i++){
 		//Empty the array to conserve energy
@@ -190,7 +191,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			C[index[0]][index[1]] += 1;
 		}
 	}
-	delete [] newPos,index;
+	// delete [] newPos,index;
 }
 
 
@@ -201,24 +202,15 @@ double *Walk::InhomogenousStep(double *r, double *s){
 	return r;
 }
 
-void Walk::SetDiffusionTensor(double **Diff, int M, int N){
-	aD = new double*[M];
+void Walk::SetDiffusionTensor(double **Diff, int m, int n){
+	aD = new double*[m];
 	for(int i=0;i<m;i++){
-		aD[i] = new double[N];
+		aD[i] = new double[n];
 	}
-	for(int i=0;i<M;i++){
-		for(int j=0;j<N;j++)
+	for(int i=0;i<m;i++){
+		for(int j=0;j<n;j++)
 		aD[i][j] = Diff[i][j];
 	}
-	/*Derivatives of diffusion tensor*/
-	// for(int i=1;i<M-1;i++){
-	// 	for(int j=1;j<N-1;j++)
-	// 	aDx[i][j] = Diff[i][j];
-	// }
-	// for(int i=0;i<M;i++){
-	// 	for(int j=0;j<N;j++)
-	// 	aDy[i][j] = Diff[i][j];
-	// }
 	inhomogenous = true;
 }
 void Walk::SetDiffusionConstant(double Diff){
