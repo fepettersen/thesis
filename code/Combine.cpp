@@ -279,6 +279,7 @@ void Combine::TestRWConvergence(int steps,string path){
 	char *name = new char[120];
 	walks.SetInitialCondition(distr,m,n);
 	walks.SetDiffusionTensor(aD,m,n);
+	walks.drift = 0.05;
 	for(int t=0;t<steps;t++){
 		walks.InhomogenousAdvance(distr,pde_solver->dt);
 		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
