@@ -336,7 +336,7 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 		beta = D*dt/(dy*dy);
 		alpha = D*dt/(dx*dx);
 		mat A = zeros(N,N);
-		if(not isotropic){
+		if(solver==3){
 			Lower = AssembleAnisotropic(dt/(2*dx*dx),dt/(2*dx*dx),m,n);
 		}
 		else{
