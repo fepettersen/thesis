@@ -10,6 +10,7 @@ class Walk
 		double **area, **aD;
 		// double **walkers;	//Array of the positions of all the walkers
 		std::vector<double*> walkers;
+		std::vector<double**> aDx;
 		int d,m,n;
 		double factor,dt,D;
 		double x0, x1, y0, y1, z0, z1;

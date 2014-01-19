@@ -1,3 +1,4 @@
+
 #include "main_walk.h"
 using namespace std;
 using namespace arma;

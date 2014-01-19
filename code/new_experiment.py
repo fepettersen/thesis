@@ -388,7 +388,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 51
-	T = 100
+	T = 13
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -397,8 +397,8 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [500]
-	Hc = [1400,3200,5600,8000,10400,13000]
+	Hc = [50]
+	# Hc = [1400,3200,5600,8000,10400,13000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
 	run = Experiment(this_dir,DEBUG,save_files)
@@ -420,12 +420,12 @@ if __name__ == '__main__':
 	time.sleep(1)
 	run.CalculateError(Hc,exact=True)
 	run.PlotError()
-	# h = [1./Hc[i] for i in range(len(Hc))]
+	# # h = [1./Hc[i] for i in range(len(Hc))]
 	run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
-	# run.SaveError(header="max(abs(error)) for manifactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
+	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
 	# run.Visualize(viz_type=None)
 

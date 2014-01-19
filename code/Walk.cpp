@@ -144,6 +144,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			C[i][j] = 0;
 		}
 	}
+	int test = 0;
 	double L = 0;
 	double L_deriv = 0;
 	double L0 = sqrt(2*dt);
@@ -155,22 +156,24 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 		Delta_p = L;
 		Delta_m = L;
 	}
-
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
-		if(inhomogenous){
-			FindPosition(walkers[i],index);
-			L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
-			L_deriv = (d>1)?(L_deriv0/sqrt(aD[index[0]][index[1]])*(aD[index[0]+1][index[1]]-aD[index[0]+1][index[1]])):(L_deriv0/sqrt(aD[index[0]][0])*(aD[index[0]+1][0]-aD[index[0]+1][0])); 	/*This should not work and is horrible programming*/
-			Tr = (1+0.5*L_deriv);
-			Tl = (1-0.5*L_deriv);
-			Delta_p = L*Tr;
-			Delta_m = L*Tl;
-			Tr /= 2.0;
-		}
 		for(int j=0;j<steps;j++){
 			/*Advance n steps*/
+			FindPosition(walkers[i],index);
 			for(int p=0; p<d; p++){
+				if(inhomogenous){
+					L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
+					/*This might work and is slightly better*/
+					L_deriv = (d>1)?(L_deriv0/sqrt(aD[index[0]][index[1]])*(aDx[p][index[0]][index[1]])):
+					(L_deriv0/sqrt(aD[index[0]][0])*(aDx[p][index[0]][0]));
+					Tr = (1+0.5*L_deriv);
+					Tl = (1-0.5*L_deriv);
+					Delta_p = L*Tr;
+					Delta_m = L*Tl;
+					Tr /= 2.0;
+					// cout<<"Tr,Delta_p,Delta_m = "<<Tr<<","<<Delta_p<<","<<Delta_m<<endl;
+				}
 				r = ran0(&Idum);
 				if(r>Tr){
 					stepvector[p] = Delta_p;
@@ -188,9 +191,10 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 		}
 		else if(d==2){
 			C[index[0]][index[1]] += 1;
+			test++;
 		}
 	}
-	delete [] newPos,index;
+	// delete [] newPos,index;
 }
 
 
@@ -203,21 +207,61 @@ double *Walk::InhomogenousStep(double *r, double *s){
 
 void Walk::SetDiffusionTensor(double **Diff, int M, int N){
 	aD = new double*[M];
-	for(int i=0;i<m;i++){
+	dx = (x1-x0)/(M-1);
+	dy = (N>1)?((y1-y0)/(N-1)):0;
+	aDx.resize(d);
+	for(int p=0;p<d;p++){
+		aDx[p] = new double*[M];
+		for(int i=0;i<M;i++){
+			aDx[p][i] = new double[N];
+		}
+	}
+	for(int i=0;i<M;i++){
 		aD[i] = new double[N];
 	}
 	for(int i=0;i<M;i++){
-		for(int j=0;j<N;j++)
-		aD[i][j] = Diff[i][j];
+		for(int j=0;j<N;j++){
+			aD[i][j] = Diff[i][j];
+		}
 	}
-	/*Derivatives of diffusion tensor*/
-	// for(int i=1;i<M-1;i++){
-	// 	for(int j=1;j<N-1;j++)
-	// 	aDx[i][j] = Diff[i][j];
-	// }
+	if(d==1){
+		for(int i=1;i<M-1;i++){
+			for(int j=0;j<1;j++){
+				aDx[0][i][j] = (1.0/(2*dx))*(aD[i+1][j]-aD[i-1][j]);
+			}
+		}
+		aDx[0][0][0] = (1.0/dx)*(aD[1][0]-aD[0][0]);
+		aDx[0][M-1][0] = (1.0/dx)*(aD[M-1][0]-aD[M-2][0]);
+	}
+	if(d==2){
+		for(int i=1;i<M-1;i++){
+			for(int j=1;j<N-1;j++){
+				aDx[0][i][j] = (1.0/(2*dx))*(aD[i+1][j]-aD[i-1][j]);
+				aDx[1][i][j] = (1.0/(2*dy))*(aD[i][j+1]-aD[i][j-1]);
+			}
+		}
+		for(int i=0;i<N;i++){
+			aDx[0][0][i] = (1.0/dx)*(aD[1][i]-aD[0][i]);
+			aDx[0][M-1][i] = (1.0/dx)*(aD[M-1][i]-aD[M-2][i]);
+			if(i>0 && i<N-1){
+				aDx[1][0][i] = (1.0/(2*dy))*(aD[0][i+1]-aD[0][i-1]);
+				aDx[1][M-1][i] = (1.0/(2*dy))*(aD[M-1][i+1]-aD[M-1][i-1]);
+			}
+		}
+		for(int i=0;i<M;i++){
+			aDx[1][i][0] = (1.0/dy)*(aD[i][1]-aD[i][0]);
+			aDx[1][i][N-1] = (1.0/dy)*(aD[i][N-2]-aD[i][N-1]);
+			if(i>0 && i<M-1){
+				aDx[0][i][0] = (1.0/(2*dx))*(aD[i+1][0]-aD[i-1][0]);
+				aDx[0][i][N-1] = (1.0/(2*dx))*(aD[i+1][N-1]-aD[i-1][N-1]);
+			}
+		}
+	}
 	// for(int i=0;i<M;i++){
-	// 	for(int j=0;j<N;j++)
-	// 	aDy[i][j] = Diff[i][j];
+	// 	for(int j=0;j<N;j++){
+	// 		cout<<aD[i][j]<<" ";
+	// 	}
+	// 	cout<<endl;
 	// }
 	inhomogenous = true;
 }
@@ -242,38 +286,9 @@ void Walk::PutWalkers(int i, int j, int counter){
 void Walk::FindPosition(double *pos, int *indx){
 	/*Maps the walkers position to its index*/
 	// int indx[d];
-	if(d==1){
-		indx[0] = -1;
-		for(int q=0; q<m; q++){
-			if(fabs(pos[0]-x[q])<dx/2.0){
-				indx[0] = q;
-				break;
-			}
-		}
-		if(indx[0]==-1){
-			cout<<"panic!!"<<endl;
-			exit(1);
-		}
-	}
-	else if(d==2){
-		indx[0] = indx[1] = -1;
-		for(int q=0; q<m; q++){
-			if(fabs(pos[0]-x[q])<dx/2.0){
-				indx[0] = q;
-				break;
-			}
-		}
-		for(int h=0; h<n; h++){
-			if(fabs(pos[1]-y[h])<dy/2.0){
-				indx[1] = h;
-				break;
-			}
-		}
-		if(indx[0]==-1||indx[1]==-1){
-			cout<<"panic!!"<<endl;
-			cout<<pos[0]<<","<<pos[1]<<endl;
-			exit(1);
-		}
+	indx[0] = int(round(pos[0]/dx));
+	if(d==2){
+		indx[1] = int(round(pos[1]/dy));
 	}
 	// return indx;
 }

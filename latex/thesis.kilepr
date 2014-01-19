@@ -1,0 +1,10 @@
+[General]
+lastDocument=theory.tex
+
+[item:Intro.tex]
+column=111
+line=33
+
+[view-settings,view=0,item:Intro.tex]
+CursorColumn=111
+CursorLine=33

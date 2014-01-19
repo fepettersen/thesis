@@ -99,6 +99,10 @@ void Combine::Solve(){
 }
 
 void Combine::AddWalkArea(double *x, double *y){
+	/*sets up a new walk-solver for the area defined by the rectangle x,y. 
+	Based on the start and end points in x and y we find the relevant indeces in 
+	the solution array, U, and calculate a distribution of walkers C = Hc*U. 
+	The isotropic/anisotropic diffusion constant is set for the area.*/
 	if(debug){cout<<"Combine::AddWalkArea"<<endl;}
 	walk_areas++;
 	int M = 0; int N = 0;
@@ -123,42 +127,47 @@ void Combine::AddWalkArea(double *x, double *y){
 	}
 	else{
 		if(d==2){
-			double **temp = new double*[M+2];
-			for(int k=0; k<(M+2);k++){
-				temp[k] = new double[N+2];
+			double **temp = new double*[M];
+			for(int k=0; k<(M);k++){
+				temp[k] = new double[N];
 			}
-			for(int k=0; k<(M+2);k++){
-				for(int l=0; l<(N+2);l++){
+			for(int k=0; k<M;k++){
+				for(int l=0; l<N;l++){
 					temp[k][l] = aD[index[0][0]+k][index[1][0]+l];
 				}
 			}
-			tmp->SetDiffusionTensor(temp,M+2,N+2);
+			tmp->SetDiffusionTensor(temp,M,N);
 		}
 		else if(d==1){
-			double **temp = new double*[M+2];
-			for(int k=0; k<(M+2);k++){
+			double **temp = new double*[M];
+			for(int k=0; k<M;k++){
 				temp[k] = new double[1];
 			}
-			for(int k=0; k<(M+2);k++){
+			for(int k=0; k<M;k++){
 				for(int l=0; l<1;l++){
 					temp[k][l] = aD[index[0][0]+k][0];
 				}
 			}
-			tmp->SetDiffusionTensor(temp,M+2,1);
+			tmp->SetDiffusionTensor(temp,M,1);
 		}
 	}
 	int **Ctmp = new int*[M];
+	signmap = new int*[M];
 	for(int k=0; k<M;k++){
 		Ctmp[k] = new int[N];
+		signmap[k] = new int[N];
 	}
 	ConvertToWalkers(Up,Ctmp,index);
 	tmp->SetInitialCondition(Ctmp,M,N);		/*The solution in the relevant area converted to walkers*/
 	walk_solvers.push_back(tmp);		/*Throws std::bad_alloc*/
 	indeces.push_back(index);
 	c.push_back(Ctmp);
+	/*deallocate index?*/
 }
 
 void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
+	/*Converts the solution, U, to a distribution of walkers for these particular 
+	indeces.*/
 	if(debug){cout<<"Combine::ConvertToWalkers"<<endl;}
 	int M,N,m0,n0;
 	m0 = index[0][0];
@@ -172,15 +181,12 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
 	}
-	signmap = new int*[M];
-	for(int e=0;e<M;e++){
-		signmap[e] = new int[N];
-	}
+
 	for(int k=0; k<M; k++){
 		for(int l=0; l<N; l++){
 			Conc[k][l] = (int) (fabs(u[k+m0][l+n0]*Hc));
 			(u[k+m0][l+n0]>0)?(signmap[k][l]=1):(signmap[k][l]=-1);
-			// cout<<Conc[k][l]<<"  ";
+			// cout<<u[k+m0][l+n0]<<" ";
 		}
 		// cout<<endl;
 	}
@@ -188,7 +194,7 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 
 void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 	if(debug){cout<<"Combine::ConvertFromWalkers"<<endl;}
-	int M,N,m0,n0;
+	int M,N,m0,n0; 
 	m0 = index[0][0];
 	if(d==1){
 		M = index[1][0]-index[0][0];
@@ -200,7 +206,6 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
 	}
-
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
@@ -208,7 +213,6 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 			// u[k+m0][j+n0] = Conc[k][j]/Hc;
 		}
 	}
-	delete[] signmap;
 }
 
 void Combine::MapAreaToIndex(double *x,double *y, int **index){
