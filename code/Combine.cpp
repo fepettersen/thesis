@@ -294,6 +294,7 @@ void Combine::TestRWConvergence(int steps,string path){
 			ofile<<endl;
 		}
 		ofile.close();
+		cout<<"t = "<<t<<endl;
 	}
 }
 

@@ -386,9 +386,9 @@ if __name__ == '__main__':
 	y0 = 0.6
 	x1 = 0.6
 	y1 = 0.7
-	m = 51
-	n = 51
-	T = 63
+	m = 26
+	n = 26
+	T = 100
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -403,7 +403,7 @@ if __name__ == '__main__':
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
-	run.SetInitialCondition(f(x,y,0))
+	run.SetInitialCondition(D(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
 	# run.SetInitialCondition(f(np.exp(np.linspace(0,1,m)),np.zeros(m),0))
 	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
@@ -411,12 +411,12 @@ if __name__ == '__main__':
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	run.VerifyDeterministicError()
+	# run.VerifyDeterministicError()
 
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
 	# time.sleep(1)
 	# run.CalculateError(Hc,exact=True)
 	# run.PlotError()
@@ -427,7 +427,7 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	# run.Visualize(viz_type=None)
+	run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)

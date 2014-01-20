@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 	FromFile(aD,"DiffusionTensor.txt",m,n);
 
 	string RWname = "RWname";
-	bool test_convergence = false;
+	bool test_convergence = true;
 	Combine BlackBox(m,n,0,1,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	

@@ -366,8 +366,10 @@ where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which,
 We notice that we must have $\left|A\right|\leq 1$ if $u$ is to not blow up. 
 Inserting \ref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives us the following
 \begin{align*}
- \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= A^n\frac{D\Delta t}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
-  A^n\exp(ikp\Delta x)\left(A-1\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
+ \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= \\
+ A^n\frac{D\Delta t}{\Delta x^2}&\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
+  A^n\exp(ikp\Delta x)\left(A-1\right) &= \\
+  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}&\left(\exp(ik\Delta x) -2  + \exp(-ik\Delta x)\right)
 \end{align*}
 Using the well known identities $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
 \begin{equation}
@@ -380,7 +382,8 @@ We now insert for the ``worst case scenario'' $max(\sin^2\left(\frac{k\Delta x}{
 In 2d this criterion is halved, and for the anisotropic case we must insert for the maximum value of D which, again, will be the ``worst case scenario''.\\
 If we insert the same solution (eq. \ref{von_neumann_fourier_solution}) in the BE scheme we get
 \begin{align*}
- \exp(ikp\Delta x)\left(A^{n}-A^{n-1}\right) &= A^n\frac{D\Delta t}{\Delta x^2}\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
+ \exp(ikp\Delta x)\left(A^{n}-A^{n-1}\right) &= \\
+ A^n\frac{D\Delta t}{\Delta x^2}&\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
   A^n\exp(ikp\Delta x)\left(1-A^{-1}\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
 \end{align*}
 which leads to 
@@ -432,12 +435,51 @@ Just as for the 2d case, the computiational cost per time step is of the order o
 In other words the computiational cost is now quite high ($\mathcal{O}(n^6)$).
 For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
-\subsection{Some linear algebra}
+\subsection{Tridiagonal linear systems}
+
+We can solve a normal linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}$ where $\mathbf{A}$ is not a sparse matrix, by Gaussian elimination.
+
+\begin{align}
+  \mathbf{A} = 
+ \left( \begin{array}{rrrr}
+ a_{11} & a_{12} & a_{13} & a_{14} \\
+ a_{21} & a_{22} & a_{23} & a_{24} \\
+ a_{31} & a_{32} & a_{33} & a_{34} \\
+ a_{41} & a_{42} & a_{43} & a_{44}
+ \end{array} \right)\mathbf{x} = \mathbf{b}
+\end{align}
+Is reduced to
+\begin{align}
+  \mathbf{A} = 
+ \left( \begin{array}{rrrr}
+ a_{11} & a_{12} & a_{13} & a_{14} \\
+ 0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
+ 0 & (a_{32}-\frac{a_{31}a_{12}}{a_{11}}) & (a_{33}-\frac{a_{31}a_{13}}{a_{11}}) & (a_{34}-\frac{a_{31}a_{14}}{a_{11}}) \\
+ 0 & (a_{42}-\frac{a_{41}a_{12}}{a_{11}}) & (a_{43}-\frac{a_{41}a_{13}}{a_{11}}) & (a_{44}-\frac{a_{41}a_{14}}{a_{11}})
+ \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
+\end{align}
+and further to
+\begin{align}
+  \mathbf{A} = 
+ \left( \begin{array}{rrrr}
+ a_{11} & a_{12} & a_{13} & a_{14} \\
+ 0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
+ 0 & 0 & (\tilde{a}_{33}-\frac{\tilde{a}_{32}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{34}-\frac{\tilde{a}_{32}\tilde{a}_{24}}{\tilde{a}_{22}}) \\
+ 0 & 0 & (\tilde{a}_{43}-\frac{\tilde{a}_{42}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{44}-\frac{\tilde{a}_{42}\tilde{a}_{34}}{\tilde{a}_{22}})
+ \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
+\end{align}
+through the well known Gaussian elimination scheme until we have an upper triangular matrix. We can then do a backwards sweep to solve for one element of the unknown vector, $\mathbf{x}$ at a time. If the matrix $\mathbf{A}$ is tridiagonal, most of the entries will be zero, and so we will not only be calculating a lot of zeros, we will also be saving a lot of them in the matrix (should we be so stupid as to save the matrix). We can easily get away with only doing one forward sweep down the matrix, eliminating all the sub-diagonal matrix-entries, and then one backward sweep, which calculates the unknown vector $\mathbf{x}$. The algorithm is listed below as a function implemented in C++.
+
+\lstinputlisting{Figures/tridiag.cpp}
+
+
 The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
 The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
-The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by a specialized Gaussian elimination. This algorithm is described in the appendix, \emph{but should be described here?} 
-In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. We can actually modify the tridiagonal solver from the one-dimensional case so we can use it on the block-tridiagonal system. 
-The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{}.
+The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed above.
+In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). 
+Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. 
+We can actually modify the tridiagonal solver from the one-dimensional case so we can use it on the block-tridiagonal system. 
+The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. 
 
 \begin{align}\label{block_tridiagonal_matrix}
    \left(\begin{array}{c c c c c c c c c}
@@ -457,7 +499,7 @@ The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_m
              \end{array}\right) = \mathbf{u}^{n}
 \end{align}
 which we can also express as $M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
-The block-tridiagonal solver is taken from \cite{}, and is listed in \ref{}.\\
+The block-tridiagonal solver is taken from \cite{}, and is listed below.\\
 There is a forward substitution
 \begin{align*}
  H_1 &= -B_1^{-1}C_1\nonumber \\
@@ -470,9 +512,14 @@ There is a forward substitution
   \mathbf{x}_{n-1} &= \mathbf{g}_{n-1}\nonumber\\
   \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
  \end{align*}
-The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. However, the matrices are at most tridiagonal themselves, and so the cost of inverting them is greatly reduced, and we only need to to the inversion once as long as the mass-matrix, $M$ is unchanged. This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme better than the implicit FE scheme.
+The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. 
+However, we only need to to the inversion once as long as the mass-matrix, $M$ is unchanged so the expense is reduced. 
+This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. 
+All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme better than the implicit FE scheme.
 
-In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. There are probably ways of improving this beyond the benchmark LU decomposition method which will take some $\mathcal{O}(n^6)$ operations per time-step
+In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. 
+As we can see in the appendix (eq. \ref{BE3D_linear_system}) we can write this so it looks like the block tridiagonal linear system we got in 2d, and that could be solved by the block-tridiagonal solver. 
+The difference is that the entries in the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that we must work with $n^2\times n^2$ matrices. All in all we should get a performance of around $\mathcal{O}(n^3)$ if we take care to save the inverted matrices from the forward substitution. This is about the same performance as the explicit scheme gives us, but again without the stability issue.
 
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\

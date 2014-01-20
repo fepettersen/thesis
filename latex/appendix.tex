@@ -74,45 +74,37 @@ In equation \ref{BE3D_linear_system} $I$ denotes the $n\times n$ identity, $D_{i
 All $0$'s denote the $n\times n$ zero-matrix. The values $\alpha$ and $\beta$ are the relevant coefficient matrices for the calculations in question. These will be diagonal as well (or simly numbers in the isotropic case). 
 Note also that the vector entries $u^{n+1}_{ijk}$ are column vectors, making the vector $\mathbf{u}^{n+1}$ have the shape $1\times n^3$.
 
-\subsection{Tridiagonal Gaussian Elimination}
-
-We can solve a normal linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}$ where $\mathbf{A}$ is not a sparse matrix, by Gaussian elimination.
-
-\begin{align}
-  \mathbf{A} = 
- \left( \begin{array}{rrrr}
- a_{11} & a_{12} & a_{13} & a_{14} \\
- a_{21} & a_{22} & a_{23} & a_{24} \\
- a_{31} & a_{32} & a_{33} & a_{34} \\
- a_{41} & a_{42} & a_{43} & a_{44}
- \end{array} \right)\mathbf{x} = \mathbf{b}
-\end{align}
-Is reduced to
-\begin{align}
-  \mathbf{A} = 
- \left( \begin{array}{rrrr}
- a_{11} & a_{12} & a_{13} & a_{14} \\
- 0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
- 0 & (a_{32}-\frac{a_{31}a_{12}}{a_{11}}) & (a_{33}-\frac{a_{31}a_{13}}{a_{11}}) & (a_{34}-\frac{a_{31}a_{14}}{a_{11}}) \\
- 0 & (a_{42}-\frac{a_{41}a_{12}}{a_{11}}) & (a_{43}-\frac{a_{41}a_{13}}{a_{11}}) & (a_{44}-\frac{a_{41}a_{14}}{a_{11}})
- \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
-\end{align}
-and further to
-\begin{align}
-  \mathbf{A} = 
- \left( \begin{array}{rrrr}
- a_{11} & a_{12} & a_{13} & a_{14} \\
- 0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
- 0 & 0 & (\tilde{a}_{33}-\frac{\tilde{a}_{32}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{34}-\frac{\tilde{a}_{32}\tilde{a}_{24}}{\tilde{a}_{22}}) \\
- 0 & 0 & (\tilde{a}_{43}-\frac{\tilde{a}_{42}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{44}-\frac{\tilde{a}_{42}\tilde{a}_{34}}{\tilde{a}_{22}})
- \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
-\end{align}
-through the well known Gaussian elimination scheme until we have an upper triangular matrix. We can then do a backwards sweep to solve for one element of the unknown vector, $\mathbf{x}$ at a time. If the matrix $\mathbf{A}$ is tridiagonal, most of the entries will be zero, and so we will not only be calculating a lot of zeros, we will also be saving a lot of them in the matrix (should we be so stupid as to save the matrix). We can easily get away with only doing one forward sweep down the matrix, eliminating all the sub-diagonal matrix-entries, and then one backward sweep, which calculates the unknown vector $\mathbf{x}$. The algorithm is listed below as a function.
-
-\lstinputlisting{Figures/tridiag.cpp}
 % \caption{Algorithm for Gaussian elimination of a tridiagonal linear system.}
 % \label{tridiag}
 
-\section{LU decomposition}
+\section{Debugging}
 
-Something
+In any project which involves programming one is bound to do some debugging. This project is no exception. 
+Debugging can be extremely frustrating because no-one sees all the hours that go into finding the bugs, only the ones that do not (when the bug is not fixed). 
+This section will deal with some general techniques for debugging finite difference solvers and random-walk implementations and some special words on how to debug the software developed to combine the two solvers.
+
+\subsection{Compiler/syntax errors}
+
+If you are programming in a compiled language like fortran or C/C++ you will forget some syntax, or misspell it, use a compiler-flag that outputs as much info as possible to terminal (-Wall for the gnu compiler), and start with the errors you understand. If you are building a larger project which requires linking, remember that packages must be linked in the correct order. For example; the armadillo linear algebra library is backened by LAPACK and BLAS. Both these libraries must be linked as well and they must be linked in the following order:
+\begin{lstlisting}
+ g++ *.cpp -o myprog -O2 -larmadillo -llapack -lblas
+\end{lstlisting}
+Anything else will give very cryptic compiler errors. \\
+If you are using an interpreted language like python or MatLab the interpreter usually gives extensive information about the errors you have done, read them thoroughly!
+
+\subsection{Segmentation faults}
+In an interpreted language you will be told exactly where and what is wrong, in compiled languages you will not unless you are using extensions that give you some more information like armadillo. Segmentation faults are often quite simple to find, and most compilers have some sort of debugger which can help you find them. 
+The gnu-compiler has an environment called gdb in which you can run your program which will catch seg.-faults and tell you where they are. If you are using some advanced editor like qt creator you can also easily place breakpoints in your code where you can get information about the various variables, instances, attributes etc. of your code at the exact time of the break. You can also step through the code. thoroughly
+Some times though the thing that works best is to print things at various places. I like having the possibility that every function in my code can print its name when it is called. There are even some python modules which tells you where it was called from. This will make it very easy to find out when the code went wrong, and what function is the problem.
+
+\subsection{Finite difference methods}
+First and foremost: Have a correct discretization. There are (probably) webpages which can discretize your equation(s) for you, but it is almost always useful to do this by hand. 
+It will help you in your further debugging. \\
+There is one very important rule in programming in general: ``First make it work, then make it fast''. 
+For implementing FDMs this means that you should start coding as soon as you have a clear image of what to be implemented, and what dependencies are needed. You will need a well defined initial condition (preferably one where you have the exact solution of the equation) and boundary conditions before you start coding. 
+Personally, I like starting with the simplest Dirichlet boundary conditions $u|_{\d \Omega} = 0$ and make them work before I go any further. 
+You should note, however, that implicit schemes will be greatly influenced by the choice of boundary conditions.\\
+Visualization is invaluable during debugging, seeing as a plot will let you see when and where the error occurs. \emph{Show some example}
+Most likely you will now have something wrong with your solution (if not, cudos). This is where you look over your discretization again to make sure that it is correct, and then look over your implementation to check that it actually does what you think it does. 
+At this point I would like to introduce rubber-duck debugging which was invented by the C-developer Dennis Ritchie. The story goes that he would keep a rubber duck at his desk and whenever he was stuck, would describe the code in detail (what each statement did) to the rubber duck. Asking questions often reveals a lot of information. Personally I like my rubber duck to challenge me, so I prefer to involve a friend, but the concept is the same.\\
+When your code seems to reproduce the intended results it is time to start the verification. This is where we make an error estimate and do some numerical analysis (you should of course have checked for the numerical stability of your chosen scheme when you discretized it).
