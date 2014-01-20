@@ -414,14 +414,14 @@ if __name__ == '__main__':
 	run.VerifyDeterministicError()
 
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# # # h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(Hc)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	# # h = [1./Hc[i] for i in range(len(Hc))]
+	run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 

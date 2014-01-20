@@ -368,8 +368,8 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return u
 
 def D(x,y,t=0):
-	# return x+y
-	return np.ones(np.shape(x))*0.5
+	return x+y
+	# return np.ones(np.shape(x))*0.5
 
 def Heaviside(x,y):
 	return 0
@@ -397,13 +397,13 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [500]
-	# Hc = [1400,5600,10400,32000,100000]
+	# Hc = [500]
+	Hc = [1400,3200,5600,8000,10400,13000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
-	run.SetInitialCondition(f(x,y,0))
+	run.SetInitialCondition(F(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
 	# run.SetInitialCondition(f(np.exp(np.linspace(0,1,m)),np.zeros(m),0))
 	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
@@ -414,20 +414,20 @@ if __name__ == '__main__':
 	run.VerifyDeterministicError()
 
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# # # h = [1./Hc[i] for i in range(len(Hc))]
-	# run.ConvergenceTest(Hc)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	# # h = [1./Hc[i] for i in range(len(Hc))]
+	run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	# run.Visualize(viz_type=None)
+	run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)

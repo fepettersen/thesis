@@ -79,7 +79,7 @@ void Combine::Solve(){
 	for(vector<Walk*>::iterator it1 = walk_solvers.begin(); it1 != walk_solvers.end(); it1++){
 		(*it1)->drift = 0;
 		ConvertToWalkers(U,c[counter],indeces[counter]);
-		(*it1)->ResetInitialCondition(c[counter]);
+		(*it1)->ResetInitialCondition(C);
 		// (*it1)->advance(c[counter]);
 		(*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);	/**/
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
