@@ -289,7 +289,6 @@ void Walk::FindPosition(double *pos, int *indx){
 	indx[0] = int(round(pos[0]/dx));
 	if(d==2){
 		indx[1] = int(round(pos[1]/dy));
-		// cout<<"FindPosition->indx: "<<indx[0]<<","<<indx[1]<<" ; pos: "<<pos[0]<<","<<pos[1]<<endl;
 	}
 	// return indx;
 }

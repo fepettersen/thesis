@@ -181,19 +181,16 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 		n0 = index[1][0];
 	}
 	double test = 0;
-	int test2 = 0;
-	// cout<<"-------------------"<<endl;
 	for(int k=0; k<M; k++){
 		for(int l=0; l<N; l++){
 			Conc[k][l] = (int) (round(fabs(u[k+m0][l+n0]*Hc)));
-			// test2 += Conc[k][l];
 			(u[k+m0][l+n0]>0)?(signmap[k][l]=1):(signmap[k][l]=-1);
 			// cout<<u[k+m0][l+n0]<<" ";
-			// test += u[k+m0][l+n0];
+			test += u[k+m0][l+n0];
 		}
 		// cout<<endl;
 	}
-	// cout<<"test*Hc =? test2: "<<test*Hc<<","<<test2<<endl;
+	// cout<<"test*Hc = "<<test*Hc<<endl;
 }
 
 void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
@@ -210,17 +207,13 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
 	}
-	// cout<<"-------------------"<<endl;
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
 			u[k+m0][j+n0] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
 			// u[k+m0][j+n0] = Conc[k][j]/Hc;
-			// cout<<Conc[k][j]<<" ";
 		}
-		// cout<<endl;
 	}
-	// cout<<"-------------------"<<endl;
 }
 
 void Combine::MapAreaToIndex(double *x,double *y, int **index){

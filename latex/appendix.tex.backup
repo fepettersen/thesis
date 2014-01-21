@@ -105,3 +105,17 @@ For implementing FDMs this means that you should start coding as soon as you hav
 Personally, I like starting with the simplest Dirichlet boundary conditions $u|_{\d \Omega} = 0$ and make them work before I go any further. 
 You should note, however, that implicit schemes will be greatly influenced by the choice of boundary conditions.\\
 Visualization is invaluable during debugging, seeing as a plot will let you see when and where the error occurs. \emph{Show some example}
+Most likely you will now have something wrong with your solution (if not, cudos). This is where you look over your discretization again to make sure that it is correct, and then look over your implementation to check that it actually does what you think it does. 
+At this point I would like to introduce rubber-duck debugging which was invented by the C-developer Dennis Ritchie. 
+The story goes that he would keep a rubber duck at his desk and whenever he was stuck, would describe the code in detail (what each statement did and was supposed to do) to the rubber duck. Asking questions often reveals a lot of information. 
+Personally I like my rubber duck to challenge me, so I prefer to involve a friend, but the concept is the same.\\
+When your code seems to reproduce the intended results it is time to start the verification. This is where we make an error estimate and do some numerical analysis (you should of course have checked for the numerical stability of your chosen scheme when you discretized it). 
+Making sure your implementation is correct is a lot harder than it sounds, but there are a few points that should be fulfilled:
+\begin{itemize}
+ \item Manufactured solution\\
+ Find some function which fulfills the equation you are working with. Remember that you have a source term which can be whatever you want it to be at this point, meaning that you can more or less decide what solution you want to your equation. 
+ \item Stationary solution\\
+ This boils down to energy-conservation. If the initial condition is a constant, there should be no time-dependencies (assuming your boundary conditions match; an initial condition $u=1$ with Dirichlet boundaries $u|_{\d \Omega}=0$ will not work), and the solution will be constant.
+ \item Exact numerical solution\\
+ For a fitting initial condition (and discretization) you will be able to find an exact solution to the discretized equation you are implementing. An example of this is found in chapter \ref{}
+\end{itemize}

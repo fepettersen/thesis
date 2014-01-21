@@ -38,6 +38,7 @@ nosetests.xml
 *.npy
 *.txt
 *.bin
+*.mpeg
 
 # Latex related files
 *.log

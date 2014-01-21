@@ -276,7 +276,7 @@ class Experiment:
 					
 	def MakeVideo(self,files):
 		import scitools.std as sci
-		sci.movie(files, encoder='mencoder', fps=25, output_file=self.result_path+'/movie.mpeg')
+		sci.movie(files, encoder='mencoder', fps=25, output_file=self.result_path+'/movie')
 		for i in files:
 			os.system('rm %s'%i)
 
@@ -385,7 +385,7 @@ def Heaviside(x,y):
 	return 0
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -393,12 +393,12 @@ if __name__ == '__main__':
 	this_dir = right_split(os.getcwd(),'/')
 
 	x0 = 0.4
-	y0 = 0.4
+	y0 = 0.6
 	x1 = 0.6
-	y1 = 0.6
+	y1 = 0.7
 	m = 26
 	n = 26
-	T = 150
+	T = 200
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -407,7 +407,7 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [50]
+	Hc = [5]
 	# Hc = [1400,5600,10400,32000,100000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
@@ -437,7 +437,7 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None,save_video=False)
+	run.Visualize(viz_type=None,save_video=True)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
