@@ -519,7 +519,9 @@ All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computation
 
 In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. 
 As we can see in the appendix (eq. \ref{BE3D_linear_system}) we can write this so it looks like the block tridiagonal linear system we got in 2d, and that could be solved by the block-tridiagonal solver. 
-The difference is that the entries in the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that we must work with $n^2\times n^2$ matrices. All in all we should get a performance of around $\mathcal{O}(n^3)$ if we take care to save the inverted matrices from the forward substitution. This is about the same performance as the explicit scheme gives us, but again without the stability issue.
+The difference is that the entries in the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that we must work with $n^2\times n^2$ matrices. 
+All in all we should get a performance of around $\mathcal{O}(n^3)$ if we take care to save the inverted matrices from the forward substitution. 
+This is about the same performance as the explicit scheme gives us, but again without the stability issue.
 
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\

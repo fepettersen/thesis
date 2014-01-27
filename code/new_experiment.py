@@ -132,7 +132,6 @@ class Experiment:
 		# mpl.hold('on')
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
-			# print 'balle'
 			mpl.plot(self.error[0],color[0],label='Deterministic')
 			for i in range(self.runcounter):
 				# mpl.plot(np.log(self.error[i]/self.dt))
@@ -155,7 +154,7 @@ class Experiment:
 			DT.append(self.dt)
 		self.error = []
 		leg = []
-		tmp = np.zeros(self.T+1)
+		tmp = np.zeros(self.T)
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-x']
 		if self.n>=1:
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
@@ -170,7 +169,7 @@ class Experiment:
 				infile = np.loadtxt(self.result_path+'/Deterministic_n%04d.txt'%i)
 				tmp[i] = np.abs(np.linalg.norm(infile-self.exact(X,Y,(i+1)*self.dt)))
 			self.error.append(tmp.copy())
-			mpl.plot(self.error[k][:-1],color[k])
+			mpl.plot(self.error[k][:],color[k])
 			leg.append('dt = %g'%DT[k])
 		mpl.legend(leg)
 		mpl.xlabel('timestep #')
@@ -179,7 +178,7 @@ class Experiment:
 		if save:
 			mpl.savefig(self.result_path+'/deterministic_errorplot.png')
 			mpl.savefig(self.result_path+'/deterministic_errorplot.eps')
-		mpl.show()
+		# mpl.show()
 
 	def UpdateWebpageDefault(self):
 		datetime = self.datetime
@@ -234,7 +233,7 @@ class Experiment:
 		im = []
 		if self.n<=1:
 			fig = mpl.figure()
-			x = np.exp(np.linspace(0,1,self.m)+1)
+			x = np.linspace(0,1,self.m)
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):
 				tmp = np.loadtxt(step)
@@ -245,8 +244,12 @@ class Experiment:
 					im.append(mpl.plot(x,self.exact(x,np.zeros(self.m),counter*self.dt),'-b'))
 				else:
 					im.append(mpl.plot(x,tmp,'b-'))
+				if save_video:
+					fig.savefig(step.split('.')[0]+'.png')
 				counter += 1
 			ani = animation.ArtistAnimation(fig,im)
+			if save_video:
+				self.MakeVideo(sorted(glob.glob(path+filename+'*.png')))
 			mpl.show()
 		else:
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
@@ -284,8 +287,12 @@ class Experiment:
 
 	def ConvergenceTest(self,Hc,save=True):
 		E = []
-		for i in xrange(len(Hc)):
-			E.append(np.sqrt(Hc[i]*np.sum(self.error[i])))
+		if self.runcounter != len(self.error):
+			for i in xrange(len(Hc)):
+				E.append(np.sqrt(Hc[i]*np.sum(self.error[i+1])))
+		else:
+			for i in xrange(len(Hc)):
+				E.append(np.sqrt(Hc[i]*np.sum(self.error[i])))
 		r = [0]*(len(E)-1)
 		for j in xrange(len(E)-1):
 			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
@@ -347,7 +354,7 @@ def f(x,y,t):
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y) +1
 
 def F(x,y,t):
 	tmp = np.zeros(np.shape(x))
@@ -379,10 +386,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return x+y
-	return np.ones(np.shape(x))*0.5
-
-def Heaviside(x,y):
-	return 0
+	return np.ones(np.shape(x))
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -392,44 +396,44 @@ if __name__ == '__main__':
 
 	this_dir = right_split(os.getcwd(),'/')
 
-	x0 = 0.4
-	y0 = 0.4
-	x1 = 0.6
-	y1 = 0.6
-	m = 26
-	n = 26
-	T = 150
+	x0 = 0.2
+	y0 = 0.5
+	x1 = 0.4
+	y1 = 0.7
+	m = 51
+	n = 51
+	T = 100
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = 0.0005
+	dt = 0.001
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [50]
-	# Hc = [1400,5600,10400,32000,100000]
+	Hc = [200]
+	# Hc = [200,1400,5600,10400,32000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
-	run = Experiment(this_dir,DEBUG,save_files)
-	run.exact = f
-	run.SetInitialCondition(f(x,y,0))
+	run = Experiment(this_dir,DEBUG,save_files,info='TestingRW')
+	run.exact = F
+	run.SetInitialCondition(run.exact(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
-	# run.SetInitialCondition(f(np.exp(np.linspace(0,1,m)),np.zeros(m),0))
+	# run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
 	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	# dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt)
-	# run.VerifyDeterministicError()
+	run.VerifyDeterministicError()
 
 
-	for i in Hc:
-		print "Hc = %g"%i
-		run.RunSimulation(i)
-	time.sleep(1)
-	run.CalculateError(Hc,exact=True)
-	run.PlotError()
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.RunSimulation(i)
+	# # time.sleep(1)
+	# run.CalculateError(Hc,exact=True)
+	# run.PlotError()
 	# # h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
@@ -437,12 +441,12 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None,save_video=False)
+	# run.Visualize(viz_type=None,save_video=True)
 
 	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n',viz_type=None)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None,save_video=True)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
+	run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
 	run.Finish()
