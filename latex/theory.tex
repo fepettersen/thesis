@@ -407,7 +407,7 @@ Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac
 We can do better than this by using another discretization scheme for the PDE, but in our case the PDE is not the only error source seeing as we will combine it with a random walk solver. 
 Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
-Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per meshpoint in the walk-area. 
+Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
 This will be such a costly operation that it will not necessarily be worth it.\\
 The spatial derivative also has a well defined residual which is found by Taylor expansion.
 \begin{equation}
@@ -415,25 +415,36 @@ R = \frac{u(x_{i+1})-2u(x_i)+u(x_{i-1})}{\Delta x^2}-u''(x_i)
 \end{equation}
 Remember Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
 \begin{align*}
- R &= \frac{u(x_i)+u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}-\frac{2u(x_i)}{\Delta x^2}+\\
- &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} -u'(x_i)\\
-R &= u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
+ &R =\\& \frac{u(x_i)+u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}-\\ &\frac{2u(x_i)}{\Delta x^2}+\\
+ &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} \\ &-u'(x_i)\\
+&R = u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
 \end{align*}
-There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative.
+There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative. \\
+For the Random walk we know from statistical mechanics that the fluctuations around a steady state is related to the number of walkers through eq. \ref{RW_error_estimate}.
+\begin{equation}\label{RW_error_estimate}
+ \langle\Delta u\rangle \propto \frac{1}{\sqrt{N}}
+\end{equation}
+In the combined solver, we assume that equation \ref{RW_error_estimate} still holds for the RW-part of the solution even though we can only say for certain that it is correct for the first time-step. 
+The number of walkers, $N$ is now given by the defined conversion factor $Hc$ as 
+\begin{equation}
+ N(x,y,t) = Hc\cdot U(x,y,t)
+\end{equation}
+and the total number of walkers is the sum of the walkers on all the mesh-points. 
+In each mesh-point the fluctuations are of the order $\sqrt{N(x_i,y_j,t_n)}^{-1}$, meaning that the convergence rate in each mesh-point is $\frac{1}{2}$. 
 
-\subsection{Extension to 3 spatial dimensions}
-
-As we see in the appendix the assembly of the linear problem that arises from the BE discretization in 2d with a variable diffusion constant is a rather messy thing. 
-While a 2d simulation might tell us a great deal, and be sufficient for many applications such as modeling of experimental setups of diffusion in the ECS (in vitro experiments on very thin slices), we should at least look into an extension of our model to 3 dimensions. 
-The BE discretization is very similar in 3d to the 2d case. In fact we must only add a term for the z-direction. 
-If we translate the resulting expression to a linear problem we immediately come across the problem that our solution, U, is a cubic matrix and so we must have a 4-dimensional matrix to describe to system. 
-The problem is solved by first of all describing the solution as a vector of matrices, and in turn as a vector of vectors (which is a matrix). 
-We now have the same situation as we had in the 2d case, and by following the same procedure as before we arrive at exactly the same situation which is a normal linear problem. 
-In fact, using block-matrix notation we can even write the problem in an identical way, as we have done in the appendix (eq. \ref{BE3D_linear_problem}). 
-The matrix is now 7-band diagonal, but the LU-decomposition still does the trick.\\
-Just as for the 2d case, the computiational cost per time step is of the order of $\mathcal{O}(N^2)$ where $N$ is now the spatial resolution cubed ($N = n^3$). 
-In other words the computiational cost is now quite high ($\mathcal{O}(n^6)$).
-For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
+% \subsection{Extension to 3 spatial dimensions}
+% 
+% As we see in the appendix the assembly of the linear problem that arises from the BE discretization in 2d with a variable diffusion constant is a rather messy thing. 
+% While a 2d simulation might tell us a great deal, and be sufficient for many applications such as modeling of experimental setups of diffusion in the ECS (in vitro experiments on very thin slices), we should at least look into an extension of our model to 3 dimensions. 
+% The BE discretization is very similar in 3d to the 2d case. In fact we must only add a term for the z-direction. 
+% If we translate the resulting expression to a linear problem we immediately come across the problem that our solution, U, is a cubic matrix and so we must have a 4-dimensional matrix to describe to system. 
+% The problem is solved by first of all describing the solution as a vector of matrices, and in turn as a vector of vectors (which is a matrix). 
+% We now have the same situation as we had in the 2d case, and by following the same procedure as before we arrive at exactly the same situation which is a normal linear problem. 
+% In fact, using block-matrix notation we can even write the problem in an identical way, as we have done in the appendix (eq. \ref{BE3D_linear_problem}). 
+% The matrix is now 7-band diagonal, but the LU-decomposition still does the trick.\\
+% Just as for the 2d case, the computiational cost per time step is of the order of $\mathcal{O}(N^2)$ where $N$ is now the spatial resolution cubed ($N = n^3$). 
+% In other words the computiational cost is now quite high ($\mathcal{O}(n^6)$).
+% For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
 \subsection{Tridiagonal linear systems}
 
@@ -539,11 +550,19 @@ A schematic of the algorithm is provided in figure \ref{schematic}.
 
 \begin{figure}[H]
 \centering
-% \includegraphics{schematic.eps}
+% \includegraphics{Figures/schematic.eps}
 \caption[Algorithm]{Schematic diagram of the algorithm.}
 \label{schematic}
 \end{figure}
-section
+
+\subsection{Convergence rate}
+
+In chapter \ref{truncation_error} we discussed the error that arises as a result of adding random walkers on parts of the mesh. 
+We found that the amplitude of the fluctuations per mesh-point is proportionate to $\frac{1}{\sqrt{N}}$ where N is the number of walkers related to the mesh-point. 
+Combining the two models means adding fluctuations to the approximation to the exact solution. Seeing as we send this combined solution to the PDE-solver as an ``initial condition'' for the next time-step we have made a compromise in accuracy. The error-estimate we will define later is still dependent of $\Delta t$, but the dependency is now of the order $\mathcal{O}(\sqrt{\Delta t})$. 
+This also further supports the claim that there is no need to find a very precise scheme to solve the PDE.\\
+\emph{We will test this by doing a convergence test in time keeping the number of walkers constant.}
+
 \subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
 
 There are a few obvious difficulties we can expect to run into in our planned project. 
@@ -565,15 +584,17 @@ Future ones will be added here as well.
  Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until we have the desired concentration of walkers.
  \item Negative concentration of walkers \\
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
- Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it might do). 
- The solution to this is simply to store the signs of the solution to the PDE in an array, and send only positive values to the random walk solver. 
- When we convert the number of walkers back to a PDE solution we still have the sign from before and can multiply the concentration by the sign it had in the last timestep. 
+ Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it most likely will not do). 
+ I can find no good solutions to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
+ This workaround has a problem in that a transition from positive to negative value will lead to a ``valley'' in the absolute-value solution. 
+ A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again.
  \item Smooth solutions\\
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
  When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one timestep to the next. 
  In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
- The approach we use to this is to do some curve-fitting using both of the solutions. 
- This will give us some difference between the two models and some smoothness.
+ The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
+ A polynomial regression model was implemented in 1d, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
+ Another idea is to implement a cubic spline interpolation over the area, but this too has its problems. An interpolation forces the solution to have a value at the interpolating points, and seeing as we cannot say for certain which value is correct how shall we pick the interpolating points?
  \item Number of timesteps on the random walk level\\
  As the timestep on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of timesteps on the RW level. 
  Strictly speaking we do not have to do this, seeing as we adjust the steplength of the walkers with respect to the timestep (see eq \ref{steplength}). 
@@ -619,4 +640,20 @@ When we additionally use an implicit FD method we will add a ``demand'' of havin
 Fortunately the implicit solvers we use are stable. \\
 In the physical scope of this thesis we do not find any rectangular shapes to apply our system to. 
 Actually we do not have any well defined geometry to apply our system on, but that is of less importance. 
-The developed software lets us specify an initial condition
+The purpose of this project is to investigate the actual coupling of two models for the same problem. \\
+If we want to model diffusion on a general geometry by a FD method we could transform the grid to a unit-square through a general transform.
+\begin{equation*}
+ \vec{r} = \mathbf{T}(\vec{q})
+\end{equation*}
+Where $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. After a lot of math, including some differential geometry we find that the diffusion equation in computational space still can be written as
+\begin{equation*}
+ \frac{\d C}{\d t} -\nabla\cdot\vec{J} = 0
+\end{equation*}
+but the total flux vector $\vec{J} = \vec{f} + \phi$ now has the properties
+\begin{align*}
+ \nabla\cdot\vec{f} = \frac{1}{g}\cdot\left(\vec{f}\cdot\frac{\d}{\d\xi}\left(\frac{\d y}{\d\eta},\frac{-\d x}{\d \eta}\right) + \vec{f}\cdot\frac{\d}{\d\eta}\left(\frac{-\d y}{\d\xi},\frac{\d x}{\d \xi}\right)\right) \\
+ \nabla\phi = \frac{1}{g}\left(\phi\cdot\frac{\d}{\d\xi}\left(\frac{\d y}{\d\eta},\frac{-\d x}{\d\eta}\right)+\phi\cdot\frac{\d}{\d\eta}\left(\frac{-\d y}{\d\xi},\frac{\d x}{\d\xi}\right)\right)
+\end{align*}
+where $g$ is the Jacobian of the transformation $\mathbf{T}$. In other words we would need to discretize a completely new and much more complicated equation in order to solve for a general geometry. We would also need to have some idea of what the functions $x(\xi,\eta)$ and $y(\xi,\eta)$ are, which is not necessarily something we have access to. 
+Furthermore we already have access to Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change the PDE-solver in the developed software to a FEniCS solver.
+

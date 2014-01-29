@@ -37,6 +37,7 @@ Walk::Walk(int dimension, double _dt)
 	D = 1;
 	dt = _dt/steps;
 	factor = sqrt(2*D*dt);
+	rng = new Random();
 	drift = factor/steps;
 	inhomogenous = false;
 };
@@ -169,7 +170,8 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 		for(int j=0;j<steps;j++){
 			/*Advance n steps*/
 			FindPosition(walkers[i],index);
-			for(p=0; p<d; p++){
+			p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
+			// for(p=0; p<d; p++){
 				if(inhomogenous){
 					L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
 					/*This might work and is slightly better*/
@@ -182,16 +184,18 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 					Tr /= 2.0;
 					// cout<<"Delta_p,Delta_m = "<<Delta_p<<","<<Delta_m<<endl;
 				}
-				r = ran0(&Idum);
+				// r = ran0(&Idum);
+				r = rng->uniform();
 				if(r>Tr){
 					stepvector[p] = Delta_p;
 				}
 				else{
 					stepvector[p] = -Delta_m;
 				}
-			}
+			// }
 			newPos = InhomogenousStep(walkers[i],stepvector);
 			walkers[i] = checkpos(newPos,stepvector);
+			stepvector[p] = 0;
 		}
 		FindPosition(walkers[i],index);
 		if(d==1){
@@ -279,9 +283,11 @@ void Walk::SetDiffusionConstant(double Diff){
 
 void Walk::PutWalkers(int i, int j, int counter){
 	// if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
-	walkers[counter][0] = x[i]+dx*(0.5-ran0(&Idum));
+	// walkers[counter][0] = x[i]+dx*(0.5-ran0(&Idum));
+	walkers[counter][0] = x[i]+dx*(0.5-rng->uniform());
 	if(d==2){
-		walkers[counter][1] = y[j]+dy*(0.5-ran0(&Idum));
+		// walkers[counter][1] = y[j]+dy*(0.5-ran0(&Idum));
+		walkers[counter][1] = y[j]+dy*(0.5-rng->uniform());
 	}
 }
 
@@ -335,7 +341,7 @@ double *Walk::checkpos(double *r,double *s){
 #undef IQ
 #undef IR
 #undef MASK
-#define MBIG 1000000000
-#define MSEED 161803398
-#define MZ 0
-#define FAC (1.0/MBIG)
+// #define MBIG 1000000000
+// #define MSEED 161803398
+// #define MZ 0
+// #define FAC (1.0/MBIG)

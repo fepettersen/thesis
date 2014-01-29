@@ -42,6 +42,7 @@ class Walk
 			// delete [] walkers;
 		};
 		// double ran0(long*);
+		Random *rng;					/*Random Number Generator*/
 
 };
 

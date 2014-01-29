@@ -11,9 +11,12 @@
 #include <vector>
 #include <fstream>
 
+#include <climits>
+
 #include <time.h>
 #include <armadillo>
 
+#include "Random.h"
 #include "Walk.h"
 #include "Diffusion.h"
 #include "Combine.h"

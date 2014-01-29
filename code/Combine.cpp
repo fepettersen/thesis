@@ -206,7 +206,7 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 			xtmp[k] = X[k+m0];
 		}
 
-		polyreg(xtmp,tmp,M);
+		// polyreg(xtmp,tmp,M);
 		for(int k=0;k<M;k++){
 			u[k+m0][0] = tmp[k];
 		}
@@ -216,18 +216,25 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
 		double** tmp = new double*[M];
-
-		// cout<<"RW solution      Actual solution     Difference      Walkers"<<endl;
+		// cout<<"===================================="<<endl;
 		for(int k=0; k<M; k++){
 			tmp[k] = new double[N];
 			for(int j=0; j<N; j++){
 				/*This is where we insert least squares or similar*/
 				u[k+m0][j+n0] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
 				// tmp[k][j] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
-				// cout<<tmp[k][j]<<"         "<<u[k+m0][j+n0]<<"     "<<tmp[k][j]-u[k+m0][j+n0]<<"     "<<Conc[k][j];
+				// cout<<fabs(tmp[k][j]-u[k+m0][j+n0])/Hc<<" ";
 			}
 			// cout<<endl;
 		}
+		// cout<<"-----------------------------------"<<endl;
+		// for(int k=0;k<M;k++){
+		// 	for(int j=0;j<N;j++){
+		// 		cout<<u[k+m0][j+n0]<<"  ";
+		// 		u[k+m0][j+n0] = tmp[k][j];
+		// 	}
+		// 	cout<<endl;
+		// }
 	}
 }
 

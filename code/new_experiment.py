@@ -386,7 +386,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return x+y
-	return np.ones(np.shape(x))
+	return np.ones(np.shape(x))*0.5
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -400,9 +400,9 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 0.4
 	y1 = 0.7
-	m = 51
-	n = 51
-	T = 100
+	m = 26
+	n = 26
+	T = 51
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -411,15 +411,15 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [200]
+	Hc = [600]
 	# Hc = [200,1400,5600,10400,32000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 
 	run = Experiment(this_dir,DEBUG,save_files,info='TestingRW')
-	run.exact = F
+	run.exact = f
 	run.SetInitialCondition(run.exact(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
-	# run.SetInitialCondition(f(np.linspace(0,1,m),np.zeros(m),0))
+	# run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
 	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 	run.compile()
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
@@ -428,13 +428,13 @@ if __name__ == '__main__':
 	run.VerifyDeterministicError()
 
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.RunSimulation(i)
-	# # time.sleep(1)
-	# run.CalculateError(Hc,exact=True)
-	# run.PlotError()
-	# # h = [1./Hc[i] for i in range(len(Hc))]
+	for i in Hc:
+		print "Hc = %g"%i
+		run.RunSimulation(i)
+	# time.sleep(1)
+	run.CalculateError(Hc,exact=True)
+	run.PlotError()
+	# h = [1./Hc[i] for i in range(len(Hc))]
 	# run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
@@ -444,9 +444,9 @@ if __name__ == '__main__':
 	# run.Visualize(viz_type=None,save_video=True)
 
 	# run.Visualize(viz_type='difference')
-	# run.Visualize(filename='/Deterministic_n',viz_type=None,save_video=True)
+	# run.Visualize(filename='/Deterministic_n',viz_type=None)
 	# run.Visualize(filename='/Deterministic_n',viz_type='exact')
-	run.Visualize(filename='/Deterministic_n',viz_type='difference')
+	# run.Visualize(filename='/Deterministic_n',viz_type='difference')
 	# a = raw_input('press return >>')
 
 	run.Finish()
