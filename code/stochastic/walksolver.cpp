@@ -1,4 +1,4 @@
-#include "Walk.h"
+#include "walksolver.h"
 using namespace std;
 // using namespace arma;
 
@@ -62,51 +62,42 @@ void FromFile(double **array, string filename,int m, int n){
 int main(int argc, char** argv)
 {
 	/*These should be changed*/
-    int tofile = atoi(argv[1]);
-    double x0 = atof(argv[2]);
-    double x1 = atof(argv[3]);
-    double y0 = atof(argv[4]);
-    double y1 = atof(argv[5]);
 
-    int m = atoi(argv[6]);
-    int n = atoi(argv[7]);
-    int T = atoi(argv[8]);
+    int m = atoi(argv[1]);
+    int n = atoi(argv[2]);
+    int T = atoi(argv[3]);
+    double Dt = strtod(argv[4],NULL);
 
-    string path = argv[9];
-    string filename = argv[10];
-    double conversion_factor =atof(argv[11]);
-    double Dt = strtod(argv[12],NULL);
-
-    string buffer;
+    string buffer = argv[5];
     ofstream outfile;
-
-	double *x = new double[2];
-	double *y = new double[2];
-	x[0] = x0; x[1] = x1;
-	y[0] = y0; y[1] = y1;
+    int d;
+    (n>1)?(d=2):(d=1);
 	double dx = 1.0/(m-1);
 	double dy = 1.0/(n-1);
 
-	double **Up = new double*[m];
 	double **aD = new double*[m];
 
 	for(int i=0; i<m; i++){
-		Up[i] = new double[n];
 		aD[i] = new double[n];
 	}
 
-	FromFile(Up,"InitialCondition.txt",m,n);
+	// FromFile(Up,"InitialCondition.txt",m,n);
 	FromFile(aD,"DiffusionTensor.txt",m,n);
 
-	Walk solver();
-	solver.SetInitialCondition(C,m,n);
+	Walk solver(d,Dt);
+
+	solver.Load(buffer);
 	solver.SetDiffusionTensor(aD,m,n);
 	for(int t=0; t<T; t++){
-		solver.InhomogenousAdvance(C,dt);
-		if(tofile){
-			// output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
-			output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
-		}
+		solver.Advance();
 	}
+	outfile.open(buffer.c_str(),ios::binary);
+	for(int i=0; i<solver.nwalkers; i++){
+		for(int j=0;j<d;j++){
+			outfile<<solver.walkers[i][j]<<" ";
+		}
+		outfile<<endl;
+	}
+	outfile.close();
 	return 0;
 }

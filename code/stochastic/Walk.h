@@ -33,6 +33,9 @@ class Walk
 		void SetDiffusionTensor(double **, int, int);
 		void SetDiffusionConstant(double);
 
+		void Advance(void);
+		void Load(std::string);
+
 		void ResetWalkers(){
 			for(int k=0;k<nwalkers;k++)
 				delete [] walkers[k];

@@ -30,6 +30,7 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	}
 
 	pde_solver = new Diffusion(dx,dy,D,Dt);
+	rng = new Random();
 	Hc = factor;
 	inhomogenous = false;
 };
@@ -63,6 +64,7 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 	// 	Dt = stabilitycriteria;
 	// }
 	pde_solver = new Diffusion(dx,dy,aD,Dt);
+	rng = new Random();
 	Hc = factor;
 	inhomogenous = true;
 };
@@ -71,13 +73,17 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 void Combine::Solve(){
 	if(debug){cout<<"Combine::Solve"<<endl;}
 	int counter = 0;
+	int num_procs = 2;
 	pde_solver->advance(U,Up,m,n);
 	double diffnorm = norm(U,Up,m,n);
-	for(vector<Walk*>::iterator it1 = walk_solvers.begin(); it1 != walk_solvers.end(); it1++){
-		(*it1)->drift = 0;
+	char* cmd;
+	for(int i=0; i<walk_areas;i++){
+		// (*it1)->drift = 0;
 		ConvertToWalkers(Up,c[counter],indeces[counter]);
-		(*it1)->ResetInitialCondition(c[counter]);
-		(*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
+		// (*it1)->ResetInitialCondition(c[counter]);
+		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
+		sprintf(cmd,"mpirun -np %d %s %d %d %d %g",num_procs,prgm,M,N,walk_steps,pde_solver->dt);
+		system(cmd);
 		ConvertFromWalkers(U,c[counter],indeces[counter]);
 		counter ++;
 	}
@@ -106,7 +112,7 @@ void Combine::AddWalkArea(double *x, double *y){
 	for(int k=0; k<2;k++){
 		index[k] = new int[d];
 	}
-	Walk *tmp = new Walk(d,pde_solver->dt);
+	//Walk *tmp = new Walk(d,pde_solver->dt);
 	MapAreaToIndex(x,y,index);
 	if(d==1){
 		M = index[1][0]-index[0][0];
@@ -116,52 +122,65 @@ void Combine::AddWalkArea(double *x, double *y){
 		M = index[0][1]-index[0][0];
 		N = index[1][1]-index[1][0];
 	}
-	if(not inhomogenous){
-		/*Should have a better test. Testing if we have a diffusion 
-		constant or inhomogenous diffusion*/
-		tmp->SetDiffusionConstant(D);
-	}
-	else{
-		if(d==2){
-			double **temp = new double*[M];
-			for(int k=0; k<(M);k++){
-				temp[k] = new double[N];
-			}
-			for(int k=0; k<M;k++){
-				for(int l=0; l<N;l++){
-					temp[k][l] = aD[index[0][0]+k][index[1][0]+l];
-				}
-			}
-			tmp->SetDiffusionTensor(temp,M,N);
+
+	if(d==2){
+		double **temp = new double*[M];
+		for(int k=0; k<(M);k++){
+			temp[k] = new double[N];
 		}
-		else if(d==1){
-			double **temp = new double*[M];
-			for(int k=0; k<M;k++){
-				temp[k] = new double[1];
+		for(int k=0; k<M;k++){
+			for(int l=0; l<N;l++){
+				temp[k][l] = aD[index[0][0]+k][index[1][0]+l];
 			}
-			for(int k=0; k<M;k++){
-				for(int l=0; l<1;l++){
-					temp[k][l] = aD[index[0][0]+k][0];
-				}
-			}
-			tmp->SetDiffusionTensor(temp,M,N);
 		}
+		SaveDiffusionTensor(temp,M,N,walk_areas);
 	}
-	int **Ctmp = new int*[M];
-	signmap = new int*[M];
-	for(int k=0; k<M;k++){
-		Ctmp[k] = new int[N];
-		signmap[k] = new int[N];
+	else if(d==1){
+		double **temp = new double*[M];
+		for(int k=0; k<M;k++){
+			temp[k] = new double[1];
+		}
+		for(int k=0; k<M;k++){
+			for(int l=0; l<1;l++){
+				temp[k][l] = aD[index[0][0]+k][0];
+			}
+		}
+		SaveDiffusionTensor(temp,M,N,walk_areas);
 	}
-	ConvertToWalkers(Up,Ctmp,index);
-	tmp->SetInitialCondition(Ctmp,M,N);		/*The solution in the relevant area converted to walkers*/
-	walk_solvers.push_back(tmp);		/*Throws std::bad_alloc*/
-	indeces.push_back(index);
-	c.push_back(Ctmp);
+	char* tmp;
+	sprintf(tmp,"walksolver_%d",walk_areas);
+	string name = tmp;
+	inifilenames.push_back(name);
+	// int **Ctmp = new int*[M];
+	// signmap = new int*[M];
+	// for(int k=0; k<M;k++){
+	// 	Ctmp[k] = new int[N];
+	// 	signmap[k] = new int[N];
+	// }
+	// ConvertToWalkers(Up,Ctmp,index);
+	// tmp->SetInitialCondition(Ctmp,M,N);		/*The solution in the relevant area converted to walkers*/
+	// walk_solvers.push_back(tmp);		/*Throws std::bad_alloc*/
+	// indeces.push_back(index);
+	// c.push_back(Ctmp);
 	/*deallocate index?*/
 
 }
-void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
+void Combine::SaveDiffusionTensor(double** tmp,int M, int N, int no){
+	/*Save the relevant part of the diffusion tensor to 
+	a file.*/
+	ofstream outfile;
+	char* neame;
+	sprintf(neame,"DiffusionTensor_%d",no);
+	outfile.open(neame);
+	for(int i =0;i<M;i++){
+		for(int j=0;j<N; j++){
+			outfile<<tmp[i][j]<<" ";
+		}
+		outfile<<endl;
+	}
+	outfile.close();
+}
+void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	/*Converts the solution, U, to a distribution of walkers for these particular 
 	indeces.*/
 	if(debug){cout<<"Combine::ConvertToWalkers"<<endl;}
@@ -186,13 +205,14 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 			Conc[k][l] = (int) (round(fabs(u[k+m0][l+n0]*Hc)));
 		}
 	}
-	inifile.open(some_filename_referring_to_instance);
+	ofstream inifile;
+	inifile.open(filename.c_str());
 	for(int i=0; i<M;i++){
 		for(int j=0; j<N;j++){
-			for(int l=0; l<C[i][j]; l++){
-				inifile<<x[i]+DX*(0.5-rng->uniform())<<" ";
+			for(int l=0; l<Conc[i][j]; l++){
+				inifile<<X[i]+DX*(0.5-rng->uniform())<<" ";
 				if(d==2){
-					inifile<<y[j]+DY*(0.5-rng->uniform());
+					inifile<<Y[j]+DY*(0.5-rng->uniform());
 				}
 				inifile<<endl;
 			}
@@ -201,11 +221,12 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 	inifile.close();
 }
 
-void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
+void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	if(debug){cout<<"Combine::ConvertFromWalkers"<<endl;}
 	int M,N,m0,n0; 
 	double DX=0,DY=0;
-	resultfile.open(some_reasonable_filename);
+	ifstream resultfile;
+	resultfile.open(filename.c_str());
 
 	M = index[0][1]-index[0][0];
 	N = index[1][1]-index[1][0];
@@ -216,6 +237,7 @@ void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 	for(int i=0; i<M;i++){
 		C[i] = new int[N];
 	}
+	resultfile.read_header();
 	for(int i=0;i<nwalkers;i++){
 		pos = resultfile.readline();
 		index = int(round(pos/dx));
@@ -346,36 +368,36 @@ void Combine::SetInitialCondition(double** U0,int x,int y){
 	}
 }
 
-void Combine::TestRWConvergence(int steps,string path){
-	Walk walks(d,pde_solver->dt);
-	int **distr = new int*[m];
-	for(int i=0;i<m;i++){
-		distr[i] = new int[n];
-		for(int j=0;j<n;j++){
-			distr[i][j] = Hc*Up[i][j];
-		}
-	}
-	ofstream ofile;
-	char *name = new char[120];
-	walks.SetInitialCondition(distr,m,n);
-	walks.SetDiffusionTensor(aD,m,n);
-	// walks.drift = 0.05;
-	for(int t=0;t<steps;t++){
-		walks.InhomogenousAdvance(distr,pde_solver->dt);
-		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
-		ofile.open(name);
-		for(int i=0;i<m;i++){
-			for(int j=0;j<n;j++){
-				U[i][j] = distr[i][j]/Hc;
-				ofile<<U[i][j]<<" ";
-			}
-			ofile<<endl;
-		}
-		ofile.close();
-		walks.ResetInitialCondition(distr);
-		cout<<"t = "<<t<<endl;
-	}
-}
+// void Combine::TestRWConvergence(int steps,string path){
+// 	Walk walks(d,pde_solver->dt);
+// 	int **distr = new int*[m];
+// 	for(int i=0;i<m;i++){
+// 		distr[i] = new int[n];
+// 		for(int j=0;j<n;j++){
+// 			distr[i][j] = Hc*Up[i][j];
+// 		}
+// 	}
+// 	ofstream ofile;
+// 	char *name = new char[120];
+// 	walks.SetInitialCondition(distr,m,n);
+// 	walks.SetDiffusionTensor(aD,m,n);
+// 	// walks.drift = 0.05;
+// 	for(int t=0;t<steps;t++){
+// 		walks.InhomogenousAdvance(distr,pde_solver->dt);
+// 		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
+// 		ofile.open(name);
+// 		for(int i=0;i<m;i++){
+// 			for(int j=0;j<n;j++){
+// 				U[i][j] = distr[i][j]/Hc;
+// 				ofile<<U[i][j]<<" ";
+// 			}
+// 			ofile<<endl;
+// 		}
+// 		ofile.close();
+// 		walks.ResetInitialCondition(distr);
+// 		cout<<"t = "<<t<<endl;
+// 	}
+// }
 
 
 double Combine::abs_max(double **array,int m, int n){

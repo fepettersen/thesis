@@ -17,7 +17,7 @@
 #include <armadillo>
 
 #include "Random.h"
-#include "Walk.h"
+// #include "Walk.h"
 #include "Diffusion.h"
 #include "Combine.h"
 

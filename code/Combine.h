@@ -10,8 +10,8 @@ class Combine
 		void advance();
 		void AddWalkArea(double*, double*);
 		void Solve();
-		void ConvertToWalkers(double **, int**, int **);
-		void ConvertFromWalkers(double **, int**, int **);
+		void ConvertToWalkers(double **, std::string, int **);
+		void ConvertFromWalkers(double **, std::string, int **);
 		void MapAreaToIndex(double *, double *, int **);
 		void SetInitialCondition(double**,int,int);
 		void polyreg(double *x,double *y,int m);
@@ -19,6 +19,7 @@ class Combine
 		double abs_max(double **array,int m, int n);
 		double norm(double **U,double **Up,int m, int n);
 		void TestRWConvergence(int steps,std::string path);
+		void SaveDiffusionTensor(double**,int, int, int);
 
 		double dx, dy, D;
 		double *X,*Y;
@@ -30,12 +31,15 @@ class Combine
 		int walk_areas;
 		int **signmap;
 		bool inhomogenous;
+		char* prgm;
 
-		std::vector<Walk*> walk_solvers; 	/*A linked list of the walk-solvers*/
-		std::vector<int**> c;				/*Linked list of walker-distr. for area i*/
+		// std::vector<Walk*> walk_solvers; 	/*A linked list of the walk-solvers*/
+		// std::vector<int**> c;				/*Linked list of walker-distr. for area i*/
 		std::vector<int**> indeces;			/*Indeces of walk-area i*/
+		std::vector<std::string> inifilenames;
 
 		Diffusion *pde_solver;
+		Random* rng;
 };
 
 

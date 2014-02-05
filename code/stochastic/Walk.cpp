@@ -1,4 +1,5 @@
-#include "Walk.h"
+#include "walksolver.h"
+
 using namespace std;
 
 bool debug_walk = false;
@@ -7,7 +8,7 @@ Walk::Walk(int dimension, double _dt)
 {
 	if(debug_walk){cout<<"Walk::Walk"<<endl;}
 	d = dimension;
-	steps = 100;		/*Should not be specified here!*/
+	steps = 1;		/*Should not be specified here!*/
 	x0 = 0; x1 = 1;
 	y0 = 0; y1 = 1;
 	z0 = 0; z1 = 1;
@@ -15,7 +16,7 @@ Walk::Walk(int dimension, double _dt)
 	dt = _dt/steps;
 	factor = sqrt(2*D*dt);
 	rng = new Random();
-	drift = factor/steps;
+	drift = 0; //factor/steps;
 	inhomogenous = false;
 };
 
@@ -62,6 +63,66 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 	x1_ = x1 + (dx/2.0);
 	y0_ = y0 - (dx/2.0);
 	y1_ = y1 + (dx/2.0);
+}
+void Walk::Advance(void){
+/*This should now implement the normal advance-function as well*/
+	if(debug_walk){cout<<"Walk::Advance"<<endl;}
+
+	double DX[d];
+	DX[0] = dx;
+	if(d==2){DX[1] = dx;}
+	// #pragma omp parallel 
+	// {
+	double *newPos, **s;
+	newPos = new double[d];
+	int *index = new int[d];
+	double L = 0;
+	double L_deriv = 0;
+	double L0 = sqrt(2*dt);
+	double L_deriv0 = (dt/d)/(2*sqrt(2*(dt/d)));
+	double Tr,Tl,Delta_m,Delta_p,r,stepvector[d];
+	if(not inhomogenous){
+		L = L0*sqrt(D);
+		Tr = 0.5;
+		Delta_p = L;
+		Delta_m = L;
+	}
+	int p=0;
+	// #pragma omp for
+	for(int i=0; i<nwalkers; i++){
+		/*For every walker: */
+		FindPosition(walkers[i],index);
+		p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
+		// for(p=0; p<d; p++){
+			if(inhomogenous){
+				L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
+				/*This might work and is slightly better*/
+				L_deriv = (d>1)?(L_deriv0/(DX[p]*sqrt(aD[index[0]][index[1]]))*(aDx[p][index[0]][index[1]])):
+				(L_deriv0/(DX[p]*sqrt(aD[index[0]][0])))*(aDx[p][index[0]][0]);
+				Tr = (1+0.5*L_deriv);
+				Tl = (1-0.5*L_deriv);
+				Delta_p = L*Tr;
+				Delta_m = L*Tl;
+				Tr /= 2.0;
+			}
+			r = rng->uniform();
+			if(r>Tr){
+				stepvector[p] = Delta_p;
+			}
+			else{
+				stepvector[p] = -Delta_m;
+			}
+		newPos = InhomogenousStep(walkers[i],stepvector);
+		walkers[i] = checkpos(newPos,stepvector);
+		stepvector[p] = 0;
+	}	
+}
+
+void Walk::Load(std::string filename){
+	/*Loads the file "filename" which is a (binary) .xyz file 
+	with the positions of all walkers and saves them in the 
+	vector walkers. More or less a replacement for the 
+	SetInitialCondition(C,m,n) - function*/
 }
 
 void Walk::ResetInitialCondition(int **C){
