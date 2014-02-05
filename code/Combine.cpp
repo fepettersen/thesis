@@ -167,74 +167,65 @@ void Combine::ConvertToWalkers(double **u, int **Conc, int **index){
 	if(debug){cout<<"Combine::ConvertToWalkers"<<endl;}
 	int M,N,m0,n0;
 	m0 = index[0][0];
+	double DX=0,DY=0;
 	if(d==1){
 		M = index[1][0]-index[0][0];
 		N = 1;
 		n0 = 0;
+		DX = 1.0/(M-1);
 	}
 	else if(d==2){
 		M = index[0][1]-index[0][0];
 		N = index[1][1]-index[1][0];
 		n0 = index[1][0];
+		DY = 1.0/(1-N);
 	}
 
 	for(int k=0; k<M; k++){
 		for(int l=0; l<N; l++){
 			Conc[k][l] = (int) (round(fabs(u[k+m0][l+n0]*Hc)));
-			(u[k+m0][l+n0]>0)?(signmap[k][l]=1):(signmap[k][l]=-1);
-			// cout<<Conc[k][l]<<" ";
 		}
-		// cout<<endl;
 	}
+	inifile.open(some_filename_referring_to_instance);
+	for(int i=0; i<M;i++){
+		for(int j=0; j<N;j++){
+			for(int l=0; l<C[i][j]; l++){
+				inifile<<x[i]+DX*(0.5-rng->uniform())<<" ";
+				if(d==2){
+					inifile<<y[j]+DY*(0.5-rng->uniform());
+				}
+				inifile<<endl;
+			}
+		}
+	}
+	inifile.close();
 }
 
 void Combine::ConvertFromWalkers(double **u, int**Conc, int **index){
 	if(debug){cout<<"Combine::ConvertFromWalkers"<<endl;}
 	int M,N,m0,n0; 
-	m0 = index[0][0];
-	if(d==1){
-		M = index[1][0]-index[0][0];
-		N = 1;
-		n0 = 0;
-		double tmp[M], xtmp[M];
-		for(int k=0; k<M; k++){
-			for(int j=0; j<N; j++){
-				/*This is where we insert least squares or similar*/
-				// u[k+m0][j+n0] = 0.2*((2*signmap[k][j]*Conc[k][j]/Hc)+3*u[k+m0][j+n0]);
-				tmp[k] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
-			}
-			xtmp[k] = X[k+m0];
-		}
+	double DX=0,DY=0;
+	resultfile.open(some_reasonable_filename);
 
-		// polyreg(xtmp,tmp,M);
-		for(int k=0;k<M;k++){
-			u[k+m0][0] = tmp[k];
-		}
+	M = index[0][1]-index[0][0];
+	N = index[1][1]-index[1][0];
+	m0 = index[0][0];
+	n0 = index[1][0];
+	
+	int** C = new int*[M];
+	for(int i=0; i<M;i++){
+		C[i] = new int[N];
 	}
-	else if(d==2){
-		M = index[0][1]-index[0][0];
-		N = index[1][1]-index[1][0];
-		n0 = index[1][0];
-		double** tmp = new double*[M];
-		// cout<<"===================================="<<endl;
-		for(int k=0; k<M; k++){
-			tmp[k] = new double[N];
-			for(int j=0; j<N; j++){
-				/*This is where we insert least squares or similar*/
-				u[k+m0][j+n0] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
-				// tmp[k][j] = 0.5*((signmap[k][j]*Conc[k][j]/Hc)+u[k+m0][j+n0]);
-				// cout<<fabs(tmp[k][j]-u[k+m0][j+n0])/Hc<<" ";
-			}
-			// cout<<endl;
+	for(int i=0;i<nwalkers;i++){
+		pos = resultfile.readline();
+		index = int(round(pos/dx));
+		C[index[0]][index[1]] += 1;
+	}
+	for(int k=0; k<M; k++){
+		for(int j=0; j<N; j++){
+			/*This is where we insert least squares or similar*/
+			u[k+m0][j+n0] = 0.5*((signmap[k][j]*C[k][j]/Hc)+u[k+m0][j+n0]);
 		}
-		// cout<<"-----------------------------------"<<endl;
-		// for(int k=0;k<M;k++){
-		// 	for(int j=0;j<N;j++){
-		// 		cout<<u[k+m0][j+n0]<<"  ";
-		// 		u[k+m0][j+n0] = tmp[k][j];
-		// 	}
-		// 	cout<<endl;
-		// }
 	}
 }
 
@@ -267,9 +258,6 @@ void Combine::MapAreaToIndex(double *x,double *y, int **index){
 			exit(1);
 		}
 	}
-	// cout<<"Index:"<<endl;
-	// cout<<index[0][0]<<","<<index[0][1]<<endl;
-	// cout<<index[1][0]<<","<<index[1][1]<<endl;
 }
 
 void Combine::polyreg(double *x,double *y,int m){
@@ -308,7 +296,7 @@ void Combine::CubicSpline(double *x, double *y, double *v, int M, double yp1, do
 	y to the equally spaced mesh with spacing dx. The results are returned in v. 
 	yp1 & yp2 are the first derivatives of y at the start- and end- points, or even better, 
 	the first derivatives of the deterministic solution in the same points.
-	Based on the function spline from lib.cpp written by Moren Hjorth Jensen*/
+	Based on the function spline from lib.cpp written by Morten Hjorth Jensen*/
 	int i,k;
 	double inf = 1e23;
 	double p, qn, sig, un, *bu;
