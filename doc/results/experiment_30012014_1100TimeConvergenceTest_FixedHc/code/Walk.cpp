@@ -116,6 +116,9 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 	/*This should now implement the normal advance-function as well*/
 	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
 	dt = _dt/steps;
+	double *newPos, **s;
+	newPos = new double[d];
+	int *index = new int[d];
 
 	for(int i=0;i<m; i++){
 		//Empty the array to conserve energy
@@ -123,19 +126,15 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 			C[i][j] = 0;
 		}
 	}
-	double DX[d];
-	DX[0] = dx;
-	if(d==2){DX[1] = dx;}
-	// #pragma omp parallel 
-	// {
-	double *newPos, **s;
-	newPos = new double[d];
-	int *index = new int[d];
+	int test = 0;
 	double L = 0;
 	double L_deriv = 0;
 	double L0 = sqrt(2*dt);
 	double L_deriv0 = (dt/d)/(2*sqrt(2*(dt/d)));
 	double Tr,Tl,Delta_m,Delta_p,r,stepvector[d];
+	double DX[d];
+	DX[0] = dx;
+	if(d==2){DX[1] = dx;}
 	if(not inhomogenous){
 		L = L0*sqrt(D);
 		Tr = 0.5;
@@ -143,7 +142,6 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 		Delta_m = L;
 	}
 	int p=0;
-	// #pragma omp for
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
 		for(int j=0;j<steps;j++){
@@ -182,9 +180,9 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 		}
 		else if(d==2){
 			C[index[0]][index[1]] += 1;
+			test++;
 		}
 	}
-// }
 	// delete [] newPos,index;
 }
 

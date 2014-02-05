@@ -113,7 +113,7 @@ int main(int argc, char** argv)
 				// output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
 				output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
 			}
-			cout<<"t = "<<t<<" of "<<T<<endl;
+			// cout<<"t = "<<t<<" of "<<T<<endl;
 		}
 	}
 	return 0;

@@ -110,8 +110,8 @@ int main(int argc, char** argv)
 		for(int t=0; t<T; t++){
 			BlackBox.Solve();
 			if(tofile){
-				// output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
-				output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
+				output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
+				// output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
 			}
 			cout<<"t = "<<t<<" of "<<T<<endl;
 		}
