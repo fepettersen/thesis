@@ -237,7 +237,7 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 			nwalkers = 0;
 			for(int l=0; l<Conc[i][j]; l++){
 				thingy = x[i]+0.99*DX*(0.5-rng->uniform());
-				inifile<<0<<" "<<thingy<<" ";
+				inifile<<thingy<<" ";
 				if(d==2){
 					thingy = y[j]+0.99*DY*(0.5-rng->uniform());
 					inifile<<thingy<<" "<<0;
@@ -285,7 +285,6 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	for(int i=0;i<nwalkers;i++){
 		getline(infile,line);
 		istringstream iss(line);
-		iss >> sub;
 		for (int j = 0; j < 3; j++){
 			iss >> sub;
 			pos[j] = atof(sub.c_str());

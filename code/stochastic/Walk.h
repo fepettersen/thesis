@@ -34,7 +34,7 @@ class Walk
 		void SetDiffusionConstant(double);
 
 		void Advance(void);
-		void Load(std::string);
+		void Load(std::string,int,int);
 
 		void ResetWalkers(){
 			for(int k=0;k<nwalkers;k++)

@@ -1,39 +1,5 @@
 #include "walksolver.h"
 using namespace std;
-// using namespace arma;
-
-string make_filename(string buffer,string filename,int conversion_factor,int step_no){
-    //Returns a filename saying something about the particular run.
-	char buff[120];
-	if(filename =="a"){
-		sprintf(buff,"/results_FE_Hc%d_n%04d.txt",conversion_factor,step_no);
-	}
-	else{
-		sprintf(buff,"/%s_n%04d.txt",filename.c_str(),step_no);
-	}
-  	buffer = buff;
-  	// delete[] buff;
-  	return buffer;
-}
-
-void output(ofstream* outfile, double **u, string buffer, string path,string filename,int m,int n,int conversion_factor, int N){
-    /*outfile is an ofstram-object letting us open a file
-    **u is a double** containing the solution at time n
-    **n is the timestep number
-    **N is the size of the array (in one direction)*/
-    string tmp = path;
-    tmp.append(make_filename(buffer,filename,conversion_factor,N));
-    // outfile->open(tmp.c_str(),ios::binary);
-    outfile->open(tmp.c_str());
-    for(int i=0;i<m;i++){
-        for(int j=0;j<n;j++){
-            *outfile <<u[i][j]<<setprecision(16)<<" ";
-            }
-        if(i<m){*outfile <<endl;}
-    }
-    outfile->close();
-    // delete(&tmp);
-}
 
 void FromFile(double **array, string filename,int m, int n){
 	/*Reads a .txt file containing a m*n matrix and saves the 
@@ -55,9 +21,6 @@ void FromFile(double **array, string filename,int m, int n){
 	}
 	infile.close();
 }
-#define PI 3.1415926535897932;
-
-
 
 int main(int argc, char** argv)
 {
@@ -80,22 +43,25 @@ int main(int argc, char** argv)
 	for(int i=0; i<m; i++){
 		aD[i] = new double[n];
 	}
-
+	// cout<<"balle"<<endl;
 	// FromFile(Up,"InitialCondition.txt",m,n);
-	FromFile(aD,"DiffusionTensor.txt",m,n);
-
+	FromFile(aD,"DiffusionTensor_1.txt",m,n);
+	// cout<<"balle2"<<endl;
 	Walk solver(d,Dt);
 
-	solver.Load(buffer);
+	solver.Load(buffer,m,n);
 	solver.SetDiffusionTensor(aD,m,n);
+	
 	for(int t=0; t<T; t++){
 		solver.Advance();
 	}
-	outfile.open(buffer.c_str(),ios::binary);
+
+	outfile.open(buffer.c_str(),ios::out | ios::binary);
+	outfile<<solver.nwalkers<<endl<<endl;
 	for(int i=0; i<solver.nwalkers; i++){
-		for(int j=0;j<d;j++){
-			outfile<<solver.walkers[i][j]<<" ";
-		}
+		outfile<<solver.walkers[i][0]<<" ";
+		if(d==2){outfile<<solver.walkers[i][1]<<" "<<0;}
+		else {outfile<<0<<" "<<0;}
 		outfile<<endl;
 	}
 	outfile.close();

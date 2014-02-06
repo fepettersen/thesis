@@ -67,7 +67,6 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 void Walk::Advance(void){
 /*This should now implement the normal advance-function as well*/
 	if(debug_walk){cout<<"Walk::Advance"<<endl;}
-
 	double DX[d];
 	DX[0] = dx;
 	if(d==2){DX[1] = dx;}
@@ -92,6 +91,7 @@ void Walk::Advance(void){
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
 		FindPosition(walkers[i],index);
+		// cout<<index[0]<<","<<index[1]<<"    "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
 		p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
 		// for(p=0; p<d; p++){
 			if(inhomogenous){
@@ -112,17 +112,53 @@ void Walk::Advance(void){
 			else{
 				stepvector[p] = -Delta_m;
 			}
-		newPos = InhomogenousStep(walkers[i],stepvector);
+		// newPos = InhomogenousStep(walkers[i],stepvector);
+		newPos[p] = walkers[i][p]+stepvector[p];
 		walkers[i] = checkpos(newPos,stepvector);
-		stepvector[p] = 0;
+		stepvector[p] = newPos[p] = 0;
 	}	
 }
 
-void Walk::Load(std::string filename){
+void Walk::Load(std::string filename,int M, int N){
+	if (debug_walk)	{cout<<"Walk::Load"<<endl;}
 	/*Loads the file "filename" which is a (binary) .xyz file 
 	with the positions of all walkers and saves them in the 
 	vector walkers. More or less a replacement for the 
 	SetInitialCondition(C,m,n) - function*/
+	m = M;
+	n = N;
+	x = new double[m];
+	y = new double[n];
+	dx = (x1-x0)/(m-1);
+	dy = (n>1)?((y1-y0)/(n-1)):0;
+	for(int k=0;k<m;k++){
+		x[k] = k*dx;
+	}
+	for(int k=0;k<n;k++){
+		y[k] = k*dy;
+	}
+	ifstream infile (filename.c_str(), ios::in | ios::binary);
+
+	string line,sub;
+	getline(infile,line);
+	nwalkers = atoi(line.c_str());
+	
+	walkers.resize(nwalkers);
+
+	getline(infile,line);
+	int j;
+	for (int i = 0; i < nwalkers; ++i){
+		walkers[i] = new double[d];
+		getline(infile,line);
+
+		istringstream iss(line);
+		iss >> sub;
+		for(j = 0; j<d; j++){
+			iss >> sub;
+			walkers[i][j] = atof(sub.c_str());
+		}
+	}
+	infile.close();
 }
 
 void Walk::ResetInitialCondition(int **C){
