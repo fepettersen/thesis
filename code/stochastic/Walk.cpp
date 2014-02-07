@@ -59,10 +59,10 @@ void Walk::SetInitialCondition(int **C, int M, int N){
 			}
 		}
 	}
-	x0_ = x0 - (dx/2.0);
-	x1_ = x1 + (dx/2.0);
-	y0_ = y0 - (dx/2.0);
-	y1_ = y1 + (dx/2.0);
+	x0_ = 0 - (dx/2.0);
+	x1_ = 1 + (dx/2.0);
+	y0_ = 0 - (dy/2.0);
+	y1_ = 1 + (dy/2.0);
 }
 void Walk::Advance(void){
 /*This should now implement the normal advance-function as well*/
@@ -80,6 +80,7 @@ void Walk::Advance(void){
 	double L0 = sqrt(2*dt);
 	double L_deriv0 = (dt/d)/(2*sqrt(2*(dt/d)));
 	double Tr,Tl,Delta_m,Delta_p,r,stepvector[d];
+
 	if(not inhomogenous){
 		L = L0*sqrt(D);
 		Tr = 0.5;
@@ -91,7 +92,6 @@ void Walk::Advance(void){
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
 		FindPosition(walkers[i],index);
-		// cout<<index[0]<<","<<index[1]<<"    "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
 		p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
 		// for(p=0; p<d; p++){
 			if(inhomogenous){
@@ -112,9 +112,12 @@ void Walk::Advance(void){
 			else{
 				stepvector[p] = -Delta_m;
 			}
-		// newPos = InhomogenousStep(walkers[i],stepvector);
-		newPos[p] = walkers[i][p]+stepvector[p];
-		walkers[i] = checkpos(newPos,stepvector);
+		for(int j=0;j<d;j++){
+			newPos[j] = walkers[i][j];
+		}
+		walkers[i][p] += stepvector[p];
+		checkpos(walkers[i]);
+		// cout<<index[0]<<","<<index[1]<<"  :  "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
 		stepvector[p] = newPos[p] = 0;
 	}	
 }
@@ -131,6 +134,10 @@ void Walk::Load(std::string filename,int M, int N){
 	y = new double[n];
 	dx = (x1-x0)/(m-1);
 	dy = (n>1)?((y1-y0)/(n-1)):0;
+	x0_ = x0 - 0.99*(dx/2.0);
+	x1_ = x1 + 0.99*(dx/2.0);
+	y0_ = y0 - 0.99*(dy/2.0);
+	y1_ = y1 + 0.99*(dy/2.0);
 	for(int k=0;k<m;k++){
 		x[k] = k*dx;
 	}
@@ -270,7 +277,7 @@ void Walk::InhomogenousAdvance(int **C, double _dt){
 				}
 			// }
 			newPos = InhomogenousStep(walkers[i],stepvector);
-			walkers[i] = checkpos(newPos,stepvector);
+			// walkers[i] = checkpos(newPos,stepvector);
 			stepvector[p] = 0;
 		}
 		FindPosition(walkers[i],index);
@@ -375,37 +382,55 @@ void Walk::FindPosition(double *pos, int *indx){
 		indx[1] = int(round(pos[1]/dy));
 	}
 }
-
-double *Walk::checkpos(double *r,double *s){
+void Walk::checkpos(double *r){
 	/*Implements reflecting boundaries -- Need to adjust the boundaries by dx/2 so each thing has 
 	as much space*/
 	// tmp = r+s 	/*This is r in this case*/
-	if(not HasLeftArea(r)){
-		return r;
+	if (r[0]<x0_){
+		r[0] = x0_ - (r[0]-x0_);
+		}
+	else if(r[0]>x1_){
+		r[0] = x1_ - (r[0]-x1_);
 	}
-	else{
-		if(d ==1){
-			if (r[0]<x0_){
-				r[0] = x0_ - (r[0]-x0_);
-				}
-			else if(r[0]>x1_){
-				r[0] = x1_ - (r[0]-x1_);
-				}
-			}
-		else if(d == 2){
-			if(r[0]<x0_){
-				r[0] = x0_ - (r[0]-x0_);
-				}
-			else if( r[0]>x1_){
-				r[0] = x1_ - (r[0]-x1_);
-				}
-			if (r[1]<y0_){
-				r[1] = y0_ - (r[1]-y0_);
-				}
-			else if (r[1]>y1_){
-				r[1] = y1_ - (r[1]-y1_);
-				}
-			}
-		return r;
+	if(d == 2){
+		if (r[1]<y0_){
+			r[1] = y0_ - (r[1]-y0_);
+		}
+		else if (r[1]>y1_){
+			r[1] = y1_ - (r[1]-y1_);
+		}
 	}
 }
+// double *Walk::checkpos(double *r,double *s){
+// 	/*Implements reflecting boundaries -- Need to adjust the boundaries by dx/2 so each thing has 
+// 	as much space*/
+// 	// tmp = r+s 	/*This is r in this case*/
+// 	if(not HasLeftArea(r)){
+// 		return r;
+// 	}
+// 	else{
+// 		if(d ==1){
+// 			if (r[0]<x0_){
+// 				r[0] = x0_ - (r[0]-x0_);
+// 				}
+// 			else if(r[0]>x1_){
+// 				r[0] = x1_ - (r[0]-x1_);
+// 				}
+// 			}
+// 		else if(d == 2){
+// 			if(r[0]<x0_){
+// 				r[0] = x0_ - (r[0]-x0_);
+// 				}
+// 			else if( r[0]>x1_){
+// 				r[0] = x1_ - (r[0]-x1_);
+// 				}
+// 			if (r[1]<y0_){
+// 				r[1] = y0_ - (r[1]-y0_);
+// 				}
+// 			else if (r[1]>y1_){
+// 				r[1] = y1_ - (r[1]-y1_);
+// 				}
+// 			}
+// 		return r;
+// 	}
+// }

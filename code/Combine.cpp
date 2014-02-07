@@ -76,14 +76,15 @@ void Combine::Solve(){
 	pde_solver->advance(U,Up,m,n);
 	double diffnorm = norm(U,Up,m,n);
 	char cmd[100];
-
+	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
 		// (*it1)->drift = 0;
 		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
 		// (*it1)->ResetInitialCondition(c[counter]);
 		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
+		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
 		// sprintf(cmd,"mpirun -np %d stochastic/%s %d %d %d %g",num_procs,prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt);
-		sprintf(cmd,"./stochastic/%s %d %d %d %g %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str());
+		sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
 		int failure = system(cmd);
 		if(failure){
 			cout<<endl;
@@ -160,7 +161,7 @@ void Combine::AddWalkArea(double *x, double *y){
 	int* parameter_tmp = new int[2];
 	parameter_tmp[0] = M; parameter_tmp[1] = N;
 	parameters.push_back(parameter_tmp);
-	walk_steps = 100;
+	walk_steps = 10;
 	prgm = "walk_solver";
 	indeces.push_back(index);
 	// int **Ctmp = new int*[M];
@@ -269,15 +270,16 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	n0 = index[1][0];
 	DX = 1.0/(M-1);
 	DY = 1.0/(N-1);
-	int** C = new int*[M];
 	double* pos = new double[d];
 	int indx[3];
-	for(int i=0; i<M;i++){
-		C[i] = new int[N];
-		for(int j=0;j<N;j++){
-			C[i][j] = 0;
-		}
-	}
+	// int** C = new int*[M];
+	// for(int i=0; i<M;i++){
+	// 	C[i] = new int[N];
+	// 	for(int j=0;j<N;j++){
+	// 		C[i][j] = 0;
+	// 	}
+	// }
+	mat C = zeros(M,N);
 	/*Read header which contains the number of walkers*/
 	getline(infile,line);
 	int nwalkers = atoi(line.c_str());
@@ -295,12 +297,23 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 		if(d==2){
 			indx[1] = int(round(pos[1]/DY));
 		}
-		C[indx[0]][indx[1]] += 1;
+		try
+		{
+		// C[indx[0]][indx[1]] += 1;		/*segfault possibilities*/
+		C(indx[0],indx[1]) +=1;
+		// throw 20;
+		}
+		catch(logic_error){
+			cout<<"Segmentation fault. indx = "<<indx[0]<<","<<indx[1]<<" :: "<<pos[0]<<","<<pos[1]<<endl;
+			exit(1);
+		}
 	}
+
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
-			u[k+m0][j+n0] = 0.5*((C[k][j]/Hc)+u[k+m0][j+n0]);
+			u[k+m0][j+n0] = 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
+			// u[k+m0][j+n0] = 0.5*((C[k][j]/Hc)+u[k+m0][j+n0]);
 		}
 	}
 }

@@ -27,7 +27,9 @@ class Walk
 		int InitializeTimestep(int **);
 		void PutWalkers(int, int, int);
 		void FindPosition(double *, int*);
-		double *checkpos(double*,double*);
+		
+		void checkpos(double*);
+
 		void SetInitialCondition(int **, int, int);
 		void ResetInitialCondition(int **);
 		void SetDiffusionTensor(double **, int, int);
