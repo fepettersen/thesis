@@ -9,16 +9,18 @@ Since a diffusion process in general has rapid changes in the beginning where fo
 This chapter will consider the expensive parts of the code and look at possible improvements.
 
 \subsection{Memory}
-The memory-expensive parts of the code include storing the decomposed matrices, and storing the random walkers.
+The memory-expensive parts of the code include storing the decomposed matrices, and storing the random walkers. 
+None of these pose any problems.
 
 \subsection{CPU time}
-There are four expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
+The program as it stands now (v 1.$\infty$) uses the BE discretization and a highly specialized tridiagonal solver. 
+The random walk-part of the software has been excreted as a stand-alone program which communicates with the main-program through a binary .xyz file containing the positions of all walkers in 3d space. This makes it easier to change solver, and implement more advanced solvers like the Direct Simulation Monte Carlo (DSMC) Molecular Dynamics (MD) simulator written by Anders Hafreager (see chapter \ref{}). 
+There are three expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
 \begin{itemize}
-\item Performing the LU decomposition is very expensive. There might be a way to make this step more efficient by utilizing the sparsity of the linear system.
-\item The cost of solving the PDE increases drastically with the spatial dimension, at least as long as we use an implicit scheme. The FE scheme will actually save us $d$ orders of operations in $d$ dimensions, at least with the BE discretization using the standard LU decomposition. If we could utilize some specialized Gaussian elimination like the one we have for tridiagonal matrices we might be able to improve this.
-\item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \ref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost.
-\item De- and re-allocation of random walkers each time-step is also an immensely costly procedure. An alternative might be to keep the number of walkers constant and rather change the conversion-factor, Hc, although this approach sacrifices physical meaning.
-\item Writing the results to file will require $\mathcal{O}(n^d)$ operations where the operations are quite slow. We can get some speed-up by writing in binary, but as of now it has proved problematic to make python interpret the result-files. 
+\item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \ref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost. 
+As an additional problem we will encounter some overhead upon calling the program, initializing variables and instances and so on.
+\item Communicating the positions of all the walkers between the two programs each time-step is very costly.
+\item Translating the positions of the walkers from the unit-square they are walking on to the coarse-grained PDE grid requires calling the ``round'' function from the math library in C++. This function is rather slow, and the program suffers from it. 
 \end{itemize}
 
 \begin{equation}\label{calls_to_ran}
@@ -39,3 +41,24 @@ In the final algorithm there are the following stages
 
 Parallelization of the random walk solver should scale linearly because the only form of communication required is shared memory. 
 The LU decomposition and back-substitution require some communication and will not scale linearly, but will still benefit from parallelizing. 
+
+\subsection{Some fancy title about changing stuff}
+
+It should be rather simple to replace parts of the code as long as certain conditions are met. Perhaps the simplest part to replace is the random walk part. 
+Requirements for this part are:
+\begin{itemize}
+ \item Locating executable main-file of the program in the folder ``stochastic'' and naming it ``walk\_solver''. 
+ \item This executable should read the filename of the ini-file containing the positions of all walkers , and the local diffusion ``tensor'' in the relevant area.
+ \item Upon completion, all positions must be written to the same file.
+\end{itemize}
+The PDE-solver should also be rather simple to replace, but some more programming will be required. First of all your solver must be included in the header-file. 
+Next, the ``Combine'' class has an instance of the PDE-solver which it calls the advance-method of at each time-step. Seeing as this method is most regularly named ``solve'' you will either have to rename the method or the call. 
+There are really very few dependencies on the PDE-solver, seeing as it is mostly left alone, but in addition to being able to respond to function calls it must:
+\begin{itemize}
+ \item Have its own $\Delta t$ attribute named ``dt''.
+ \item Work on ``double**'' data types for all spatial dimensions (or implement some form of workaround)
+ \item Be able to respond to increasing the time-step. In practice this means that the solver should be implicit.
+\end{itemize}
+As discussed, the implementation of random walks on parts of the mesh will reduce the convergence-rate to 0.5, and so there are really only two reasons to implement a new PDE solver. 
+The current one only implements Neumann boundaries, and consequently must either be modified or replaced in order to work with other boundary conditions.
+It also only works on a square mesh. As discussed in section \ref{} it will be immensely complicated to implement a grid transformation, and this is already implemented in most finite element software.

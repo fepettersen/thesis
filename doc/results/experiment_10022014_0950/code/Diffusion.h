@@ -14,15 +14,17 @@ class Diffusion
 		int solver; 							/*Which solver to use*/
 		int t; 									/*Timestep number*/
 		int isotropic;							/*set to zero if not*/
-		arma::mat Lower;						/*used for the BE solver*/
+		arma::mat Lower, Upper, Permutation;	/*used for the LU decomposition*/
 		double alpha,beta;						/*Saved in case dt is changed*/
-		Tridiag* linalg;
+
 		void advance(double **U,double **Up, int, int);
 		void boundary(double **,double **, int, int);
 		double f(double x,double y, double t);
 		void BE2D(double **U, double **Up, int m, int n);
+		void tridiag(double *u, double *up, int N, double *di, double *ab, double *bel);
 		arma::mat Assemble(double, double, int, int);
 		arma::mat AssembleAnisotropic(double a, double b, int m, int n);
+		arma::vec BlockTridiag(arma::mat, arma::vec,int, int);
 };
 
 #endif // DIFFUSION_H

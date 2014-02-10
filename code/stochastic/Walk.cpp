@@ -20,50 +20,7 @@ Walk::Walk(int dimension, double _dt)
 	inhomogenous = false;
 };
 
-void Walk::SetInitialCondition(int **C, int M, int N){
-	/*Takes the initial condition as an array C[m,n] of ints(?) 
-	describing how many walkers in each entry. */
-	if(debug_walk){cout<<"Walk::SetInitialCondition"<<endl;}
-	nwalkers = 0;
-	m = M;
-	n = N;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n;j++){
-			nwalkers += C[i][j];
-		}
-	}
-	walkers.resize(nwalkers);
-	for(int i=0; i<nwalkers;i++){
-		walkers[i] = new double[d];
-		for(int l=0; l<d;l++){
-			walkers[i][l] = 0;
-		}
-	}
-	x = new double[m];
-	y = new double[n];
-	dx = (x1-x0)/(m-1);
-	dy = (n>1)?((y1-y0)/(n-1)):0;
-	for(int k=0;k<m;k++){
-		x[k] = k*dx;
-	}
-	for(int k=0;k<n;k++){
-		y[k] = k*dy;
-	}
-	int counter = 0;
 
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n;j++){
-			for(int l=0; l<C[i][j]; l++){
-				PutWalkers(i,j,counter);
-				counter ++;
-			}
-		}
-	}
-	x0_ = 0 - (dx/2.0);
-	x1_ = 1 + (dx/2.0);
-	y0_ = 0 - (dy/2.0);
-	y1_ = 1 + (dy/2.0);
-}
 void Walk::Advance(void){
 /*This should now implement the normal advance-function as well*/
 	if(debug_walk){cout<<"Walk::Advance"<<endl;}
@@ -149,8 +106,8 @@ void Walk::Load(std::string filename,int M, int N){
 	string line,sub;
 	getline(infile,line);
 	nwalkers = atoi(line.c_str());
-	
-	walkers.resize(nwalkers);
+	walkers = new double*[nwalkers];
+	// walkers.resize(nwalkers);
 
 	getline(infile,line);
 	int j;
@@ -168,137 +125,6 @@ void Walk::Load(std::string filename,int M, int N){
 	infile.close();
 }
 
-void Walk::ResetInitialCondition(int **C){
-	if(debug_walk){cout<<"Walk:ResetInitialCondition"<<endl;}
-	int nwalkers_prev = nwalkers;
-	nwalkers = 0;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n;j++){
-			nwalkers += C[i][j];
-		}
-	}
-	if (nwalkers>nwalkers_prev){
-		/*Do something smart*/
-		walkers.resize(nwalkers);
-	}
-	// ResetWalkers();
-	// cout<<"nwalkers = "<<nwalkers<<endl;
-	for(int i=nwalkers_prev;i<nwalkers;i++)
-		walkers[i] = new double[d];
-
-	int counter = 0;
-	for(int i=0; i<m;i++){
-		for(int j=0; j<n;j++){
-			for(int l=0; l<C[i][j]; l++){
-				PutWalkers(i,j,counter);
-				counter ++;
-			}
-		}
-	}
-}
-bool Walk::HasLeftArea(double *pos){
-	// if(debug_walk){cout<<"Walk::HasLeftArea"<<endl;}
-	/*pos = [x] in 1d;
-	pos = [x,y] in 2d etc*/
-	if(d==1){
-		if(pos[0]<x0 || pos[0]>x1){
-			return true;
-		}
-	}
-	else if(d==2){
-		if(pos[0]>x1 || pos[0]<x0){
-			return true;
-		}
-		if(pos[1]<y0 || pos[1]>y1){
-			return true;
-		}
-	}
-	return false;
-}
-
-void Walk::InhomogenousAdvance(int **C, double _dt){
-	/*This should now implement the normal advance-function as well*/
-	if(debug_walk){cout<<"Walk::InhomogenousAdvance"<<endl;}
-	dt = _dt/steps;
-
-	for(int i=0;i<m; i++){
-		//Empty the array to conserve energy
-		for(int j=0; j<n; j++){
-			C[i][j] = 0;
-		}
-	}
-	double DX[d];
-	DX[0] = dx;
-	if(d==2){DX[1] = dx;}
-	// #pragma omp parallel 
-	// {
-	double *newPos, **s;
-	newPos = new double[d];
-	int *index = new int[d];
-	double L = 0;
-	double L_deriv = 0;
-	double L0 = sqrt(2*dt);
-	double L_deriv0 = (dt/d)/(2*sqrt(2*(dt/d)));
-	double Tr,Tl,Delta_m,Delta_p,r,stepvector[d];
-	if(not inhomogenous){
-		L = L0*sqrt(D);
-		Tr = 0.5;
-		Delta_p = L;
-		Delta_m = L;
-	}
-	int p=0;
-	// #pragma omp for
-	for(int i=0; i<nwalkers; i++){
-		/*For every walker: */
-		for(int j=0;j<steps;j++){
-			/*Advance n steps*/
-			FindPosition(walkers[i],index);
-			p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
-			// for(p=0; p<d; p++){
-				if(inhomogenous){
-					L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
-					/*This might work and is slightly better*/
-					L_deriv = (d>1)?(L_deriv0/(DX[p]*sqrt(aD[index[0]][index[1]]))*(aDx[p][index[0]][index[1]])):
-					(L_deriv0/(DX[p]*sqrt(aD[index[0]][0])))*(aDx[p][index[0]][0]);
-					Tr = (1+0.5*L_deriv);
-					Tl = (1-0.5*L_deriv);
-					Delta_p = L*Tr;
-					Delta_m = L*Tl;
-					Tr /= 2.0;
-					// cout<<"Delta_p,Delta_m = "<<Delta_p<<","<<Delta_m<<endl;
-				}
-				// r = ran0(&Idum);
-				r = rng->uniform();
-				if(r>Tr){
-					stepvector[p] = Delta_p;
-				}
-				else{
-					stepvector[p] = -Delta_m;
-				}
-			// }
-			newPos = InhomogenousStep(walkers[i],stepvector);
-			// walkers[i] = checkpos(newPos,stepvector);
-			stepvector[p] = 0;
-		}
-		FindPosition(walkers[i],index);
-		if(d==1){
-			C[index[0]][0] += 1;
-		}
-		else if(d==2){
-			C[index[0]][index[1]] += 1;
-		}
-	}
-// }
-	// delete [] newPos,index;
-}
-
-
-double *Walk::InhomogenousStep(double *r, double *s){
-	for(int l=0;l<d;l++){
-		r[l] += s[l];
-	}
-	return r;
-}
 
 void Walk::SetDiffusionTensor(double **Diff, int M, int N){
 	if(debug_walk){cout<<"Walk::SetDiffusionTensor"<<endl;}
@@ -364,15 +190,6 @@ void Walk::SetDiffusionConstant(double Diff){
 	inhomogenous = false;
 }
 
-void Walk::PutWalkers(int i, int j, int counter){
-	// if(debug_walk){cout<<"Walk::PutWalkers"<<endl;}
-	// walkers[counter][0] = x[i]+dx*(0.5-ran0(&Idum));
-	walkers[counter][0] = x[i]+dx*(0.5-rng->uniform());
-	if(d==2){
-		// walkers[counter][1] = y[j]+dy*(0.5-ran0(&Idum));
-		walkers[counter][1] = y[j]+dy*(0.5-rng->uniform());
-	}
-}
 
 
 void Walk::FindPosition(double *pos, int *indx){
@@ -401,36 +218,3 @@ void Walk::checkpos(double *r){
 		}
 	}
 }
-// double *Walk::checkpos(double *r,double *s){
-// 	/*Implements reflecting boundaries -- Need to adjust the boundaries by dx/2 so each thing has 
-// 	as much space*/
-// 	// tmp = r+s 	/*This is r in this case*/
-// 	if(not HasLeftArea(r)){
-// 		return r;
-// 	}
-// 	else{
-// 		if(d ==1){
-// 			if (r[0]<x0_){
-// 				r[0] = x0_ - (r[0]-x0_);
-// 				}
-// 			else if(r[0]>x1_){
-// 				r[0] = x1_ - (r[0]-x1_);
-// 				}
-// 			}
-// 		else if(d == 2){
-// 			if(r[0]<x0_){
-// 				r[0] = x0_ - (r[0]-x0_);
-// 				}
-// 			else if( r[0]>x1_){
-// 				r[0] = x1_ - (r[0]-x1_);
-// 				}
-// 			if (r[1]<y0_){
-// 				r[1] = y0_ - (r[1]-y0_);
-// 				}
-// 			else if (r[1]>y1_){
-// 				r[1] = y1_ - (r[1]-y1_);
-// 				}
-// 			}
-// 		return r;
-// 	}
-// }

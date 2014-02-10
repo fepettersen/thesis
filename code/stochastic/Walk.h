@@ -8,8 +8,8 @@ class Walk
 
 		int nwalkers, steps;
 		double **area, **aD;
-		// double **walkers;	//Array of the positions of all the walkers
-		std::vector<double*> walkers;
+		double **walkers;				/*Array of the positions of all the walkers*/
+		// std::vector<double*> walkers;
 		std::vector<double**> aDx;
 		int d,m,n;
 		double factor,dt,D;
@@ -19,35 +19,20 @@ class Walk
 		double *y;
 		double dx,dy,drift;
 		bool inhomogenous;
+		Random *rng;					/*Random Number Generator*/
 		
 
-		bool HasLeftArea(double *);
-		void InhomogenousAdvance(int **C, double _dt);
-		double *InhomogenousStep(double*, double*);
-		int InitializeTimestep(int **);
-		void PutWalkers(int, int, int);
+		
 		void FindPosition(double *, int*);
 		
 		void checkpos(double*);
 
-		void SetInitialCondition(int **, int, int);
-		void ResetInitialCondition(int **);
 		void SetDiffusionTensor(double **, int, int);
 		void SetDiffusionConstant(double);
 
 		void Advance(void);
 		void Load(std::string,int,int);
 
-		void ResetWalkers(){
-			for(int k=0;k<nwalkers;k++)
-				delete [] walkers[k];
-			walkers.clear();
-				// for(int l=0; l<d; l++)
-				// 	walkers[k][l] = 0;
-			// delete [] walkers;
-		};
-		// double ran0(long*);
-		Random *rng;					/*Random Number Generator*/
 
 };
 

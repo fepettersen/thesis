@@ -83,7 +83,7 @@ class Experiment:
 			# self.walk.append(np.fromfile(step,sep=" "))
 			self.walk.append(np.loadtxt(step))
 			name = self.result_path+'/Deterministic*.txt'
-		self.CalculateError(name)
+			self.CalculateError(name)
 
 	def RunSimulation(self,Hc):
 		# Run a simulation with the parameters specified in SetupRun 
@@ -135,6 +135,7 @@ class Experiment:
 				infile = np.loadtxt(step)
 				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
+			print np.shape(tmp[j])
 			self.error.append(tmp.copy())
 
 
@@ -423,9 +424,9 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 0.4
 	y1 = 0.7
-	m = 76
-	n = 76
-	T = 150
+	m = 26
+	n = 26
+	T = 50
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -434,8 +435,8 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	# Hc = [200]
-	Hc = [200,1400,5600,10400,32000]
+	Hc = [200]
+	# Hc = [200,1400,5600,10400,32000]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 	# info='Errortest_FixedHc_smaller_than_dtdt'
 	run = Experiment(this_dir,DEBUG,save_files)
@@ -449,20 +450,20 @@ if __name__ == '__main__':
 	
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	dt = [1e-2,1e-3,1e-4]
-	dt = [1e-3]
+	dt = [1e-2]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	run.VerifyDeterministicError()
 
 
-	for i in Hc:
-		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-		run.RunSimulation(i)
-	time.sleep(1)
-	# h = [1./dt[i] for i in range(len(dt))]
-	leg = ['dt = %g'%i for i in Hc]
-	run.PlotError(leg)
-	run.ConvergenceTest(Hc)
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	# 	run.RunSimulation(i)
+	# time.sleep(1)
+	# # h = [1./dt[i] for i in range(len(dt))]
+	# leg = ['dt = %g'%i for i in Hc]
+	# run.PlotError(leg)
+	# run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
