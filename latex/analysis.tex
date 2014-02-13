@@ -28,7 +28,9 @@ To investigate the error we are introducing we will first need to test that the 
  \caption[Initial condition in 2d]{Initial condition of manufactured solution in 2d and the simulation.}
  \label{initial_condition_2d}
 \end{figure}
+
 \subsection{The error estimate}
+
 Before we do anything we should specify what we use to measure the error. 
 Throughout this thesis the term error is used quite lazily, but unless something else is specified we refer to the expression 
 \begin{equation}
@@ -45,6 +47,46 @@ and the same error integrated in time as well
 \begin{equation}
  err = \sum||\sum u_e-u||_2
 \end{equation}
+
+\subsection{A simplified version of the algorithm}
+
+Monte Carlo methods are immensely important in modern computational science, and can be used to solve integrals as well as random walks. 
+As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
+\begin{equation}\label{ODE}
+ \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
+\end{equation}
+Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}), for the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
+\begin{equation}\label{ODE_solution}
+ f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
+\end{equation}
+This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
+By the relation we found earlier (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+\begin{align*}
+ \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
+ N \simeq \frac{1}{\Delta x^4} = N_x^4
+\end{align*}
+The following output is from a program generously donated by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
+It uses the relation described, but multiplies with a constant, giving us 
+\begin{equation*}
+ N = 2000\times N_x^4
+\end{equation*}
+
+\begin{lstlisting}
+  N_x	    N_MC	   error       MC_error   MP_error
+   1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
+   2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
+   4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
+   8     8192000 (   8)  4.683E-04   4.866E-04  -1.832E-05
+  16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
+  
+  Convergence rates
+total  MP     MC
+-1.84 -1.83  0.20
+-1.95 -1.95 -0.55
+-2.03 -1.99  0.26
+-1.99 -2.00 -0.52
+\end{lstlisting}
+We see that the convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound.
 
 \section{Manufactured Solutions}
 A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 

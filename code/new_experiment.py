@@ -412,7 +412,7 @@ def D(x,y,t=0):
 	return np.ones(np.shape(x))*0.5
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -425,7 +425,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 76
 	n = 76
-	T = 150
+	T = 450
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -436,6 +436,7 @@ if __name__ == '__main__':
 	print 'Python: ',dt,' dx: ',dx
 	# Hc = [200]
 	Hc = [200,1400,5600,10400,32000]
+	Hc = [1e4,1e5,3*1e5,7*1e5,1e6,3*1e6]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 	# info='Errortest_FixedHc_smaller_than_dtdt'
 	run = Experiment(this_dir,DEBUG,save_files)

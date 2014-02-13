@@ -21,8 +21,16 @@ To investigate the error we are introducing we will first need to test that the 
  \caption[Initial condition in 1d]{Initial condition of manufactured solution in 1d and the simulation.}
  \label{initial_condition_1d}
 \end{figure}
+\begin{figure}[H]
+ \centering
+%  \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/initial_condition.eps}
+ \includegraphics[scale=0.7]{Figures/InitialCondition2d.eps}
+ \caption[Initial condition in 2d]{Initial condition of manufactured solution in 2d and the simulation.}
+ \label{initial_condition_2d}
+\end{figure}
 
 \subsection{The error estimate}
+
 Before we do anything we should specify what we use to measure the error. 
 Throughout this thesis the term error is used quite lazily, but unless something else is specified we refer to the expression 
 \begin{equation}
@@ -39,6 +47,41 @@ and the same error integrated in time as well
 \begin{equation}
  err = \sum||\sum u_e-u||_2
 \end{equation}
+
+\subsection{A simplified version of the algorithm}
+
+Monte Carlo methods are immensely important in modern computational science, and can be used to solve integrals as well as random walks. 
+As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
+\begin{equation}\label{ODE}
+ \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
+\end{equation}
+Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}), for the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
+\begin{equation}\label{ODE_solution}
+ f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
+\end{equation}
+This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
+By the relation we found earlier (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+\begin{align*}
+ \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
+ N \simeq \frac{1}{\Delta x^4} = N_x^4
+\end{align*}
+
+\begin{lstlisting}
+  N_x	    N_MC	   error       MC_error   MP_error
+   1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
+   2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
+   4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
+   8     8192000 (   8)  4.683E-04   4.866E-04  -1.832E-05
+  16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
+  
+  Convergence rates
+total  MP     MC
+-1.84 -1.83  0.20
+-1.95 -1.95 -0.55
+-2.03 -1.99  0.26
+-1.99 -2.00 -0.52
+\end{lstlisting}
+
 
 \section{Manufactured Solutions}
 A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
@@ -122,10 +165,16 @@ The expected value of r is approximately 1. The result is not perfect, but still
  \caption{Convergence test for the FE scheme. The x axis is $\ln(\Delta t)$.}
  \label{convergence_test_FE}
 \end{figure}
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{../doc/results/experiment_13012014_0925_Simple1DConvergenceTestBE/results/ConvergenceTest.eps}
+ \caption{Convergence test for the BE scheme. The x axis is $\ln(\Delta t)$, the y-axis (though a little hard to see) is zoomed in around r=1.}
+ \label{convergence_test_FE}
+\end{figure}
 
 
 
-\subsection{Exact numerical solution}
+\subsection{Exact numerical solution}\label{exact_numerical_solution}
 
 The FE scheme also has an exact solution seeing as it is in fact a difference equation. 
 We can find this (for this exact initial condition \ref{initial_condition_1d}) if we formulate the scheme as 
@@ -459,7 +508,21 @@ In chapter \ref{testing_random_walks} we will see that the random walk algorithm
  \label{Convergence_rate_diffusion_with_walk}
 \end{figure}
 We argued earlier that for the error from the random walk part of the mesh not to dominate we will need to have some $\Delta t^{-2}$ walkers per unit concentration per mesh-point. Using an explicit scheme this will be an unreasonable demand, but if we use an implicit solver, we can at least check that this is the case for a larger $\Delta t$. Figure \ref{convergence_test_ADI_2d} shows the same convergence test as we see in figure \ref{convergence_test_FE_2d}, but using the ADI scheme and a rather large time-step, $\Delta t=0.001$. We see that as the conversion factor, Hc, increases beyond $10^6$ the convergence rate goes to 1. This proves the concept that we can include random walks as a viable part of the solver and still reproduce the exact solution to any desired error should we wish to do so.
-
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_13122013_1519_convergenceTest_combinedSimulation_2d/results/ConvergenceTest.eps}
+  \caption{Convergence rate}
+  \label{convergence_test_ADI_2d:2d}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_13122013_1519_convergenceTest_combinedSimulation_2d/results/errorplot.eps}
+  \caption{Error plot}
+  \label{convergence_test_ADI_2d:1d}
+ \end{subfigure}
+ \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, is varied over the values shown in the legend in figure b over 490 timesteps. Initial condition is given by $u(x,y,t=0) = \cos(\pi x)\cos(\pi y)$ and $\Delta t=0.001$. Note that the x-axis on figure a is wrong, and should be interpreted simply as Hc.}
+ \label{convergence_test_ADI_2d}
+\end{figure}
 
 
 \section{Testing Random walks}\label{testing_random_walks}

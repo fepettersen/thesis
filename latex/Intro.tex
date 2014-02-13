@@ -47,3 +47,33 @@ The definition of a homogeneous media includes a mean free path close to infinit
 On the other hand, I know that another Einstein relation \ref{stochastic_einstein} is widely used  in other fields of physics where the media in question is hardly homogeneous. 
 In molecular dynamics simulations, the two mentioned Einstein relations are used to measure the viscosity of fluids in nano-porous materials, and with success as far as I know.
 
+\section{A short introduction to mathematical neuroscience}
+
+Neuroscience is the scientific study of the nervous system, but in the traditional sense it focuses very much on what parts of the brain are responsible for what. 
+Mathematical neruroscience is more focused on the physics and chemistry involved in the different parts of the brain and nervous system. 
+An example of the power of this approach is the classical work done by Hodgkin and Huxley in 1952, earning them the Nobel price in Physiology or medicine in 1963. 
+Through four non-linear coupled differential equations they were able to predict the propagation speed of signals along the squid giant axon to a quite high precision. \\
+
+% Copied from the project
+
+The human brain consists of two types of cells; the neurons and neuroglia. 
+Neurons are tasked with signal processing and transport, while the glia are thought to have more janitorial tasks. 
+The neurons are bathed in a salt solution that is mainly $Na^+$ and $Cl^-$. 
+Inside the neurons, a highly regulated salt solution of mainly $K^+$ sets up a potential difference relative to the outside of the cell of approximately $-65$mV.
+The neurons are in constant communication with each other through action potentials, which are disturbances in the membrane potentials of neurons. 
+These action potentials are generated in the body of the cell, called the soma, from where they propagate down the axon without loss of amplitude. 
+This is achieved by constantly amplifying the signal using ion pumps (see the Hodgin-Huxley model of the action potential \cite{sterratt2011principles}).
+After propagating down the axon, the action potential reaches a synapse which is a gate to another neuron. 
+If the action potential is of significant strength, vesicles carrying neurotransmitters merge with the synapse membrane, letting the neurotransmitters diffuse to the dendrite of the other neuron. 
+If enough neurotransmitters reach the post-synaptic side, the signal continues propagating to the soma of this neuron, and the entire process starts over again. \\
+The interest of this project lies, mainly, in the diffusion processes that take place in the space between these types of cells, the so-called extracellular space (ECS). 
+This is a narrow space ($\sim 10-100$ nm \cite{nicholson2001diffusion}) with a highly complicated geometry (Figure \ref{ECS}). 
+Surprisingly, the ECS adds up to $20\%$ of the total brain volume. 
+We can understand this by realizing that every part of a cell must be separated from another cell by the ECS. 
+Since the cells consists of axons and dendrites which can be viewed as (somewhat) fractal, we see that this means separating a vast amount of surface area from other surface areas.
+
+The ECS is thought to support the diffusion of oxygen and nutrients to the neurons and glia, and diffusion of carbon dioxide and other waste from these cells through the blood - brain barrier and into the bloodflow. 
+
+% \section{Dendritic spines}
+
+

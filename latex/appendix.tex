@@ -77,7 +77,7 @@ Note also that the vector entries $u^{n+1}_{ijk}$ are column vectors, making the
 % \caption{Algorithm for Gaussian elimination of a tridiagonal linear system.}
 % \label{tridiag}
 
-\section{Debugging}
+\section{Debugging}\label{debugging}
 
 In any project which involves programming one is bound to do some debugging. This project is no exception. 
 Debugging can be extremely frustrating because no-one sees all the hours that go into finding the bugs, only the ones that do not (when the bug is not fixed). 
@@ -100,7 +100,7 @@ Some times though the thing that works best is to print things at various places
 \subsection{Finite difference methods}
 First and foremost: Have a correct discretization. There are (probably) webpages which can discretize your equation(s) for you, but it is almost always useful to do this by hand. 
 It will help you in your further debugging. \\
-There is one very important rule in programming in general: ``First make it work, then make it fast''. 
+There is one very important rule in programming in general: ``First make it work, then make right, then make it fast''. 
 For implementing FDMs this means that you should start coding as soon as you have a clear image of what to be implemented, and what dependencies are needed. You will need a well defined initial condition (preferably one where you have the exact solution of the equation) and boundary conditions before you start coding. 
 Personally, I like starting with the simplest Dirichlet boundary conditions $u|_{\d \Omega} = 0$ and make them work before I go any further. 
 You should note, however, that implicit schemes will be greatly influenced by the choice of boundary conditions.\\
@@ -121,3 +121,24 @@ Making sure your implementation is correct is a lot harder than it sounds, but t
  \item Convergence test\\
  
 \end{itemize}
+
+\subsection{Random walk and Monte Carlo methods}
+
+The main difference between debugging a MC based solver and a deterministic solver is the fact that you often do not have a clear idea of what the results of the intermediate steps should be. 
+What you might know (or should know during development), however is the result of the complete MC integration, and some statistical properties of your random numbers. 
+Using uniformly distributed random numbers will give you a certain mean and standard deviation, and a Gaussian distribution will give you another. 
+You should check that the random number generator (RNG) you chose actually reproduces these properties to a reasonable precision. 
+If you are working with random walkers it also helps to look at the behavior of a small number of walkers, to check that they behave more or less as you expect. 
+One thing to look out for is the fact that a random walker in both one and two spatial dimensions will fill all space given enough steps. 
+Of course enough steps is infinitely many, but if you also implement reflecting boundaries and use some 4-5 walkers you will see a tendency after approximately $10^4$ steps. \\
+As we have discussed earlier the fluctuations in a MC-model are usually of a magnitude $\frac{1}{\sqrt N}$ this is also smart to verify. \\
+Finally, you should absolutely have the possibility to set the random seed and check that two runs with the same random seed produces the exact same result and makes sure you are using a RNG with a large enough period. The xor-shift algorithm by Geroge Marsagla \cite{} has a period of around $10^48$ which usually is more than adequate.
+
+\subsection{The developed software}
+
+For some 2 months while working with this project I got really good results which seemed to verify all the important parts of the theory. 
+Unfortunately it turned out that, while individually both parts of the program did exactly what they were supposed to do (verified by various tests), the combination of the two parts was implemented wrong. 
+What actually happened was a finer and finer round-off rather than taking some number of steps with random walkers and combining the two models. 
+It turned out that I sent an empty array to the random walk class as a new initial condition for the current time-step. \\
+The moral behind this little story is that you should make 100\% sure that every part of every function you write does exactly what you think it does, and nothing else. 
+Furthermore, if you rewrite your code, you should remove the old parts as soon as possible. If you use some kind of version control software, which you definitely should, you will have older versions saved in the version control anyways. Do not be nostalgic and simply comment out the old parts just in case something, this makes your code very messy, and leaves the possibility of something slipping past you.

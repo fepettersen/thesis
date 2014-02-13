@@ -10,11 +10,12 @@ A level-1 auxiliary file: appendix.aux
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: main-blx.bib
 Database file #2: references.bib
+Warning--I didn't find a database entry for "sterratt2011principles"
 Biblatex version: 1.7
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 You've used 3 entries,
             6019 wiz_defined-function locations,
-            1144 strings with 8458 characters,
+            1145 strings with 8480 characters,
 and the built_in function-call counts, 7761 in all, are:
 = -- 339
 > -- 269
@@ -53,3 +54,4 @@ warning$ -- 0
 while$ -- 87
 width$ -- 0
 write$ -- 67
+(There was 1 warning)

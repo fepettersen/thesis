@@ -18,7 +18,8 @@ The random walk-part of the software has been excreted as a stand-alone program 
 There are three expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
 \begin{itemize}
 \item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \ref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost. 
-As an additional problem we will encounter some overhead upon calling the program, initializing variables and instances and so on.
+As an additional problem we will encounter some overhead upon calling the program, initializing variables and instances and so on. 
+The computationally most demanding function seems to be the round-off function, which is used to place the walkers on the coarse-grained PDE-mesh.
 \item Communicating the positions of all the walkers between the two programs each time-step is very costly.
 \item Translating the positions of the walkers from the unit-square they are walking on to the coarse-grained PDE grid requires calling the ``round'' function from the math library in C++. This function is rather slow, and the program suffers from it. 
 \end{itemize}

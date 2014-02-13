@@ -26,12 +26,10 @@ void Walk::Advance(void){
 	if(debug_walk){cout<<"Walk::Advance"<<endl;}
 	double DX[d];
 	DX[0] = dx;
-	if(d==2){DX[1] = dx;}
+	if(d==2){DX[1] = dy;}
 	// #pragma omp parallel 
 	// {
-	double *newPos, **s;
-	newPos = new double[d];
-	int *index = new int[d];
+	int *index = new int[2];
 	double L = 0;
 	double L_deriv = 0;
 	double L0 = sqrt(2*dt);
@@ -44,38 +42,36 @@ void Walk::Advance(void){
 		Delta_p = L;
 		Delta_m = L;
 	}
-	int p=0;
+	int p = 0;
+	double temp= 0;
+	index[1] = 0;
 	// #pragma omp for
 	for(int i=0; i<nwalkers; i++){
 		/*For every walker: */
 		FindPosition(walkers[i],index);
-		p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
+		//p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
+		p = int(rng->ran0()*d);
 		// for(p=0; p<d; p++){
 			if(inhomogenous){
-				L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
+				temp = sqrt(aD[index[0]][index[1]]);
+				// L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
+				L = L0*temp;
 				/*This might work and is slightly better*/
-				L_deriv = (d>1)?(L_deriv0/(DX[p]*sqrt(aD[index[0]][index[1]]))*(aDx[p][index[0]][index[1]])):
-				(L_deriv0/(DX[p]*sqrt(aD[index[0]][0])))*(aDx[p][index[0]][0]);
+				// L_deriv = (d>1)?(L_deriv0/(DX[p]*sqrt(aD[index[0]][index[1]]))*(aDx[p][index[0]][index[1]])):
+				// (L_deriv0/(DX[p]*sqrt(aD[index[0]][0])))*(aDx[p][index[0]][0]);
+				L_deriv = L_deriv0/(DX[p]*temp)*(aDx[p][index[0]][index[1]]);
 				Tr = (1+0.5*L_deriv);
 				Tl = (1-0.5*L_deriv);
 				Delta_p = L*Tr;
 				Delta_m = L*Tl;
-				Tr /= 2.0;
+				Tr *= 0.5;
 			}
-			r = rng->uniform();
-			if(r>Tr){
-				stepvector[p] = Delta_p;
-			}
-			else{
-				stepvector[p] = -Delta_m;
-			}
-		for(int j=0;j<d;j++){
-			newPos[j] = walkers[i][j];
-		}
-		walkers[i][p] += stepvector[p];
+			// stepvector[p] = (rng->ran0()>Tr)?(Delta_p):(-Delta_m);
+		walkers[i][p] += (rng->ran0()>Tr)?(Delta_p):(-Delta_m);
+		// walkers[i][p] += stepvector[p];
 		checkpos(walkers[i]);
 		// cout<<index[0]<<","<<index[1]<<"  :  "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
-		stepvector[p] = newPos[p] = 0;
+		// stepvector[p] =  0;
 	}	
 }
 
@@ -103,6 +99,30 @@ void Walk::Load(std::string filename,int M, int N){
 	}
 	ifstream infile (filename.c_str(), ios::in | ios::binary);
 
+	/*Could read the file like this. Might be faster*/	
+	// file.read(reinterpret_cast<char*>(&N),sizeof(int));
+ //    data_type *tmp_data = new data_type[6*N];
+
+ //    file.read(reinterpret_cast<char*>(tmp_data), 6*N*sizeof(data_type));
+ //    file.close();
+ //    vector<data_type> &r = system->r;
+ //    vector<data_type> &v = system->v;
+
+ //    for(int n=0;n<N;n++) {
+ //        r.at(3*n+0) = tmp_data[6*n+0];
+ //        r.at(3*n+1) = tmp_data[6*n+1];
+ //        r.at(3*n+2) = tmp_data[6*n+2];
+ //        v.at(3*n+0) = tmp_data[6*n+3];
+ //        v.at(3*n+1) = tmp_data[6*n+4];
+ //        v.at(3*n+2) = tmp_data[6*n+5];
+ //        int mapped_cell_index = system->cell_index_map[system->cell_index_from_position(n)];
+ //        Cell *cell = system->active_cells.at(mapped_cell_index);
+ //        cell->add_molecule(n,system->molecule_index_in_cell,system->molecule_cell_index);
+ //    }
+
+ //    delete filename;
+ //    delete tmp_data;
+	
 	string line,sub;
 	getline(infile,line);
 	nwalkers = atoi(line.c_str());
@@ -195,6 +215,7 @@ void Walk::SetDiffusionConstant(double Diff){
 void Walk::FindPosition(double *pos, int *indx){
 	/*Maps the walkers position to its index*/
 	indx[0] = int(round(pos[0]/dx));
+	// indx[1] = (d>1)?(int(round(pos[1]/dy))):(0);
 	if(d==2){
 		indx[1] = int(round(pos[1]/dy));
 	}
