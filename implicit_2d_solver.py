@@ -262,8 +262,8 @@ def f(x,y,t):
 for j in xrange(0,T):
 	ax.collections.remove(wframe)
 	time.sleep(1)
-	# U = BE_2D(Up,alpha,beta,gamma)
-	U = ADI_2D(Up,dt,dx,dx,D)
+	U = BE_2D(Up,alpha,beta,gamma)
+	# U = ADI_2D(Up,dt,dx,dx,D)
 	Up = U.copy()
 	wframe = ax.plot_wireframe(x,y,Up)
 	# wframe = ax.plot_wireframe(x,y,f(x,y,(j+1)*dt))

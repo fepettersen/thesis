@@ -1,6 +1,33 @@
 \section{About}
+The current version of the software (14.02.14) works in the following way. 
+Various parameters are specified in a python-script which calls the program. 
+After initialization, where anisotropic diffusion constant, initial condition and areas of combined solution are set up we start solving the equation (using the implicit BE scheme). 
+At each time-step we call the Solve-method of the combine-class which in turn calls the solve-method of the PDE-solver, calculates the number of walkers by the conversion-rate, gives them a random position in proximity to the coarse-grained PDE-mesh-point we are looking at, and writes this position to a file. 
+The random walk program is then called with some parameters. This program reads the file with walker-positions, advances some specified number of time-steps and writes the final positions to the same file it read. 
+The main program now reads this file, maps the walker-positions back to the coarse-grained PDE-mesh and converts the spatial distribution of walkers to a concentration distribution. 
+Here we are faced with a few choices with respect to the combination of the two solutions we have for the same area: 
+\begin{itemize}
+ \item Some form of least squares fitting could be done. A polynomial regression was developed, but tests indicate that it is not a good solution.
+ \item Cubic spline interpolation might be slightly better seeing as we force the derivatives to be equal at the end-points. 
+ Interpolation forces the fitted curve to take the measured values at the interpolation-points, and so we must chose only some of the points to be used by the interpolation in order for there to be a difference. Immediately we are faced with the problem of which points to use and which to throw away. If we consistently chose the points which are closest to the PDE-solution (and the end-points which must be included for smoothness) we might as well not include a random walk model, and vice versa.
+ \item We could use only the result from the random walk model
+ \item Some sort of average might also help us. There are many to chose from, both arithmetic and geometric and with different kinds of weighting.
+\end{itemize}
+Intuitively, I find it better to use either an average or only the random walk result. At present (14.02.14) the simplest arithmetic mean is implemented at each mesh-point.\\
+After each time-step the program also writes the combined solution on the coarse-grained mesh to a unique file.\\
+The python script also does some other more or less clever stuff at each run. This is described in the appendix as a form of debugging \ref{debugging}.
+
+\subsection{Limitations}
+
+As with any software there are limitations. The limitations discussed in this chapter will be with regard to physical problems, and not memory or CPU limitations which are described later. \\
+Assuming the dendritic spines stuff will be the final application:\\
+First of all, to specify a source function, one must program it in the Diffusion class (Diffusion::f()). This might be fixed in a later version using inheritance.\\
+The geometry is, currently, limited to a square. Of course we can argue that we have scaled the size to a unit square, but as discussed in chapter \ref{} the actual geometry remains a unit square. 
+Furthermore the same issue arises on the random walks. \\
+As of now, it is unclear if 3d-modeling is supported. This is actually a smaller issue since there is usually little more to learn from switching from 2d to 3d. In any case, the extension to 3d is most likely not very hard, provided we use an array of slices from the cubic matrix describing the solution.
 
 \section{Adaptivity}
+
 There are two adaptive parts of the software. First of all, the number of walkers which depend on the concentration, or the solution the the PDE in the relevant area. This must change in order to keep physical meaning and give results. Without this adaptivity, the results would either be wrong, or the model would not make physical sense.\\
 Since a diffusion process in general has rapid changes in the beginning where for example high frequency variations are dampened and very slow convergence to a steady state later, we have introduced a test of the amount of change between two subsequent time-steps. If this amount is smaller than some limit, we will increase the time-step.\\
 \emph{This increase should be done in a more elegant manner(linearly?)}

@@ -1,4 +1,22 @@
 \section{About}
+The current version of the software (14.02.14) works in the following way. 
+Various parameters are specified in a python-script which calls the program. 
+After initialization, where anisotropic diffusion constant, initial condition and areas of combined solution are set up we start solving the equation (using the implicit BE scheme). 
+At each time-step we call the Solve-method of the combine-class which in turn calls the solve-method of the PDE-solver, calculates the number of walkers by the conversion-rate, gives them a random position in proximity to the coarse-grained PDE-mesh-point we are looking at, and writes this position to a file. 
+The random walk program is then called with some parameters. This program reads the file with walker-positions, advances some specified number of time-steps and writes the final positions to the same file it read. 
+The main program now reads this file, maps the walker-positions back to the coarse-grained PDE-mesh and converts the spatial distribution of walkers to a concentration distribution. 
+Here we are faced with a few choices with respect to the combination of the two solutions we have for the same area: 
+\begin{itemize}
+ \item Some form of least squares fitting could be done. A polynomial regression was developed, but tests indicate that it is not a good solution.
+ \item Cubic spline interpolation might be slightly better seeing as we force the derivatives to be equal at the end-points. 
+ Interpolation forces the fitted curve to take the measured values at the interpolation-points, and so we must chose only some of the points to be used by the interpolation in order for there to be a difference. Immediately we are faced with the problem of which points to use and which to throw away. If we consistently chose the points which are closest to the PDE-solution (and the end-points which must be included for smoothness) we might as well not include a random walk model, and vice versa.
+ \item We could use only the result from the random walk model
+ \item Some sort of average might also help us. There are many to chose from, both arithmetic and geometric and with different kinds of weighting.
+\end{itemize}
+Intuitively, I find it better to use either an average or only the random walk result. At present (14.02.14) the simplest arithmetic mean is implemented at each mesh-point.\\
+After each time-step the program also writes the combined solution on the coarse-grained mesh to a unique file.\\
+The python script also does some other more or less clever stuff at each run. This is described in the appendix as a form of debugging \ref{debugging}.
+
 
 \section{Adaptivity}
 There are two adaptive parts of the software. First of all, the number of walkers which depend on the concentration, or the solution the the PDE in the relevant area. This must change in order to keep physical meaning and give results. Without this adaptivity, the results would either be wrong, or the model would not make physical sense.\\
@@ -18,7 +36,8 @@ The random walk-part of the software has been excreted as a stand-alone program 
 There are three expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
 \begin{itemize}
 \item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \ref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost. 
-As an additional problem we will encounter some overhead upon calling the program, initializing variables and instances and so on.
+As an additional problem we will encounter some overhead upon calling the program, initializing variables and instances and so on. 
+The computationally most demanding function seems to be the round-off function, which is used to place the walkers on the coarse-grained PDE-mesh.
 \item Communicating the positions of all the walkers between the two programs each time-step is very costly.
 \item Translating the positions of the walkers from the unit-square they are walking on to the coarse-grained PDE grid requires calling the ``round'' function from the math library in C++. This function is rather slow, and the program suffers from it. 
 \end{itemize}
@@ -51,4 +70,14 @@ Requirements for this part are:
  \item This executable should read the filename of the ini-file containing the positions of all walkers , and the local diffusion ``tensor'' in the relevant area.
  \item Upon completion, all positions must be written to the same file.
 \end{itemize}
-The PDE-solver should also be rather simple to replace, but some more programming will be required. First of all your solver must be included in the header-file
+The PDE-solver should also be rather simple to replace, but some more programming will be required. First of all your solver must be included in the header-file. 
+Next, the ``Combine'' class has an instance of the PDE-solver which it calls the advance-method of at each time-step. Seeing as this method is most regularly named ``solve'' you will either have to rename the method or the call. 
+There are really very few dependencies on the PDE-solver, seeing as it is mostly left alone, but in addition to being able to respond to function calls it must:
+\begin{itemize}
+ \item Have its own $\Delta t$ attribute named ``dt''.
+ \item Work on ``double**'' data types for all spatial dimensions (or implement some form of workaround)
+ \item Be able to respond to increasing the time-step. In practice this means that the solver should be implicit.
+\end{itemize}
+As discussed, the implementation of random walks on parts of the mesh will reduce the convergence-rate to 0.5, and so there are really only two reasons to implement a new PDE solver. 
+The current one only implements Neumann boundaries, and consequently must either be modified or replaced in order to work with other boundary conditions.
+It also only works on a square mesh. As discussed in section \ref{} it will be immensely complicated to implement a grid transformation, and this is already implemented in most finite element software.
