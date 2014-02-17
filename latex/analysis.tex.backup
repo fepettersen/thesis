@@ -14,27 +14,27 @@ To investigate the error we are introducing we will first need to test that the 
 % Figure \ref{errorplot_1d} shows the error norm (\ref{}) of only the PDE solver done in 1 dimension plotted for each timestep of the simulation. 
 % The manufactured, exact solution is $u(x,t) = \exp\left(-\pi^2t\right)\cos(\pi x)$ and its initial condition is shown in figure \ref{}.
 
-\begin{figure}[H]
- \centering
-%  \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/initial_condition.eps}
- \includegraphics[scale=0.7]{../doc/results/experiment_31102013_1017/results/initial_condition.eps}
- \caption[Initial condition in 1d]{Initial condition of manufactured solution in 1d and the simulation.}
- \label{initial_condition_1d}
-\end{figure}
-\begin{figure}[H]
- \centering
-%  \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/initial_condition.eps}
- \includegraphics[scale=0.7]{Figures/InitialCondition2d.eps}
- \caption[Initial condition in 2d]{Initial condition of manufactured solution in 2d and the simulation.}
- \label{initial_condition_2d}
-\end{figure}
+% \begin{figure}[H]
+%  \centering
+% %  \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/initial_condition.eps}
+%  \includegraphics[scale=0.7]{../doc/results/experiment_31102013_1017/results/initial_condition.eps}
+%  \caption[Initial condition in 1d]{Initial condition of manufactured solution in 1d and the simulation.}
+%  \label{initial_condition_1d}
+% \end{figure}
+% \begin{figure}[H]
+%  \centering
+% %  \includegraphics[scale=0.7]{/home/fredriep/Dropbox/uio/thesis/doc/results/experiment_31102013_1017/results/initial_condition.eps}
+%  \includegraphics[scale=0.7]{Figures/InitialCondition2d.eps}
+%  \caption[Initial condition in 2d]{Initial condition of manufactured solution in 2d and the simulation.}
+%  \label{initial_condition_2d}
+% \end{figure}
 
-\subsection{The error estimate}
+\subsection{The error estimate}\label{error_estimate}
 
 Before we do anything we should specify what we use to measure the error. 
 Throughout this thesis the term error is used quite lazily, but unless something else is specified we refer to the expression 
 \begin{equation}
- err = max\left(||u_e-u||_2\right)
+ err(t_i) = ||u_e(t_i)-u(t_i)||_2
 \end{equation}
 where $u_e$ is the exact (manufactured) solution to the equation, and $u$ is the result from the numerical simulation. 
 We use this error-estimate because it is time-dependent, thus letting us explicitly see how the error evolves over time. 
@@ -48,46 +48,37 @@ and the same error integrated in time as well
  err = \sum||\sum u_e-u||_2
 \end{equation}
 
-\subsection{A simplified version of the algorithm}
-
-Monte Carlo methods are immensely important in modern computational science, and can be used to solve integrals as well as random walks. 
-As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
-\begin{equation}\label{ODE}
- \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
+\subsection{Verification techniques}
+There are quite a few ways to verify an implementation. In this thesis we will focus on three which I think are adequate for no particular reason.
+\begin{itemize}
+ \item Method of manufactured solutions\\
+ A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
+Since the software contains both an explicit FE scheme and an implicit BE scheme we will verify the two of them at the same time. 
+We will start with the simplest diffusion equation (eq. \ref{simple_diffusion_equation}) and add complexity until we have the desired expression. 
+Both schemes is expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
+The next thing we do is decide that the solution to the diffusion equation should be equation \ref{manifactured_solution_1D}.
+\begin{equation}\label{manifactured_solution_1D}
+ u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
 \end{equation}
-Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}), for the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
-\begin{equation}\label{ODE_solution}
- f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
-\end{equation}
-This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
-By the relation we found earlier (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
-\begin{align*}
- \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
- N \simeq \frac{1}{\Delta x^4} = N_x^4
-\end{align*}
+which satisfies our equation if we set the diffusion constant to 1. 
+\item Exact numerical solutions\\
+At least for the explicit schemes we can find an exact solution to the scheme itself seeing as the scheme is a difference equation. The calculations are shown step-by-step in chapter \ref{exact_numerical_solution}.
+\item Convergence tests\\
+This must be combined with the manufactured solution, but takes a slightly different approach to quantifying the error estimate. We start bu calculating some form of error estimate, and chose a value to represent the error of the entire simulation. This could be the maximum error for the entire simulation, or an integrated measure. 
+We do multiple simulations while improving the parameter we want to investigate, say how the number of walkers influences the error (see chapter \ref{}). 
+Finally, using equation \ref{} we get a number indicating the improvement in the error estimate by improving the parameter in question. This number indicates the so called order of convergence which is one for FE and BE since the error goes as $\mathcal{O}(\Delta t)$, and two for our approximation to the second derivative in space since the error goes as $\mathcal O(\Delta x^2)$.
+\end{itemize}
 
-\begin{lstlisting}
-  N_x	    N_MC	   error       MC_error   MP_error
-   1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
-   2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
-   4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
-   8     8192000 (   8)  4.683E-04   4.866E-04  -1.832E-05
-  16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
-  
-  Convergence rates
-total  MP     MC
--1.84 -1.83  0.20
--1.95 -1.95 -0.55
--2.03 -1.99  0.26
--1.99 -2.00 -0.52
-\end{lstlisting}
 
+\section{Verification of PDE solvers}
+To verify the implementation of the PDE-solvers we will now run through the steps outlined in the previous chapter. We will also add complexity along the way, but this will be described when we get there. First of all we will test the simplest possible implementation which is equation \ref{}. Since both the FE and BE discretization have been implemented we will test both of them, but mostly we will use the BE discretization because it has no stability criterion. For most of the tests we will force the solution to be equation \ref{}
 
 \section{Manufactured Solutions}
 A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
-As a first, simple implementation we have worked with the explicit Forward Euler discretization of the simplest form of the diffusion equation (eq. \ref{simple_diffusion_equation}). 
-This discretization is expected to have an error-term of the order of $\Delta t$, which again is limited by a stability criterion. 
-We can now decide that the solution to equation (eq. \ref{simple_diffusion_equation}) should be
+Since the software contains both an explicit FE scheme and an implicit BE scheme we will verify the two of them at the same time. 
+We will start with the simplest diffusion equation (eq. \ref{simple_diffusion_equation}) and add complexity until we have the desired expression. 
+Both schemes is expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
+The next thing we do is decide that the solution to the diffusion equation should be equation \ref{manifactured_solution_1D}.
 \begin{equation}\label{manifactured_solution_1D}
  u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
 \end{equation}
@@ -95,18 +86,17 @@ which satisfies our equation if we set the diffusion constant to 1.
 \begin{align}
  \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\\
  -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1
-\end{align}
-As we saw in section \ref{truncation_error} the Forward Euler scheme is expected to have an error of the order of $\Delta t$ in time. 
-The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. 
-Testing only the scheme first, in 1D we get the following plot \ref{errorplot_FE1D_noWalk} of the maximum of the absolute value of the difference between the exact solution and the numerical solution to the equation, showing us that the error is linear in the first part of a simulation. 
-For longer simulations, however, we expect the analytic solution to take a steady state which we find in the limit of large $t$. 
+\end{align}Hc = 32000
+
+
+
+The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and, in the FE case, the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. 
+Testing only the schemes with no walkers added first, in 1D we get the plots in figure \ref{errorplot_FE1D_noWalk} of error described in chapter \ref{error_estimate}, with the corresponding plots of the convergence rates in figure \ref{} that verify the order of the error term.
+For longer simulations, we expect the analytic solution to take a steady state which we find in the limit of large $t$. 
 \begin{equation}
  u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
 \end{equation}
-The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of times steps. 
-Figure \ref{errorplot_FE1D_noWalk_long} shows a longer simulation of the equation which includes the converging part as well. 
-Looking closely at figure \ref{errorplot_FE1D_noWalk_long}, which has a smaller $\Delta t$ by a factor of $\sim6$ with respect to figure \ref{errorplot_FE1D_noWalk}, we can note that the error norm $0.0015$ is reached after some $100-200$ time steps, which is later than in figure \ref{errorplot_FE1D_noWalk}. 
-Although this is not an exact measurement, it is another indication that the implementation is correct.
+The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of times steps, but in the very least the error should stabilize. 
 
 \begin{figure}[H]
 \centering
@@ -142,7 +132,7 @@ Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of t
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{../doc/results/experiment_31102013_1017/results/errorplot.eps}
+\includegraphics[scale=0.7]{../doc/results/experimen(t_i)t_31102013_1017/results/errorplot.eps}
 \caption[Effect of increasing number of walkers]{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$. Other parameters of importance are $\Delta t\approx 0.00083333$, $\Delta x = 0.05$.}
 \label{errorplot_FE1D_Walk_first_attemt}
 \end{figure}
@@ -206,6 +196,7 @@ from the initial condition. This finally gives us the exact numerical solution o
 \begin{equation}
  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\pi^{2i}\left(-1\right)^i\left(D\Delta t\right)^i\cos(\pi x)
 \end{equation}
+
 Notice that we have not used the approximation to the spatial derivative, but rather the analytical derivative. 
 We can find the approximation that the computer uses to the spatial derivative in the same way as for the time derivative. 
 \begin{align*}
@@ -526,6 +517,48 @@ We argued earlier that for the error from the random walk part of the mesh not t
 
 
 \section{Testing Random walks}\label{testing_random_walks}
+\subsection{A simplified version of the algorithm}
+
+Monte Carlo methods are immensely important in modern computational science (\emph{reference}), and can be used to solve integrals as well as random walks. 
+As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
+\begin{equation}\label{ODE}
+ \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
+\end{equation}
+Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}), for the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
+\begin{equation}\label{ODE_solution}
+ f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
+\end{equation}
+This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
+By the relation we found earlier (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+\begin{align*}
+ \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
+ N \simeq \frac{1}{\Delta x^4} = N_x^4
+\end{align*}
+The following output is from a program generously donated by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
+It uses the relation described, but multiplies with a constant, giving us 
+\begin{equation*}
+ N = 2000\times N_x^4
+\end{equation*}
+
+\begin{lstlisting}
+  N_x	    N_MC	   error       MC_error   MP_error
+   1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
+   2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
+   4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
+   8     8192000 (   8)  4.683E-04   4.866E-04  -1.832E-05
+  16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
+  
+  Convergence rates
+total  MP     MC
+-1.84 -1.83  0.20
+-1.95 -1.95 -0.55
+-2.03 -1.99  0.26
+-1.99 -2.00 -0.52
+\end{lstlisting}
+We see that the convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
+Another thing to notice it the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
+As the listed output and equation \ref{} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
+
 
 To verify our implementation, and perhaps gain some new knowledge we will do some testing on the random walks implementation as well. 
 This means that we have to find a solution of the diffusion equation \ref{simple_diffusion_equation} for an initial condition we can recreate with random walkers to the best possible precision. 

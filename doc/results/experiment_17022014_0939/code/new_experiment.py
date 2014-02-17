@@ -148,7 +148,6 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
-		print self.error
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
@@ -437,7 +436,6 @@ if __name__ == '__main__':
 	print 'Python: ',dt,' dx: ',dx
 	# Hc = [200]
 	Hc = [200,1400,5600,10400,32000]
-	Hc = [5600, 10000, 50000]
 	# Hc = [1e4,1e5,3*1e5,7*1e5,1e6,3*1e6]
 	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
 	# info='Errortest_FixedHc_smaller_than_dtdt'
