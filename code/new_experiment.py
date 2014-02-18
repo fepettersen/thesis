@@ -66,6 +66,9 @@ class Experiment:
 		self.samples = 0
 
 
+	def LoadFromPath(self,path):
+		pass
+
 	def compile(self):
 		# os.system('g++ *.cpp -O2 -o -larmadillo -llapack -lblas main_walk')
 		os.system('g++ *.cpp -o main_walk -O2 -larmadillo -llapack -lblas -fopenmp')
@@ -410,22 +413,22 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return x+y
-	return np.ones(np.shape(x))*0.5
+	return np.ones(np.shape(x))
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
 
 	this_dir = right_split(os.getcwd(),'/')
 
-	x0 = 0.2
+	x0 = 0.3
 	y0 = 0.5
-	x1 = 0.4
+	x1 = 0.5
 	y1 = 0.7
 	m = 76
-	n = 76
+	n = 1
 	T = 100
 
 	dx = 1.0/(m-1)
@@ -435,37 +438,44 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	# Hc = [200]
-	Hc = [200,1400,5600,10400,32000]
-	Hc = [5600, 10000, 50000]
-	# Hc = [1e4,1e5,3*1e5,7*1e5,1e6,3*1e6]
-	# Hc = [1000,2000,4000,8000,16000,32000,64000,128000,256000,512000,1024000,2048000]
-	# info='Errortest_FixedHc_smaller_than_dtdt'
+	Hc = [20000]
+	# Hc = [200,1400,5600,10400,32000]
+	# Hc = [5600, 10000, 50000]
+	info='_Check_then_delete'
 	run = Experiment(this_dir,DEBUG,save_files)
 	run.exact = f
-	run.SetInitialCondition(run.exact(x,y,0))
-	run.SetDiffusionTensor(D(x,y))
-	# run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
-	# run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
+
+	# run.SetInitialCondition(run.exact(x,y,0))
+	# run.SetDiffusionTensor(D(x,y))
+	run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
+	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 
 	run.compile()
 	
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
-	dt = [1e-2,1e-3,1e-4]
-	dt = [1e-2]
+	dt = [0.2,0.1,0.07,0.03,0.01]
+	# dt = [1e-2]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	run.VerifyDeterministicError()
+	# run.VerifyDeterministicError()
 
+	### --- Run for walkers --- ###
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	# 	run.RunSimulation(i)
 
-	for i in Hc:
-		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-		run.RunSimulation(i)
-	time.sleep(1)
+	### --- Run for time-step --- ###
+	print glob.glob('home/fredrik/Dropbox/uio/thesis/doc/results/experiment_18022014_1438/results/results_FE_Hc20000_*.txt')
+	# run.CalculateError()
+	# for i in dt:
+	# 	print "dt = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,i)
+	# 	run.RunSimulation(Hc[0])
+	# time.sleep(1)
 	# h = [1./dt[i] for i in range(len(dt))]
 	leg = ['dt = %g'%i for i in Hc]
 	run.PlotError(leg)
-	run.ConvergenceTest(Hc)
+	# run.ConvergenceTest(Hc)
 	# run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 

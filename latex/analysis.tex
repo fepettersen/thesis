@@ -76,6 +76,8 @@ We will also add complexity along the way, but this will be described when we ge
 Since both the FE and BE discretization have been implemented we will test both of them, but mostly we will use the BE discretization because it has no stability criterion. 
 For most of the tests we will force the solution to be equation \ref{manifactured_solution_1D} in 1d which satisfies our equation if we set the diffusion constant to 1.
 
+\subsection{Manufactured Solutions}
+
 \begin{equation}\label{manifactured_solution_1D}
  u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
 \end{equation}
@@ -92,6 +94,7 @@ For longer simulations, we expect the analytic solution to take a steady state w
  u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
 \end{equation}
 The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of times steps, but in the very least the error should stabilize. 
+Figures \ref{} and \ref{} seem to show the expected behaviour from the error estimate, which implies that the implementation is correct so far.
 
 \begin{figure}[H]
 \centering
@@ -109,41 +112,14 @@ The numerical scheme should be able to represent this to machine precision ($10^
 \label{errorplot_FE1D_noWalk_super}
 \end{figure}
 
-\section{Manufactured Solutions}
+\subsection{Convergence Tests}
 
-
-We then introduce an area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$. 
-These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
-\begin{equation}\label{conversion_rate}
- C_{ij} = \frac{a}{\Delta t}U_{ij}
-\end{equation}
-Mostly we will rewrite equation \ref{conversion_rate} to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
-As of now, the conversion factor, $Hc$, is defined in equation \ref{definition_Hc_first}. 
-One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
-\begin{equation}\label{definition_Hc_first}
- Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
-\end{equation}
-
-The area where the model has been replaced is between $x=0.6$ and $x=0.7$, which is three mesh points. 
-In the same way as for only the simple 1D PDE case we compare the combined numerical solution from the two models to the exact solution. 
-Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligible. 
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.7]{../doc/results/experimen(t_i)t_31102013_1017/results/errorplot.eps}
-\caption[Effect of increasing number of walkers]{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$. Other parameters of importance are $\Delta t\approx 0.00083333$, $\Delta x = 0.05$.}
-\label{errorplot_FE1D_Walk_first_attemt}
-\end{figure}
-
-As we can see from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the number of walkers that each ``unit concentration'' corresponds to has a positive effect on the error norm up to a certain point. 
-After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of the Forward Euler scheme. 
-This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
-Meaning of course that the calculations in section \ref{} are not hopeless.
-
-We can also do a convergence test to see that the error is approximately of the expected order. 
-This is done by doing several simulations with different values for $\Delta t$ and comparing the errors by equation \ref{convergence_rate_def}. 
+The next step in testing the implementation will be to perform a convergence test in time. 
+We omit the spatial convergence test because chances are very good that an incorrect implementation of the spatial derivative would be clearly visible both in the visualization of the simulation (the solution blows up), and in the error plot seeing as the spatial error would dominate.
+We carry out the convergence test by doing several simulations with different values for $\Delta t$ and comparing the errors by equation \ref{convergence_rate_def}. 
 A result of such an experiment for the FE scheme using the $\Delta t$ values listed below is found in figure \ref{convergence_test_FE}. 
-The expected value of r is approximately 1. The result is not perfect, but still close to 1.
+The expected value of r is approximately 1. The result is not perfect, but still close to 1. 
+For the BE scheme we get the convergence rate shown in figure \ref{convergence_test_BE}. Again, the expected order of convergence is 1 and this time the result is almost perfect.
 \begin{lstlisting}
  dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
 \end{lstlisting}
@@ -156,16 +132,15 @@ The expected value of r is approximately 1. The result is not perfect, but still
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{../doc/results/experiment_13012014_0925_Simple1DConvergenceTestBE/results/ConvergenceTest.eps}
- \caption{Convergence test for the BE scheme. The x axis is $\ln(\Delta t)$, the y-axis (though a little hard to see) is zoomed in around r=1.}
- \label{convergence_test_FE}
+ \caption{Convergence test for the BE scheme. The x axis is $\Delta t$, the y-axis (though a little hard to see) is zoomed in around r=1.}
+ \label{convergence_test_BE}
 \end{figure}
-
 
 
 \subsection{Exact numerical solution}\label{exact_numerical_solution}
 
 The FE scheme also has an exact solution seeing as it is in fact a difference equation. 
-We can find this (for this exact initial condition \ref{initial_condition_1d}) if we formulate the scheme as 
+We can find this (for this exact initial condition, eq. \ref{manifactured_solution_1D}) if we formulate the scheme as 
 
 \begin{equation}
  u^{n+1} = D\Delta t u_{xx}^n + u^n
@@ -230,7 +205,194 @@ The results from testing the FE scheme are found in figure \ref{errorplot_numeri
  \label{errorplot_numerical_exact_FE_1D}
 \end{figure}
 
+\section{Testing the Random walk implementation}\label{testing_random_walks}
 
+
+
+To verify our implementation, and perhaps gain some new knowledge we will do some testing on the random walks implementation as well. 
+This means that we have to find a solution of the diffusion equation \ref{simple_diffusion_equation} for an initial condition we can recreate with random walkers to the best possible precision. 
+The absolute simplest initial condition to recreate is the Heaviside step function, defined in equation \ref{Heaviside_def}. 
+\begin{equation}\label{Heaviside_def}
+ H(x-a) = \begin{cases}
+           1\;\;x\geq a\\
+           0\;\;x<a
+          \end{cases}
+\end{equation}
+In order to verify our implementation we must solve the diffusion equation \ref{simple_diffusion_equation} for this new initial condition. 
+This is most easily done through separation of variables. We have
+\begin{align*}
+ \frac{\d u}{\d t} = D\frac{\d^2 u}{\d x^2};\;\; \frac{\d u(0,t)}{\d x} = \frac{\d u(1,t)}{\d x} = 0 \\
+ u(x,0) = H\left(x-\frac{1}{2}\right);\;\; D = 1
+\end{align*}
+and
+\begin{align*}
+ u(x,t) = F(x)T(t) \implies \frac{T'(t)}{T(t)} = \frac{F''(x)}{F(x)}
+\end{align*}
+where the primes denotes the respective derivatives. We separate the equation using a separation constant $\lambda$
+\begin{align*}
+ T'(t)-\lambda T(t) = 0 \implies T(t) = C\exp(\lambda t)\\
+ F''(x) -\lambda F(x) = 0 \implies F(x) = C_1\exp(\sqrt{\lambda}x) + C_2\exp(-\sqrt{\lambda}x)
+\end{align*}
+Where $C$, $C_1$ and $C_2$ are arbitrary constants. 
+Choosing $\lambda = -\mu^2$ lets us rewrite the spatial solution in terms of sines and cosines
+\begin{equation*}
+ F(x) = a\cos(\mu x) + b\sin(\mu x)
+\end{equation*}
+The boundary conditions gives us 
+\begin{align*}
+ F'(0)T(t) = F'(1)T(t) = 0
+\end{align*}
+Since the time dependent solution cannot be exactly zero, the first derivative of the spatial solution must be zero
+\begin{align*}
+ F'(x) &= -a\mu\sin(\mu x) + b\mu\cos(\mu x) \\
+ F'(0) &= -a \mu\sin(0) + b\mu\cos(\mu x) = b\mu\cos(\mu x) \implies b=0 \\
+ F(1) &= a\cos(\mu) \implies \mu = n\pi
+\end{align*}
+Telling us that a Fourier series in cosines is the solution to the equation, and it will look like this.
+\begin{equation}
+ u(x,t) = a_0 + \sum\limits_{n=1}^\infty a_n\exp\left(-(n\pi)^2t\right)\cos(n\pi x)
+\end{equation}
+
+The coefficients are found by approximating the initial condition
+\begin{align*}
+ a_0 &= \int\limits_0^1H(x-0.5)dx = \frac{1}{2} \\
+ a_n &= 2\int\limits_0^1H(x-0.5)\cos(n\pi x)dx = 2\int\limits_{0.5}^1\cos(n\pi x)dx \\
+ &= \frac{2}{n\pi}\left[sin(n\pi x)\right]_{0.5}^1 = \frac{2}{n\pi}\sin(n\pi) - \sin(\frac{n\pi}{2}) \\
+ a_n &= \frac{2\sin(\frac{n\pi}{2})}{n\pi}
+\end{align*}
+which gives us the final solution
+\begin{equation}
+ u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}\exp\left(-(n\pi)^2t\right)\cos(n\pi x)
+\end{equation}
+
+We can now perform a convergence test to find the convergence rate for the random walkers, this is the order the error of the scheme goes as and it is defined in equation \ref{convergence_rate_def}. 
+We will modify it slightly by testing for the number of walkers rather than the time step. 
+We must also use another error estimate $E_i$ which gives us one number for each simulation. 
+The candidates are either the maximum of the error we are already using, or an integrated error.
+
+\begin{equation}\label{convergence_rate_def}
+ r = \frac{\ln(E_{i+1}/E_i)}{\ln(\Delta t_{i+1}/\Delta t_i)}
+\end{equation}
+
+Using the maximum of the error measure already in use, we have tested the convergence rate measure for the following measures of Hc:
+\begin{lstlisting}
+ Hc = [200,1400,5600,10400,32000]
+\end{lstlisting}
+Meaning that the largest value of Hc we will get an estimate for is $Hc = 10000$. 
+The convergence test suggests that the convergence rate for random walks follows the proportionality in equation \ref{convergence_rate_RW}. 
+This relation tells us just what we have been expecting the whole time; while increasing the number of walkers will reduce the error, the convergence is slow. 
+Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $err\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $err\sim\mathcal{O}(\Delta t^2)$. Clearly we will have enough trouble for the simpler cases.
+
+\begin{equation}\label{convergence_rate_RW}
+err \propto Hc^{\frac{-1}{2}}
+\end{equation}
+
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{../doc/results/experiment_18022014_1413_RW_convergencetest_1d/ConvergenceTest.eps}
+ \caption[Convergence test RW]{A convergence test for the isotropic random walk implementation using different conversion factors, Hc. The x axis (conversion rate) is log transformed and ranges from 100 to 50000 in real numbers.}
+ \label{ConvergenceTestRW}
+\end{figure}
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{../doc/results/experiment_18022014_1413_RW_convergencetest_1d/results/errorplot.eps}
+ \caption[Error plot RW]{A ``normal'' error plot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to couple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a step length calculated from equation \ref{steplength}}
+\end{figure}
+
+
+
+
+\section{Testing the combined solution}
+In this chapter we will combine the PDE-solution on some part of the mesh with the result from a random walk simulation using the same initial condition as the PDE-solver was given. 
+As we will discuss in chapter \ref{Software:About} there are many candidates as to the combination of the solutions, but we will use one of the simplest ones; the average of the two. 
+Before we start with the verification, however, we will take a quick look at a simplified problem which in principle is the same.
+
+\subsection{A simplified version of the algorithm}\label{simplified_test}
+
+Monte Carlo methods are immensely important in modern computational science (\emph{reference}), and can be used to solve integrals as well as random walks. 
+As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
+\begin{equation}\label{ODE}
+ \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
+\end{equation}
+Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}), for the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
+\begin{equation}\label{ODE_solution}
+ f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
+\end{equation}
+This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
+By the relation we found earlier (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+\begin{align*}
+ \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
+ N \simeq \frac{1}{\Delta x^4} = N_x^4
+\end{align*}
+The following output is from a program generously donated by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
+It uses the relation described, but multiplies with a constant, giving us 
+\begin{equation*}
+ N = 2000\times N_x^4
+\end{equation*}
+
+\begin{lstlisting}
+  N_x	    N_MC	   error       MC_error   MP_error
+   1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
+   2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
+   4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
+   8     8192000 (   8)  4.683E-04   4.866E-04  -1.832E-05
+  16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
+  
+  Convergence rates
+total  MP     MC
+-1.84 -1.83  0.20
+-1.95 -1.95 -0.55
+-2.03 -1.99  0.26
+-1.99 -2.00 -0.52
+\end{lstlisting}
+We see that the convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
+Another thing to notice it the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
+As the listed output and equation \ref{} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
+
+\subsection{Introducing walkers}
+
+First of all, using random walkers on parts of the mesh will have a considerable, negative impact on the error estimate. 
+As we have discussed before, the solution from the random walkers will fluctuate around the ``correct'' (it is in fact correct while verifying) solution with amplitude proportional to $\frac{1}{\sqrt{N_{ij}}}$ which will depend on the PDE-solution in the mesh-point. 
+It will also, as demonstrated in chapter \ref{simplified_test}, be possible to force the combined solution to have the desired properties in terms of error-estimates but at considerable computational cost. 
+While doing the various error-testing for the combined solution we will therefore stick to the implicit scheme since we can choose the time-step more freely and by extension reduce the number of random walkers required.\\
+Keeping in mind that the spatial error goes like $\Delta x^2$ we should at least choose the time-step so that $\Delta t> \Delta x^2$ to make sure the error from the time derivative is dominant. 
+Starting off, we have a 2d simulation of isotropic diffusion with $\Delta t = 0.01$ and $\Delta x = \frac{1}{75}$ over the full interesting course of the solution, meaning that the solution more or less at steady state the last time-steps. The error-plot from this simulation is shown in figure \ref{errorplot_combined_BE2d}. We can see that although the error-term from the combined solution does not converge onto the error-curve from the deterministic solution, the error term is of the same order. 
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{../doc/results/experiment_17022014_1541/results/errorplot.eps}
+ \caption{Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac{1}{75}$. Simulations doen with the BE scheme for 100 steps.}
+ \label{errorplot_combined_BE2d}
+\end{figure}
+
+
+We then introduce an area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$. 
+These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
+\begin{equation}\label{conversion_rate}
+ C_{ij} = \frac{a}{\Delta t}U_{ij}
+\end{equation}
+Mostly we will rewrite equation \ref{conversion_rate} to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
+As of now, the conversion factor, $Hc$, is defined in equation \ref{definition_Hc_first}. 
+One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
+\begin{equation}\label{definition_Hc_first}
+ Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
+\end{equation}
+
+The area where the model has been replaced is between $x=0.6$ and $x=0.7$, which is three mesh points. 
+In the same way as for only the simple 1D PDE case we compare the combined numerical solution from the two models to the exact solution. 
+Figure \ref{errorplot_FE1D_Walk_first_attemt} shows that the error is still of the order of $\Delta t$, and the difference between the two models are negligible. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{../doc/results/experimen(t_i)t_31102013_1017/results/errorplot.eps}
+\caption[Effect of increasing number of walkers]{Numerical error for 1D Forward Euler discretization combined with random walk model between $x=0.6$ and $x=0.7$. Other parameters of importance are $\Delta t\approx 0.00083333$, $\Delta x = 0.05$.}
+\label{errorplot_FE1D_Walk_first_attemt}
+\end{figure}
+
+As we can see from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the number of walkers that each ``unit concentration'' corresponds to has a positive effect on the error norm up to a certain point. 
+After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of the Forward Euler scheme. 
+This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
+Meaning of course that the calculations in section \ref{} are not hopeless.
 \subsection{Increasing the time step and the relative size of walk-area}\label{increasing_dt}
 
 Now that we have an estimate of how to adjust the step length of the walkers in order to adjust for the time step, $\Delta t$, on the PDE level we would like to investigate the actual effects of running the simulation with a larger time step to verify our calculations. 
@@ -310,7 +472,10 @@ This particular equation has steady state $u(t\to\infty,x) = 0$, and so not havi
 \caption{}
 \label{errorplot_FE_walk_long:deterministic}
  \end{subfigure}
-\caption[Errorplot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
+\caption[Errorplot, long simulation]{The deterministic errory
+
+ Current goal:
+Beat Brock, then head to Mt Moon. and the error from simulations with walkers for long simulations.}
 \label{errorplot_FE_walk_long}
 \end{figure}
 
@@ -511,140 +676,5 @@ We argued earlier that for the error from the random walk part of the mesh not t
  \end{subfigure}
  \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, is varied over the values shown in the legend in figure b over 490 timesteps. Initial condition is given by $u(x,y,t=0) = \cos(\pi x)\cos(\pi y)$ and $\Delta t=0.001$. Note that the x-axis on figure a is wrong, and should be interpreted simply as Hc.}
  \label{convergence_test_ADI_2d}
-\end{figure}
-
-
-\section{Testing Random walks}\label{testing_random_walks}
-\subsection{A simplified version of the algorithm}
-
-Monte Carlo methods are immensely important in modern computational science (\emph{reference}), and can be used to solve integrals as well as random walks. 
-As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
-\begin{equation}\label{ODE}
- \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
-\end{equation}
-Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}), for the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
-\begin{equation}\label{ODE_solution}
- f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
-\end{equation}
-This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
-By the relation we found earlier (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
-\begin{align*}
- \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
- N \simeq \frac{1}{\Delta x^4} = N_x^4
-\end{align*}
-The following output is from a program generously donated by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
-It uses the relation described, but multiplies with a constant, giving us 
-\begin{equation*}
- N = 2000\times N_x^4
-\end{equation*}
-
-\begin{lstlisting}
-  N_x	    N_MC	   error       MC_error   MP_error
-   1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
-   2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
-   4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
-   8     8192000 (   8)  4.683E-04   4.866E-04  -1.832E-05
-  16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
-  
-  Convergence rates
-total  MP     MC
--1.84 -1.83  0.20
--1.95 -1.95 -0.55
--2.03 -1.99  0.26
--1.99 -2.00 -0.52
-\end{lstlisting}
-We see that the convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
-Another thing to notice it the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
-As the listed output and equation \ref{} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
-
-
-To verify our implementation, and perhaps gain some new knowledge we will do some testing on the random walks implementation as well. 
-This means that we have to find a solution of the diffusion equation \ref{simple_diffusion_equation} for an initial condition we can recreate with random walkers to the best possible precision. 
-The absolute simplest initial condition to recreate is the Heaviside step function, defined in equation \ref{Heaviside_def}. 
-\begin{equation}\label{Heaviside_def}
- H(x-a) = \begin{cases}
-           1\;\;x\geq a\\
-           0\;\;x<a
-          \end{cases}
-\end{equation}
-We then solve the equation by separation of variables. We have
-\begin{align*}
- \frac{\d u}{\d t} = D\frac{\d^2 u}{\d x^2};\;\; \frac{\d u(0,t)}{\d x} = \frac{\d u(1,t)}{\d x} = 0 \\
- u(x,0) = H\left(x-\frac{1}{2}\right);\;\; D = 1
-\end{align*}
-and
-\begin{align*}
- u(x,t) = F(x)T(t) \implies \frac{T'(t)}{T(t)} = \frac{F''(x)}{F(x)}
-\end{align*}
-where the primes denotes the respective derivatives. We separate the equation using a separation constant $\lambda$
-\begin{align*}
- T'(t)-\lambda T(t) = 0 \implies T(t) = C\exp(\lambda t)\\
- F''(x) -\lambda F(x) = 0 \implies F(x) = C_1\exp(\sqrt{\lambda}x) + C_2\exp(-\sqrt{\lambda}x)
-\end{align*}
-Where $C$, $C_1$ and $C_2$ are arbitrary constants. 
-Choosing $\lambda = -\mu^2$ lets us rewrite the spatial solution in terms of sines and cosines
-\begin{equation*}
- F(x) = a\cos(\mu x) + b\sin(\mu x)
-\end{equation*}
-The boundary conditions gives us 
-\begin{align*}
- F'(0)T(t) = F'(1)T(t) = 0
-\end{align*}
-Since the time dependent solution cannot be exactly zero, the first derivative of the spatial solution must be zero
-\begin{align*}
- F'(x) &= -a\mu\sin(\mu x) + b\mu\cos(\mu x) \\
- F'(0) &= -a \mu\sin(0) + b\mu\cos(\mu x) = b\mu\cos(\mu x) \implies b=0 \\
- F(1) &= a\cos(\mu) \implies \mu = n\pi
-\end{align*}
-Telling us that a Fourier series in cosines is the solution to the equation, and it will look like this.
-\begin{equation}
- u(x,t) = a_0 + \sum\limits_{n=1}^\infty a_n\exp\left(-(n\pi)^2t\right)\cos(n\pi x)
-\end{equation}
-
-The coefficients are found by approximating the initial condition
-\begin{align*}
- a_0 &= \int\limits_0^1H(x-0.5)dx = \frac{1}{2} \\
- a_n &= 2\int\limits_0^1H(x-0.5)\cos(n\pi x)dx = 2\int\limits_{0.5}^1\cos(n\pi x)dx \\
- &= \frac{2}{n\pi}\left[sin(n\pi x)\right]_{0.5}^1 = \frac{2}{n\pi}\sin(n\pi) - \sin(\frac{n\pi}{2}) \\
- a_n &= \frac{2\sin(\frac{n\pi}{2})}{n\pi}
-\end{align*}
-which gives us the final solution
-\begin{equation}
- u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}\exp\left(-(n\pi)^2t\right)\cos(n\pi x)
-\end{equation}
-
-We can now perform a convergence test to find the convergence rate for the random walkers, this is the order the error of the scheme goes as and it is defined in equation \ref{convergence_rate_def}. 
-We will modify it slightly by testing for the number of walkers rather than the time step. 
-We must also use another error estimate $E_i$ which gives us one number for each simulation. 
-The candidates are either the maximum of the error we are already using, or an integrated error.
-
-\begin{equation}\label{convergence_rate_def}
- r = \frac{\ln(E_{i+1}/E_i)}{\ln(\Delta t_{i+1}/\Delta t_i)}
-\end{equation}
-
-Using the maximum of the error measure already in use, we have tested the convergence rate measure for the following measures of Hc:
-\begin{lstlisting}
- Hc = [100,500,1000,5000,10000,50000]
-\end{lstlisting}
-Meaning that the largest value of Hc we will get an estimate for is $Hc = 10000$. 
-The convergence test suggests that the convergence rate for random walks follows the proportionality in equation \ref{convergence_rate_RW}. 
-This relation tells us just what we have been expecting the whole time; while increasing the number of walkers will reduce the error, the convergence is slow. 
-Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $err\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $err\sim\mathcal{O}(\Delta t^2)$. Clearly we will have enough trouble for the simpler cases.
-
-\begin{equation}\label{convergence_rate_RW}
-err \propto Hc^{\frac{-1}{2}}
-\end{equation}
-
-
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.7]{../doc/results/experiment_27112013_0837/resultsConvergenceTest.eps}
- \caption[Convergence test RW]{A convergence test for the isotropic random walk implementation using different conversion factors, Hc. The x axis (conversion rate) is log transformed and ranges from 100 to 50000 in real numbers.}
- \label{ConvergenceTestRW}
-\end{figure}
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.7]{../doc/results/experiment_24112013_1525/results/errorplot.eps}
- \caption[Error plot RW]{A ``normal'' error plot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to couple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a step length calculated from equation \ref{steplength}}
 \end{figure}
 
