@@ -1,13 +1,13 @@
 \section{Some discussion}
 
-This chapter will concern most of the numerical error analysis and some of the discussion of this analysis as well as an introduction to the methods used for error analysis in general, and how they are adapted to this particular problem.\\
+This chapter will contain most of the numerical error analysis and some of the discussion of this analysis as well as a recap of the methods used for error analysis in general, and how they are adapted to this particular problem.\\
 
 
-In this numerical setup we will potentially introduce several new error sources in addition to the normal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
-When a part of the solution acquired is replaced by the solution from another model, which in this case is stochastic, we will change the initial condition to the next iteration in time. 
+In the numerical setup chosen for this project we will potentially introduce several new error sources in addition to the normal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
+When a part of the solution acquired is replaced by the solution from a stochastic model, we will change the initial condition to the next iteration in time. 
 This might have a number of effects on our final solution. 
-When we solve a differential equation numerically we only get an approximation to the actual solution because we are using approximate derivatives (see figure \ref{illustrate_approximate_derivatives}). 
-To investigate the error we are introducing we will first need to test that the truncation error of the numerical PDE solver behaves as expected. 
+Figure \ref{illustrate_approximate_derivatives} we can see the typical effects of solving an equation numerically. When we impose a stochastic solution on top of this again, we will get fluctuations around the approximations to the solution at the new time-step which most likely worsens our approximation.
+The aim of this chapter is to verify our implementation and investigate the effects of adding the stochastic solution to the normal PDE solution.
 % This can be done by choosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
 % As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
 % We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
@@ -31,21 +31,17 @@ To investigate the error we are introducing we will first need to test that the 
 
 \subsection{The error estimate}\label{error_estimate}
 
-Before we do anything we should specify what we use to measure the error. 
+Before we do anything we should specify what we use to measure the error which will be denoted as $\epsilon$. 
 Throughout this thesis the term error is used quite lazily, but unless something else is specified we refer to the expression 
 \begin{equation}
- err(t_i) = ||u_e(t_i)-u(t_i)||_2
+ \epsilon(t_i) = ||u_e(t_i)-u(t_i)||_2
 \end{equation}
 where $u_e$ is the exact (manufactured) solution to the equation, and $u$ is the result from the numerical simulation. 
 We use this error-estimate because it is time-dependent, thus letting us explicitly see how the error evolves over time. 
 The error is calculated over the entire mesh, letting us see clearly if the error from the random-walk areas are dominating, or (otherwise) how the PDE-scheme is holding up.
-Other error measures that might come in handy later will be the integrated spatial error as a function of time
+Another error estimate we will use later is the maximum value of the error. This will be used for the convergence tests to make sure that we overlook any effects of simulating for a long time. 
 \begin{equation}
- err = ||\sum u_e-u||_2
-\end{equation}
-and the same error integrated in time as well
-\begin{equation}
- err = \sum||\sum u_e-u||_2
+ \epsilon = max(\epsilon(t_i))
 \end{equation}
 
 \subsection{Verification techniques}
@@ -53,20 +49,18 @@ There are quite a few ways to verify an implementation. In this thesis we will f
 \begin{itemize}
  \item Method of manufactured solutions\\
  A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
-Since the software contains both an explicit FE scheme and an implicit BE scheme we will verify the two of them at the same time. 
+Since the software contains both an explicit FE scheme and an implicit BE scheme we will verify the two of them alongside one another. 
 We will start with the simplest diffusion equation (eq. \ref{simple_diffusion_equation}) and add complexity until we have the desired expression. 
-Both schemes is expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
-The next thing we do is decide that the solution to the diffusion equation should be equation \ref{manifactured_solution_1D}.
-\begin{equation}\label{manifactured_solution_1D}
- u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
-\end{equation}
-which satisfies our equation if we set the diffusion constant to 1. 
+Both schemes are expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
+The next thing we do is decide that the solution to the diffusion equation should be equation \ref{manifactured_solution_1D} which satisfies our equation if we set the diffusion constant to 1. 
 \item Exact numerical solutions\\
 At least for the explicit schemes we can find an exact solution to the scheme itself seeing as the scheme is a difference equation. The calculations are shown step-by-step in chapter \ref{exact_numerical_solution}.
 \item Convergence tests\\
 This must be combined with the manufactured solution, but takes a slightly different approach to quantifying the error estimate. We start bu calculating some form of error estimate, and chose a value to represent the error of the entire simulation. This could be the maximum error for the entire simulation, or an integrated measure. 
-We do multiple simulations while improving the parameter we want to investigate, say how the number of walkers influences the error (see chapter \ref{}). 
-Finally, using equation \ref{} we get a number indicating the improvement in the error estimate by improving the parameter in question. This number indicates the so called order of convergence which is one for FE and BE since the error goes as $\mathcal{O}(\Delta t)$, and two for our approximation to the second derivative in space since the error goes as $\mathcal O(\Delta x^2)$.
+We do multiple simulations while improving the parameter we want to investigate, say how the size of the time-step influences the error. 
+Finally, using equation \ref{} we get a number indicating the improvement in the error estimate by improving the parameter in question. 
+This number indicates the order of convergence which is one for FE and BE since the error goes as $\mathcal{O}(\Delta t)$, and two for our approximation to the second derivative in space since the error goes as $\mathcal O(\Delta x^2)$.
+A convergence rate of 1 means that halving the parameter will (roughly) halve the error, while the same reduction for a second order convergence will reduce the error by 4.
 \end{itemize}
 
 
@@ -76,24 +70,30 @@ We will also add complexity along the way, but this will be described when we ge
 Since both the FE and BE discretization have been implemented we will test both of them, but mostly we will use the BE discretization because it has no stability criterion. 
 For most of the tests we will force the solution to be equation \ref{manifactured_solution_1D} in 1d which satisfies our equation if we set the diffusion constant to 1.
 
+Despite testing the simple cases first we will do all the tests on the same implementation (the full one) because it should be able to recreate the simple cases as well. 
+Setting $D(x,y) = 0.5$ as an array with all entries equal and inserting this into the schemes will return the average of $D(x,y)$ at different mesh-points, and effectively this is the same as having only a constant. 
+We will also do all verification without random walkers.
+
 \subsection{Manufactured Solutions}
 
+As mentioned we force the solution to be equation \ref{manifactured_solution_1D} because it fulfills the boundary conditions we have chosen.
 \begin{equation}\label{manifactured_solution_1D}
  u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
 \end{equation}
+Equations \ref{manufactured_prof_pt1} and \ref{manufactured_prof_pt2} prove that the manufactured solution we have chosen will indeed fulfill the diffusion equation (eq. \ref{simple_diffusion_equation}).
 \begin{align}
- \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\\
- -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1
+ \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\label{manufactured_prof_pt1}\\
+ -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1\label{manufactured_prof_pt2}
 \end{align}
 
 The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and, in the FE case, the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. 
-Testing only the schemes with no walkers added first, in 1D we get the plots in figure \ref{errorplot_FE1D_noWalk} of error described in chapter \ref{error_estimate}, with the corresponding plots of the convergence rates in figure \ref{} that verify the order of the error term.
-For longer simulations, we expect the analytic solution to take a steady state which we find in the limit of large $t$. 
+In 1D we get the plots in figure \ref{errorplot_FE1D_noWalk} of error described in chapter \ref{error_estimate}, with the corresponding plots of the convergence rates in figure \ref{} that verify the order of the error term.
+For longer simulations, we expect the analytic solution to reach a steady state which we find in the limit of large $t$. 
 
 \begin{equation}
  u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
 \end{equation}
-The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of times steps, but in the very least the error should stabilize. 
+The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of times steps, but this might depend on how the derivatives as estimated so we say that it should in the very least stabilize. 
 Figures \ref{} and \ref{} seem to show the expected behaviour from the error estimate, which implies that the implementation is correct so far.
 
 \begin{figure}[H]
@@ -111,6 +111,34 @@ Figures \ref{} and \ref{} seem to show the expected behaviour from the error est
 \caption[Numerical error for 1D Forward Euler discretization]{Numerical error for 1D Forward Euler discretization of the PDE. Nothing else is done to the simulation.}
 \label{errorplot_FE1D_noWalk_super}
 \end{figure}
+
+As we discussed in section \ref{random_walks_and_anisotropy} we should also be able to model diffusion where the diffusion constant is not a constant. 
+The scheme we derived in section \ref{discretizing} already takes this into account, and so all we need to do is to add the drift term which was discussed in section \ref{effect_of_drift_on_walkers} to the scheme. 
+Like before we should verify that the scheme solves the equation to the expected accuracy by using a manufactured solution \ref{manifactured_solution_1D} and tweaking the source term so this function solved the equation \ref{convection_diffusion_equation}. 
+When $v=0$ and $D(x) = \pi x$ the source term becomes
+\begin{align*}
+ -\pi^2\exp\left(-\pi^2t\right)\cos\left(\pi x\right) &= -\pi\exp\left(-\pi^2t\right)\frac{\d}{\d x}\pi x\sin(\pi x) +f(x,t) \\
+ -\pi^2\cos\left(\pi x\right) &= -\pi^2\left(\sin(\pi x) + \pi x\cos(\pi x)\right) +\tilde{f}(x) \\
+ \tilde{f}(x) &= \pi^2\left(\sin(\pi x) +\cos(\pi x)(\pi x-1)\right)
+\end{align*}
+Once again $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$. Figure \ref{anisotropic_diffusion_verification} shows the error norm of the result of simulations of this equation with different values of $\Delta t$.
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{../doc/results/experiment_05112013_1303/results/deterministic_errorplot.eps}
+\caption{}
+\label{anisotropic_diffusion_verification:single_dt}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{../doc/results/experiment_05112013_1304/results/deterministic_errorplot.eps}
+\caption{}
+\label{anisotropic_diffusion_verification:double_dt}
+\end{subfigure}
+\caption[Verification of anisotropic diffusion equation implementation]{Verification of anisotropic diffusion equation implementation}
+\label{anisotropic_diffusion_verification}
+\end{figure}
+Again, the error is of the order of $\Delta t$ and is roughly halved by halving $\Delta t$.
 
 \subsection{Convergence Tests}
 
@@ -136,6 +164,15 @@ For the BE scheme we get the convergence rate shown in figure \ref{convergence_t
  \label{convergence_test_BE}
 \end{figure}
 
+We can also do a convergence test, equal to the one we did in 1d, to check that the scheme converges to 1 (by equation \ref{convergence_rate_def}) for smaller $\Delta t$. 
+The results of this test are shown in figure \ref{convergence_test_FE_2d} and it does converge nicely to one.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
+\caption[Convergence test FE 2d]{Convergence test for the FE scheme in 2d using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
+\label{convergence_test_FE_2d}
+\end{figure}
 
 \subsection{Exact numerical solution}\label{exact_numerical_solution}
 
@@ -203,6 +240,29 @@ The results from testing the FE scheme are found in figure \ref{errorplot_numeri
  \includegraphics[scale=0.7]{Figures/exact_numerical_1d_n130.eps}
  \caption[Verification for exact numerical solution]{Error plot for 1d FE scheme compared to the exact numerical solution \ref{numerical_solution} with the modifications suggested earlier.}
  \label{errorplot_numerical_exact_FE_1D}
+\end{figure}
+Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
+This can, however be tweaked by increasing the conversion parameters.
+
+\begin{equation}\label{initial_condition_2d_numex}
+ u(x,y,t=0) = \cos(\pi x)\cos(\pi y)
+\end{equation}
+
+The exact numerical solution of the FE scheme can be found in equation \ref{exact_numerical_solution_2d}, and again we expect the scheme to be able to reproduce this to more or less machine precision. 
+The result of a test simulation of this, using the initial condition in equation \ref{initial_condition_2d_numex}, is shown in figure \ref{exact_numerical_2d_n130}. 
+Again, as in we did in 1d, we see that although the error is very small, and start out with machine precision, it does increase and even more than in the 1d case. 
+This is \emph{probably} because of the terms we have do drop in the exact numerical solution due to overflow and so on, which accumulate in the numerical solution from the scheme. 
+We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
+
+\begin{equation}\label{exact_numerical_solution_2d}
+ u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
+\end{equation}
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
+ \caption{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8e-05$.}
+ \label{exact_numerical_2d_n130}
 \end{figure}
 
 \section{Testing the Random walk implementation}\label{testing_random_walks}
@@ -393,6 +453,8 @@ As we can see from figure \ref{errorplot_FE1D_Walk_first_attemt} increasing the 
 After we reach $Hc \sim 10^4$ the error is dominated by the truncation error of the Forward Euler scheme. 
 This tells us that the error associated with introducing a random walk model on parts of the mesh behaves roughly as we hoped; it tends to zero for large numbers of walkers. 
 Meaning of course that the calculations in section \ref{} are not hopeless.
+
+
 \subsection{Increasing the time step and the relative size of walk-area}\label{increasing_dt}
 
 Now that we have an estimate of how to adjust the step length of the walkers in order to adjust for the time step, $\Delta t$, on the PDE level we would like to investigate the actual effects of running the simulation with a larger time step to verify our calculations. 
@@ -548,133 +610,4 @@ The drift term is the step length, which is quite large. The strangest thing is,
 \end{figure}
 
 
-
-\subsection{Anisotropic diffusion}
-
-As we discussed in section \ref{random_walks_and_anisotropy} we should also be able to model diffusion where the diffusion constant is not a constant. 
-The scheme we derived in section \ref{discretizing} already takes this into account, and so all we need to do is to add the drift term which was discussed in section \ref{effect_of_drift_on_walkers} to the scheme. 
-Like before we should verify that the scheme solves the equation to the expected accuracy by using a manufactured solution \ref{manifactured_solution_1D} and tweaking the source term so this function solved the equation \ref{convection_diffusion_equation}. 
-When $v=0$ and $D(x) = \pi x$ the source term becomes
-\begin{align*}
- -\pi^2\exp\left(-\pi^2t\right)\cos\left(\pi x\right) &= -\pi\exp\left(-\pi^2t\right)\frac{\d}{\d x}\pi x\sin(\pi x) +f(x,t) \\
- -\pi^2\cos\left(\pi x\right) &= -\pi^2\left(\sin(\pi x) + \pi x\cos(\pi x)\right) +\tilde{f}(x) \\
- \tilde{f}(x) &= \pi^2\left(\sin(\pi x) +\cos(\pi x)(\pi x-1)\right)
-\end{align*}
-Once again $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$. Figure \ref{anisotropic_diffusion_verification} shows the error norm of the result of simulations of this equation with different values of $\Delta t$.
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{../doc/results/experiment_05112013_1303/results/deterministic_errorplot.eps}
-\caption{}
-\label{anisotropic_diffusion_verification:single_dt}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{../doc/results/experiment_05112013_1304/results/deterministic_errorplot.eps}
-\caption{}
-\label{anisotropic_diffusion_verification:double_dt}
-\end{subfigure}
-\caption[Verification of anisotropic diffusion equation implementation]{Verification of anisotropic diffusion equation implementation}
-\label{anisotropic_diffusion_verification}
-\end{figure}
-Again, the error is of the order of $\Delta t$ and is roughly halved by halving $\Delta t$.
-
-\section{2D}
-Doing the same tests is 2D gives slightly different results; adding a 2D walk-domain has an influence on the error, but a rather small one. 
-This can, however be tweaked by increasing the conversion parameters.
-
-\begin{equation}\label{initial_condition_2d_numex}
- u(x,y,t=0) = \cos(\pi x)\cos(\pi y)
-\end{equation}
-
-The exact numerical solution of the FE scheme can be found in equation \ref{exact_numerical_solution_2d}, and again we expect the scheme to be able to reproduce this to more or less machine precision. 
-The result of a test simulation of this, using the initial condition in equation \ref{initial_condition_2d_numex}, is shown in figure \ref{exact_numerical_2d_n130}. 
-Again, as in we did in 1d, we see that although the error is very small, and start out with machine precision, it does increase and even more than in the 1d case. 
-This is \emph{probably} because of the terms we have do drop in the exact numerical solution due to overflow and so on, which accumulate in the numerical solution from the scheme. 
-We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
-
-\begin{equation}\label{exact_numerical_solution_2d}
- u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
-\end{equation}
-
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
- \caption{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8e-05$.}
- \label{exact_numerical_2d_n130}
-\end{figure}
-
-We can also do a convergence test, equal to the one we did in 1d, to check that the scheme converges to 1 (by equation \ref{convergence_rate_def}) for smaller $\Delta t$. 
-The results of this test are shown in figure \ref{convergence_test_FE_2d} and it does converge nicely to one.
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.7]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
-\caption[Convergence test FE 2d]{Convergence test for the FE scheme in 2d using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
-\label{convergence_test_FE_2d}
-\end{figure}
-
-\subsection{Including random walks}
-
-In the same way as in figure \ref{errorplot_FE1D_Walk_first_attemt} we can test the effect of introducing walkers in part of the mesh. 
-In figure \ref{errorplot_FE1D_Walk_first_attemt_2d} we have more or less recreated the plot from the 1d case, only simulating for more time steps and with more walkers. 
-First of all we note that we in 2d will need quite a lot more walkers than in 1d in order to get a decent error. 
-Secondly, and more importantly, because we have done longer simulations, we notice that the error is completely dominated by the walkers. 
-In the simulation in question the rectangle x0=0.4, x1=0.7 and y0=0.6 y1=0.7 has walkers on it.
-The error does in fact seem to behave like a square root function. 
-This is rather unnerving, and to check if this was the case in 1d as well a long simulation was run for a similar case. 
-Figure \ref{errorplot_FE_walk_long} shows that the error in the long term behaves similarly to the error from the deterministic simulations, but with a \emph{much} larger amplitude. For the ``best'' case the maximum amplitude seems to be about a factor 100 times the deterministic one.
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1229/results/errorplot.eps}
-\caption{}
-\label{errorplot_FE1D_Walk_first_attemt_2d:few_walkers}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{../doc/results/experiment_02122013_1223/results/errorplot.eps}
-\caption{}
-\label{errorplot_FE1D_Walk_first_attemt_2d:many_walkers}
-\end{subfigure}
-\caption[Verification of anisotropic diffusion equation implementation]{Verification of anisotropic diffusion equation implementation}
-\label{errorplot_FE1D_Walk_first_attemt_2d}
-\end{figure}
-
-In fact, we can test the convergence rate for a simulation where we hold $\Delta t$, $\Delta x$ and the number of time steps constant, and then increase the conversion rate for the walkers. 
-The result of this is shown in figure \ref{Convergence_rate_diffusion_with_walk} and shows that introducing random walks reduces the convergence rate from 1 to $\frac{1}{2}$. 
-A result we actually expect since the convergence test, and the error measure in general, are sensitive to the largest error in the solution. 
-In chapter \ref{testing_random_walks} we will see that the random walk algorithm has a convergence which goes as $0.5$, and this makes the error larger than for the FE scheme alone. 
-
-\begin{figure}[H]
- \centering
- \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d/results/ConvergenceTest.eps}
-  \caption{2D}
-  \label{Convergence_rate_diffusion_with_walk:2d}
- \end{subfigure}
- \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_05122013_1037_ConvergenceTest_CombinedSimulation_1d/results/ConvergenceTest.eps}
-  \caption{1D}
-  \label{Convergence_rate_diffusion_with_walk:1d}
- \end{subfigure}
- \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, in varied (from 1000 to 16000) over 170 timesteps. Initial condition is given by $u(\vec{x},t=0) = H(x-0.5)$ in both 1d and 2d, and the time step is the same as well, $\Delta t = 8\cdot10^{-7}$ which by figure \ref{convergence_test_FE_2d} should give us perfect convergence.}
- \label{Convergence_rate_diffusion_with_walk}
-\end{figure}
-We argued earlier that for the error from the random walk part of the mesh not to dominate we will need to have some $\Delta t^{-2}$ walkers per unit concentration per mesh-point. Using an explicit scheme this will be an unreasonable demand, but if we use an implicit solver, we can at least check that this is the case for a larger $\Delta t$. Figure \ref{convergence_test_ADI_2d} shows the same convergence test as we see in figure \ref{convergence_test_FE_2d}, but using the ADI scheme and a rather large time-step, $\Delta t=0.001$. We see that as the conversion factor, Hc, increases beyond $10^6$ the convergence rate goes to 1. This proves the concept that we can include random walks as a viable part of the solver and still reproduce the exact solution to any desired error should we wish to do so.
-\begin{figure}[H]
- \centering
- \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_13122013_1519_convergenceTest_combinedSimulation_2d/results/ConvergenceTest.eps}
-  \caption{Convergence rate}
-  \label{convergence_test_ADI_2d:2d}
- \end{subfigure}
- \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_13122013_1519_convergenceTest_combinedSimulation_2d/results/errorplot.eps}
-  \caption{Error plot}
-  \label{convergence_test_ADI_2d:1d}
- \end{subfigure}
- \caption[Convergence test for combined simulation]{Convergence rate for simulation where only the conversion faction, Hc, is varied over the values shown in the legend in figure b over 490 timesteps. Initial condition is given by $u(x,y,t=0) = \cos(\pi x)\cos(\pi y)$ and $\Delta t=0.001$. Note that the x-axis on figure a is wrong, and should be interpreted simply as Hc.}
- \label{convergence_test_ADI_2d}
-\end{figure}
 
