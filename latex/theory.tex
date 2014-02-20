@@ -152,23 +152,18 @@ and see that they are equal, meaning that the diffusion equation is satisfied.
 
 \subsection{Choosing random walk algorithm}\label{choosing_random_walk_algorithm}
 
-As this article points out \cite{farnell2005monte} the simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great success to model diffusion processes. 
-
-However, this model will struggle with reproducing anisotropic diffusion, that is $D = D(x)$. Farnell and Gibson also suggest a method for improving the results by adjusting the step length and probability according to position, thus effectively adjusting the diffusion constant of the walk as well. 
-We see then that the simplest model is rather robust, and well tested. 
-However, the aim of this project is to combine two realistic models for diffusion on different length scales, and the simplest random walk model has one fundamental flaw in that view; it is not a realistic model for diffusing particles. 
-Brownian motion is a more realistic physical model for diffusing particles, and can (I think) quite easily be modified to model anisotropic diffusion as well. 
-We can model Brownian motion simply by using equation \ref{brownian_motion}, and we can with a bit of work expand it to model collisions between walkers as well. \\
+The simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great success to model diffusion processes. 
+Farnell and Gibson discuss this in their article \cite{farnell2005monte}. 
+In this project we will be torn between chosing a realistic algorithm to advance the random walkers, like brownian motion or to go for simplicity. 
 That being said, by the central limit theorem both models will after some timesteps be described by a Gaussian distribution meaning that on the PDE scale we will not know the difference. 
 Hence it will make no sense to not use the simplest random walk model.
-
+We should note that it will be quite easy to change the algorithm used for random walks, and so we have not locked ourselves to anything yet.
 
 \subsection{Random walks and anisotropy}\label{random_walks_and_anisotropy}
 
 Any real problem where parts of the diffusion process cannot be modelled by the continuum approximation is bound to be anisotropic. 
 There is reason to believe that an anisotropic diffusion process on the PDE level will lead to an anisotropic random walk model as well, but how do we model this. 
-Equation \ref{steplength} shows the step length as a function of the diffusion constant. 
-If we simply replace the diffusion constant by a function $D = D(\vec{x})$ we are at least started, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
+If we simply replace the diffusion constant by a function $D = D(\vec{x})$ (see eq \ref{steplength}) we are at least started, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
 Through their experiments they found that only adjusting the steplength will not improve the error noticeably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
 They went on to introduce an adjusted steplength and an adjusted step probability, a solution they landed on after trial and error. 
 The expressions they proposed are listed in equations \ref{farnell_and_gibson_1} to \ref{farnell_and_gibson_5}. 
@@ -182,7 +177,7 @@ where $L(x)$ is defined in equation \ref{farnell_and_gibson_3} and $\Delta_p(x)$
 \begin{equation}\label{farnell_and_gibson_3}
 L(x) = \sqrt{2D(x)\Delta t}
 \end{equation}
-We also have the adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker in position x to jump right or left, respectively. 
+We also have the adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker at position x to jump right or left, respectively. 
 These are defined in equations \ref{farnell_and_gibson_4} and \ref{farnell_and_gibson_5}
 \begin{equation}\label{farnell_and_gibson_4}
 T_r(x) = \frac{1}{2} +\frac{1}{4}L'(x)
@@ -197,10 +192,9 @@ We notice that the adjusted steplength we proposed to start with is still a part
 
 Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
 
-Initially one thought that diffusion in the Extra Cellular Space of the brain was governed by a drift term, but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}.
-The drift term might be of importance in other applications, however, and something we should look into it.\\
-How do we model random walks with drift? \\
-A first instinct is to simply add some vector to the Brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
+Initially one thought that diffusion in the Extra Cellular Space of the brain was governed by a drift term, but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}. 
+Though it is unlikely that we will include a drift term in our model, we will say a few words about it here since it is of importance in other applications and might be a natural extension at some point, should someone else use this work.\\
+We model random walkers with drift by simply adding some vector to the Brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
 This approach can also be used in the fixed steplength (or variable steplength in the anisotropic case)  if we express the new step, $\vec{s}$, as
 \begin{align*}
  \vec{s} = (\pm l \text{ or }0,\pm l \text{ or }0) +\vec{d}
@@ -245,26 +239,29 @@ When we convert this to the continuous variables $x$ and $t$ we get the solution
  C(x,t) = \frac{N}{\sqrt{4\pi Dt}}\exp\left(-\frac{(x-vt)^2}{4Dt}\right)
 \end{equation}
 Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is the well known diffusion constant, inserted from the Einstein relation $\sigma^2 = 2D\Delta t$.\\
-The only problem with the solution \ref{solution_convection_diffusion_eq} is that it is invalid for $t=0$. 
-In order to use it we will need an initial condition which fits the rest of the solution. 
-We try and find this by first checking by simulation if it converges towards some initial solution as $t\to0$ and if so, extrapolate this to $t=0$ as the initial condition. 
-Figure \ref{convection_diffusion_eq_initial_condition} shows the result of this little experiment, and as we clearly see it does diverge as $t\to0$. 
-However, it also converges to a Dirac delta function, $\delta(x)$ which is defined by its properties
-\begin{align*}
-\delta(x) = \begin{cases} +\infty, & x = 0 \\ 0, & x \ne 0 \end{cases}
-\end{align*}
-and
-\begin{equation*}
- \int_{-\infty}^\infty \delta(x) \, dx = 1
-\end{equation*}
-The Dirac delta function often sought as an initial condition in experimental setups for measurements on diffusion processes because of its compatibility with a variety of diffusion equations, and should do a very good job in our numerical setup as well. 
 
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.7]{Figures/convection_diffusion_eq_initial_condition.eps}
- \caption[Initial condition for convection diffusion]{Experiment to determine the initial condition of equation \ref{solution_convection_diffusion_eq}}
- \label{convection_diffusion_eq_initial_condition}
-\end{figure}
+%%%%%% Not sure if this should be included %%%%%%%%%
+
+% The only problem with the solution \ref{solution_convection_diffusion_eq} is that it is invalid for $t=0$. 
+% In order to use it we will need an initial condition which fits the rest of the solution. 
+% We try and find this by first checking by simulation if it converges towards some initial solution as $t\to0$ and if so, extrapolate this to $t=0$ as the initial condition. 
+% Figure \ref{convection_diffusion_eq_initial_condition} shows the result of this little experiment, and as we clearly see it does diverge as $t\to0$. 
+% However, it also converges to a Dirac delta function, $\delta(x)$ which is defined by its properties
+% \begin{align*}
+% \delta(x) = \begin{cases} +\infty, & x = 0 \\ 0, & x \ne 0 \end{cases}
+% \end{align*}
+% and
+% \begin{equation*}
+%  \int_{-\infty}^\infty \delta(x) \, dx = 1
+% \end{equation*}
+% The Dirac delta function often sought as an initial condition in experimental setups for measurements on diffusion processes because of its compatibility with a variety of diffusion equations, and should do a very good job in our numerical setup as well. 
+% 
+% \begin{figure}[H]
+%  \centering
+%  \includegraphics[scale=0.7]{Figures/convection_diffusion_eq_initial_condition.eps}
+%  \caption[Initial condition for convection diffusion]{Experiment to determine the initial condition of equation \ref{solution_convection_diffusion_eq}}
+%  \label{convection_diffusion_eq_initial_condition}
+% \end{figure}
 
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
@@ -352,6 +349,22 @@ As an improvement we note that the Matrix in the linear problem stays the same a
 In other words, since we have chosen the same resolution in x and y direction (and the time dependence can be related to this resolution as well for the explicit schemes) if we chose a resolution of $n$ we will need $n^4$ FLOPS per time-step as opposed to the $n^2$ for the explicit scheme.
 
 
+When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
+
+Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
+We must also find a new stability criterion for the scheme. \\
+As for now, the Leap-frog discretization will do (though it is not by far a perfect choice seeing as it is unstable). 
+As a side note we can also note that the Neumann boundary condition will be very clear in this scheme. 
+$\frac{\d C}{\d n} = 0 \implies \frac{\d C}{\d x} = 0 $ on the boundary, leading to $C_{-1} = C_{1}$ on the boundary and canceling the drift term on the boundary.
+\begin{equation}\label{convection_diffusion_equation_leapfrog}
+ C^{n+1} = \frac{D\Delta t}{\Delta x^2}\left(C^n_{i+1}-2C^n_i+C^n_{i-1}\right)-\frac{v\Delta t}{2\Delta x}\left(C^n_{i+1}-C^n_{i-1}\right) + C^n
+\end{equation}
+The truncation error for the first order derivative using the Leap-frog scheme is obtained as follows
+\begin{align*}
+ u(t,x+\Delta x) = u(t,x) + \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)\\
+ u(t,x-\Delta x) = u(t,x) - \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)
+\end{align*}
+which we recognize as the same error we got from the second order spatial derivatives.
 
 
 \subsection{Stability}\label{stability}
@@ -530,7 +543,7 @@ All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computation
 
 In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. 
 As we can see in the appendix (eq. \ref{BE3D_linear_system}) we can write this so it looks like the block tridiagonal linear system we got in 2d, and that could be solved by the block-tridiagonal solver. 
-The difference is that the entries in the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that we must work with $n^2\times n^2$ matrices. 
+The difference is that the entries i n the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that we must work with $n^2\times n^2$ matrices. 
 All in all we should get a performance of around $\mathcal{O}(n^3)$ if we take care to save the inverted matrices from the forward substitution. 
 This is about the same performance as the explicit scheme gives us, but again without the stability issue.
 
