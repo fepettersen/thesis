@@ -272,7 +272,7 @@ To maintain a bit of generality we will look at the (potentially) anisotropic di
  \frac{\d u}{\d t} = \nabla D\nabla u +f
 \end{equation}
 where f is some source term. 
-The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will mostly have the same approximation. \\
+The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will have the same approximation. \\
 We start off by doing the innermost derivative in one dimension. 
 The generalization to more dimensions is trivial, and will consist of adding the same terms for the y and z derivatives. 
 \begin{align*}
@@ -293,78 +293,68 @@ Inserting this gives us
  \nabla D\nabla u\approx\frac{1}{2\Delta x^2}\left((D_{i+1,j}+D_{i,j})(u_{i+1,j}-u_{i,j})-(D_{i,j}+D_{i-1,j})(u_{i,j}-u_{i-1,j})\right) \\
  +\frac{1}{2\Delta y^2}\left((D_{i,j+1}+D_{i,j})(u_{i,j+1}-u_{i,j})-(D_{i,j}+D_{i,j-1})(u_{i,j}-u_{i,j-1})\right)
 \end{align*}
-The Forward Euler discretization has one drawback which is its instability for ``large'' $\Delta t$. 
-A common tradeoff for explicit numerical schemes. 
-We could sacrifice ease of implementation for unconditional stability in our scheme. 
-At least in 1d the implementation is not that much worse either if we chose the Backward Euler discretization for an isotropic (homogeneous) equation. 
-The discretization itself is found in equation \ref{BE_discretisation_isotropic}. 
-\begin{equation}\label{BE_discretisation_isotropic}
- \frac{u^n_i - u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i +u^n_{i-1}}{\Delta x^2}
+
+The discretization of the time-derivative is where we can see a difference between the two schemes we will use in this project. 
+When ordinary differential equations are discretized one can clearly see how this difference arises, and so we will write our PDE using a new notation
+\begin{equation}
+ D_t u = Ou
 \end{equation}
-The advantage of this discretization is that it results in a tridiagonal linear system, which we can easily find if we just insert the first couple of steps.
+where the right-hand-side operator $O$ indicates some operation like the double spatial derivative. 
+Introducing the general discretization of the time derivative gives us equation \ref{theta_rule} known as theta-rule. 
+Setting $\theta = 0$ yields the FE discretization, and $\theta = 1$ the BE discretization. 
+
+\begin{equation}\label{theta_rule}
+ \frac{u^{n+1}-u^n}{\Delta t} = O\left(\theta u^{n+1} +(1-\theta)u^n\right)
+\end{equation}
+
+From the theta rule we can see that the only difference between the FE and BE scheme is at what time-step we evaluate the right-hand-side of the equation. 
+The theta-rule can give other schemes as well, using some weighted average of the right-hand-side at $t^n$ and $t^{n+1}$ but we will not look into these in this project. 
+We can now summarize by writing out the FE discretization as it will be implemented in 1d in equation \ref{FE_scheme_1D}.
+
+\begin{align}\label{FE_scheme_1D}
+ u^{n+1}_i = \frac{\Delta t}{2\Delta x^2}\left((D_{i+1}+D_{i})(u^n_{i+1}-u^n_{i})-(D_{i}+D_{i-1})(u^n_{i}-u^n_{i-1})\right) + u^n_i
+\end{align}
+
+We will come back to the FE discretization when we discuss stability later. \\
+Looking at the BE discretization which is written out in 1d in equation \ref{BE_scheme_1D} we notice that there are quite a few more unknowns per mesh-point. 
+
+\begin{align}\label{BE_scheme_1D}
+ u^{n+1}_i = \frac{\Delta t}{2\Delta x^2}\left((D_{i+1}+D_{i})(u^{n+1}_{i+1}-u^{n+1}_{i})-(D_{i}+D_{i-1})(u^{n+1}_{i}-u^{n+1}_{i-1})\right) + u^n_i
+\end{align}
+
+Writing out the calculations for a small mesh we recognize a pattern which we can exploit.
 \begin{align*}
- \frac{u^{n}_i-u^{n-1}_i}{\Delta t} = D\frac{u^n_{i+1}-2u^n_i + u^n_{i-1}}{\Delta x^2} \\
- u^n_i -\frac{D\Delta t}{\Delta x^2}\left(u^n_{i+1}-2u^n_i + u^n_{i-1}\right) = u^{n-1}_i \\
- u^n_i\Big(1+2\dfrac{D\Delta t}{\Delta x^2}\Big) -u^n_{i-1}\dfrac{D\Delta t}{\Delta x^2} - u^n_{n+1}\dfrac{D\Delta t}{\Delta x^2} 
- = u^{n-1}_i
+ &u^{n+1}_0 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{0}+D_{1})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_0\\
+ &u^{n+1}_1 = \frac{\Delta t}{2\Delta x^2}\left((D_{2}+D_{1})(u^{n+1}_{2}-u^{n+1}_{1})-(D_{1}+D_{0})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_1\\
+ &u^{n+1}_2 = \frac{\Delta t}{2\Delta x^2}\left((D_{3}+D_{2})(u^{n+1}_{3}-u^{n+1}_{2})-(D_{2}+D_{1})(u^{n+1}_{2}-u^{n+1}_{1})\right) + u^n_2 \\
+ &u^{n+1}_3 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{2}+D_{3})(u^{n+1}_{3}-u^{n+1}_{2})\right) + u^n_3
 \end{align*}
-If we insert for a few steps we see that this takes the form of
-\begin{align*}\label{BE}
- \left(\begin{array}{c c c c c c c c}
-        \Big(1+2\alpha\Big) & -\alpha &0 &\dots & & &0 &0 \\
-        -\alpha & \Big(1+2\alpha\Big) & -\alpha &0 &\dots & & &0 \\
-        0& \ddots & \ddots & \ddots & 0 & \dots &  &0\\
-        0& \dots & & &0&-\alpha & \Big(1+2\alpha\Big) & -\alpha\\
-         0& \dots & && &0&-\alpha & \Big(1+2\alpha\Big) 
-       \end{array}\right)\mathbf{u}^n = \mathbf{u}^{n-1} 
+
+Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ gives us a normal system of linear equations
+\begin{align*}
+ &u^{n+1}_0\left(1+2a(D_0+D_1)\right)- 2au^{n+1}_{1}(D_1+D_0) =  u^n_0\\
+ &u^{n+1}_1\left(1+a(D_2+2D_1+D_0)\right)-au^{n+1}_{2}(D_2+D_1)-au^{n+1}_{0}(D_1+D_0) = u^n_1\\
+ &u^{n+1}_2\left(1+a(D_3+2D_2+D_1)\right)-au^{n+1}_{3}(D_3+D_2)-au^{n+1}_{1}(D_2+D_1) = u^n_2\\
+ &u^{n+1}_3\left(1+2a(D_3+D_2)\right)- 2au^{n+1}_{2}(D_3+D_2) =  u^n_3
 \end{align*}
-where we have set $\alpha = \frac{\Delta t}{D\Delta x^2}$.
-\begin{equation*}
+which we arrange as 
+{\tiny
+\begin{align}\label{BE}
+ \left(\begin{array}{c c c c}
+        1+2a(D_0+D_1) & -2a(D_1+D_0) &0 &0 \\
+        -a(D_1+D_0) &1+a(D_2+2D_1+D_0) & -a(D_2+D_1) &0 \\
+        0& -a(D_2+D_1) & 1+a(D_3+2D_2+D_1)& -a(D_3+D_2)\\
+        0& 0& 1+2a(D_3+D_2) & - 2a(D_3+D_2)\\
+       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n} \\
  \mathbf{A}\mathbf{u}^n = \mathbf{u}^{n-1}
-\end{equation*}
-This can be solved very efficiently by a sparse Gaussian elimination, which is quite simple to implement once you take the boundary conditions into account. 
-We implement the Backward Euler discretization in order to efficiently simulate for longer times, and by extension to test the effects the longer time steps will have on the random walk model. More on the tridiagonal Gaussian elimination in the appendix.\\
-We would, of course, also like an implicit solver in 2 and 3d as well to make sure that we can take longer time steps here as well. 
-Doing the BE discretization in 2d gives us a slightly more difficult linear problem (eq \ref{linear_system_BE2D}), which is still sparse, but we do not have any simple, efficient solver for five-band matrices. 
-Further difficulties arise when we attempt to implement Neumann boundary conditions of girds larger than $3\times3$ since the off-diagonal elements do not ``hit'' their intended matrix-elements. 
-In order to use the 2D BE scheme we must either invert a cubic matrix and multiply it by a normal matrix, or we will have to start rearranging the elements in the vectors (converted matrices) and the entries in the linear-problem matrix correspondingly. 
-All things considered, we will therefore try and find another implicit scheme for our 2D problem. 
-There is another discretization which lets us utilize our tridiagonal solver, and is implicit and unconditionally stable in 2d, the Alternate Direction Implicit (ADI) scheme. 
-The ADI scheme divides the time step in two and only propagates one of the spatial derivatives at a time, making it very similar to the Crank Nicholson scheme. 
-In fact, the truncation error in the ADI scheme is of second order, just as in the CN scheme, but this is (as discussed earlier) of small importance in this thesis. 
-Discretizing the simple diffusion equation by the ADI scheme is done as follows.
-\begin{align*}
- \frac{u^{n+1/2}-u^n}{\Delta t/2} &= D\left(D_xD_xu^{n+1/2}+D_yD_yu^n\right)\\
- \frac{u^{n+1}-u^{n+1/2}}{\Delta t/2} &= D\left(D_xD_xu^{n+1/2}+D_yD_yu^{n+1}\right)
-\end{align*}
-We can write this as two standard equations on the form 
-\begin{align*}
-\mathbf{A}_{1/2}\mathbf{u}^{n+1/2} = \mathbf{u}^n \\
-\mathbf{A}_{1}\mathbf{u}^{n+1} = \mathbf{u}^{n+1/2} 
-\end{align*}
-Note that the indices are only intended as labels. For a $3\times3$ mesh the equations are shown in the appendix.\\
-After more careful calculations, we find that the ADI discretization does not, in fact, produce a tridiagonal linear problem when we introduce the Neumann boundary conditions. 
-While the scheme is still a viable alternative for other applications, considering its second order convergence, there is no benefit in using it for our application and we can concentrate on the normal Backward Euler discretization using a pre-exisiting solver for the linear problem as a first approach. \\
-As an improvement we note that the Matrix in the linear problem stays the same as long as $\Delta t$ is unchanged. This means that we can get away with assembling the matrix once, and it lets us do an LU decomposition which will reduce the number of FLOPS needed per time-step from $\mathcal{O}(N^3)$ to $\mathcal{O}(N^2)$ where $N$ is the product of the number of mesh-points in x and y direction. 
-In other words, since we have chosen the same resolution in x and y direction (and the time dependence can be related to this resolution as well for the explicit schemes) if we chose a resolution of $n$ we will need $n^4$ FLOPS per time-step as opposed to the $n^2$ for the explicit scheme.
-
-
-When discretizing the convection diffusion equation however, we must take care to use an approximation to the first order spatial derivative that has a truncation error of second order. 
-
-Otherwise the truncation error in this term will completely dominate seeing as $\Delta t<\Delta x$. 
-We must also find a new stability criterion for the scheme. \\
-As for now, the Leap-frog discretization will do (though it is not by far a perfect choice seeing as it is unstable). 
-As a side note we can also note that the Neumann boundary condition will be very clear in this scheme. 
-$\frac{\d C}{\d n} = 0 \implies \frac{\d C}{\d x} = 0 $ on the boundary, leading to $C_{-1} = C_{1}$ on the boundary and canceling the drift term on the boundary.
-\begin{equation}\label{convection_diffusion_equation_leapfrog}
- C^{n+1} = \frac{D\Delta t}{\Delta x^2}\left(C^n_{i+1}-2C^n_i+C^n_{i-1}\right)-\frac{v\Delta t}{2\Delta x}\left(C^n_{i+1}-C^n_{i-1}\right) + C^n
-\end{equation}
-The truncation error for the first order derivative using the Leap-frog scheme is obtained as follows
-\begin{align*}
- u(t,x+\Delta x) = u(t,x) + \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)\\
- u(t,x-\Delta x) = u(t,x) - \frac{\d u(t,x)}{\d x}\Delta x + \frac{\d^2u(t,x)}{2\d x^2}\Delta x^2 +\mathcal{O}(\Delta x^3)
-\end{align*}
-which we recognize as the same error we got from the second order spatial derivatives.
+\end{align}
+}
+Immediately we notice a problem with the implicit scheme. If we solve the system of equations by the fool-proof Gaussian elimination we will use some $\mathcal O(n^3)$ FLOPs per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2d and $\mathcal O(n^9)$ in 3d. 
+As a comparison the explicit scheme will make due with $\mathcal O(n^d)$ FLOPs.
+There are, however ways to improve this. Seeing as the matrix $\mathbf A$ does not change as long as none of the parameters change we can use a LU-decomposition. 
+This will demand a decomposition of $\mathcal{O}(n^3)$ FLOPs, but all the subsequent steps will be $\mathcal{O}(n^2)$ FLOPs ($\mathcal O(n^{2d})$ for higher dimensions). 
+We are still not quite at the level of the explicit scheme, but it is a clear improvement. \\
+Looking closer at $A$ we notice that it is not only sparse, but tridiagonal. This calls for further optimization which brings the required number of FLOPs down to $\mathcal O(n)$ making it equally efficient to the explicit scheme. More on tridiagonal Gaussian elimination later.
 
 
 \subsection{Stability}\label{stability}
@@ -418,7 +408,7 @@ Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac
   &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) = \mathcal{O}(\Delta t)
 \end{align*}
 We can do better than this by using another discretization scheme for the PDE, but in our case the PDE is not the only error source seeing as we will combine it with a random walk solver. 
-Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
+Quantifying an error term The block-tridiagonal solver is taken from \cite{}, and is listed below.\\for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
 Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
 This will be such a costly operation that it will not necessarily be worth it.\\
@@ -460,8 +450,14 @@ In each mesh-point the fluctuations are of the order $\sqrt{N(x_i,y_j,t_n)}^{-1}
 % For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
 \subsection{Tridiagonal linear systems}
+The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
+The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
+The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed above.
+In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). 
+Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. 
 
-We can solve a normal linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}$ where $\mathbf{A}$ is not a sparse matrix, by Gaussian elimination.
+
+The fool-proof way to solve a linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}$ where $\mathbf{A}$ is not a sparse matrix, by Gaussian elimination.
 
 \begin{align}
   \mathbf{A} = 
@@ -492,18 +488,13 @@ and further to
  0 & 0 & (\tilde{a}_{43}-\frac{\tilde{a}_{42}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{44}-\frac{\tilde{a}_{42}\tilde{a}_{34}}{\tilde{a}_{22}})
  \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
 \end{align}
-through the well known Gaussian elimination scheme until we have an upper triangular matrix. We can then do a backwards sweep to solve for one element of the unknown vector, $\mathbf{x}$ at a time. If the matrix $\mathbf{A}$ is tridiagonal, most of the entries will be zero, and so we will not only be calculating a lot of zeros, we will also be saving a lot of them in the matrix (should we be so stupid as to save the matrix). We can easily get away with only doing one forward sweep down the matrix, eliminating all the sub-diagonal matrix-entries, and then one backward sweep, which calculates the unknown vector $\mathbf{x}$. The algorithm is listed below as a function implemented in C++.
+until we have an upper triangular matrix. We then do a backwards sweep to solve for one element of the unknown vector, $\mathbf{x}$ at a time. 
+
+Since most entries are zero we can easily get away with only doing one forward sweep down the matrix, eliminating all the sub-diagonal matrix-entries, and then one backward sweep, which calculates the unknown vector $\mathbf{x}$. The algorithm is listed below as a function implemented in C++.
 
 \lstinputlisting{Figures/tridiag.cpp}
-
-
-The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
-The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
-The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed above.
-In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). 
-Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. 
-We can actually modify the tridiagonal solver from the one-dimensional case so we can use it on the block-tridiagonal system. 
-The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. 
+We can also modify the tridiagonal solver from the one-dimensional case so we can use it on block-tridiagonal systems. 
+The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. The result of rewriting the $2n$-band diagonal matrix is the block matrix in equation \ref{block_tridiagonal_matrix}.
 
 \begin{align}\label{block_tridiagonal_matrix}
    \left(\begin{array}{c c c c c c c c c}
@@ -523,7 +514,7 @@ The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_m
              \end{array}\right) = \mathbf{u}^{n}
 \end{align}
 which we can also express as $M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
-The block-tridiagonal solver is taken from \cite{}, and is listed below.\\
+
 There is a forward substitution
 \begin{align*}
  H_1 &= -B_1^{-1}C_1\nonumber \\
@@ -539,7 +530,7 @@ There is a forward substitution
 The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. 
 However, we only need to to the inversion once as long as the mass-matrix, $M$ is unchanged so the expense is reduced. 
 This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. 
-All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme better than the implicit FE scheme.
+All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme as effective as the implicit FE scheme.
 
 In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. 
 As we can see in the appendix (eq. \ref{BE3D_linear_system}) we can write this so it looks like the block tridiagonal linear system we got in 2d, and that could be solved by the block-tridiagonal solver. 
@@ -577,52 +568,51 @@ This also further supports the claim that there is no need to find a very precis
 \emph{We will test this by doing a convergence test in time keeping the number of walkers constant.}
 
 \subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
-
-There are a few obvious difficulties we can expect to run into in our planned project. 
-Future ones will be added here as well.
+ 
+In this chapter we will identify and discuss a few obvious difficulties we can expect to run into in our planned project. As far as possible we will also explain how to solve the problems or how to live with them.
 
 \begin{itemize}
  \item Different timescales\\
-  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
-  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
+  The PDE-solver will be operating with some time-step $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
+  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the time-step on the PDE level. 
   Depending on the coupling chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
-  Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
+  Running some number of steps, N, on the random-walk level should eventually sum up to the time-step on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
   It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
  \item Boundary conditions\\
  To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
- Finding a boundary condition that accurately models the actual system turns out to be quite straightforward, so long as the walk-domain is not on the actual boundary of the whole system. 
- We can assume that the number of walkers in the walk-domain is conserved for each PDE-timestep, and thus no walkers can escape the domain. 
+ Finding a boundary condition that accurately models the actual system turns out to be quite straightforward.
+ We can assume that the number of walkers in the walk-domain is conserved for each PDE time-step, and thus no walkers can escape the domain. 
  Implementing perfectly reflecting boundaries solves this quite well. 
  This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
  Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until we have the desired concentration of walkers.
  \item Negative concentration of walkers \\
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
- Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it most likely will not do). 
+ Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems if the solution of the PDE takes negative values (which it most likely will not do). 
  I can find no good solutions to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
  This workaround has a problem in that a transition from positive to negative value will lead to a ``valley'' in the absolute-value solution. 
  A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again.
  \item Smooth solutions\\
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
- When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one timestep to the next. 
+ When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one time-step to the next. 
  In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
  The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
  A polynomial regression model was implemented in 1d, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
  Another idea is to implement a cubic spline interpolation over the area, but this too has its problems. An interpolation forces the solution to have a value at the interpolating points, and seeing as we cannot say for certain which value is correct how shall we pick the interpolating points?
- \item Number of timesteps on the random walk level\\
- As the timestep on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of timesteps on the RW level. 
- Strictly speaking we do not have to do this, seeing as we adjust the steplength of the walkers with respect to the timestep (see eq \ref{steplength}). 
- As an initial value we put the number of timesteps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
+ \item Number of time-steps on the random walk level\\
+ As the time-step on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of time-steps on the RW level. 
+ Strictly speaking we do not have to do this, seeing as we adjust the step-length of the walkers with respect to the time-step (see eq \ref{steplength}). 
+ As an initial value we put the number of time-steps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
  The question really boils down to how we define our model, which we have yet to do in an accurate way.
  \item Random walks in 3D\\
  Both 1 and 2 dimensional space are spanned completely by a random walk, but space of 3 or more dimensions is not. 
  This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
 \end{itemize}
 
-\subsection{Probability distribution and timesteps}\label{probability_distribution_and_timesteps}
-As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
+\subsection{Probability distribution and time-steps}\label{probability_distribution_and_timesteps}
+As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
 In our application, however, we are not interested in finding the walker at an exact position, but in an interval around the mesh-points sent to the walk-solver. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
-We will also run the walk solver for some $N$ timesteps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
+We will also run the walk solver for some $N$ time-steps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
 This slightly modifies our distribution into
 \begin{equation}
  P(x_i\pm\Delta x,t_{n+1}) = \frac{1}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)

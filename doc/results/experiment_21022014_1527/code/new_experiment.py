@@ -438,7 +438,7 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [500000]
+	Hc = [200]
 	# Hc = [200,1400,5600,10400,32000]
 	# Hc = [5600, 10000, 50000]
 	info='_Check_then_delete'
