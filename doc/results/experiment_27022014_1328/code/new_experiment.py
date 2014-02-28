@@ -101,6 +101,29 @@ class Experiment:
 		name = self.result_path+'/results_FE_Hc%d*.txt'%Hc if filename=='a' else result_path+filename
 		self.CalculateError(name)
 
+	# def CalculateError(self,Hc,exact=None):
+	# 	# Calculates an error estimate
+	# 	self.legends = Hc
+	# 	# self.error = []
+	# 	tmp = np.zeros(self.T)
+	# 	if exact is None:
+	# 		for i in xrange(self.runcounter):
+	# 			for j in xrange(self.T):
+	# 				self.error[i][j] = np.max(np.absolute(self.walk[j]-self.no_walk[i][j]))
+	# 	else:
+	# 		if self.n <= 1:
+	# 			X = np.linspace(0,1,self.m)
+	# 			Y = np.zeros(self.m)
+	# 		else:
+	# 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+	# 		for a in range(len(Hc)):
+	# 			i = int(np.round(Hc[a]))
+	# 			print i
+	# 			for j in xrange(self.T): 
+	# 				step = np.loadtxt(self.result_path+'/results_FE_Hc%d_n%04d.txt'%(i,j))
+	# 				tmp[j] = np.max(np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-step))
+	# 			self.error.append(tmp.copy())
+
 	def CalculateError(self,filename):
 		if self.n <= 1:
 			X = np.linspace(0,1,self.m)
@@ -415,7 +438,7 @@ if __name__ == '__main__':
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
 	print 'Python: ',dt,' dx: ',dx
-	Hc = [20000]
+	Hc = [2000]
 	# Hc = [200,1400,5600,10400,32000]
 	# Hc = [5600, 10000, 50000]
 	info='_preparing_to_combine_with_DSMC'
@@ -431,35 +454,34 @@ if __name__ == '__main__':
 	
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
 	dt = [0.2,0.1,0.07,0.01]
-	dt = [5*1e-2]
+	# dt = [1e-2]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 
 	### --- Run for walkers --- ###
-
 	# for i in Hc:
 	# 	print "Hc = %g"%i
 	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# 	run.RunSimulation(i)
-	# run.CalculateError()
-	# run.ConvergenceTest(Hc)
 
 	### --- Run for time-step --- ###
-
+	# print glob.glob('home/fredrik/Dropbox/uio/thesis/doc/results/experiment_18022014_1438/results/results_FE_Hc20000_*.txt')
+	# run.CalculateError()
 	for i in dt:
 		print "dt = %g"%i
 		run.SetupRun(x0,x1,y0,y1,m,n,T,i)
 		run.RunSimulation(Hc[0])
-	# time.sleep(1)
-	# # h = [1./dt[i] for i in range(len(dt))]
+	time.sleep(1)
+	# h = [1./dt[i] for i in range(len(dt))]
 	leg = ['dt = %g'%i for i in dt]
 	run.PlotError(leg)
-	# run.ConvergenceTest(dt)
+	# run.ConvergenceTest(Hc)
+	run.ConvergenceTest(dt)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None)
+	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
@@ -468,4 +490,5 @@ if __name__ == '__main__':
 	# a = raw_input('press return >>')
 
 	run.Finish()
+# g++ *.cpp -O2 -Wall -o main_walk
 

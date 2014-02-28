@@ -8,24 +8,22 @@ class Walk
 
 		int nwalkers, steps;
 		double **area, **aD;
-		double **walkers;				/*Array of the positions of all the walkers*/
-		// std::vector<double*> walkers;
 		std::vector<double**> aDx;
-		int d,m,n;
+		int d,m,n,o;
 		double factor,dt,D;
 		double x0, x1, y0, y1, z0, z1;
-		double *x;
-		double *y;
-		double dx,dy,drift;
+		double *x,*y,*z;
+		double dx,dy,dz,drift;
 		bool inhomogenous;
 		Random *rng;					/*Random Number Generator*/
+		double **walkers;				/*Array of the positions of all the walkers*/
+		double x0_, x1_, y0_, y1_,z0_,z1_; 		/*x0_ = x0 - (dx/2.0); etc*/
 		
 
 		
 		void FindPosition(double *, int*);
 		
 		void checkpos(double*);
-		double x0_, x1_, y0_, y1_; 		/*x0_ = x0 - (dx/2.0); etc*/
 
 		void SetDiffusionTensor(double **, int, int);
 		void SetDiffusionConstant(double);

@@ -351,8 +351,8 @@ which we arrange as
 }
 Immediately we notice a problem with the implicit scheme. If we solve the system of equations by the fool-proof Gaussian elimination we will use some $\mathcal O(n^3)$ FLOPs per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2d and $\mathcal O(n^9)$ in 3d. 
 As a comparison the explicit scheme will make due with $\mathcal O(n^d)$ FLOPs.
-There are, however ways to improve this. Seeing as the matrix $mathbf A$ does not change as long as none of the parameters change we can use a LU-decomposition. 
-This will demand a decomposition of $\mathcal{O}(n^3)$ FLOPs, but all the subsequent steps will be $\mathcal{O}(n^2)$ FLOPs ($\mathcal O(n^2d)$ for higher dimensions). 
+There are, however ways to improve this. Seeing as the matrix $\mathbf A$ does not change as long as none of the parameters change we can use a LU-decomposition. 
+This will demand a decomposition of $\mathcal{O}(n^3)$ FLOPs, but all the subsequent steps will be $\mathcal{O}(n^2)$ FLOPs ($\mathcal O(n^{2d})$ for higher dimensions). 
 We are still not quite at the level of the explicit scheme, but it is a clear improvement. \\
 Looking closer at $A$ we notice that it is not only sparse, but tridiagonal. This calls for further optimization which brings the required number of FLOPs down to $\mathcal O(n)$ making it equally efficient to the explicit scheme. More on tridiagonal Gaussian elimination later.
 
@@ -408,7 +408,7 @@ Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac
   &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) = \mathcal{O}(\Delta t)
 \end{align*}
 We can do better than this by using another discretization scheme for the PDE, but in our case the PDE is not the only error source seeing as we will combine it with a random walk solver. 
-Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
+Quantifying an error term The block-tridiagonal solver is taken from \cite{}, and is listed below.\\for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
 Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
 This will be such a costly operation that it will not necessarily be worth it.\\
@@ -514,7 +514,7 @@ The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_m
              \end{array}\right) = \mathbf{u}^{n}
 \end{align}
 which we can also express as $M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
-The block-tridiagonal solver is taken from \cite{}, and is listed below.\\
+
 There is a forward substitution
 \begin{align*}
  H_1 &= -B_1^{-1}C_1\nonumber \\
@@ -530,7 +530,7 @@ There is a forward substitution
 The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. 
 However, we only need to to the inversion once as long as the mass-matrix, $M$ is unchanged so the expense is reduced. 
 This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. 
-All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme better than the implicit FE scheme.
+All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme as effective as the implicit FE scheme.
 
 In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. 
 As we can see in the appendix (eq. \ref{BE3D_linear_system}) we can write this so it looks like the block tridiagonal linear system we got in 2d, and that could be solved by the block-tridiagonal solver. 
@@ -568,52 +568,51 @@ This also further supports the claim that there is no need to find a very precis
 \emph{We will test this by doing a convergence test in time keeping the number of walkers constant.}
 
 \subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
-
-There are a few obvious difficulties we can expect to run into in our planned project. 
-Future ones will be added here as well.
+ 
+In this chapter we will identify and discuss a few obvious difficulties we can expect to run into in our planned project. As far as possible we will also explain how to solve the problems or how to live with them.
 
 \begin{itemize}
  \item Different timescales\\
-  The PDE-solver will be operating with some timestep $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
-  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the timestep on the PDE level. 
+  The PDE-solver will be operating with some time-step $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
+  The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the time-step on the PDE level. 
   Depending on the coupling chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
-  Running some number of steps, N, on the random-walk level should eventually sum up to the timestep on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
+  Running some number of steps, N, on the random-walk level should eventually sum up to the time-step on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
   It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
  \item Boundary conditions\\
  To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
- Finding a boundary condition that accurately models the actual system turns out to be quite straightforward, so long as the walk-domain is not on the actual boundary of the whole system. 
- We can assume that the number of walkers in the walk-domain is conserved for each PDE-timestep, and thus no walkers can escape the domain. 
+ Finding a boundary condition that accurately models the actual system turns out to be quite straightforward.
+ We can assume that the number of walkers in the walk-domain is conserved for each PDE time-step, and thus no walkers can escape the domain. 
  Implementing perfectly reflecting boundaries solves this quite well. 
  This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
  Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until we have the desired concentration of walkers.
  \item Negative concentration of walkers \\
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
- Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems when the solution of the PDE takes negative values (which it most likely will not do). 
+ Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems if the solution of the PDE takes negative values (which it most likely will not do). 
  I can find no good solutions to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
  This workaround has a problem in that a transition from positive to negative value will lead to a ``valley'' in the absolute-value solution. 
  A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again.
  \item Smooth solutions\\
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
- When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one timestep to the next. 
+ When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one time-step to the next. 
  In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
  The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
  A polynomial regression model was implemented in 1d, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
  Another idea is to implement a cubic spline interpolation over the area, but this too has its problems. An interpolation forces the solution to have a value at the interpolating points, and seeing as we cannot say for certain which value is correct how shall we pick the interpolating points?
- \item Number of timesteps on the random walk level\\
- As the timestep on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of timesteps on the RW level. 
- Strictly speaking we do not have to do this, seeing as we adjust the steplength of the walkers with respect to the timestep (see eq \ref{steplength}). 
- As an initial value we put the number of timesteps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
+ \item Number of time-steps on the random walk level\\
+ As the time-step on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of time-steps on the RW level. 
+ Strictly speaking we do not have to do this, seeing as we adjust the step-length of the walkers with respect to the time-step (see eq \ref{steplength}). 
+ As an initial value we put the number of time-steps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
  The question really boils down to how we define our model, which we have yet to do in an accurate way.
  \item Random walks in 3D\\
  Both 1 and 2 dimensional space are spanned completely by a random walk, but space of 3 or more dimensions is not. 
  This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
 \end{itemize}
 
-\subsection{Probability distribution and timesteps}\label{probability_distribution_and_timesteps}
-As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ timesteps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
+\subsection{Probability distribution and time-steps}\label{probability_distribution_and_timesteps}
+As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
 In our application, however, we are not interested in finding the walker at an exact position, but in an interval around the mesh-points sent to the walk-solver. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
-We will also run the walk solver for some $N$ timesteps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
+We will also run the walk solver for some $N$ time-steps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
 This slightly modifies our distribution into
 \begin{equation}
  P(x_i\pm\Delta x,t_{n+1}) = \frac{1}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
@@ -622,21 +621,29 @@ This makes the concentration of walkers $C(x,t) = MP(x,t)$
 \begin{equation}
  C(x_i\pm\Delta x,t_{n+1}) = \frac{M}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
 \end{equation}
-For each PDE-timestep we reset the walkers to have some new initial condition. 
-We do this because the concentration over the ``walk-area'' will change with each PDE-timestep.
+For each PDE time-step we reset the walkers to have some new initial condition. 
+We do this because the concentration over the ``walk-area'' will change with each PDE time-step.
 The point is that $ C(x_i\pm\Delta x,t_{n+1})$ will be dependent on the initial condition $ C(x_i\pm\Delta x,t_{n})$.
 
 
-Looking at the difference in timestep size between the two length scales we see from equation \ref{descrete_gaussian_distr} that the stepsize on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
+Looking at the difference in time-step size between the two length scales we see from equation \ref{descrete_gaussian_distr} that the step-size on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
 \begin{equation}
  \sigma^2 = \langle\Delta x^2\rangle = 2DN\Delta\tilde{t} \implies \Delta\tilde{t} = \frac{\langle\Delta x^2\rangle}{2DN}
 \end{equation}
-Equating this with \ref{random_walk_variance} gives us a first order approximation to the steplength, $l$
+Equating this with \ref{random_walk_variance} gives us a first order approximation to the step-length, $l$
 \begin{align}
  \langle\Delta x^2\rangle &= 4pqNl^2 = 2DN\Delta\tilde{t} \nonumber \\ 
  l &= \sqrt{2D\Delta\tilde{t}}. \label{steplength}
 \end{align}
-Of course this is assuming that we use a random walk algorithm of fixed steplength.
+Of course this is assuming that we use a random walk algorithm of fixed step-length.\\
+Equation \ref{steplength} is proportional to the square-root of the adjusted time-step. 
+We have already suggested that the error term from the RW simulation depends on the number of walkers we use (or the conversion rate). This equation suggests that the error term also depends on the time step. 
+Though this might seem a bit frustrating at first glance, but it answers a question we asked earlier; how many time-steps do we need to take at the RW-level. 
+We have the intuitive relation between the RW time-step, $\Delta \tile t$ and the PDE time-step through the number of steps at the RW level, $T$:
+\begin{equation*}
+ \Delta \tilde t = \frac{\Delta t}{T}
+\end{equation*}
+
 
 \section{Geometry}
 Any finite difference method is problematic to solve on anything else than a rectangular grid. 

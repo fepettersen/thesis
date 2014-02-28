@@ -26,6 +26,7 @@ int main(int argc, char** argv)
     int T = atoi(argv[3]);
     double Dt = strtod(argv[4],NULL);
 
+    Dt /=T;
     string infile = argv[5];
     string DiffusionTensor = argv[6];
 

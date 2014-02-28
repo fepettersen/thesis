@@ -79,13 +79,12 @@ void Combine::Solve(){
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
 		// (*it1)->drift = 0;
-		ConvertToWalkers(U,inifilenames[i],indeces[i]);
+		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
 		// (*it1)->ResetInitialCondition(c[counter]);
 		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
 		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
 		// sprintf(cmd,"mpirun -np %d stochastic/%s %d %d %d %g",num_procs,prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt);
 		sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
-		// sprintf(cmd,"python balle2.py");
 		int failure = system(cmd);
 		if(failure){
 			cout<<endl;
@@ -157,13 +156,12 @@ void Combine::AddWalkArea(double *x, double *y){
 	}
 	char tmp[100];
 	sprintf(tmp,"stochastic/inifile_%d.bin",walk_areas);
-	// sprintf(tmp,"state.xyz");
 	string name = tmp;
 	inifilenames.push_back(name);
 	int* parameter_tmp = new int[2];
 	parameter_tmp[0] = M; parameter_tmp[1] = N;
 	parameters.push_back(parameter_tmp);
-	walk_steps = 500;
+	walk_steps = 10;
 	prgm = "walk_solver";
 	indeces.push_back(index);
 	// int **Ctmp = new int*[M];
@@ -184,9 +182,9 @@ void Combine::SaveDiffusionTensor(double** tmp,int M, int N, int no){
 	/*Save the relevant part of the diffusion tensor to 
 	a file.*/
 	ofstream outfile;
-	char name[100];
-	sprintf(name,"stochastic/DiffusionTensor_%d.txt",no);
-	outfile.open(name);
+	char neame[100];
+	sprintf(neame,"stochastic/DiffusionTensor_%d.txt",no);
+	outfile.open(neame);
 	for(int i =0;i<M;i++){
 		for(int j=0;j<N; j++){
 			outfile<<tmp[i][j]<<" ";
@@ -217,19 +215,16 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	}
 	int** Conc = new int*[M];
 	int nwalkers = 0;
-	double test = 0;
 	for(int k=0; k<M; k++){
 		Conc[k] = new int[N];
 		for(int l=0; l<N; l++){
 			Conc[k][l] = (int) (round(fabs(u[k+m0][l+n0]*Hc)));
 			nwalkers += Conc[k][l];
-			test += u[k+m0][l+n0];
 		}
 	}	
-	cout<<"Actual \"integrated\" solution = "<<test<<endl<<"nwalkers/Hc = "<<double(nwalkers/Hc)<<endl;
-	// ofstream inifile (filename.c_str(), ios::out | ios::binary);
-	ofstream inifile (filename.c_str());
-
+	char* asdf = new char[100];
+	sprintf(asdf,"stochastic/%s",filename.c_str());
+	ofstream inifile (filename.c_str(), ios::out | ios::binary);
 	
 
 	/* Need to make new x & y to make sure they are mapped to unit square*/
@@ -237,25 +232,19 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	vec y = linspace(0,1,N);
 	inifile<<nwalkers<<endl<<endl;		/*Write header*/
 	double thingy = 0;
+
 	for(int i=0; i<M;i++){
 		for(int j=0; j<N;j++){
 			nwalkers = 0;
 			for(int l=0; l<Conc[i][j]; l++){
 				thingy = x[i]+0.99*DX*(0.5-rng->uniform());
-				// thingy = (DX/2.0+1.0/128.0)+ 0.984375/(1+DX+1.0/64)*(x[i]+0.99*DX*(0.5-rng->uniform()));
-				// if(thingy>=0.984375){
-				// 	cout<<"balle! "<<thingy<<endl;
-				// }
-				inifile<<"Ar "<<thingy<<" ";
+				inifile<<0<<" "<<thingy<<" ";
 				if(d==2){
-					thingy = y[i]+0.99*DY*(0.5-rng->uniform());
+					thingy = y[j]+0.99*DY*(0.5-rng->uniform());
 					inifile<<thingy<<" "<<0;
-					// thingy = (DY/2.0+1.0/128.0)+ 0.984375/(1+DY+1.0/64)*(y[j]+0.99*DY*(0.5-rng->uniform()));
-					// inifile<<thingy<<" "<<0.008;
 				}
 				else{
-					// inifile<<0.008<<" "<<0.008;
-					inifile<<0<<" "<<0;
+					inifile<<0<<" "<<0;	
 				}
 				inifile<<endl;
 				nwalkers++;
@@ -271,8 +260,7 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	int M,N,m0,n0; 
 	double DX=0,DY=0;
 	
-	// ifstream infile (filename.c_str(), ios::in | ios::binary);
-	ifstream infile (filename.c_str());
+	ifstream infile (filename.c_str(), ios::in | ios::binary);
 	string line, sub;
 
 	M = index[0][1]-index[0][0];
@@ -290,7 +278,6 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	// 		C[i][j] = 0;
 	// 	}
 	// }
-	double factor = 0.984375*(1+DX);
 	mat C = zeros(M,N);
 	/*Read header which contains the number of walkers*/
 	int j = 0;
@@ -319,28 +306,24 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 			exit(1);
 		}
 	}
-	// double tmp[M];
-	// double xtmp[M];
-	// for(int k=0; k<M; k++){
-	// 	xtmp[k] =X[k+m0];
-	// 	for(int j=0; j<N; j++){
-	// 		tmp[k] = C(k,j)/Hc;
-	// 	}
-	// }
-	// polyreg(xtmp,tmp,M);
-	double test = 0;
+	double tmp[M];
+	double xtmp[M];
+	for(int k=0; k<M; k++){
+		xtmp[k] =X[k+m0];
+		for(int j=0; j<N; j++){
+			tmp[k] = C(k,j)/Hc;
+		}
+	}
+	polyreg(xtmp,tmp,M);
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
-			u[k+m0][j+n0] = 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
-			// u[k+m0][j+n0] = 0.5*((C[k][j]/Hc)+u[k+m0][j+n0]);
-			// u[k+m0][j+n0] = tmp[k];
+			// u[k+m0][j+n0] = 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
+			u[k+m0][j+n0] = tmp[k];
 			// u[k+m0][j+n0] = (C(k,j)/Hc);
-			test += 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
+			// u[k+m0][j+n0] = 0.5*((C[k][j]/Hc)+u[k+m0][j+n0]);
 		}
 	}
-	cout<<"\"integrated\" solution after walk-stuff = "<<test<<endl<<"nwalkers/Hc = "<<double(nwalkers/Hc)<<endl<<"--------------------"<<endl;
-
 }
 
 void Combine::MapAreaToIndex(double *x,double *y, int **index){
@@ -416,7 +399,12 @@ void Combine::CubicSpline(double *x, double *y, double *v, int M, double yp1, do
 	double p, qn, sig, un, *bu;
 	m0 = 0;
 	bu = new double[M];
-
+	// if(!bu) {
+	// 	cout<<"Error in function CubicSpline():"<<endl;
+	// 	cout<<"Not enough memory for u["<<M<<"]. Exiting"<<endl;
+	// 	exit(1);
+	// }
+	cout<<"yp1,yp2 = "<<yp1<<","<<yp2<<endl;
 	if(yp1>inf) {v[0] = bu[0] = 0.0;}
 	else {
 		v[0] = -0.5;
@@ -456,6 +444,36 @@ void Combine::SetInitialCondition(double** U0,int x,int y){
 	}
 }
 
+// void Combine::TestRWConvergence(int steps,string path){
+// 	Walk walks(d,pde_solver->dt);
+// 	int **distr = new int*[m];
+// 	for(int i=0;i<m;i++){
+// 		distr[i] = new int[n];
+// 		for(int j=0;j<n;j++){
+// 			distr[i][j] = Hc*Up[i][j];
+// 		}
+// 	}
+// 	ofstream ofile;
+// 	char *name = new char[120];
+// 	walks.SetInitialCondition(distr,m,n);
+// 	walks.SetDiffusionTensor(aD,m,n);
+// 	// walks.drift = 0.05;
+// 	for(int t=0;t<steps;t++){
+// 		walks.InhomogenousAdvance(distr,pde_solver->dt);
+// 		sprintf(name,"%s/results_FE_Hc%d_n%04d.txt",path.c_str(),(int) Hc,t);
+// 		ofile.open(name);
+// 		for(int i=0;i<m;i++){
+// 			for(int j=0;j<n;j++){
+// 				U[i][j] = distr[i][j]/Hc;
+// 				ofile<<U[i][j]<<" ";
+// 			}
+// 			ofile<<endl;
+// 		}
+// 		ofile.close();
+// 		walks.ResetInitialCondition(distr);
+// 		cout<<"t = "<<t<<endl;
+// 	}
+// }
 
 
 double Combine::abs_max(double **array,int m, int n){

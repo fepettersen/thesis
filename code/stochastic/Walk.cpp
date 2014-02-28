@@ -14,7 +14,6 @@ Walk::Walk(int dimension, double _dt)
 	z0 = 0; z1 = 1;
 	D = 1;
 	dt = _dt/steps;
-	factor = sqrt(2*D*dt);
 	rng = new Random();
 	drift = 0; //factor/steps;
 	inhomogenous = false;
@@ -27,12 +26,11 @@ void Walk::Advance(void){
 	double DX[d];
 	DX[0] = dx;
 	if(d==2){DX[1] = dy;}
-	// #pragma omp parallel 
-	// {
+
 	int *index = new int[2];
 	double L = 0;
 	double L_deriv = 0;
-	double L0 = sqrt(2*dt);
+	double L0 = sqrt(2*dt);						/*should it be sqrt(2*d*dt); ???*/
 	double L_deriv0 = (dt/d)/(2*sqrt(2*(dt/d)));
 	double Tr,Tl,Delta_m,Delta_p,r,stepvector[d];
 
@@ -45,33 +43,23 @@ void Walk::Advance(void){
 	int p = 0;
 	double temp= 0;
 	index[1] = 0;
-	// #pragma omp for
 	for(int i=0; i<nwalkers; i++){
-		/*For every walker: */
+		/*Loop over all walkers: */
 		FindPosition(walkers[i],index);
-		//p = int(round(rng->uniform()*(d-1)));	/*pick a spatial dimension to advance the walker*/
-		p = int(rng->ran0()*d);
-		// for(p=0; p<d; p++){
-			if(inhomogenous){
-				temp = sqrt(aD[index[0]][index[1]]);
-				// L = (d>1)?(L0*sqrt(aD[index[0]][index[1]])):(L0*sqrt(aD[index[0]][0]));
-				L = L0*temp;
-				/*This might work and is slightly better*/
-				// L_deriv = (d>1)?(L_deriv0/(DX[p]*sqrt(aD[index[0]][index[1]]))*(aDx[p][index[0]][index[1]])):
-				// (L_deriv0/(DX[p]*sqrt(aD[index[0]][0])))*(aDx[p][index[0]][0]);
-				L_deriv = L_deriv0/(DX[p]*temp)*(aDx[p][index[0]][index[1]]);
-				Tr = (1+0.5*L_deriv);
-				Tl = (1-0.5*L_deriv);
-				Delta_p = L*Tr;
-				Delta_m = L*Tl;
-				Tr *= 0.5;
-			}
-			// stepvector[p] = (rng->ran0()>Tr)?(Delta_p):(-Delta_m);
+		p = int(rng->ran0()*d);		/*pick a spatial dimension to advance the walker*/
+		if(inhomogenous){
+			/*Calculate step-length and step-probabilities based D(x,y)*/
+			temp = sqrt(aD[index[0]][index[1]]);
+			L = L0*temp;
+			L_deriv = L_deriv0/(DX[p]*temp)*(aDx[p][index[0]][index[1]]);
+			Tr = (1+0.5*L_deriv);
+			Tl = (1-0.5*L_deriv);
+			Delta_p = L*Tr;
+			Delta_m = L*Tl;
+			Tr *= 0.5;
+		}
 		walkers[i][p] += (rng->ran0()>Tr)?(Delta_p):(-Delta_m);
-		// walkers[i][p] += stepvector[p];
-		checkpos(walkers[i]);
-		// cout<<index[0]<<","<<index[1]<<"  :  "<<walkers[i][0]<<","<<walkers[i][1]<<endl;
-		// stepvector[p] =  0;
+		checkpos(walkers[i]);		/*Make sure walker does not leave area*/
 	}	
 }
 
@@ -83,14 +71,21 @@ void Walk::Load(std::string filename,int M, int N){
 	SetInitialCondition(C,m,n) - function*/
 	m = M;
 	n = N;
+	o = 0;
 	x = new double[m];
 	y = new double[n];
+	z = new double[o];
 	dx = (x1-x0)/(m-1);
 	dy = (n>1)?((y1-y0)/(n-1)):0;
+	dz = (o>1)?((z1-z0)/(o-1)):0;
+
 	x0_ = x0 - 0.99*(dx/2.0);
 	x1_ = x1 + 0.99*(dx/2.0);
 	y0_ = y0 - 0.99*(dy/2.0);
 	y1_ = y1 + 0.99*(dy/2.0);
+	z0_ = z0 + 0.99*(dz/2.0);
+	z1_ = z1 + 0.99*(dz/2.0);
+	
 	for(int k=0;k<m;k++){
 		x[k] = k*dx;
 	}
@@ -216,26 +211,37 @@ void Walk::FindPosition(double *pos, int *indx){
 	/*Maps the walkers position to its index*/
 	indx[0] = int(round(pos[0]/dx));
 	// indx[1] = (d>1)?(int(round(pos[1]/dy))):(0);
-	if(d==2){
+	if(d>1){
 		indx[1] = int(round(pos[1]/dy));
+	}
+	if(d>2){
+		indx[2] = int(round(pos[2]/dz));
 	}
 }
 void Walk::checkpos(double *r){
-	/*Implements reflecting boundaries -- Need to adjust the boundaries by dx/2 so each thing has 
-	as much space*/
-	// tmp = r+s 	/*This is r in this case*/
+	/*Implements reflecting boundaries.
+	r[0] = x-coordinate
+	r[1] = y-coordinate	...*/
 	if (r[0]<x0_){
 		r[0] = x0_ - (r[0]-x0_);
 		}
 	else if(r[0]>x1_){
 		r[0] = x1_ - (r[0]-x1_);
 	}
-	if(d == 2){
+	if(d>1){
 		if (r[1]<y0_){
 			r[1] = y0_ - (r[1]-y0_);
 		}
 		else if (r[1]>y1_){
 			r[1] = y1_ - (r[1]-y1_);
+		}
+	}
+	if(d>2){
+		if (r[2]<z0_){
+			r[2] = z0_ - (r[2]-z0_);
+		}
+		else if (r[2]>z1_){
+			r[2] = z1_ - (r[2]-z1_);
 		}
 	}
 }

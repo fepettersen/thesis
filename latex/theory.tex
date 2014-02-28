@@ -621,21 +621,35 @@ This makes the concentration of walkers $C(x,t) = MP(x,t)$
 \begin{equation}
  C(x_i\pm\Delta x,t_{n+1}) = \frac{M}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
 \end{equation}
-For each PDE-timestep we reset the walkers to have some new initial condition. 
-We do this because the concentration over the ``walk-area'' will change with each PDE-timestep.
+For each PDE time-step we reset the walkers to have some new initial condition. 
+We do this because the concentration over the ``walk-area'' will change with each PDE time-step.
 The point is that $ C(x_i\pm\Delta x,t_{n+1})$ will be dependent on the initial condition $ C(x_i\pm\Delta x,t_{n})$.
 
 
-Looking at the difference in timestep size between the two length scales we see from equation \ref{descrete_gaussian_distr} that the stepsize on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
+Looking at the difference in time-step size between the two length scales we see from equation \ref{descrete_gaussian_distr} that the step-size on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
 \begin{equation}
  \sigma^2 = \langle\Delta x^2\rangle = 2DN\Delta\tilde{t} \implies \Delta\tilde{t} = \frac{\langle\Delta x^2\rangle}{2DN}
 \end{equation}
-Equating this with \ref{random_walk_variance} gives us a first order approximation to the steplength, $l$
+Equating this with \ref{random_walk_variance} gives us a first order approximation to the step-length, $l$
 \begin{align}
  \langle\Delta x^2\rangle &= 4pqNl^2 = 2DN\Delta\tilde{t} \nonumber \\ 
  l &= \sqrt{2D\Delta\tilde{t}}. \label{steplength}
 \end{align}
-Of course this is assuming that we use a random walk algorithm of fixed steplength.
+Of course this is assuming that we use a random walk algorithm of fixed step-length.\\
+Equation \ref{steplength} is proportional to the square-root of the adjusted time-step. 
+We have already suggested that the error term from the RW simulation depends on the number of walkers we use (or the conversion rate). This equation suggests that the error term also depends on the time step. 
+Though this might seem a bit frustrating at first glance, but it answers a question we asked earlier; how many time-steps do we need to take at the RW-level. 
+We have the intuitive relation between the RW time-step, $\Delta \tilde t$ and the PDE time-step through the number of steps at the RW level, $T$:
+\begin{equation*}
+ \Delta \tilde t = \frac{\Delta t}{T}
+\end{equation*}
+Further we suggested that the error from the RW simulation is proportional to the root of the time-step $\epsilon \propto \sqrt{\Delta \tilde t} = \sqrt{\frac{\Delta t}{T}}$. We want to force this error to behave as $\mathcal O(\Delta t)$, and see that we can adjust the number of time-steps at the RW level in order to make this happen.
+\begin{equation}
+ \mathcal O(\Delta t)>\sqrt \frac{\Delta t}{T} \implies T>\frac{1}{\Delta t}
+\end{equation}
+
+Combined with the demand to the number of walkers we will quickly end up with an extreme computational demand if we want to force our model to have first order convergence (not to mention second order convergence). 
+Fortunately we will ignore this demand outside of verification because there is little physical meaning left if we use the demanded number of walkers.
 
 \section{Geometry}
 Any finite difference method is problematic to solve on anything else than a rectangular grid. 

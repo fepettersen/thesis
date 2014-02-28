@@ -10,33 +10,33 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Numerical error for 1D Forward Euler discretization}}{33}{figure.caption.4}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Numerical error for 1D Forward Euler discretization}}{35}{figure.caption.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{34}{figure.caption.5}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{36}{figure.caption.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \ref {simple_diffusion_equation}).\relax }}{35}{figure.caption.6}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \ref {simple_diffusion_equation}).\relax }}{37}{figure.caption.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence test FE 2d}}{36}{figure.caption.7}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence test FE 2d}}{38}{figure.caption.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{38}{figure.caption.8}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{40}{figure.caption.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Verification for exact numerical solution}}{39}{figure.caption.9}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Verification for exact numerical solution}}{41}{figure.caption.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac {\Delta x \Delta y}{5} = 8e-05$.\relax }}{40}{figure.caption.10}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac {\Delta x \Delta y}{5} = 8e-05$.\relax }}{42}{figure.caption.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Convergence test RW}}{43}{figure.caption.11}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Convergence test RW}}{45}{figure.caption.11}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Error plot RW}}{43}{figure.caption.12}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Error plot RW}}{45}{figure.caption.12}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac {1}{75}$. Simulations doen with the BE scheme for 100 steps.\relax }}{46}{figure.caption.13}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac {1}{75}$. Simulations doen with the BE scheme for 100 steps.\relax }}{48}{figure.caption.13}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{47}{figure.caption.14}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{49}{figure.caption.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.12}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{48}{figure.caption.15}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{50}{figure.caption.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.13}{\ignorespaces \relax }}{49}{figure.caption.16}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces \relax }}{51}{figure.caption.16}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.14}{\ignorespaces Errorplot, long simulation}}{49}{figure.caption.17}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Errorplot, long simulation}}{51}{figure.caption.17}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 

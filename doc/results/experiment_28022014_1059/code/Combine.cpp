@@ -79,7 +79,7 @@ void Combine::Solve(){
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
 		// (*it1)->drift = 0;
-		ConvertToWalkers(U,inifilenames[i],indeces[i]);
+		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
 		// (*it1)->ResetInitialCondition(c[counter]);
 		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
 		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
@@ -332,11 +332,11 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	for(int k=0; k<M; k++){
 		for(int j=0; j<N; j++){
 			/*This is where we insert least squares or similar*/
-			u[k+m0][j+n0] = 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
+			// u[k+m0][j+n0] = 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
 			// u[k+m0][j+n0] = 0.5*((C[k][j]/Hc)+u[k+m0][j+n0]);
 			// u[k+m0][j+n0] = tmp[k];
 			// u[k+m0][j+n0] = (C(k,j)/Hc);
-			test += 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
+			test += (C(k,j)/Hc);
 		}
 	}
 	cout<<"\"integrated\" solution after walk-stuff = "<<test<<endl<<"nwalkers/Hc = "<<double(nwalkers/Hc)<<endl<<"--------------------"<<endl;
