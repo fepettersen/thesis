@@ -264,7 +264,7 @@ def setup_plot():
 	return fig,ax
 
 if __name__ == '__main__':
-	if 0:
+	if 1:
 		"1D"
 		n = 11
 		U = np.zeros(n)
@@ -281,7 +281,7 @@ if __name__ == '__main__':
 			t+=1
 		ani = animation.ArtistAnimation(fig,im,interval=180,blit=True)
 		mpl.show()
-	if 1:
+	if 0:
 		"2D"
 		X,Y = np.meshgrid(np.linspace(0,1,11),np.linspace(0,1,11))
 		U = np.zeros((11,11))
@@ -299,4 +299,3 @@ if __name__ == '__main__':
 			t+=1
 			wframe = ax.plot_wireframe(X,Y,U)
 			mpl.draw()
-	raw_input('Press Return..')

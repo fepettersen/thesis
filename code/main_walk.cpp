@@ -61,6 +61,7 @@ void FromFile(double **array, string filename,int m, int n){
 
 int main(int argc, char** argv)
 {
+	cout<<"initializing... ";
     int tofile = atoi(argv[1]);
     double x0 = atof(argv[2]);
     double x1 = atof(argv[3]);
@@ -103,13 +104,14 @@ int main(int argc, char** argv)
 	BlackBox.SetInitialCondition(Up,m,n);
 	
 	BlackBox.AddWalkArea(x,y);
+	cout<<"done!"<<endl;
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
 		if(tofile){
 			// output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
 			output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
 		}
-		cout<<"t = "<<t<<" of "<<T<<endl;
+		cout<<"t = "<<t+1<<" of "<<T<<endl;
 	}
 
 	return 0;

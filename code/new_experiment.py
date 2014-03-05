@@ -85,7 +85,7 @@ class Experiment:
 		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
 			# self.walk.append(np.fromfile(step,sep=" "))
 			self.walk.append(np.loadtxt(step))
-			name = self.result_path+'/Deterministic*.txt'
+		name = self.result_path+'/Deterministic*.txt'
 		self.CalculateError(name)
 
 	def RunSimulation(self,Hc):
@@ -112,6 +112,7 @@ class Experiment:
 			tmp = np.zeros(self.T)
 			j=0
 			for step in sorted(glob.glob(filename)):
+				# print step
 				infile = np.loadtxt(step)
 				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
@@ -166,11 +167,11 @@ class Experiment:
 			self.dt = DT[k]
 			self.RunDeterministic()
 			self.walk = []
-			for i in range(self.T):
-				infile = np.loadtxt(self.result_path+'/Deterministic_n%04d.txt'%i)
-				tmp[i] = np.abs(np.linalg.norm(infile-self.exact(X,Y,(i+1)*self.dt)))
-			self.error.append(tmp.copy())
-			mpl.plot(self.error[k][:],color[k])
+			# # for i in range(self.T):
+			# # 	infile = np.loadtxt(self.result_path+'/Deterministic_n%04d.txt'%i)
+			# # 	tmp[i] = np.abs(np.linalg.norm(infile-self.exact(X,Y,(i+1)*self.dt)))
+			# # self.error.append(tmp.copy())
+			# mpl.plot(self.error[k][:],color[k])
 			leg.append('dt = %g'%DT[k])
 		mpl.legend(leg)
 		mpl.xlabel('timestep #')
@@ -393,18 +394,18 @@ def D(x,y,t=0):
 	return np.ones(np.shape(x))
 
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
 
 	this_dir = right_split(os.getcwd(),'/')
 
-	x0 = 0.3
+	x0 = 0.1
 	y0 = 0.5
-	x1 = 0.5
+	x1 = 1.0
 	y1 = 0.7
-	m = 76
+	m = 11
 	n = 1
 	T = 100
 
@@ -414,12 +415,11 @@ if __name__ == '__main__':
 
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
-	print 'Python: ',dt,' dx: ',dx
-	Hc = [20000]
-	# Hc = [200,1400,5600,10400,32000]
+	Hc = [4000,40000,400000]
+	# Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
-	info='_preparing_to_combine_with_DSMC'
-	run = Experiment(this_dir,DEBUG,save_files)
+	info='_Testing_walkers_1d_again'
+	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
 	# run.SetInitialCondition(run.exact(x,y,0))
@@ -430,31 +430,45 @@ if __name__ == '__main__':
 	run.compile()
 	
 	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
-	dt = [0.2,0.1,0.07,0.01]
-	dt = [5*1e-2]
+	# dt = [0.1,0.05,0.01,0.005]
+	dt = [5*1e-3]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	# run.VerifyDeterministicError()
+	run.VerifyDeterministicError()
 
 	### --- Run for walkers --- ###
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	# 	run.RunSimulation(i)
-	# run.CalculateError()
-	# run.ConvergenceTest(Hc)
+	for i in Hc:
+		print "Hc = %g"%i
+		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+		run.RunSimulation(i)
+	run.ConvergenceTest(Hc)
+	leg = ['Hc = %g'%i for i in Hc]
+	run.PlotError(leg)
 
 	### --- Run for time-step --- ###
-
-	for i in dt:
-		print "dt = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,i)
-		run.RunSimulation(Hc[0])
-	# time.sleep(1)
-	# # h = [1./dt[i] for i in range(len(dt))]
-	leg = ['dt = %g'%i for i in dt]
-	run.PlotError(leg)
+	# for i in dt:
+	# 	print "dt = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,i)
+	# 	run.RunSimulation(Hc[0])
 	# run.ConvergenceTest(dt)
+	# leg = ['dt = %g'%i for i in dt]
+
+	## --- Run for h --- ###
+	h = [0.2,0.1,0.05]
+	# h = [0.05]
+
+	# for i in h:
+	# 	timestep = i*i/2.0
+	# 	m = (1/i)+1
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+	# 	run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
+	# 	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
+	# 	hc = int(round(1.0/((i*i/2.0)**2)))
+	# 	print i," , ", timestep, " , ", hc
+	# 	run.RunSimulation(10*hc)
+	# leg = ['h = %g'%i for i in h]
+	# run.ConvergenceTest(h)
+	# run.PlotError(leg)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])

@@ -19,6 +19,7 @@
 
 \renewcommand{\d}{\partial}
 
+
 \setlength{\headheight}{15pt}
 
 % \usepackage{fontspec}
@@ -47,9 +48,9 @@
 
 \maketitle
 
-\begin{abstract}
-This is an abstract text.
-\end{abstract}
+% \begin{abstract}
+% This is an abstract text.
+% \end{abstract}
 
 % \begin{dedication}
 %   To someone
@@ -84,7 +85,7 @@ This is an abstract text.
 
 
 \chapter{Results}
-
+\include{results}
 
 \appendix
 \chapter{}

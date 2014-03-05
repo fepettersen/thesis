@@ -79,7 +79,7 @@ void Combine::Solve(){
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
 		// (*it1)->drift = 0;
-		ConvertToWalkers(U,inifilenames[i],indeces[i]);
+		// ConvertToWalkers(U,inifilenames[i],indeces[i]);
 		// (*it1)->ResetInitialCondition(c[counter]);
 		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
 		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
@@ -163,7 +163,7 @@ void Combine::AddWalkArea(double *x, double *y){
 	int* parameter_tmp = new int[2];
 	parameter_tmp[0] = M; parameter_tmp[1] = N;
 	parameters.push_back(parameter_tmp);
-	walk_steps = 500;
+	walk_steps = 250;
 	prgm = "walk_solver";
 	indeces.push_back(index);
 	// int **Ctmp = new int*[M];
@@ -172,7 +172,7 @@ void Combine::AddWalkArea(double *x, double *y){
 	// 	Ctmp[k] = new int[N];
 	// 	signmap[k] = new int[N];
 	// }
-	// ConvertToWalkers(Up,Ctmp,index);
+	ConvertToWalkers(Up,name,index);
 	// tmp->SetInitialCondition(Ctmp,M,N);		/*The solution in the relevant area converted to walkers*/
 	// walk_solvers.push_back(tmp);		/*Throws std::bad_alloc*/
 	// c.push_back(Ctmp);
@@ -218,28 +218,20 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	int** Conc = new int*[M];
 	int nwalkers = 0;
 	double test = 0;
+	ofstream inifile (filename.c_str());
+	// ofstream inifile (filename.c_str(), ios::out | ios::binary);
+
+	
+	vec x = linspace(0,1,M);
+	vec y = linspace(0,1,N);
+	inifile<<nwalkers<<endl<<endl;		/*Write xyz-header*/
+	double thingy = 0;
 	for(int k=0; k<M; k++){
 		Conc[k] = new int[N];
 		for(int l=0; l<N; l++){
 			Conc[k][l] = (int) (round(fabs(u[k+m0][l+n0]*Hc)));
 			nwalkers += Conc[k][l];
 			test += u[k+m0][l+n0];
-		}
-	}	
-	cout<<"Actual \"integrated\" solution = "<<test<<endl<<"nwalkers/Hc = "<<double(nwalkers/Hc)<<endl;
-	// ofstream inifile (filename.c_str(), ios::out | ios::binary);
-	ofstream inifile (filename.c_str());
-
-	
-
-	/* Need to make new x & y to make sure they are mapped to unit square*/
-	vec x = linspace(0,1,M);
-	vec y = linspace(0,1,N);
-	inifile<<nwalkers<<endl<<endl;		/*Write header*/
-	double thingy = 0;
-	for(int i=0; i<M;i++){
-		for(int j=0; j<N;j++){
-			nwalkers = 0;
 			for(int l=0; l<Conc[i][j]; l++){
 				thingy = x[i]+0.99*DX*(0.5-rng->uniform());
 				// thingy = (DX/2.0+1.0/128.0)+ 0.984375/(1+DX+1.0/64)*(x[i]+0.99*DX*(0.5-rng->uniform()));
@@ -258,12 +250,16 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 					inifile<<0<<" "<<0;
 				}
 				inifile<<endl;
-				nwalkers++;
 			}
 		}
-	}
+	}	
 	inifile.close();
-	// delete [] asdf;
+	// for(int i=0; i<M;i++){
+	// 	for(int j=0; j<N;j++){
+	// 		nwalkers = 0;
+	// 			nwalkers++;
+	// 	}
+	// }
 }
 
 void Combine::ConvertFromWalkers(double **u, string filename, int **index){
@@ -335,11 +331,10 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 			u[k+m0][j+n0] = 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
 			// u[k+m0][j+n0] = 0.5*((C[k][j]/Hc)+u[k+m0][j+n0]);
 			// u[k+m0][j+n0] = tmp[k];
-			// u[k+m0][j+n0] = (C(k,j)/Hc);
-			test += 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
+			u[k+m0][j+n0] = (C(k,j)/Hc);
+			// test += 0.5*((C(k,j)/Hc)+u[k+m0][j+n0]);
 		}
 	}
-	cout<<"\"integrated\" solution after walk-stuff = "<<test<<endl<<"nwalkers/Hc = "<<double(nwalkers/Hc)<<endl<<"--------------------"<<endl;
 
 }
 

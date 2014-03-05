@@ -27,14 +27,12 @@ class Combine
 		double x0, x1, y0, y1;
 		int m,n,d;				/*resolution in x and y dir. and dim. n=0 => d=1*/
 		double **U, **Up;		/*Actual solution*/
-		double Hc;			/*conversion factors*/
+		double Hc;				/*conversion factors*/
 		int walk_areas, walk_steps;
 		int **signmap;
 		bool inhomogenous;
 		std::string prgm;
 
-		// std::vector<Walk*> walk_solvers; 	/*A linked list of the walk-solvers*/
-		// std::vector<int**> c;				/*Linked list of walker-distr. for area i*/
 		std::vector<int**> indeces;				/*Indeces of walk-area i*/
 		std::vector<std::string> inifilenames;
 		std::vector<int*> parameters;
