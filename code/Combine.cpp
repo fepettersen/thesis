@@ -224,14 +224,19 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	
 	vec x = linspace(0,1,M);
 	vec y = linspace(0,1,N);
-	inifile<<nwalkers<<endl<<endl;		/*Write xyz-header*/
 	double thingy = 0;
 	for(int k=0; k<M; k++){
 		Conc[k] = new int[N];
 		for(int l=0; l<N; l++){
 			Conc[k][l] = (int) (round(fabs(u[k+m0][l+n0]*Hc)));
 			nwalkers += Conc[k][l];
-			test += u[k+m0][l+n0];
+		}
+	}	
+
+	inifile<<nwalkers<<endl<<endl;		/*Write xyz-header*/
+	
+	for(int i=0; i<M; i++){
+		for(int j=0; j<N; j++){
 			for(int l=0; l<Conc[i][j]; l++){
 				thingy = x[i]+0.99*DX*(0.5-rng->uniform());
 				// thingy = (DX/2.0+1.0/128.0)+ 0.984375/(1+DX+1.0/64)*(x[i]+0.99*DX*(0.5-rng->uniform()));
@@ -252,14 +257,9 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 				inifile<<endl;
 			}
 		}
-	}	
+	}
 	inifile.close();
-	// for(int i=0; i<M;i++){
-	// 	for(int j=0; j<N;j++){
-	// 		nwalkers = 0;
-	// 			nwalkers++;
-	// 	}
-	// }
+
 }
 
 void Combine::ConvertFromWalkers(double **u, string filename, int **index){

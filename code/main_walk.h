@@ -20,5 +20,7 @@
 #include "Tridiag.h"
 #include "Diffusion.h"
 #include "Combine.h"
+#include "Dendrite.h"
+
 
 #endif // MAIN_WALK_H
