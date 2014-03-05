@@ -100,10 +100,10 @@ int main(int argc, char** argv)
 
 	string RWname = "RWname";
 	bool test_convergence = false;
-	Combine BlackBox(m,n,0,1,0,1,aD,conversion_factor,Dt);
+	Dendrite BlackBox(m,n,0,1,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
-	BlackBox.AddWalkArea(x,y);
+	BlackBox.AddWalkArea(x,y,"python ","../../../Desktop/anders_stuff_master-master/code/base_code/","balle2.py");
 	cout<<"done!"<<endl;
 	for(int t=0; t<T; t++){
 		BlackBox.Solve();
