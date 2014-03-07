@@ -71,7 +71,8 @@ class Experiment:
 
 	def compile(self):
 		# os.system('g++ *.cpp -O2 -o -larmadillo -llapack -lblas main_walk')
-		os.system('g++ *.cpp -o main_walk -O2 -larmadillo -llapack -lblas -fopenmp')
+		# os.system('g++ *.cpp -o main_walk -O2 -larmadillo -llapack -lblas')
+		os.system('make')
 
 	def SetupRun(self,x0,x1,y0,y1,m,n,T,dt,filename="a"):
 		self.x0 = x0; self.x1 = x1; self.y0 = y0; self.y1 = y1
@@ -394,7 +395,7 @@ def D(x,y,t=0):
 	return np.ones(np.shape(x))
 
 if __name__ == '__main__':
-	DEBUG = False
+	DEBUG = True
 	save_files = True
 	mode = 'test'
 
