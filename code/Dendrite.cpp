@@ -3,7 +3,8 @@ using namespace std;
 using namespace arma;
 
 Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,double **DiffTensor, double factor, double Dt):Combine(M,N,X0,X1,Y0,Y1,DiffTensor,factor,Dt){
-
+	max_spine_contact_point = 4;
+	diffusie_into_spine_probability = 1e-3;
 	}
 
 void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
@@ -62,6 +63,20 @@ void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
 		}
 	}
 	inifile.close();
+}
+
+void Dendrite::AddSpine(double drift){
+	int m0[2];
+	m0[0] = 0;
+	m0[1] = m + 1;
+	while(m0[1]>=m){
+		m0[1] = m0[0]+1 +rng->uniform()*max_spine_contact_point;
+	}
+	spine_placements.push_back(m0);
+	Spine* tmp = new Spine(m0[0],m0[1],0.5,0.01);
+	spines.push_back(tmp);
+	spines[num_spines]->SetDrift(drift);
+	num_spines ++;
 }
 
 void Dendrite::AddWalkArea(double* x, double* y, string cmd, string path, string excecutable_name){
@@ -137,9 +152,27 @@ void Dendrite::Solve(void){
 		}
 		ConvertFromWalkers(U,inifilenames[i],indeces[i]);
 	}
+	for (vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
+		for(int i=0;i<100;i++){
+			if(rng->uniform()<diffusie_into_spine_probability){
+				(*spine)->AddIonFromDendrite();
+				U[(*spine)->pos + int(rng->uniform()*(*spine)->dendrite_gridpoints)][0] -= Hc;
+			}
+			(*spine)->Solve();
+		}
+		SpineBoundary((*spine));
+	}
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
 			Up[k][l] = U[k][l];
 		}
 	}
+}
+
+void Dendrite::SpineBoundary(Spine* spine){
+	int ions = 0;
+	for (vector<Walker*>::iterator i = spine->dendrite_boundary.begin(); i != spine->dendrite_boundary.end(); ++i){
+		U[spine->pos + int(round((*i)->r[0]/spine->dx))][0] += Hc;
+	}
+
 }

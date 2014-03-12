@@ -20,6 +20,8 @@
 #include "Tridiag.h"
 #include "Diffusion.h"
 #include "Combine.h"
+#include "Walker.h"
+#include "Spine.h"
 #include "Dendrite.h"
 
 
