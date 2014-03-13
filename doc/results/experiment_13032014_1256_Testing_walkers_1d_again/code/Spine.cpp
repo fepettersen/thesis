@@ -8,11 +8,10 @@ Spine::Spine(int spine_start, int spine_stop, double D, double dt){
 	max_spike_size = 15;
 	d = 2;
 	dendrite_gridpoints = spine_stop - spine_start;
-	pos = spine_start;
 	spike_probability = 5e-4;
 
 	neck_width = some_factor*dendrite_gridpoints;
-	neck_length = (1-0.5*rng->uniform())*neck_width;
+	neck_length = (1-rng->uniform())*neck_width;
 	head_height = 1-neck_length;
 	head_width = 0.5*(1-neck_width);
 	a = head_height/head_width;
@@ -23,10 +22,7 @@ Spine::Spine(int spine_start, int spine_stop, double D, double dt){
 	
 	_x1 = _y1 = 1.0;
 	_x0  =_y0 = 0.0;
-	dx = (dendrite_gridpoints>1)?(1.0/(dendrite_gridpoints-1)):(1.0);
-	cout<<"dx = "<<dx<<endl;
-	// cout<<endl<<"Values: "<<endl<<"neck_width = "<<neck_width<<endl;
-	// cout<<"neck_length = "<<neck_length<<endl<<"a = "<<a<<endl;
+	dx = 1.0/(dendrite_gridpoints-1);
 }
 
 void Spine::AddSpike(void){
@@ -48,8 +44,7 @@ void Spine::Solve(void){
 	// cout<<Ions.size()<<"  ";
 	// for(auto Ion:Ions){
 	for(vector<Walker*>::iterator Ion = Ions.begin(); Ion != Ions.end(); ++Ion){
-		int index = int(d*rng->uniform());
-		(*Ion)->r[index] += pow(-1,int(d*rng->uniform()))*(step_length);
+		(*Ion)->r[int((d+1)*rng->uniform())] += pow(-1,int((d+1)*rng->uniform()))*(step_length);
 		AddDrift((*Ion));
 		delete_me = checkpos((*Ion));
 		if (delete_me){
@@ -66,15 +61,15 @@ void Spine::AddIonFromDendrite(void){
 
 bool Spine::checkpos(Walker* ion){
 	if (ion->r[1]>=neck_length){
-		double minimum_y_value_right = right_limit(ion->r[0]);
-		double minimum_y_value_left = left_limit(ion->r[0]);
-		if (ion->r[1]<minimum_y_value_right){
-			ion->r[0] = (ion->r[1]-neck_length)/a + 0.5*(1+neck_width);
-			ion->r[1] += (minimum_y_value_right - ion->r[1]);
+		double tmpr = right_limit(ion->r[0]);
+		double tmpl = left_limit(ion->r[0]);
+		if (ion->r[1]<tmpr){
+			ion->r[0] -= (ion->r[1]-tmpr)/a;
+			ion->r[1] += (ion->r[1]-tmpr);
 		}
-		else if (ion->r[1]<minimum_y_value_left){
-			ion->r[0] = (ion->r[1]-1)/(-1*a);
-			ion->r[1] += (minimum_y_value_left - ion->r[1]);
+		else if (ion->r[1]<tmpl){
+			ion->r[0] += (ion->r[1]-tmpr)/a;
+			ion->r[1] += (ion->r[1]-tmpr);
 		}
 		if (ion->r[1]>_y1){
 			ion->r[1] = _y1 - (ion->r[1] - _y1);
@@ -109,7 +104,7 @@ void Spine::AddDrift(Walker* ion){
 void Spine::Write(string filename){
 	ofstream outfile (filename.c_str());
 	for (int i = 0; i < Ions.size(); ++i){
-		outfile<<Ions.at(i)->r[0]<<" "<<Ions.at(i)->r[1]<<endl;
+		outfile<<Ions.at(i)->r[0]<<" "<<Ions.at(i)->r[0]<<endl;
 	}
 	outfile.close();
 }

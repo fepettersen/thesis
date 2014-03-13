@@ -416,7 +416,7 @@ if __name__ == '__main__':
 
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
-	Hc = [40]
+	Hc = [4000]
 	# Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testing_walkers_1d_again'

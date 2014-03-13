@@ -9,7 +9,7 @@ string make_filename(string buffer,string filename,int conversion_factor,int ste
 		sprintf(buff,"/results_FE_Hc%d_n%04d.txt",conversion_factor,step_no);
 	}
 	else{
-		sprintf(buff,"%s_n%04d.txt",filename.c_str(),step_no);
+		sprintf(buff,"/%s_n%04d.txt",filename.c_str(),step_no);
 	}
   	buffer = buff;
   	// delete[] buff;
@@ -101,13 +101,15 @@ int main(int argc, char** argv)
 	string RWname = "spine";
 	bool test_convergence = false;
 
-	// Spine* s = new Spine(5,8,1.0,0.01);
-	// s->AddSpike();
+	Spine s = Spine(5,8,1.0,0.01);
+	s.AddSpike()
+	// string filename = "spine";
+	// string buffer;
+	for (int i = 0; i < T; ++i){
 
-	// for (int i = 0; i < T; ++i){
-	// 	s->Solve();
-	// 	s->Write(make_filename(buffer,RWname,conversion_factor,i));
-	// }
+		s.Solve();
+		s.Write(make_filename(buffer,RWname,conversion_factor,i));
+	}
 	Dendrite BlackBox(m,n,0,1,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
