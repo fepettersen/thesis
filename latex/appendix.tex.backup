@@ -119,8 +119,10 @@ Making sure your implementation is correct is a lot harder than it sounds, but t
  \item Exact numerical solution\\
  For a fitting initial condition (and discretization) you will be able to find an exact solution to the discretized equation you are implementing. An example of this is found in chapter \ref{exact_numerical_solution}. Your scheme should reproduce this solution to more or less machine precision. Note that you might run into round-off errors and overflow here in some cases (again, see chapter \ref{exact_numerical_solution}).\\
  \item Convergence test\\
- 
+ The discretization that is implemented will have some error term dependent on a discretization parameter (usually $\Delta t$, $\Delta x$ or some parameter $h$ used to determine the other discretization parameters) to some power. This power will determine the convergence rate of the numerical scheme, and you should verify that your implementation has the expected convergence. A convergence test is another way of saying that reducing the discretization parameter should reduce the error by the expected ammount. For a first order scheme the error should be halved by halving the time-step where as a second order scheme will get a reduction of $\frac{1}{4}$ for the same havlving of the discretization parameter. 
 \end{itemize}
+
+There are probably more ways to make sure that a finite difference scheme is working properly, but the ones listed will usually give a good implication.
 
 \subsection{Random walk and Monte Carlo methods}
 
@@ -132,8 +134,24 @@ If you are working with random walkers it also helps to look at the behavior of 
 One thing to look out for is the fact that a random walker in both one and two spatial dimensions will fill all space given enough steps. 
 Of course enough steps is infinitely many, but if you also implement reflecting boundaries and use some 4-5 walkers you will see a tendency after approximately $10^4$ steps. \\
 As we have discussed earlier the fluctuations in a MC-model are usually of a magnitude $\frac{1}{\sqrt N}$ this is also smart to verify. \\
-Finally, you should absolutely have the possibility to set the random seed and check that two runs with the same random seed produces the exact same result and makes sure you are using a RNG with a large enough period. The xor-shift algorithm by Geroge Marsagla \cite{} has a period of around $10^48$ which usually is more than adequate.
+Finally, you should absolutely have the possibility to set the random seed and check that two runs with the same random seed produces the exact same result and makes sure you are using a RNG with a large enough period. The xor-shift algorithm by Geroge Marsagla \cite{} has a period of around $10^{48}$ which usually is more than adequate.
 
 \subsection{The developed software}
 
-For some 2 months while working with this project I got really good results which seemed to verify all the important par
+For some 2 months while working with this project I got really good results which seemed to verify all the important parts of the theory. 
+Unfortunately it turned out that, while individually both parts of the program did exactly what they were supposed to do (verified by various tests), the combination of the two parts was implemented wrong. 
+What actually happened was a finer and finer round-off rather than taking some number of steps with random walkers and combining the two models. 
+It turned out that I sent an empty array to the random walk class as a new initial condition for the current time-step. \\
+The moral behind this little story is that you should make 100\% sure that every part of every function you write does exactly what you think it does, and nothing else. 
+Furthermore, if you rewrite your code, you should remove the old parts as soon as possible. If you use some kind of version control software, which you definitely should, you will have older versions saved in the version control anyways. Do not be nostalgic and simply comment out the old parts just in case something, this makes your code very messy, and leaves the possibility of something slipping past you.
+
+Another point to be made is that it will probably be helpfull to construct the different parts of your code in such a way that they can be run as independently of eachother as possible. 
+As an example, both the PDE-solver, its tridiagonal linear system solver and the spine object can with relatively small changes to the main-fine be run independently. 
+This allows for easier testing of the various parts of the code, and makes it more likely that the code will be reused in other projects.
+
+\subsection{When you cannot find the bug}
+
+While debugging (or any other repetative task involving your own work) it is remarkably easy to become blind to your mistakes. 
+The psychology behind this is (probably) that you have a clear idea of what should happen in each statement, and so you read that in stead of what the statement actually says. 
+When it comes to proof-reading you can supposedly read backwards word by word, but can you do something similar when reading code? 
+While I have never tried 

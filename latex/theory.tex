@@ -543,13 +543,31 @@ This section will deal with the actual combination of the two models.\\
 
 \subsection{The basic algorithm}\label{basic_algorithm}
 
-The basic structure of the program is to have one solver-object which contains one PDE-solver for the normal diffusion equation, and a linked list of random walk-solvers and their relevant areas. 
-Before we start we must add an initial condition along with some parameters such as the diffusion constant (/tensor) and $\Delta t$, and we have the opportunity to mark areas on the mesh where we want random walk solvers. 
-The method for adding walk-areas will map them to an index and set the initial condition for the walk. 
-In the future we plan to add the possibility of setting boundary conditions and having anisotropy follow into the random walk solvers as well.
-At each timestep we call the solve-method of the combined solver, which in turn calls the solve method for the PDE-solver. 
-We then loop over the random walk solvers and call their solve-methods. 
-The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the timestep is done. 
+The basic structure of the program is rather similar to the physical problem.
+There is one dendrite-object which contains the PDE-solver for the normal diffusion equation, with the possibility to use a random walk solver instead. 
+On the dendrite object spines can be placed, which in the physical world are the receiving end of a synapse. 
+Depending on what is being modeled, synaptic input is modeled by randomly added spikes of some random number of molecules which spawn at the far end of the spine. 
+In the overlapping points where the spine is located on the dendrite mesh, the coupling is done as follows: 
+If a random walker in the spine comes in contact with the position labeled as the ``end'' of the spine it is moved from the list of active walkers to a list of walkers which have moved out of the spine. 
+Similarly, at each time-step a part of the PDE-solution corresponding to one walker will diffuse into the spine with a certain probability. 
+It might be desirable for a walker to only be able to diffuse out of the spine with some probability as well, or for the walkers which diffuse into the spine to have some drift term, but these are minor updates and might be added later if needed. \\
+
+There is also the possibility of modeling parts of the dendrite-mesh as random walk (This can be done in 2d as well as 1d). 
+This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
+Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{farnell2005monte}. 
+At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 
+The solution from the PDE-solver is used to calculate the number of walkers by eq. \ref{} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
+Because the sum of the PDE-solution over the random walk area of the mesh might be different from one time-step to the next (eq. \ref{integral_u}) the conversion from PDE-solution to random walker distribution must be done at every time-step. 
+The alternatives are to remove or add the difference at each time-step, but this will require checking that each mesh-point has the ``correct'' number of walkers and updating the number to correspond with the solution from the PDE-solver. \emph{which is what we are doing already?}
+Or the conversion factor could be adjusted at each time-step. The latter is largely a bad solution because it ruins transparency and might introduce even more fluctuations in the solution.
+
+\begin{equation}\label{integral_u}
+ \sum u_{i,j}^n \neq \sum u_{i,j}^{n+1}
+\end{equation}
+After the random walk integration the two solutions are combined by a simple average. A few other methods have been tested (see chapter \ref{}) but discarded. 
+The average of the two solutions is then set as the new ``initial condition'' for the next time-step, and the  process repeats itself.
+
+The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the time-step is done. 
 A schematic of the algorithm is provided in figure \ref{schematic}.
 
 \begin{figure}[H]

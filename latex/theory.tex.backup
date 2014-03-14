@@ -543,13 +543,25 @@ This section will deal with the actual combination of the two models.\\
 
 \subsection{The basic algorithm}\label{basic_algorithm}
 
-The basic structure of the program is to have one solver-object which contains one PDE-solver for the normal diffusion equation, and a linked list of random walk-solvers and their relevant areas. 
-Before we start we must add an initial condition along with some parameters such as the diffusion constant (/tensor) and $\Delta t$, and we have the opportunity to mark areas on the mesh where we want random walk solvers. 
-The method for adding walk-areas will map them to an index and set the initial condition for the walk. 
-In the future we plan to add the possibility of setting boundary conditions and having anisotropy follow into the random walk solvers as well.
-At each timestep we call the solve-method of the combined solver, which in turn calls the solve method for the PDE-solver. 
-We then loop over the random walk solvers and call their solve-methods. 
-The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the timestep is done. 
+The basic structure of the program is rather similar to the physical problem.
+There is one dendrite-object which contains the PDE-solver for the normal diffusion equation, with the possibility to use a random walk solver instead. 
+On the dendrite object spines can be placed, which in the physical world are the receiving end of a synapse. 
+Depending on what is being modeled, synaptic input is modeled by randomly added spikes of some random number of molecules which spawn at the far end of the spine. 
+There is also the possibility of modeling parts of the dendrite-mesh as random walk (This can be done in 2d as well as 1d). 
+This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
+Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{Farnell_2001_Monte}. 
+At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 
+The solution from the PDE-solver is used to calculate the number of walkers by eq. \ref{} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
+Because the sum of the PDE-solution over the random walk area of the mesh might be different from one time-step to the next (eq. \ref{integral_u}) the conversion from PDE-solution to random walker distribution must be done at every time-step. 
+The alternatives are to remove or add the difference at each time-step, but this will require checking that each mesh-point has the ``correct'' number of walkers and updating the number to correspond with the solution from the PDE-solver. \emph{which is what we are doing already?}
+Or the conversion factor could be adjusted at each time-step. The latter is largely a bad solution because it ruins transparency and might introduce even more fluctuations in the solution.
+
+\begin{equation}\label{integral_u}
+ \sum u_{i,j}^n \neq \sum u_{i,j}^{n+1}
+\end{equation}
+
+
+The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the time-step is done. 
 A schematic of the algorithm is provided in figure \ref{schematic}.
 
 \begin{figure}[H]
@@ -639,11 +651,17 @@ Of course this is assuming that we use a random walk algorithm of fixed step-len
 Equation \ref{steplength} is proportional to the square-root of the adjusted time-step. 
 We have already suggested that the error term from the RW simulation depends on the number of walkers we use (or the conversion rate). This equation suggests that the error term also depends on the time step. 
 Though this might seem a bit frustrating at first glance, but it answers a question we asked earlier; how many time-steps do we need to take at the RW-level. 
-We have the intuitive relation between the RW time-step, $\Delta \tile t$ and the PDE time-step through the number of steps at the RW level, $T$:
+We have the intuitive relation between the RW time-step, $\Delta \tilde t$ and the PDE time-step through the number of steps at the RW level, $T$:
 \begin{equation*}
  \Delta \tilde t = \frac{\Delta t}{T}
 \end{equation*}
+Further we suggested that the error from the RW simulation is proportional to the root of the time-step $\epsilon \propto \sqrt{\Delta \tilde t} = \sqrt{\frac{\Delta t}{T}}$. We want to force this error to behave as $\mathcal O(\Delta t)$, and see that we can adjust the number of time-steps at the RW level in order to make this happen.
+\begin{equation}
+ \mathcal O(\Delta t)>\sqrt \frac{\Delta t}{T} \implies T>\frac{1}{\Delta t}
+\end{equation}
 
+Combined with the demand to the number of walkers we will quickly end up with an extreme computational demand if we want to force our model to have first order convergence (not to mention second order convergence). 
+Fortunately we will ignore this demand outside of verification because there is little physical meaning left if we use the demanded number of walkers.
 
 \section{Geometry}
 Any finite difference method is problematic to solve on anything else than a rectangular grid. 
