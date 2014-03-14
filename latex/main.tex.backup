@@ -11,14 +11,15 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{epstopdf}
-
+\usepackage{nomencl}
+\makenomenclature
 
 \usepackage[backend=bibtex]{biblatex}
 % \bibliography{bibtex_ref_test.bib}
 \bibliography{references.bib}
 
 \renewcommand{\d}{\partial}
-
+\renewcommand{\nomname}{List of Abbreviations}
 
 \setlength{\headheight}{15pt}
 
@@ -36,6 +37,7 @@
 
 
 % compile with pdflatex --shell-escape main.tex
+% makeindex main.nlo -s nomencl.ist -o main.nls
 
 %opening
 \author{Fredrik E Pettersen\\ f.e.pettersen@fys.uio.no}
@@ -66,11 +68,16 @@
 \tableofcontents
 \clearpage
 \listoffigures
+
+\clearpage
+\printnomenclature
+
 % \clearpage
 % \listoftables
 
 \chapter{Introduction}
 \include{Intro}
+\nomenclature{PDE}{Parital Differential Equation}
 
 \chapter{Basic Theory}
 \include{theory}

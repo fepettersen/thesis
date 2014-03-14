@@ -101,7 +101,7 @@ Finally by insertion we find the variance $\langle \Delta x^2\rangle$
 
 \subsection{More general Random Walks}\label{more_general_random_walks}
 
-In the more general case, the position of a random walker,$\vec{r}$ at a time $t_i$ is given by the sum
+In the more general case, the position of a random walker, $\vec{r}$ at a time $t_i$ is given by the sum
 \begin{equation}\label{brownian_motion}
  \vec{r}(t_i)=\sum\limits_{j=0}^i \Delta \vec{x}(t_j)
 \end{equation}
@@ -295,13 +295,13 @@ Inserting this gives us
 \end{align*}
 
 The discretization of the time-derivative is where we can see a difference between the two schemes we will use in this project. 
-When ordinary differential equations are discretized one can clearly see how this difference arises, and so we will write our PDE using a new notation
+When ordinary differential equations are discretized one can clearly see how this difference arises, and so we will write our PDE \nomenclature{PDE}{Parital Differential Equation} using a new notation
 \begin{equation}
  D_t u = Ou
 \end{equation}
 where the right-hand-side operator $O$ indicates some operation like the double spatial derivative. 
 Introducing the general discretization of the time derivative gives us equation \ref{theta_rule} known as theta-rule. 
-Setting $\theta = 0$ yields the FE discretization, and $\theta = 1$ the BE discretization. 
+Setting $\theta = 0$ yields the FE\nomenclature{FE}{Forward Euler} discretization, and $\theta = 1$ the BE \nomenclature{BE}{Backward Euler} discretization. 
 
 \begin{equation}\label{theta_rule}
  \frac{u^{n+1}-u^n}{\Delta t} = O\left(\theta u^{n+1} +(1-\theta)u^n\right)
