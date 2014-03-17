@@ -16,7 +16,7 @@ public:
 	void Solve(void);
 	void AddSpine(double drift=0);
 	void SpineBoundary(Spine*);
-	double minimum,maximum;
+	double minimum,maximum,dt;
 	
 	int max_spine_contact_point, num_spines, left_spine_pos_limit, right_spine_pos_limit;
 	double diffusie_into_spine_probability;
@@ -24,5 +24,6 @@ public:
 	std::vector<Spine*> spines;
 	std::vector<int*> spine_placements;
 	std::vector<std::string> command;
+	std::vector<Walker*> dendrite_walkers;
 };
 #endif // DENDRITE_H

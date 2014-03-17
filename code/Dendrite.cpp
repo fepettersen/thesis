@@ -7,6 +7,8 @@ Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,doub
 	left_spine_pos_limit = 2;
 	right_spine_pos_limit = m - 2;
 	diffusie_into_spine_probability = 1e-3;
+	dt = Dt;
+	num_spines = 0;
 	}
 
 void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
@@ -52,6 +54,8 @@ void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
 		for(int j=0; j<N; j++){
 			for(int l=0; l<Conc[i][j]; l++){
 				thingy = x[i]+0.99*DX*(0.5-rng->uniform());
+				Walker* tmp = new Walker(thingy,0);
+				dendrite_walkers.push_back(tmp);
 				inifile<<"Ar "<<thingy<<" ";
 				if(d==2){
 					thingy = y[i]+0.99*DY*(0.5-rng->uniform());
@@ -76,7 +80,7 @@ void Dendrite::AddSpine(double drift){
 		m0[1] = m0[0]+1 +rng->uniform()*max_spine_contact_point;
 	}
 	spine_placements.push_back(m0);
-	Spine* tmp = new Spine(m0[0],m0[1],0.5,0.01);
+	Spine* tmp = new Spine(m0[0],m0[1],aD[0][0],dt);
 	spines.push_back(tmp);
 	spines[num_spines]->SetDrift(drift);
 	num_spines ++;
@@ -145,27 +149,41 @@ void Dendrite::AddWalkArea(double* x, double* y, string cmd, string path, string
 void Dendrite::Solve(void){
 	pde_solver->advance(U,Up,m,n);
 	char diffT[40];
-	for(int i=0; i<walk_areas;i++){
-		ConvertToWalkers(U,inifilenames[i],indeces[i]);
-		int failure = system(command[i].c_str());
-		if(failure){
-			cout<<endl;
-			cout<<"command \""<<command[i]<<"\" gave return value: "<<failure<<endl;
-			cout<<endl<<endl;
-			exit(1);
+	// for(int i=0; i<walk_areas;i++){
+	// 	ConvertToWalkers(U,inifilenames[i],indeces[i]);
+	// 	int failure = system(command[i].c_str());
+	// 	if(failure){
+	// 		cout<<endl;
+	// 		cout<<"command \""<<command[i]<<"\" gave return value: "<<failure<<endl;
+	// 		cout<<endl<<endl;
+	// 		exit(1);
+	// 	}
+	// 	ConvertFromWalkers(U,inifilenames[i],indeces[i]);
+	// }
+	double step_length = sqrt(2*d*aD[0][0]*dt);
+	for(int i=0;i<100;i++){
+		for(vector<Walker*>::iterator Ion = dendrite_walkers.begin(); Ion != dendrite_walkers.end(); ++Ion){
+			(*Ion)->r[0] += pow(-1,int(2*rng->uniform()))*(step_length);
+			if ((*Ion)->r[0] < x0 - dx/2.0){
+				(*Ion)->r[0] += (x0-dx/2.0) - (*Ion)->r[0];
+			}
+			if ((*Ion)->r[0] < x1 + dx/2.0){
+				(*Ion)->r[0] += (x1 + dx/2.0) - (*Ion)->r[0];
+			}
 		}
-		ConvertFromWalkers(U,inifilenames[i],indeces[i]);
-	}
-	for (vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
-		for(int i=0;i<100;i++){
+		for (vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
 			if(rng->uniform()<diffusie_into_spine_probability){
+				/*Particle diffusing into spine*/
 				fprintf(stderr,"Particle diffusing into spine\n");
 				(*spine)->AddIonFromDendrite();
 				U[(*spine)->pos + int(rng->uniform()*(*spine)->dendrite_gridpoints)][0] -= 1.0/Hc;
+				/*Pick a random random walker at relevant position and delete it*/
+				// dendrite_walkers.delete()
 			}
 			(*spine)->Solve();
+			/*Particles diffusing from spine*/
+			SpineBoundary((*spine));
 		}
-		SpineBoundary((*spine));
 	}
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
@@ -178,6 +196,8 @@ void Dendrite::SpineBoundary(Spine* spine){
 	int ions = 0;
 	for (vector<Walker*>::iterator i = spine->dendrite_boundary.begin(); i != spine->dendrite_boundary.end(); ++i){
 		U[spine->pos + int(round((*i)->r[0]/spine->dx))][0] += 1.0/Hc;
+		(*i)->r[1] = 0;
+		dendrite_walkers.push_back((*i));
 	}
 	// cout<<"Dendrite::SpineBoundary:"<<endl<<"boundary ions: "<<spine->dendrite_boundary.size()<<endl;
 	spine->dendrite_boundary.clear();

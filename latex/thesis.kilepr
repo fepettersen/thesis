@@ -3,8 +3,8 @@ def_graphic_ext=
 img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
-kileversion=2.1.3
-lastDocument=appendix.tex
+kileversion=2.1.0
+lastDocument=analysis.tex
 masterDocument=
 name=Project
 pkg_extIsRegExp=false
@@ -94,7 +94,7 @@ highlight=LaTeX
 line=69
 mode=LaTeX
 open=true
-order=3
+order=2
 
 [item:analysis.tex]
 archive=true
@@ -104,7 +104,7 @@ highlight=LaTeX
 line=515
 mode=LaTeX
 open=true
-order=1
+order=0
 
 [item:appendix.tex]
 archive=true
@@ -114,7 +114,7 @@ highlight=LaTeX
 line=161
 mode=LaTeX
 open=true
-order=2
+order=1
 
 [item:main.tex]
 archive=true
@@ -124,7 +124,7 @@ highlight=LaTeX
 line=20
 mode=LaTeX
 open=true
-order=0
+order=6
 
 [item:results.tex]
 archive=true
@@ -134,7 +134,7 @@ highlight=LaTeX
 line=3
 mode=LaTeX
 open=true
-order=4
+order=3
 
 [item:software.tex]
 archive=true
@@ -144,7 +144,7 @@ highlight=LaTeX
 line=44
 mode=LaTeX
 open=true
-order=5
+order=4
 
 [item:theory.tex]
 archive=true
@@ -154,7 +154,7 @@ highlight=LaTeX
 line=556
 mode=LaTeX
 open=true
-order=6
+order=5
 
 [view-settings,view=0,item:Intro.tex]
 CursorColumn=48
