@@ -1,51 +1,62 @@
 
-In this chapter we will take a closer look at random walks, both in general and the transition from the statistical view to partial differential equations. 
-We will take a look at different algorithms to produce random walks, and discuss their pros and cons in light of this project. 
-Then we will take a quick look at partial differential equations and numerical solution of them.
+This chapter will deal with random walks in general and the transition from the statistical view to PDEs. 
+Different algorithms to produce random walks (and pseudo-random numbers?) will be discussed, highlighting their pros and cons in light of this project along with some details which prove either problematic or helpful. 
+Numerical solution of PDEs will also be discussed, also with emphasis on what is relevant for this project. 
+Finally an algorithm for combining random walk diffusion solvers and normal PDE diffusion solvers will be introduced and discussed.
+
 
 \section{Introduction to random walks}\label{introduction_to_random_walks}
 The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
 Using (pseudo-) random numbers on a computer we can simulate the outcomes of a random walk. 
-For each step (of which there are N) we draw a random number, r, between 0 and 1 from some distribution (say a uniform one) which will be the probability. 
+For each step (of which there are N) a random number, $r\in [0,1]$ is drawn from some distribution (say a uniform one) which will be the probability. 
 If $r\leq p$ the walker will take a step to the left, otherwise it will take a step to the right. 
 After the N steps the walker will have taken R steps to the right, and $L = N-R$ steps to the left. 
 The net displacement from the origin will be $S = R-L$. \\
 This simple approach is easily generalizable to two and three dimensions by having $2d$ possible outcomes from the random number, where d is the dimensionality. 
-In two dimensions the walker will step up if $r\in(0.75,1]$ and left if $r\in[0,0.25)$, for example.
+In two dimensions the walk can be split in two; first randomly choosing what dimension to perform the step in and then randomly choosing the sign of the step ($(-1)^r\cdot l$).
 
-\subsection{Further discussion and analysis of the introduction}\label{further_introduction}
+\subsection{Random walkers and Gaussian distribution}\label{further_introduction}
 The following derivation is borrowed from a compendium in statistical mechanics by Finn Ravndal. \\
-If we do sufficiently many walks, the net displacement will vary from $S=+N$ to $S=-N$ representing all steps to the right and all steps to the left respectively. 
+If sufficiently many walks are done, the net displacement will vary from $S=+N$ to $S=-N$ representing all steps to the right and all steps to the left respectively. 
 The probability of all steps being to the right is $P_N(N) = p^N$. 
-Should one of the steps be to the left, and the rest to the right we will get a net displacement of $S = N-2$ with the probability $P_N(R = N-1) = Np^{N-1}q$. 
-We can generalize this to finding the probability of a walk with a R steps to the right as 
+Should one of the steps be to the left, and the rest to the right the resulting net displacement will be $S = N-2$ with the probability $P_N(R = N-1) = Np^{N-1}q$. 
+This can be generalized to finding the probability of a walk with a R steps to the right as 
 \begin{equation}\label{bernoulli_distr}
  P_N(R) = {N\choose R}p^{R}q^{N-R}
 \end{equation}
 where ${N\choose R}=\frac{N!}{R!(N-R)!}$ is the number of walks which satisfy the net displacement in question, or the multiplicity of this walk in statistical mechanics terms. 
 Equation \ref{bernoulli_distr} is the Bernoulli probability distribution, which is normalized.
+
 \begin{align*}
  \sum\limits_{R=0}^N P_N(R) = (p+q)^N = 1^N = 1
 \end{align*}
-We can use this distribution to calculate various average properties of a walk consisting of N steps. 
+
+From this distribution important statistical properties of a walk consisting of some N steps can be calculated.
+% We can use this distribution to calculate various average properties of a walk consisting of N steps. 
 For example, the average number of steps to the right is
+
 \begin{align*}
  \langle R\rangle &=  \sum\limits_{R=0}^N RP_N(R) =  \sum\limits_{R=0}^N {N\choose R}Rp^Rq^{N-R} = \\
  p\frac{d}{dp} \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= p\frac{d}{dp}(p+q)^N = Np(p+q)^{N-1} = Np
 \end{align*}
-From this we can also find the average value of the net displacement using $S = R-L = R-(N-R) = 2R-N$.
+
+The average value of the net displacement is found by using $S = R-L = R-(N-R) = 2R-N$.
+% From this we can also find the average value of the net displacement using $S = R-L = R-(N-R) = 2R-N$.
+
 \begin{align*}
  \langle S\rangle = \langle2R\rangle -N = 2Np-N(p+q) = N(2p-p-q) = N(p-q)
 \end{align*}
 We notice that the average net displacement is greatly dependent on the relationship between $p$ and $q$, and that any symmetric walk will have an expected net displacement of zero. 
-In many cases we will be more interested in the mean square displacement than the displacement itself, because many important large scale parameters can be related to the root-mean-square displacement. 
+In many cases the mean square displacement is of more interest than the displacement itself, because many important large scale parameters can be related to the root-mean-square displacement. 
 This can also be calculated rather straightforwardly. 
 \begin{align*}
   \langle R^2\rangle =  \sum\limits_{R=0}^N R^2P_N(R) &=  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
  \left(p\frac{d}{dp}\right)^2 \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= \left(p\frac{d}{dp}\right)^2(p+q)^N \\
  = Np(p+q)^{N-1} +p^2N(N-1)(p+q)^{N-2} &= (Np)^2 +Np(1-p) = (Np)^2 +Npq
 \end{align*}
+
 Like before, the average net displacement is given as $S^2 = (2R-N)^2$ and we obtain
+
 \begin{align*}
  \langle S^2\rangle = 4\langle R^2\rangle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
  = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq.
@@ -55,8 +66,8 @@ which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, 
  \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq 
 \end{align}
 
-When the number of steps gets very large we can approximate the Bernoulli distribution (eq. \ref{bernoulli_distr}) by the Gaussian distribution. 
-This is most easily done in the symmetric case where $p=q=\frac{1}{2}$, but it is sufficient for the steplengths to have a finite variance (\emph{find something to refer to}). 
+When the number of steps gets very large the Bernoulli distribution (eq. \ref{bernoulli_distr}) can to a very good accuracy be approximated by the Gaussian distribution. 
+This is most easily done in the symmetric case where $p=q=\frac{1}{2}$, but it is sufficient for the step-lengths to have a finite variance (\emph{find something to refer to}). 
 The Bernoulli distribution then simplifies to
 \begin{equation}
  P(S,N) = \left(\frac{1}{2}\right)^N\frac{N!}{R!L!}
@@ -67,22 +78,35 @@ on which we apply Stirling's famous formula for large factorials $n!\simeq\sqrt{
  &= \exp\left(-N\ln2+\ln\sqrt{2\pi N}+N\ln N - \ln\sqrt{2\pi R} -R\ln R - \ln\sqrt{2\pi L} - L\ln L \right) \\
  &= \sqrt{\frac{N}{2\pi RL}}\exp\left(-R\ln\frac{2R}{N}-L\ln\frac{2L}{N}\right)
 \end{align*}
-Where we have used $R+L=N$. We now insert for $\frac{2R}{N}=1+\frac{S}{N}$ and $\frac{2L}{N}=1-\frac{S}{N}$ and expand the logarithms to first order, $RL=\frac{N^2-S^2}{4}$ in the prefactor, and approximate $1-\frac{S^2}{N^2}\simeq1$. This gives
+
+Where we have used $R+L=N$. 
+Inserting $\frac{2R}{N}=1+\frac{S}{N}$ and $\frac{2L}{N}=1-\frac{S}{N}$ and expanding the logarithms to first order results in
+\begin{align*}
+ P(S,N) &= \sqrt{\frac{N}{2\pi RL}}\exp\left(-\frac{N+S}{2}\frac{S}{N} + \frac{N-S}{2}\frac{S}{N}\right)\\
+ &= \sqrt{\frac{N}{2\pi RL}}\exp\left(-\frac{S^2}{2N}\right)
+\end{align*}
+
+Then inserting $RL=\frac{N^2-S^2}{4}$ in the prefactor, and approximating $1-\frac{S^2}{N^2}\simeq1$ results in a discrete Gaussian distribution (eq. \ref{descrete_gaussian_distr}) with $\langle S\rangle = 0$  and $\langle S^2\rangle = N$.
+
 \begin{equation}\label{descrete_gaussian_distr}
  P(S,N) =\sqrt{\frac{2}{\pi N}}\exp\left(\frac{-S^2}{2N}\right)
 \end{equation}
-which is an ordinary, discrete Gaussian distribution with $\langle S\rangle = 0$  and $\langle S^2\rangle = N$. 
-If we keep assuming that the walker is on the x-axis, and let the step length, a, get small the final position will be $x=Sa$ which we can assume is a continuous variable. 
-Similarly, we let the time interval between each step, $\tau$, be small and let the walk run for a continuous time $t=N\tau$. This changes the distribution \ref{descrete_gaussian_distr} to
+
+A continuous final position can be derived by assuming that the walker is moving on the x-axis, and letting the step-length, a, get small. 
+The final position is now the continuous variable $x=Sa$.
+% If we keep assuming that the walker is on the x-axis, and let the step length, a, get small the final position will be $x=Sa$ which we can assume is a continuous variable. 
+Similarly the time interval between each step, $\tau$ is assumed to be small, and the walker now runs for a continuous time-variable $t=N\tau$.
+% Similarly, we let the time interval between each step, $\tau$, be small and let the walk run for a continuous time $t=N\tau$. 
+This changes the distribution \ref{descrete_gaussian_distr} to
 \begin{equation}
  P(x,t) = \frac{1}{2a}\sqrt{\frac{2\tau}{\pi t}}\exp\left(-\frac{x^2\tau}{2a^2t}\right). 
 \end{equation}
 The prefactor $\frac{1}{2a}$ is needed to normalize the continuous probability distribution since the separation between each possible final position in walks with the same number of steps is $\Delta x=2a$. 
-We also introduce the diffusion constant
+Introducing the diffusion constant
 \begin{equation}
 D = \frac{a^2}{2\tau} 
 \end{equation}
-making the distribution
+makes the distribution
 \begin{equation}
  P(x,t) = \sqrt{\frac{1}{4\pi Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
@@ -93,7 +117,7 @@ We have $x=Sa$ which means
 $$\langle x\rangle=a\langle S\rangle$$ 
 and 
 $$\langle x^2\rangle=a^2\langle S^2\rangle$$
-Finally by insertion we find the variance $\langle \Delta x^2\rangle$
+Finally, the variance is found by insertion $\langle \Delta x^2\rangle$
 \begin{equation}\label{random_walk_variance}
  \langle \Delta x^2\rangle = \langle\langle x^2\rangle -\langle x\rangle^2\rangle = \langle a^2\langle S^2\rangle -a^2\langle S\rangle^2\rangle = 4Npqa^2
 \end{equation}
@@ -101,7 +125,7 @@ Finally by insertion we find the variance $\langle \Delta x^2\rangle$
 
 \subsection{More general Random Walks}\label{more_general_random_walks}
 
-In the more general case, the position of a random walker,$\vec{r}$ at a time $t_i$ is given by the sum
+In the more general case, the position of a random walker, $\vec{r}$ at a time $t_i$ is given by the sum
 \begin{equation}\label{brownian_motion}
  \vec{r}(t_i)=\sum\limits_{j=0}^i \Delta \vec{x}(t_j)
 \end{equation}
@@ -116,83 +140,88 @@ $$
 \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{(n-\mu)^2}{2\sigma^2}\right)
 $$
 
-We can introduce an Einstein relation $\sigma^2 = 2dD\Delta t$ and the obvious relation $t = M\Delta t$ to get a more desirable exponent.
-We see that $\langle \Delta x^2\rangle = 2Dt$ in the one dimensional case where $d=1$. 
+Introducing an Einstein relation $\sigma^2 = 2dD\Delta t$ and the obvious relation $t = M\Delta t$ results in a more desirable exponent. 
 
-\emph{The introduction of the Einstein relation might put some restrictions on our model.}
-Normalizing the expression gives us 
+\emph{The introduction of the Einstein relation might put some restrictions on the model.}
+Normalizing the expression gives
 \begin{equation}\label{rw_gaussian_distribution}
  P(x,t) = \sqrt{\frac{1}{4Dt}}\exp\left(-\frac{x^2}{4Dt}\right)
 \end{equation}
 
-If we have a large number, N, of walkers, their concentration will be $C(x,t) = NP(x,t)$. 
+A large number, N, of walkers can be described by their concentration $C(x,t) = NP(x,t)$.
+% If we have a large number, N, of walkers, their concentration will be $C(x,t) = NP(x,t)$. 
 The concentration is conserved, so any amount that flows out of an area must reflect as a decrease in concentration. 
-We can express this by the flow of concentration
+This is expressed by the flow of concentration
 \begin{equation}
  \frac{\d C}{\d t} -\nabla\cdot\vec{J} = S
 \end{equation}
-where $\vec{J}$ is the flow vector and S is a source term which in our case will be zero.
-From Fick's first law we know that $\vec{J} = -D\nabla C$. Inserting this gives us
+where $\vec{J}$ is the flow vector and S is a source term which for now is zero.
+Through Fick's first law the diffusive flux is related to the concentration gradient $\vec{J} = -D\nabla C$. 
+Inserting this gives
 \begin{equation}\label{simple_diffusion_equation}
  \frac{\d C}{\d t} = \nabla\cdot \left(D\cdot\nabla C\right)
 \end{equation}
 which is the diffusion equation.
-By insertion we can check that this version (\ref{rw_gaussian_distribution}) of the Gaussian distribution fulfills the diffusion equation. 
-Starting with only the time derivative gives us
+Insertion of the Gaussian distribution \ref{rw_gaussian_distribution}) verifies that the Gaussian distribution fulfills the diffusion equation. 
+Starting with only the time derivative gives
 \begin{align*}
  \frac{\d P}{\d t} = -\frac{4\pi D\exp\left(-\frac{x^2}{4Dt}\right)}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2\exp\left(-\frac{x^2}{4Dt}\right)}{4Dt^2\sqrt{4\pi Dt}} \\
  = \exp\left(-\frac{x^2}{4Dt}\right)\left(\frac{8Dx^2}{2\sqrt{\pi}(4Dt)^{5/2}} -\frac{(4D)^2t}{2\sqrt{\pi}(4Dt)^{5/2}}\right)&= \frac{4D\exp\left(-\frac{x^2}{4Dt}\right)(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
 \end{align*}
- We then finish by doing the spatial derivative
+ Which is balanced by the spatial derivative
 \begin{align*}
  D\frac{\d^2 P}{\d x^2} &= \frac{D}{\sqrt{4\pi Dt}}\frac{\d}{\d x}\left[-\exp\left(\frac{-x^2}{4Dt}\right)\left(\frac{-2x}{4Dt}\right)\right]\\
  = \frac{2D}{4Dt\sqrt{4\pi Dt}}&\exp\left(\frac{-x^2}{4Dt}\right)\left[1-x\left(\frac{2x}{4Dt}\right)\right] = \frac{4D\exp\left(-\frac{x^2}{4Dt}\right)(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
 \end{align*}
-and see that they are equal, meaning that the diffusion equation is satisfied.
+meaning that the diffusion equation is satisfied.
 
 \subsection{Choosing random walk algorithm}\label{choosing_random_walk_algorithm}
 
 The simplest random walk model, which places walkers on discrete mesh points and uses a fixed step length, has been used with great success to model diffusion processes. 
 Farnell and Gibson discuss this in their article \cite{farnell2005monte}. 
-In this project we will be torn between chosing a realistic algorithm to advance the random walkers, like brownian motion or to go for simplicity. 
-That being said, by the central limit theorem both models will after some timesteps be described by a Gaussian distribution meaning that on the PDE scale we will not know the difference. 
+In this project we will be torn between choosing a realistic algorithm to advance the random walkers, like Brownian motion or to go for simplicity. 
+That being said, by the central limit theorem both models will after some time-steps be described by a Gaussian distribution meaning that on the PDE scale we will not know the difference. 
 Hence it will make no sense to not use the simplest random walk model.
-We should note that it will be quite easy to change the algorithm used for random walks, and so we have not locked ourselves to anything yet.
+Note that it will be quite easy to change the algorithm used for random walks, and so we have not locked ourselves to anything yet.
 
 \subsection{Random walks and anisotropy}\label{random_walks_and_anisotropy}
 
-Any real problem where parts of the diffusion process cannot be modelled by the continuum approximation is bound to be anisotropic. 
-There is reason to believe that an anisotropic diffusion process on the PDE level will lead to an anisotropic random walk model as well, but how do we model this. 
-If we simply replace the diffusion constant by a function $D = D(\vec{x})$ (see eq \ref{steplength}) we are at least started, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
-Through their experiments they found that only adjusting the steplength will not improve the error noticeably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
-They went on to introduce an adjusted steplength and an adjusted step probability, a solution they landed on after trial and error. 
+Although the self diffusion problem, which is what we are looking at with diffusing particles in and out of dendritic spines is not anisotropic on its own, there might be some possible applications which require describing anisotropic diffusion of random walkers.
+There is reason to believe that an anisotropic diffusion process on the PDE level will lead to an anisotropic random walk model as well, but how should this be modeled. 
+Simply replacing the diffusion constant by a function $D = D(\vec{x})$ (see eq \ref{steplength}) is a natural first approximation, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
+Through their experiments they found that only adjusting the step-length will not improve the error noticeably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
+They went on to introduce an adjusted step-length and an adjusted step probability, a solution they landed on after trial and error. 
 The expressions they proposed are listed in equations \ref{farnell_and_gibson_1} to \ref{farnell_and_gibson_5}. 
+
 \begin{equation}\label{farnell_and_gibson_1}
  \Delta_p(x) = \frac{1}{2}\left(L(x) + L(x +\Delta_p(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
 \end{equation}
 \begin{equation}\label{farnell_and_gibson_2}
  \Delta_m(x) = \frac{1}{2}\left(L(x) + L(x -\Delta_m(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
 \end{equation}
-where $L(x)$ is defined in equation \ref{farnell_and_gibson_3} and $\Delta_p(x)$ and $\Delta_m(x)$ are the adjusted steplengths to the right and left, respectively.
+
+where $L(x)$ is defined in equation \ref{farnell_and_gibson_3} and $\Delta_p(x)$ and $\Delta_m(x)$ are the adjusted step-lengths to the right and left, respectively.
+
 \begin{equation}\label{farnell_and_gibson_3}
 L(x) = \sqrt{2D(x)\Delta t}
 \end{equation}
-We also have the adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker at position x to jump right or left, respectively. 
-These are defined in equations \ref{farnell_and_gibson_4} and \ref{farnell_and_gibson_5}
+The adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker at position x to jump right or left, respectively are defined in equations \ref{farnell_and_gibson_4} and \ref{farnell_and_gibson_5}
+
 \begin{equation}\label{farnell_and_gibson_4}
 T_r(x) = \frac{1}{2} +\frac{1}{4}L'(x)
 \end{equation}
 \begin{equation}\label{farnell_and_gibson_5}
 T_l(x) = \frac{1}{2} -\frac{1}{4}L'(x)
 \end{equation}
-We notice that the adjusted steplength we proposed to start with is still a part of the final expressions.
+Notice that the adjusted step-length first proposed is still a part of the final expressions.
 
 
 \subsection{Random walks and drift}\label{random_walks_and_drift}
 
-Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
+Another point which should be addressed is diffusion with a drift term, $\frac{\d u}{\d x}$. 
+% Another point we have yet to say something about is diffusion that has a drift term, $\frac{\d u}{\d x}$. 
 
-Initially one thought that diffusion in the Extra Cellular Space of the brain was governed by a drift term, but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}. 
+Initially one thought that diffusion in the ECS of the brain was governed by a drift term, but the modern perception is that this drift term is in the very least negligible \cite{nicholson2001diffusion}. 
 Though it is unlikely that we will include a drift term in our model, we will say a few words about it here since it is of importance in other applications and might be a natural extension at some point, should someone else use this work.\\
 We model random walkers with drift by simply adding some vector to the Brownian motion model, thus forcing all walkers to have a tendency to walk a certain direction. 
 This approach can also be used in the fixed steplength (or variable steplength in the anisotropic case)  if we express the new step, $\vec{s}$, as
@@ -267,41 +296,45 @@ Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is t
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
 \subsection{Discretizing}\label{discretizing}
 
-To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation in 2d. The extension to 3d is trivial, as is the 1d version.
+To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation in 2d. The extension to 3d is trivial, as is the 1d version. The drift term will be omitted in the beginning because this also results in a simple addition to the numerical scheme. The equation to be discussed is 
 \begin{equation}
  \frac{\d u}{\d t} = \nabla D\nabla u +f
 \end{equation}
 where f is some source term. 
 The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will have the same approximation. \\
-We start off by doing the innermost derivative in one dimension. 
-The generalization to more dimensions is trivial, and will consist of adding the same terms for the y and z derivatives. 
+The innermost derivative is done first in one dimension, generalization to more dimensions is trivial, and will consist of adding the same terms for the y and z derivatives. 
 \begin{align*}
  \left[\frac{d}{dx}u\right]^n \approx \frac{u^n_{i+1/2}-u^n_{i-1/2}}{\Delta x}
 \end{align*}
-Where we have made the approximate derivative around the point $x_i$. 
-We then set $\phi(x)=D\frac{du}{dx}$ and do the second derivative
+
+Where the derivative is approximated around the point $x_i$. 
+Inserting $\phi(x)=D\frac{du}{dx}$ simplifies the outermost derivative, which will also be done in one dimension.
+
 \begin{align*}
   \left[\frac{d}{dx}\phi\right]^n \approx \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x}
 \end{align*}
-and insert for $\phi$
+Inserting for $\phi$ gives the important intermediate step
+
 \begin{align*}
  \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x} = \frac{1}{\Delta x^2}\left(D_{i+1/2}(u^n_{i+1}-u^n_{i+1}) -D_{i-1/2}(u^n_{i}-u^n_{i-1})\right)
 \end{align*}
-Since we can only evaluate the diffusion constant at the mesh points (or strictly speaking since it is a lot simpler to do so) we must approximate $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$. 
-Inserting this gives us 
+
+Since the diffusion constant can only be evaluated at the mesh points (or strictly speaking since it is a lot simpler to do so),an approximation $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$ is used. 
+Inserting this results in
 \begin{align*}
  \nabla D\nabla u\approx\frac{1}{2\Delta x^2}\left((D_{i+1,j}+D_{i,j})(u_{i+1,j}-u_{i,j})-(D_{i,j}+D_{i-1,j})(u_{i,j}-u_{i-1,j})\right) \\
  +\frac{1}{2\Delta y^2}\left((D_{i,j+1}+D_{i,j})(u_{i,j+1}-u_{i,j})-(D_{i,j}+D_{i,j-1})(u_{i,j}-u_{i,j-1})\right)
 \end{align*}
 
-The discretization of the time-derivative is where we can see a difference between the two schemes we will use in this project. 
-When ordinary differential equations are discretized one can clearly see how this difference arises, and so we will write our PDE using a new notation
+The discretization of the time-derivative is where a difference between the two schemes used in this project can be seen. 
+When ordinary differential equations are discretized one can clearly see how this difference arises, and so the PDE \nomenclature{PDE}{Parital Differential Equation} is written using a new notation
 \begin{equation}
  D_t u = Ou
 \end{equation}
+
 where the right-hand-side operator $O$ indicates some operation like the double spatial derivative. 
-Introducing the general discretization of the time derivative gives us equation \ref{theta_rule} known as theta-rule. 
-Setting $\theta = 0$ yields the FE discretization, and $\theta = 1$ the BE discretization. 
+Introducing the general discretization of the time derivative gives equation \ref{theta_rule} known as theta-rule. 
+Setting $\theta = 0$ yields the FE\nomenclature{FE}{Forward Euler} discretization, and $\theta = 1$ the BE \nomenclature{BE}{Backward Euler} discretization. 
 
 \begin{equation}\label{theta_rule}
  \frac{u^{n+1}-u^n}{\Delta t} = O\left(\theta u^{n+1} +(1-\theta)u^n\right)
@@ -547,9 +580,14 @@ The basic structure of the program is rather similar to the physical problem.
 There is one dendrite-object which contains the PDE-solver for the normal diffusion equation, with the possibility to use a random walk solver instead. 
 On the dendrite object spines can be placed, which in the physical world are the receiving end of a synapse. 
 Depending on what is being modeled, synaptic input is modeled by randomly added spikes of some random number of molecules which spawn at the far end of the spine. 
+In the overlapping points where the spine is located on the dendrite mesh, the coupling is done as follows: 
+If a random walker in the spine comes in contact with the position labeled as the ``end'' of the spine it is moved from the list of active walkers to a list of walkers which have moved out of the spine. 
+Similarly, at each time-step a part of the PDE-solution corresponding to one walker will diffuse into the spine with a certain probability. 
+It might be desirable for a walker to only be able to diffuse out of the spine with some probability as well, or for the walkers which diffuse into the spine to have some drift term, but these are minor updates and might be added later if needed. \\
+
 There is also the possibility of modeling parts of the dendrite-mesh as random walk (This can be done in 2d as well as 1d). 
 This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
-Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{Farnell_2001_Monte}. 
+Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{farnell2005monte}. 
 At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 
 The solution from the PDE-solver is used to calculate the number of walkers by eq. \ref{} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
 Because the sum of the PDE-solution over the random walk area of the mesh might be different from one time-step to the next (eq. \ref{integral_u}) the conversion from PDE-solution to random walker distribution must be done at every time-step. 
@@ -559,7 +597,8 @@ Or the conversion factor could be adjusted at each time-step. The latter is larg
 \begin{equation}\label{integral_u}
  \sum u_{i,j}^n \neq \sum u_{i,j}^{n+1}
 \end{equation}
-
+After the random walk integration the two solutions are combined by a simple average. A few other methods have been tested (see chapter \ref{}) but discarded. 
+The average of the two solutions is then set as the new ``initial condition'' for the next time-step, and the  process repeats itself.
 
 The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the time-step is done. 
 A schematic of the algorithm is provided in figure \ref{schematic}.
