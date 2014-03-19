@@ -135,7 +135,7 @@ This means that the probability of finding the walker at some position x after M
 \begin{equation}
  P(x,M)\propto e^{-\frac{x^2}{2M\sigma^2}}
 \end{equation}
-Remember that the actual Gaussian distribution is 
+Recall that the actual Gaussian distribution is 
 $$
 \frac{1}{\sqrt{2\pi\sigma^2}}\exp\left(\frac{(n-\mu)^2}{2\sigma^2}\right)
 $$
@@ -162,7 +162,7 @@ Inserting this gives
  \frac{\d C}{\d t} = \nabla\cdot \left(D\cdot\nabla C\right)
 \end{equation}
 which is the diffusion equation.
-Insertion of the Gaussian distribution \ref{rw_gaussian_distribution}) verifies that the Gaussian distribution fulfills the diffusion equation. 
+Insertion of the Gaussian distribution \eqref{rw_gaussian_distribution}) verifies that the Gaussian distribution fulfills the diffusion equation. 
 Starting with only the time derivative gives
 \begin{align*}
  \frac{\d P}{\d t} = -\frac{4\pi D\exp\left(-\frac{x^2}{4Dt}\right)}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2\exp\left(-\frac{x^2}{4Dt}\right)}{4Dt^2\sqrt{4\pi Dt}} \\
@@ -188,10 +188,10 @@ Note that it will be quite easy to change the algorithm used for random walks, a
 
 Although the self diffusion problem, which is what we are looking at with diffusing particles in and out of dendritic spines is not anisotropic on its own, there might be some possible applications which require describing anisotropic diffusion of random walkers.
 There is reason to believe that an anisotropic diffusion process on the PDE level will lead to an anisotropic random walk model as well, but how should this be modeled. 
-Simply replacing the diffusion constant by a function $D = D(\vec{x})$ (see eq \ref{steplength}) is a natural first approximation, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
+Simply replacing the diffusion constant by a function $D = D(\vec{x})$ (see eq \eqref{steplength}) is a natural first approximation, but this will not quite be sufficient as Farnell and Gibson point out \cite{farnell2005monte}. 
 Through their experiments they found that only adjusting the step-length will not improve the error noticeably and reasoned that this is because the walkers are still as likely to jump in both directions (right or left in 1d), and that the stepsize is the same in both cases, hence the model does not resemble anisotropy. 
 They went on to introduce an adjusted step-length and an adjusted step probability, a solution they landed on after trial and error. 
-The expressions they proposed are listed in equations \ref{farnell_and_gibson_1} to \ref{farnell_and_gibson_5}. 
+The expressions they proposed are listed in equations \eqref{farnell_and_gibson_1} to \eqref{farnell_and_gibson_5}. 
 
 \begin{equation}\label{farnell_and_gibson_1}
  \Delta_p(x) = \frac{1}{2}\left(L(x) + L(x +\Delta_p(x))\right) \to L(x) +\frac{1}{2}L(x)L'(x)
@@ -205,7 +205,7 @@ where $L(x)$ is defined in equation \ref{farnell_and_gibson_3} and $\Delta_p(x)$
 \begin{equation}\label{farnell_and_gibson_3}
 L(x) = \sqrt{2D(x)\Delta t}
 \end{equation}
-The adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker at position x to jump right or left, respectively are defined in equations \ref{farnell_and_gibson_4} and \ref{farnell_and_gibson_5}
+The adjusted jump probabilities $T_r(x)$ and $T_l(x)$ which are the probabilities for a walker at position x to jump right or left, respectively are defined in equations \eqref{farnell_and_gibson_4} and \eqref{farnell_and_gibson_5}
 
 \begin{equation}\label{farnell_and_gibson_4}
 T_r(x) = \frac{1}{2} +\frac{1}{4}L'(x)
@@ -237,7 +237,7 @@ Where $\vec{j}$ denotes the total flux of walkers through some enclosed volume a
 Since the walkers are affected by drift the flux will consist of two terms; $\vec{j} = \vec{j}_{diff}+\vec{j}_{drift}$. 
 From Fick's first law we know that $\vec{j}_{diff} = -D\nabla C$. 
 The second flux term is the advective flux which will be equal to the average velocity of the system; $\vec{j}_{drift} = \vec{v}C$. 
-Inserting this in the continuity equation gives us the well known convection diffusion equation (\ref{convection_diffusion_equation}).
+Inserting this in the continuity equation gives us the well known convection diffusion equation \eqref{convection_diffusion_equation}.
 \begin{equation}\label{convection_diffusion_equation}
  \frac{\d C}{\d t} = \nabla\cdot\left(D\nabla C\right)-\nabla\cdot\left(\vec{v}C\right) + S
 \end{equation}
@@ -246,7 +246,7 @@ Which in many cases will simplify to
  \frac{\d C}{\d t} = D\nabla^2 C-\vec{v}\cdot\nabla C
 \end{equation}
 
-In order to determine all the parameters of the convection diffusion equation \ref{convection_diffusion_equation} we will need to go through some of the calculations from chapter \ref{introduction_to_random_walks}. 
+In order to determine all the parameters of the convection diffusion equation \eqref{convection_diffusion_equation} we will need to go through some of the calculations from chapter \ref{introduction_to_random_walks}. 
 The situation is the same, a walker in one dimension which can jump left or right, but this time will also move a finite distance $d$ each timestep. 
 This will make the expected net displacement
 \begin{equation*}
@@ -294,15 +294,36 @@ Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is t
 
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
+
+\subsection{Finite Difference Methods}\label{finite_difference_methods}
+
+Although there are a few methods for solving PDEs numerically, this project will focus on finite difference methods (FDM)\nomenclature{FDM}{Finite Difference Methods}. 
+This is done both for simplicity and because, as will be argued later, there is no need for very accurate solvers due to the error terms arising from random walk solvers. 
+
+Solution of PDEs through FDMs is done by approximating a continuous axis by a discontinuous mesh, and likewise the continuous PDE is approximated by its value at the discontinuous mesh-points. 
+The derivatives in the PDE are then approximated by finite differences through the definition of the derivative \eqref{derivative_definition}, replacing the limit of $h$ with the  finite discretization parameter $h$.
+
+\begin{equation}\label{derivative_definition}
+ f\!\,'(x) = \lim_{h\to 0} \frac{f(x +h) - f(x)}{h},
+\end{equation}
+
+Numerical solution of PDEs is an enormous and important field, which cannot be done justice by a presentation here. 
+For more on numerical solution of PDEs in general, consult \cite{} or \cite{}.
+
 \subsection{Discretizing}\label{discretizing}
 
-To maintain a bit of generality we will look at the (potentially) anisotropic diffusion equation in 2d. The extension to 3d is trivial, as is the 1d version. The drift term will be omitted in the beginning because this also results in a simple addition to the numerical scheme. The equation to be discussed is 
+To maintain a bit of generality, the (potentially) anisotropic diffusion equation in 2d will be discretized. 
+The extension to 3d is trivial, as is the 1d version. 
+The drift term will be omitted in the beginning because this also results in a simple addition to the numerical scheme. The equation to be discussed is 
+
 \begin{equation}
  \frac{\d u}{\d t} = \nabla D\nabla u +f
 \end{equation}
+
 where f is some source term. 
-The final expression and scheme will depend on how we chose to approximate the time derivative, but the spatial derivative will have the same approximation. \\
+The final expression and scheme will depend on how the time derivative is approximated, but the spatial derivative will have the same approximation. \\
 The innermost derivative is done first in one dimension, generalization to more dimensions is trivial, and will consist of adding the same terms for the y and z derivatives. 
+
 \begin{align*}
  \left[\frac{d}{dx}u\right]^n \approx \frac{u^n_{i+1/2}-u^n_{i-1/2}}{\Delta x}
 \end{align*}
@@ -313,49 +334,52 @@ Inserting $\phi(x)=D\frac{du}{dx}$ simplifies the outermost derivative, which wi
 \begin{align*}
   \left[\frac{d}{dx}\phi\right]^n \approx \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x}
 \end{align*}
+
 Inserting for $\phi$ gives the important intermediate step
 
 \begin{align*}
  \frac{\phi^n_{i+1/2}-\phi^n_{i-1/2}}{\Delta x} = \frac{1}{\Delta x^2}\left(D_{i+1/2}(u^n_{i+1}-u^n_{i+1}) -D_{i-1/2}(u^n_{i}-u^n_{i-1})\right)
 \end{align*}
 
-Since the diffusion constant can only be evaluated at the mesh points (or strictly speaking since it is a lot simpler to do so),an approximation $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$ is used. 
+Since the diffusion constant can only be evaluated at the mesh points (or strictly speaking since it is a lot simpler to do so), an approximation $D_{i\pm1/2}\approx0.5(D_{i\pm1}+D_i)$ is used. 
 Inserting this results in
+
 \begin{align*}
  \nabla D\nabla u\approx\frac{1}{2\Delta x^2}\left((D_{i+1,j}+D_{i,j})(u_{i+1,j}-u_{i,j})-(D_{i,j}+D_{i-1,j})(u_{i,j}-u_{i-1,j})\right) \\
  +\frac{1}{2\Delta y^2}\left((D_{i,j+1}+D_{i,j})(u_{i,j+1}-u_{i,j})-(D_{i,j}+D_{i,j-1})(u_{i,j}-u_{i,j-1})\right)
 \end{align*}
 
 The discretization of the time-derivative is where a difference between the two schemes used in this project can be seen. 
-When ordinary differential equations are discretized one can clearly see how this difference arises, and so the PDE \nomenclature{PDE}{Parital Differential Equation} is written using a new notation
+When ordinary differential equations are discretized one can clearly see how this difference arises, and so the PDE \nomenclature{PDE}{Parital Differential Equation} is written in a new notation using some general operation, $P$ like the double spatial derivative
+
 \begin{equation}
- D_t u = Ou
+ D_t u = Pu
 \end{equation}
 
-where the right-hand-side operator $O$ indicates some operation like the double spatial derivative. 
-Introducing the general discretization of the time derivative gives equation \ref{theta_rule} known as theta-rule. 
-Setting $\theta = 0$ yields the FE\nomenclature{FE}{Forward Euler} discretization, and $\theta = 1$ the BE \nomenclature{BE}{Backward Euler} discretization. 
+Introducing the general discretization of the time derivative gives equation \eqref{theta_rule} known as theta-rule. 
+Setting $\theta = 0$ yields the Forward Euler (FE\nomenclature{FE}{Forward Euler}) discretization, and $\theta = 1$ the Backward Euler (BE\nomenclature{BE}{Backward Euler}) discretization. 
 
 \begin{equation}\label{theta_rule}
- \frac{u^{n+1}-u^n}{\Delta t} = O\left(\theta u^{n+1} +(1-\theta)u^n\right)
+ \frac{u^{n+1}-u^n}{\Delta t} = P\left(\theta u^{n+1} +(1-\theta)u^n\right)
 \end{equation}
 
-From the theta rule we can see that the only difference between the FE and BE scheme is at what time-step we evaluate the right-hand-side of the equation. 
-The theta-rule can give other schemes as well, using some weighted average of the right-hand-side at $t^n$ and $t^{n+1}$ but we will not look into these in this project. 
-We can now summarize by writing out the FE discretization as it will be implemented in 1d in equation \ref{FE_scheme_1D}.
+From the theta rule it is clear that the only difference between the FE and BE scheme is at what time-step the right-hand-side of the equation is evaluated. 
+The theta-rule can give other schemes as well, using some weighted average of the right-hand-side at $t^n$ and $t^{n+1}$ but these are considered irrelevant in this project. 
+Equation \ref{FE_scheme_1D} summarizes what has been done so far by writing out the FE discretization the way it will be implemented in 1d.
 
 \begin{align}\label{FE_scheme_1D}
  u^{n+1}_i = \frac{\Delta t}{2\Delta x^2}\left((D_{i+1}+D_{i})(u^n_{i+1}-u^n_{i})-(D_{i}+D_{i-1})(u^n_{i}-u^n_{i-1})\right) + u^n_i
 \end{align}
 
 We will come back to the FE discretization when we discuss stability later. \\
-Looking at the BE discretization which is written out in 1d in equation \ref{BE_scheme_1D} we notice that there are quite a few more unknowns per mesh-point. 
+% Looking at the BE discretization which is written out in 1d in equation \ref{BE_scheme_1D} we notice that there are quite a few more unknowns per mesh-point. 
+The BE discretization has more unknowns to be found at each mesh-point, as equation \ref{BE_scheme_1D} shows.
 
 \begin{align}\label{BE_scheme_1D}
  u^{n+1}_i = \frac{\Delta t}{2\Delta x^2}\left((D_{i+1}+D_{i})(u^{n+1}_{i+1}-u^{n+1}_{i})-(D_{i}+D_{i-1})(u^{n+1}_{i}-u^{n+1}_{i-1})\right) + u^n_i
 \end{align}
 
-Writing out the calculations for a small mesh we recognize a pattern which we can exploit.
+Writing out the calculations for a small mesh reveals a pattern which can be exploited.
 \begin{align*}
  &u^{n+1}_0 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{0}+D_{1})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_0\\
  &u^{n+1}_1 = \frac{\Delta t}{2\Delta x^2}\left((D_{2}+D_{1})(u^{n+1}_{2}-u^{n+1}_{1})-(D_{1}+D_{0})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_1\\
@@ -363,65 +387,80 @@ Writing out the calculations for a small mesh we recognize a pattern which we ca
  &u^{n+1}_3 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{2}+D_{3})(u^{n+1}_{3}-u^{n+1}_{2})\right) + u^n_3
 \end{align*}
 
-Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ gives us a normal system of linear equations
+Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ results in a normal system of linear equations
 \begin{align*}
  &u^{n+1}_0\left(1+2a(D_0+D_1)\right)- 2au^{n+1}_{1}(D_1+D_0) =  u^n_0\\
  &u^{n+1}_1\left(1+a(D_2+2D_1+D_0)\right)-au^{n+1}_{2}(D_2+D_1)-au^{n+1}_{0}(D_1+D_0) = u^n_1\\
  &u^{n+1}_2\left(1+a(D_3+2D_2+D_1)\right)-au^{n+1}_{3}(D_3+D_2)-au^{n+1}_{1}(D_2+D_1) = u^n_2\\
  &u^{n+1}_3\left(1+2a(D_3+D_2)\right)- 2au^{n+1}_{2}(D_3+D_2) =  u^n_3
 \end{align*}
-which we arrange as 
-{\tiny
+which is arranged as 
+{\scriptsize
 \begin{align}\label{BE}
  \left(\begin{array}{c c c c}
         1+2a(D_0+D_1) & -2a(D_1+D_0) &0 &0 \\
         -a(D_1+D_0) &1+a(D_2+2D_1+D_0) & -a(D_2+D_1) &0 \\
         0& -a(D_2+D_1) & 1+a(D_3+2D_2+D_1)& -a(D_3+D_2)\\
         0& 0& 1+2a(D_3+D_2) & - 2a(D_3+D_2)\\
-       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n} \\
- \mathbf{A}\mathbf{u}^n = \mathbf{u}^{n-1}
+       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{align}
 }
-Immediately we notice a problem with the implicit scheme. If we solve the system of equations by the fool-proof Gaussian elimination we will use some $\mathcal O(n^3)$ FLOPs per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2d and $\mathcal O(n^9)$ in 3d. 
+\begin{equation}
+  \mathbf{M}\mathbf{u}^n = \mathbf{u}^{n-1}
+\end{equation}
+
+
+\nomenclature{FLOPs}{Floating Point Operations Per second}
+If the system of equations is solved by the fool-proof Gaussian elimination, some $\mathcal O(n^3)$ FLOPs are required per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2d and $\mathcal O(n^9)$ in 3d. 
 As a comparison the explicit scheme will make due with $\mathcal O(n^d)$ FLOPs.
-There are, however ways to improve this. Seeing as the matrix $\mathbf A$ does not change as long as none of the parameters change we can use a LU-decomposition. 
+There are, however ways to improve this. Seeing as the matrix $\mathbf M$ does not change as long as none of the parameters change a LU-decomposition can be used. 
 This will demand a decomposition of $\mathcal{O}(n^3)$ FLOPs, but all the subsequent steps will be $\mathcal{O}(n^2)$ FLOPs ($\mathcal O(n^{2d})$ for higher dimensions). 
-We are still not quite at the level of the explicit scheme, but it is a clear improvement. \\
-Looking closer at $A$ we notice that it is not only sparse, but tridiagonal. This calls for further optimization which brings the required number of FLOPs down to $\mathcal O(n)$ making it equally efficient to the explicit scheme. More on tridiagonal Gaussian elimination later.
+This is still not quite at the level of the explicit scheme, but it is a clear improvement. \\
+Looking closer at $\mathbf M$ we notice that it is not only sparse, but tridiagonal. This calls for further optimization which brings the required number of FLOPs down to $\mathcal O(n)$ making it equally efficient to the explicit scheme. More on tridiagonal Gaussian elimination later.
 
 
 \subsection{Stability}\label{stability}
 
-In section \ref{discretizing} we used the Forward Euler approximation to the time derivative. 
-Unfortunately the resulting scheme is potentially unstable, as we shall now see. 
-We start out by assuming that the solution $u(x,t)$ is on the form 
+In section \ref{discretizing} the Forward Euler was used as an approximation to the time derivative. 
+Unfortunately the resulting scheme is potentially unstable, as this section will demonstrate. 
+First, the solution to \eqref{simple_diffusion_equation} ($u(x,t)$) is assumed to be on the form 
+
 \begin{equation}\label{von_neumann_fourier_solution}
- u(x,t) = A^n\exp(ikp\Delta x)
+ u(x,t) = A^n e^{(ikp\Delta x)}
 \end{equation}
-where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which, for the solution \ref{von_neumann_fourier_solution} ideally should be $\exp(-\pi^2t)$, but will be something else in the numerical case. 
-We notice that we must have $\left|A\right|\leq 1$ if $u$ is to not blow up. 
-Inserting \ref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives us the following
+
+where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which, for the solution \eqref{von_neumann_fourier_solution} ideally should be $e^{-\pi^2t}$, but will be something else in the numerical case. 
+Notice the restriction $\left|A\right|\leq 1$ if $u$ is to not blow up. 
+Inserting \eqref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives the following
+
 \begin{align*}
- \exp(ikp\Delta x)\left(A^{n+1}-A^n\right) &= \\
- A^n\frac{D\Delta t}{\Delta x^2}&\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
-  A^n\exp(ikp\Delta x)\left(A-1\right) &= \\
-  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}&\left(\exp(ik\Delta x) -2  + \exp(-ik\Delta x)\right)
-\end{align*}
-Using the well known identities $\exp(iax)+\exp(-iax) = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$  and $\cos^2(ax)-1 = \sin^2(ax)$ gives us
-\begin{equation}
+ e^{(ikp\Delta x)}\left(A^{n+1}-A^n\right) &=  A^n\frac{D\Delta t}{\Delta x^2}\left(e^{(ik(p+1)\Delta x)}-2e^{(ikp\Delta x)} +e^{(ik(p-1)\Delta x)}\right)\\
+  A^ne^{(ikp\Delta x)}\left(A-1\right) &=   A^ne^{(ikp\Delta x)}\frac{D\Delta t}{\Delta x^2}\left(e^{(ik\Delta x)} -2  + e^{(-ik\Delta x)}\right)
+  \end{align*}
+  
+Using the well known identities
+$$e^{(iax)}+e^{(-iax)} = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$$
+and 
+$$\cos^2(ax)-1 = \sin^2(ax)$$
+gives the intermediate expression \eqref{intermediate_FE}
+
+\begin{equation}\label{intermediate_FE}
  A-1 = \frac{D\Delta t}{\Delta x^2}\sin^2\left(\frac{k\Delta x}{2}\right)
 \end{equation}
-We now insert for the ``worst case scenario'' $max(\sin^2\left(\frac{k\Delta x}{2}\right))= 1$
+
+The ``worst case scenario'' in \eqref{intermediate_FE} is  $max(\sin^2\left(\frac{k\Delta x}{2}\right))= 1$. Inserting this extreme value helps find the worst possible error term
+
 \begin{equation}
  A = \frac{D\Delta t}{2\Delta x^2}+1 \implies \Delta t\leq\frac{\Delta x^2}{2D}
 \end{equation}
-In 2d this criterion is halved, and for the anisotropic case we must insert for the maximum value of D which, again, will be the ``worst case scenario''.\\
-If we insert the same solution (eq. \ref{von_neumann_fourier_solution}) in the BE scheme we get
+In 2d this criterion is halved, and for the anisotropic case the maximum value of D must be considered which, again, will be the ``worst case scenario''.\\
+The same procedure is used to determine the stability of the BE scheme
+
 \begin{align*}
- \exp(ikp\Delta x)\left(A^{n}-A^{n-1}\right) &= \\
- A^n\frac{D\Delta t}{\Delta x^2}&\left(\exp(ik(p+1)\Delta x)-2\exp(ikp\Delta x) +\exp(ik(p-1)\Delta x)\right)\\
-  A^n\exp(ikp\Delta x)\left(1-A^{-1}\right) &=  A^n\exp(ikp\Delta x)\frac{D\Delta t}{\Delta x^2}\left(\exp(ik\Delta x) -2 + \exp(-ik\Delta x)\right)\\
+ e^{(ikp\Delta x)}\left(A^{n}-A^{n-1}\right) &=  A^n\frac{D\Delta t}{\Delta x^2}\left(e^{(ik(p+1)\Delta x)}-2e^{(ikp\Delta x)} +e^{(ik(p-1)\Delta x)}\right)\\
+  A^n e^{(ikp\Delta x)}\left(1-A^{-1}\right) &=  A^n e^{(ikp\Delta x)}\frac{D\Delta t}{\Delta x^2}\left(e^{(ik\Delta x)} -2 + e^{(-ik\Delta x)}\right)
 \end{align*}
+
 which leads to 
 \begin{equation}\label{stability_BE}
 A = \frac{1}{ 1+\frac{D\Delta t}{\Delta x^2}}
@@ -430,16 +469,23 @@ Equation \ref{stability_BE} is smaller than 1 for all $\Delta t>0$ which means t
 
 \subsection{Truncation error}\label{truncation_error}
 
-As we know the numerical derivative is not the analytical derivative, but an approximation. 
-This approximation has a well defined residual, or truncation error which we can find by Taylor expansion.
+The numerical derivative is not the analytical derivative, but an approximation. 
+This approximation has a well defined residual, or truncation error which is found by Taylor expansion. 
+The following section will derive the residuals for the approximations used in this project in order to verify the numerical implementation later. 
+For the FE time-derivative scheme, the residual is defined as
+
 \begin{equation*}
   R = \frac{u(t_{n+1}) -u(t_n)}{\Delta t} -u'(t_n)
 \end{equation*}
-Remember Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h^i$
+
+Recall the Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(t)h^i$
+
 \begin{align*}
  R &= \frac{u(t_n)+u'(t_n)\Delta t +0.5u''(t_n)\Delta t^2 + \mathcal{O}(\Delta t^3)-u(t_n)}{\Delta t} -u'(t_n)\\
-  &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) = \mathcal{O}(\Delta t)
+  &= u''(t_n)\Delta t+ \mathcal{O}(\Delta t^2) \\
+  R &\sim \mathcal{O}(\Delta t)
 \end{align*}
+
 We can do better than this by using another discretization scheme for the PDE, but in our case the PDE is not the only error source seeing as we will combine it with a random walk solver. 
 Quantifying an error term The block-tridiagonal solver is taken from \cite{}, and is listed below.\\for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
 So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
@@ -449,7 +495,7 @@ The spatial derivative also has a well defined residual which is found by Taylor
 \begin{equation}
 R = \frac{u(x_{i+1})-2u(x_i)+u(x_{i-1})}{\Delta x^2}-u''(x_i) 
 \end{equation}
-Remember Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
+Recall the Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
 \begin{align*}
  &R =\\& \frac{u(x_i)+u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}-\\ &\frac{2u(x_i)}{\Delta x^2}+\\
  &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} \\ &-u'(x_i)\\
@@ -485,15 +531,15 @@ In each mesh-point the fluctuations are of the order $\sqrt{N(x_i,y_j,t_n)}^{-1}
 \subsection{Tridiagonal linear systems}
 The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
 The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
-The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed above.
+The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed below.
 In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). 
 Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. 
 
 
-The fool-proof way to solve a linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}$ where $\mathbf{A}$ is not a sparse matrix, by Gaussian elimination.
+Assuming the system has a solution, the fool-proof way to solve a linear equation $\mathbf{M}\mathbf{x} = \mathbf{b}$ where $\mathbf{M}$ is not a sparse matrix, by Gaussian elimination.
 
 \begin{align}
-  \mathbf{A} = 
+  \mathbf{M} = 
  \left( \begin{array}{rrrr}
  a_{11} & a_{12} & a_{13} & a_{14} \\
  a_{21} & a_{22} & a_{23} & a_{24} \\
@@ -503,7 +549,7 @@ The fool-proof way to solve a linear equation $\mathbf{A}\mathbf{x} = \mathbf{b}
 \end{align}
 Is reduced to
 \begin{align}
-  \mathbf{A} = 
+  \mathbf{M} = 
  \left( \begin{array}{rrrr}
  a_{11} & a_{12} & a_{13} & a_{14} \\
  0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
@@ -513,7 +559,7 @@ Is reduced to
 \end{align}
 and further to
 \begin{align}
-  \mathbf{A} = 
+  \mathbf{M} = 
  \left( \begin{array}{rrrr}
  a_{11} & a_{12} & a_{13} & a_{14} \\
  0 & (a_{22}-\frac{a_{21}a_{12}}{a_{11}}) & (a_{23}-\frac{a_{21}a_{13}}{a_{11}}) & (a_{24}-\frac{a_{21}a_{14}}{a_{11}}) \\
@@ -546,7 +592,7 @@ The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_m
              \mathbf{u}^{n+1}_{n}
              \end{array}\right) = \mathbf{u}^{n}
 \end{align}
-which we can also express as $M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
+which we can also express as $\mathbf M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
 
 There is a forward substitution
 \begin{align*}
@@ -561,7 +607,7 @@ There is a forward substitution
   \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
  \end{align*}
 The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. 
-However, we only need to to the inversion once as long as the mass-matrix, $M$ is unchanged so the expense is reduced. 
+However, we only need to to the inversion once as long as the mass-matrix, $\mathbf M$ is unchanged so the expense is reduced. 
 This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. 
 All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme as effective as the implicit FE scheme.
 

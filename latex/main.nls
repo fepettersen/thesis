@@ -1,0 +1,12 @@
+\begin{thenomenclature} 
+
+ \nomgroup{A}
+
+  \item [{BE}]\begingroup Backward Euler\nomeqref {2.24}\nompageref{18}
+  \item [{ECS}]\begingroup Extra Cellular Space\nomeqref {1.0}
+		\nompageref{6}
+  \item [{FE}]\begingroup Forward Euler\nomeqref {2.24}\nompageref{18}
+  \item [{PDE}]\begingroup Parital Differential Equation\nomeqref {2.23}
+		\nompageref{18}
+
+\end{thenomenclature}
