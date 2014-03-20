@@ -392,7 +392,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return x+y
-	return np.ones(np.shape(x))
+	return np.ones(np.shape(x))*0.33
 
 if __name__ == '__main__':
 	DEBUG = True
@@ -406,13 +406,17 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 1.0
 	y1 = 0.7
-	m = 101
+	m = 5001
 	n = 1
-	T = 100
+	T = 100 		# no. timesteps, [dt*T] = seconds
+
+	x_start = 0
+	x_end = 50 		#um
 
 	dx = 1.0/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
-	dt = dx*dy/4.0 if n>1 else dx**2/5.0
+	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
+	dt = [5/1e3]
 
 
 	x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,n))
@@ -430,9 +434,6 @@ if __name__ == '__main__':
 
 	run.compile()
 	
-	# dt = [dx*dy/5.0*10**(-i) for i in range(6)]
-	# dt = [0.1,0.05,0.01,0.005]
-	dt = [5*1e-3]
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 

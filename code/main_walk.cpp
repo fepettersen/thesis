@@ -84,7 +84,11 @@ int main(int argc, char** argv)
 	double *y = new double[2];
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
-	double dx = 1.0/(m-1);
+
+	double x_start = 0;
+	double x_end = 50;
+
+	double dx = (x_end-x_start)/(m-1);
 	double dy = 1.0/(n-1);
 
 	double **Up = new double*[m];
@@ -108,7 +112,7 @@ int main(int argc, char** argv)
 	// 	s->Solve();
 	// 	s->Write(make_filename(buffer,RWname,conversion_factor,i));
 	// }
-	Dendrite BlackBox(m,n,0,1,0,1,aD,conversion_factor,Dt);
+	Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
 	// BlackBox.AddWalkArea(x,y,"python ","../../../../Desktop/anders_stuff/master-master/code/base_code/","balle2.py");
