@@ -4,6 +4,22 @@ Different algorithms to produce random walks (and pseudo-random numbers?) will b
 Numerical solution of PDEs will also be discussed, also with emphasis on what is relevant for this project. 
 Finally an algorithm for combining random walk diffusion solvers and normal PDE diffusion solvers will be introduced and discussed.
 
+\section{Notation}
+
+There will be some mathematics in this chapter, and so it might be useful to clarify on the notation used throughout the project.\\
+
+In the following section the Gaussian distribution will be derived from the Bernoulli distribution through some expectation values such as the expected total displacement of a random walker and the expected root mean square displacement of a walker. 
+Expectation values are denoted by brackets. Equation \eqref{notation:brackets} shows the expectation value of a quantity $a$. 
+
+\begin{equation}\label{notation:brackets}
+ \langle a \rangle = \sum aP(a)
+\end{equation}
+Note the difference between the expectation value of a quantity squared and the square of the expectation value of the same quantity, stated in equation \ref{notation:}
+
+\begin{equation}\label{notation:}
+ 
+\end{equation}
+
 
 \section{Introduction to random walks}\label{introduction_to_random_walks}
 The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
@@ -486,19 +502,25 @@ Recall the Taylor expansion of $u(t+h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\fr
   R &\sim \mathcal{O}(\Delta t)
 \end{align*}
 
-We can do better than this by using another discretization scheme for the PDE, but in our case the PDE is not the only error source seeing as we will combine it with a random walk solver. 
-Quantifying an error term The block-tridiagonal solver is taken from \cite{}, and is listed below.\\for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
-So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
-Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
-This will be such a costly operation that it will not necessarily be worth it.\\
-The spatial derivative also has a well defined residual which is found by Taylor expansion.
+Similarly, the BE scheme has the following residual
+Recall the Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
+
+\begin{align*}
+  R &= \frac{u(t_{n}) -u(t_n-1)}{\Delta t} -u'(t_n) \\
+  &= \frac{u(t_{n}) + \Delta t u'(t_n) + 0.5\Delta t^2 u''(t_n) +\mathcal{O}(\Delta t^3)}{\Delta t}-u'(t_n)\\
+  R&\sim \mathcal{O}(\Delta t)
+\end{align*}
+
+There are many discretization schemes with much smaller residuals than these, but in this project the PDE is not the only error source seeing as a random walk solver will be introduced, and so the FE/BE schemes are deemed accurate enough.
+
+The spatial derivative also has a well defined residual defined by
 \begin{equation}
 R = \frac{u(x_{i+1})-2u(x_i)+u(x_{i-1})}{\Delta x^2}-u''(x_i) 
 \end{equation}
-Recall the Taylor expansion of $u(x-h) = \sum\limits_{i=0}^\infty\frac{1}{i!}\frac{d^i}{dt^i}u(x)(-h)^i$
+Doing the expansions and cleaning up a bit 
 \begin{align*}
- &R =\\& \frac{u(x_i)+u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}-\\ &\frac{2u(x_i)}{\Delta x^2}+\\
- &\frac{u(x_i)-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3) +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} \\ &-u'(x_i)\\
+ &R =\\& \frac{u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3 +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}+\\ &\frac{2u(x_i)-2u(x_i)}{\Delta x^2} -u''(x_i) +\\
+ &\frac{-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3 +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} \\
 &R = u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
 \end{align*}
 There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative. \\
@@ -514,6 +536,10 @@ The number of walkers, $N$ is now given by the defined conversion factor $Hc$ as
 and the total number of walkers is the sum of the walkers on all the mesh-points. 
 In each mesh-point the fluctuations are of the order $\sqrt{N(x_i,y_j,t_n)}^{-1}$, meaning that the convergence rate in each mesh-point is $\frac{1}{2}$. 
 
+Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
+So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
+Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
+This will be such a costly operation that it will not necessarily be worth it.\\
 % \subsection{Extension to 3 spatial dimensions}
 % 
 % As we see in the appendix the assembly of the linear problem that arises from the BE discretization in 2d with a variable diffusion constant is a rather messy thing. 

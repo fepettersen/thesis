@@ -16,6 +16,36 @@
   {}
 \endgroup
 
+\entry{craske2005spines}{article}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Craske}{C.}%
+     {Madeleine~L}{M.~L.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Fivaz}{F.}%
+     {Marc}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Batada}{B.}%
+     {Nizar~N}{N.~N.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Meyer}{M.}%
+     {Tobias}{T.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{CML+1}
+  \strng{fullhash}{CMLFMBNNMT1}
+  \field{sortinit}{C}
+  \field{title}{{Spines and neurite branches function as geometric attractors
+  that enhance protein kinase C action}}
+\endentry
+
 \entry{farnell2005monte}{article}{}
   \name{author}{2}{}{%
     {{}%
@@ -42,6 +72,29 @@
   \field{volume}{208}
   \field{journaltitle}{Journal of Computational Physics}
   \field{year}{2005}
+\endentry
+
+\entry{graham2011principles}{book}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Graham}{G.}%
+     {Bruce}{B.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Gillies}{G.}%
+     {Andrew}{A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Willshaw}{W.}%
+     {David}{D.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{GBGAWD1}
+  \strng{fullhash}{GBGAWD1}
+  \field{sortinit}{G}
 \endentry
 
 \entry{nicholson2001diffusion}{article}{}

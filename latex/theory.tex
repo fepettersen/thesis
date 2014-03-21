@@ -4,9 +4,28 @@ Different algorithms to produce random walks (and pseudo-random numbers?) will b
 Numerical solution of PDEs will also be discussed, also with emphasis on what is relevant for this project. 
 Finally an algorithm for combining random walk diffusion solvers and normal PDE diffusion solvers will be introduced and discussed.
 
+\section{Notation}
+
+There will be some mathematics in this chapter, and so it might be useful to clarify on the notation used throughout the project.\\
+
+In the following section the Gaussian distribution will be derived from the Bernoulli distribution through some expectation values such as the expected total displacement of a random walker and the expected root mean square displacement of a walker. 
+Expectation values are denoted by brackets. Equation \eqref{notation:brackets} shows the expectation value of a quantity $a$. 
+
+\begin{equation}\label{notation:brackets}
+ \langle a \rangle = \sum aP(a)
+\end{equation}
+Note the difference between the expectation value of a quantity squared and the square of the expectation value of the same quantity, stated in equation \ref{notation:clarification}.
+
+\begin{equation}\label{notation:clarification}
+ \langle a \rangle^2 \neq \langle a^2 \rangle
+\end{equation}
+
+For the section on discretization of partial differential equations (\ref{some_words_on_PDEs}) some sub- and super- scripts will be used. To clarify; a superscript $t^n$ does not mean t to the n'th power, but $n\cdot\Delta t$
+
 
 \section{Introduction to random walks}\label{introduction_to_random_walks}
-The most basic random walk is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
+
+The most basic random walk (\emph{is it though?}) is a walker on the x-axis which will take a step of a fixed length to the right with a probability $p$, or to the left with a probability $q=1-p$. 
 Using (pseudo-) random numbers on a computer we can simulate the outcomes of a random walk. 
 For each step (of which there are N) a random number, $r\in [0,1]$ is drawn from some distribution (say a uniform one) which will be the probability. 
 If $r\leq p$ the walker will take a step to the left, otherwise it will take a step to the right. 

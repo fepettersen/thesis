@@ -58,15 +58,25 @@ Through four non-linear coupled differential equations they were able to predict
 % Copied from the project
 
 The human brain consists of two types of cells; the neurons and neuroglia. 
-Neurons are tasked with signal processing and transport, while the glia are thought to have more janitorial tasks. 
+Neurons are tasked with signal processing and transport, while the glial cells are thought to have more janitorial tasks. 
 The neurons are bathed in a salt solution that is mainly $Na^+$ and $Cl^-$. 
 Inside the neurons, a highly regulated salt solution of mainly $K^+$ sets up a potential difference relative to the outside of the cell of approximately $-65$mV.
 The neurons are in constant communication with each other through action potentials, which are disturbances in the membrane potentials of neurons. 
 These action potentials are generated in the body of the cell, called the soma, from where they propagate down the axon without loss of amplitude. 
 This is achieved by constantly amplifying the signal using ion pumps (see the Hodgin-Huxley model of the action potential \cite{graham2011principles}).
 After propagating down the axon, the action potential reaches a synapse which is a gate to another neuron. 
-If the action potential is of significant strength, vesicles carrying neurotransmitters merge with the synapse membrane, letting the neurotransmitters diffuse to the dendrite of the other neuron. 
+If the action potential is of significant strength, vesicles carrying neurotransmitters merge with the synapse membrane, letting the neurotransmitters diffuse to the Post Synaptic Density (PSD\nomenclature{PSD}{Post Synaptic Density} of a spine on the receiving dendrite.
 If enough neurotransmitters reach the post-synaptic side, the signal continues propagating to the soma of this neuron, and the entire process starts over again. \\
+The storage of memories on a sub-cellular level is thought to partly lie in the strengthening or weakening of the receiving synapse end, the PSD \cite{}. 
+Familiar impressions will cause similar firing patterns in the sense that the same neurons tend to fire action potentials, which in turn are received by the same neurons each time. 
+If the receiving synapses are strengthened or weakened the resulting integrated signals sent to the cell body will be hastened or held back accordingly and the response is strengthened and more time-efficient (DEFINETELY CITE SOMETHING HERE, OR JUST REWRITE... \cite{}). 
+The strengthening of synapses is known as long-term potentiation (LTP\nomenclature{LTP}{Long-term potentiation}, and the weakening of synapses is known as long-term depression (LTD\nomenclature{LTD}{Long-term depression}). \\
+
+LTP has been coupled directly with the enzyme protein kinase C${\gamma}$ (PKC$\gamma$\nomenclature{PKC$\gamma$}{protein kinase C${\gamma}$}. 
+The dynamics of the actual process is, in part, what will be modeled in this project. 
+According to Craske et.al \cite{craske2005spines} PKC$\gamma$ is released into the intracellular plasma of a neuron after being triggered by an increased concentration of calcium ions (Ca$^{2+}$)
+
+
 The interest of this project lies, mainly, in the diffusion processes that take place in the space between these types of cells, the so-called extracellular space (ECS). 
 This is a narrow space ($\sim 10-100$ nm \cite{nicholson2001diffusion}) with a highly complicated geometry (Figure \ref{ECS}). 
 Surprisingly, the ECS adds up to $20\%$ of the total brain volume. 
