@@ -115,8 +115,10 @@ int main(int argc, char** argv)
 	Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
-	// BlackBox.AddWalkArea(x,y,"python ","../../../../Desktop/anders_stuff/master-master/code/base_code/","balle2.py");
-	BlackBox.AddSpine();
+	for (int i = 0; i < 10; ++i){
+		/*Adds some number of spines to the dendrite*/
+		BlackBox.AddSpine();
+	}
 	
 	cout<<"done!"<<endl;
 	for(int t=0; t<T; t++){

@@ -201,7 +201,14 @@ void Dendrite::Solve(void){
 	spine_info<<diffT<<endl;
 
 	for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
-		spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<endl;
+		if ((*spine)->ions_in_spine_head > 0 && t>1){
+			/*Introduce this test in order to limit ammount of data*/
+			spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;	
+		}
+		else if (t==1){
+			/*Write info about all spines at least once*/
+			spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;	
+		}
 	}
 	spine_info.close();
 	
