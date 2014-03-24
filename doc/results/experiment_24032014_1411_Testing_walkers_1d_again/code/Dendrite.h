@@ -17,7 +17,6 @@ public:
 	void AddSpine(double drift=0);
 	void SpineBoundary(Spine*);
 	double minimum,maximum,dt;
-	int t;
 	
 	int max_spine_contact_point, num_spines, left_spine_pos_limit, right_spine_pos_limit;
 	double diffusie_into_spine_probability;

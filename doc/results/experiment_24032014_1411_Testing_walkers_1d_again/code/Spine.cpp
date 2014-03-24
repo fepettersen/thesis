@@ -41,7 +41,6 @@ void Spine::AddSpike(void){
 
 void Spine::Solve(void){
 	bool delete_me;
-	ions_in_spine_head = 0;
 	if (rng->uniform()<spike_probability){
 		cout<<"Spike";
 		AddSpike();
@@ -67,8 +66,6 @@ void Spine::AddIonFromDendrite(void){
 
 bool Spine::checkpos(Walker* ion){
 	if (ion->r[1]>=neck_length){
-		/*The "Ion" is located in the spine head*/
-		ions_in_spine_head += 1;
 		double minimum_y_value_right = right_limit(ion->r[0]);
 		double minimum_y_value_left = left_limit(ion->r[0]);
 		if (ion->r[1]<minimum_y_value_right){
@@ -90,7 +87,6 @@ bool Spine::checkpos(Walker* ion){
 		}
 	}
 	else{
-		/*The "Ion" is located in the spine neck*/
 		if (ion->r[0]<left_neck_limit){
 			ion->r[0] = left_neck_limit + (left_neck_limit - ion->r[0]);
 		}

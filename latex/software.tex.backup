@@ -17,8 +17,17 @@ Intuitively, I find it better to use either an average or only the random walk r
 After each time-step the program also writes the combined solution on the coarse-grained mesh to a unique file.\\
 The python script also does some other more or less clever stuff at each run. This is described in the appendix as a form of debugging \ref{debugging}.
 
+\subsection{Limitations}
+
+As with any software there are limitations. The limitations discussed in this chapter will be with regard to physical problems, and not memory or CPU limitations which are described later. \\
+Assuming the dendritic spines stuff will be the final application:\\
+First of all, to specify a source function, one must program it in the Diffusion class (Diffusion::f()). This might be fixed in a later version using inheritance.\\
+The geometry is, currently, limited to a square. Of course we can argue that we have scaled the size to a unit square, but as discussed in chapter \ref{} the actual geometry remains a unit square. 
+Furthermore the same issue arises on the random walks. \\
+As of now, it is unclear if 3d-modeling is supported. This is actually a smaller issue since there is usually little more to learn from switching from 2d to 3d. In any case, the extension to 3d is most likely not very hard, provided we use an array of slices from the cubic matrix describing the solution.
 
 \section{Adaptivity}
+
 There are two adaptive parts of the software. First of all, the number of walkers which depend on the concentration, or the solution the the PDE in the relevant area. This must change in order to keep physical meaning and give results. Without this adaptivity, the results would either be wrong, or the model would not make physical sense.\\
 Since a diffusion process in general has rapid changes in the beginning where for example high frequency variations are dampened and very slow convergence to a steady state later, we have introduced a test of the amount of change between two subsequent time-steps. If this amount is smaller than some limit, we will increase the time-step.\\
 \emph{This increase should be done in a more elegant manner(linearly?)}
@@ -80,4 +89,16 @@ There are really very few dependencies on the PDE-solver, seeing as it is mostly
 \end{itemize}
 As discussed, the implementation of random walks on parts of the mesh will reduce the convergence-rate to 0.5, and so there are really only two reasons to implement a new PDE solver. 
 The current one only implements Neumann boundaries, and consequently must either be modified or replaced in order to work with other boundary conditions.
-It also only works on a square mesh. As discussed in section \ref{} it will be immensely complicated to implement a grid transformation, and this is already implemented in most finite element software.
+It also only works on a square mesh. As discussed in section \ref{geometry} it will be immensely complicated to implement a grid transformation, and this is already implemented in most finite element software.
+
+\section{Numerical model}
+
+The numerical model of the PKC$\gamma$ diffusion problem is implemented as follows. 
+In the same way as Craske et.al \cite{craske2005} a section of dendrite will be modeled by one-dimensional diffusion. 
+This dendrite section is thought to be in contact with the cell soma, and to have some spines on it. 
+The soma is modeled as a source at the one end of the dendrite section, whereas the other end of the dendrite section is thought to continue branching into narrower and narrower dendrite branches. 
+The branching and the rest of the dendrite will not be modeled in the beginning at least, because the situation in thin branches is thought to be the same as in thick branches with a time-delay and some effects due to a higher surface to volume ratio, all of which are described by Craske et.al. 
+
+Dendritic spines are modeled as a two-dimensional funnel attached to the dendrite at some number of mesh-point which must correspond to the typical range of spine-neck diameters. 
+This limits the spatial resolution by demanding the narrowest spine necks to connect at two mesh-points (in order for the spine to be two-dimensional). 
+

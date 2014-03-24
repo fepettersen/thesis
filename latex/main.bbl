@@ -97,6 +97,22 @@
   \field{sortinit}{G}
 \endentry
 
+\entry{hjorth2011computational}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Hjorth-Jensen}{H.-J.}%
+     {Morten}{M.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{HJM1}
+  \strng{fullhash}{HJM1}
+  \field{sortinit}{H}
+  \field{title}{{Computational physics}}
+  \field{journaltitle}{Lecture notes}
+  \field{year}{2011}
+\endentry
+
 \entry{nicholson2001diffusion}{article}{}
   \name{author}{1}{}{%
     {{}%

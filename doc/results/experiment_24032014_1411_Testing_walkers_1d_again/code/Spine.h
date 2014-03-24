@@ -26,12 +26,12 @@ public:
 	std::vector<Walker*> dendrite_boundary;
 
 	Random* rng;
-	int max_spike_size, d, pos, dendrite_gridpoints, ions_in_spine_head;
-	double dx,neck_length;
+	int max_spike_size, d, pos, dendrite_gridpoints;
+	double dx;
 	/* data */
 private:
 	/* data */
-	double drift, neck_width, head_height, head_width, left_neck_limit, right_neck_limit, spike_probability;
+	double drift, neck_width, neck_length, head_height, head_width, left_neck_limit, right_neck_limit, spike_probability;
 	double step_length, a, _x0, _x1, _y0, _y1;
 
 };

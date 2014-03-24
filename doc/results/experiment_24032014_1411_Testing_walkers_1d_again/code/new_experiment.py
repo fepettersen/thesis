@@ -237,6 +237,7 @@ class Experiment:
 		if self.n<=1:
 			# 1d
 			fig = mpl.figure()
+			fig.x_label('micrometers')
 			x = np.linspace(x_start,x_end,self.m)
 			counter = 1
 			for step in sorted(glob.glob(path+filename+'*.txt')):

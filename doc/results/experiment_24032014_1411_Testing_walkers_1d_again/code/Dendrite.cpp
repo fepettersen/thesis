@@ -8,11 +8,7 @@ Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,doub
 	right_spine_pos_limit = m - 2;
 	diffusie_into_spine_probability = 1e-3;
 	dt = Dt;
-	num_spines = t = 0;
-
-	ofstream spine_info;
-	spine_info.open("spine_info.txt");
-	spine_info.close();
+	num_spines = 0;
 	}
 
 void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
@@ -164,7 +160,6 @@ void Dendrite::Solve(void){
 	// 	}
 	// 	ConvertFromWalkers(U,inifilenames[i],indeces[i]);
 	// }
-	t += 1;
 	double step_length = sqrt(2*d*aD[0][0]*dt);
 	for(int i=0;i<100;i++){
 		for(vector<Walker*>::iterator Ion = dendrite_walkers.begin(); Ion != dendrite_walkers.end(); ++Ion){
@@ -194,17 +189,6 @@ void Dendrite::Solve(void){
 			SpineBoundary((*spine));
 		}
 	}
-	/*Write information about spine heads to a separate file*/
-	ofstream spine_info;
-	spine_info.open("spine_info.txt",ios_base::app);
-	sprintf(diffT,"%04d  %d",t,spines.size());
-	spine_info<<diffT<<endl;
-
-	for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
-		spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<endl;
-	}
-	spine_info.close();
-	
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
 			Up[k][l] = U[k][l];

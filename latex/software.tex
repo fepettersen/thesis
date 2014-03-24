@@ -91,5 +91,17 @@ As discussed, the implementation of random walks on parts of the mesh will reduc
 The current one only implements Neumann boundaries, and consequently must either be modified or replaced in order to work with other boundary conditions.
 It also only works on a square mesh. As discussed in section \ref{geometry} it will be immensely complicated to implement a grid transformation, and this is already implemented in most finite element software.
 
-\section{Model problem}
+\section{Numerical model}
 
+The numerical model of the PKC$\gamma$ diffusion problem is implemented as follows. 
+In the same way as Craske et.al \cite{craske2005spines} a section of dendrite will be modeled by one-dimensional diffusion. 
+This dendrite section is thought to be in contact with the cell soma, and to have some spines on it. 
+The soma is modeled as a source at the one end of the dendrite section, whereas the other end of the dendrite section is thought to continue branching into narrower and narrower dendrite branches. 
+The branching and the rest of the dendrite will not be modeled in the beginning at least, because the situation in thin branches is thought to be the same as in thick branches with a time-delay and some effects due to a higher surface to volume ratio, all of which are described by Craske et.al. 
+
+Dendritic spines are modeled as a two-dimensional funnel attached to the dendrite at some number of mesh-point which must correspond to the typical range of spine-neck diameters. 
+This limits the spatial resolution by demanding the narrowest spine necks to connect at two mesh-points (in order for the spine to be two-dimensional). 
+
+The model can without very much effort be extended to model an entire neuron with a dendrite tree (some modification to the dendrite class is required in order to add a dendrite to an existing dendrite) by making a neuron class containing a dendrite tree linked list and possibly a soma object should one wish to model the soma individually. 
+Other possible extensions include adding and removing spines according to the rules proposed by (\emph{artikkelen Gaute snakket om}) in order to investigate how this affects various diffusion processes in dendrites or dendrite trees. 
+Recall that the possibility to add spikes in spines is already built-in.
