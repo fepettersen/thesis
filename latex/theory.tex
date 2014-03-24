@@ -20,8 +20,19 @@ Note the difference between the expectation value of a quantity squared and the 
  \langle a \rangle^2 \neq \langle a^2 \rangle
 \end{equation}
 
-For the section on discretization of partial differential equations (\ref{some_words_on_PDEs}) some sub- and super- scripts will be used. To clarify; a superscript $t^n$ does not mean t to the n'th power, but $n\cdot\Delta t$
+For the section on discretization of partial differential equations \ref{some_words_on_PDEs} some sub- and super- scripts will be used. 
+To clarify; a superscript $t^n$ does not mean t to the n'th power, but $n\cdot\Delta t$ meaning the n'th time-step. 
+Similarly, the subscripts denote positions on the mesh. This means, finally, that $u^n_{ij}$ denotes the numerical solution to the discretized PDE evaluated at time-step n and in the i'th point in x-direction and the j'th point in y direction:
+\begin{equation*}
+ u^n_{ij} = u(n\cdot\Delta t,i\cdot\Delta x, j\cdot\Delta y)
+\end{equation*}
 
+Throughout the thesis, the use of exponential functions might seem a bit inconsistent notation-wise. 
+There are two different notations in use, $e^C$ and $\exp(C)$. 
+The latter is mainly used when the expression $C$ is large, like a fraction, to improve readability. 
+However, this is abandoned if there might be room for misconception. 
+As an example, the calculations in section \ref{more_general_random_walks} are done using $e^C$ rather than $\exp(C)$ even though $C$ might be a fraction.
+This is done because the exponential at some point is multiplied by a parenthesis, and where this multiplication takes place might have been unclear otherwise.
 
 \section{Introduction to random walks}\label{introduction_to_random_walks}
 
@@ -184,13 +195,13 @@ which is the diffusion equation.
 Insertion of the Gaussian distribution \eqref{rw_gaussian_distribution}) verifies that the Gaussian distribution fulfills the diffusion equation. 
 Starting with only the time derivative gives
 \begin{align*}
- \frac{\d P}{\d t} = -\frac{4\pi D\exp\left(-\frac{x^2}{4Dt}\right)}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2\exp\left(-\frac{x^2}{4Dt}\right)}{4Dt^2\sqrt{4\pi Dt}} \\
- = \exp\left(-\frac{x^2}{4Dt}\right)\left(\frac{8Dx^2}{2\sqrt{\pi}(4Dt)^{5/2}} -\frac{(4D)^2t}{2\sqrt{\pi}(4Dt)^{5/2}}\right)&= \frac{4D\exp\left(-\frac{x^2}{4Dt}\right)(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
+ \frac{\d P}{\d t} = -\frac{4\pi De^{-\frac{x^2}{4Dt}}}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2e^{-\frac{x^2}{4Dt}}}{4Dt^2\sqrt{4\pi Dt}} \\
+ = e^{-\frac{x^2}{4Dt}}\left(\frac{8Dx^2}{2\sqrt{\pi}(4Dt)^{5/2}} -\frac{(4D)^2t}{2\sqrt{\pi}(4Dt)^{5/2}}\right)&= \frac{4De^{-\frac{x^2}{4Dt}}(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
 \end{align*}
  Which is balanced by the spatial derivative
 \begin{align*}
- D\frac{\d^2 P}{\d x^2} &= \frac{D}{\sqrt{4\pi Dt}}\frac{\d}{\d x}\left[-\exp\left(\frac{-x^2}{4Dt}\right)\left(\frac{-2x}{4Dt}\right)\right]\\
- = \frac{2D}{4Dt\sqrt{4\pi Dt}}&\exp\left(\frac{-x^2}{4Dt}\right)\left[1-x\left(\frac{2x}{4Dt}\right)\right] = \frac{4D\exp\left(-\frac{x^2}{4Dt}\right)(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
+ D\frac{\d^2 P}{\d x^2} &= \frac{D}{\sqrt{4\pi Dt}}\frac{\d}{\d x}\left[-e^{\frac{-x^2}{4Dt}}\left(\frac{-2x}{4Dt}\right)\right]\\
+ = \frac{2D}{4Dt\sqrt{4\pi Dt}}&e^{\frac{-x^2}{4Dt}}\left[1-x\left(\frac{2x}{4Dt}\right)\right] = \frac{4De^{-\frac{x^2}{4Dt}}(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
 \end{align*}
 meaning that the diffusion equation is satisfied.
 
@@ -266,7 +277,7 @@ Which in many cases will simplify to
 \end{equation}
 
 In order to determine all the parameters of the convection diffusion equation \eqref{convection_diffusion_equation} we will need to go through some of the calculations from chapter \ref{introduction_to_random_walks}. 
-The situation is the same, a walker in one dimension which can jump left or right, but this time will also move a finite distance $d$ each timestep. 
+The situation is the same, a walker in one dimension which can jump left or right, but this time will also move a finite distance $d$ each time-step. 
 This will make the expected net displacement
 \begin{equation*}
  \langle S\rangle = R-L +Nd = N(p-q) + Nd
@@ -311,6 +322,34 @@ Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is t
 %  \label{convection_diffusion_eq_initial_condition}
 % \end{figure}
 
+\subsection{Pseudo-random numbers}
+
+This is also a large mathematical field which will only be touched in this thesis. 
+Further reading can be found in \emph{Some RNG thing. Preferably be Gerorge Marsagla}. 
+
+Although modern technology has made true randomness available, we do not currently have access to this and are limited to pseudo-random numbers. 
+For all purposes in this thesis, pseudo-randomness is presumed adequate. 
+
+A pseudo random number generator (RNG\nomenclature{RNG}{(pseudo) random number generator}) is essentially a function which produces seemingly random numbers through a series of operations. 
+These operations often rely on other, engineered numbers which will maximize the RNGs period. 
+A period is the number of function calls which can be performed before the RNG starts producing the same sequence of numbers. 
+Naturally this period should be as large as possible. 
+There are quite a lot of methods to produce pseudo-random numbers \emph{cite a review article or something}, but only two are implemented in this project (not counting the built in RNGs in the ``cmath'' and ``armadillo'' modules). 
+
+\subsubsection{ran0}
+
+This is a simple RNG borrowed from \cite{jensen2013computational}. 
+It is very fast, and simple to implement and use given that you know the engineered unlikely numbers it uses. 
+The period of ran0 on the other hand is rather small, only $\sim 10^8$. For short simulations this will not be a problem, however.
+
+\subsubsection{Five seeded xor-shift}
+
+This is a more complicated algorithm developed by George Marsagla. 
+It uses five seeds which are all updated every time it is called to make a pseudo-random 64-bit unsigned integer (\emph{check this}), which can be converted to a double. 
+Implementing this algorithm is intricate, but it is found written out on the internet (\emph{Be very careful about this, and cite something}). 
+As opposed to the ran0 algorithm this uses a series of bitshifts to produce the random numbers and update the seeds. 
+It is not as fast as ran0, but only some $10-30\%$ slower. 
+Because of the five seeds used, however, this algorithm has a period of $\sim10^{48}$ (\emph{This needs to come from somewhere}) making it more than good enough for most MC-simulations I have heard about, and certainly for this project.
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
 
@@ -325,6 +364,12 @@ The derivatives in the PDE are then approximated by finite differences through t
 \begin{equation}\label{derivative_definition}
  f\!\,'(x) = \lim_{h\to 0} \frac{f(x +h) - f(x)}{h},
 \end{equation}
+
+The terms explicit and implicit scheme will also be used. 
+An explicit scheme is a numerical scheme which solves a PDE numerically by using values which have already been calculated. 
+A typical example of this would be to evaluate the spatial derivative at the previous time-step seeing as this has been calculated already. 
+Implicit schemes typically tries to use values which have yet to be calculated in order to calculate new values. 
+This can for example be achieved by evaluating the spatial derivative at the time-step which is being calculated, leading to a system of linear equations (see section \ref{discretizing} to see how this is done).
 
 Numerical solution of PDEs is an enormous and important field, which cannot be done justice by a presentation here. 
 For more on numerical solution of PDEs in general, consult \cite{} or \cite{}.
@@ -524,25 +569,37 @@ Doing the expansions and cleaning up a bit
 \begin{align*}
  &R =\\& \frac{u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 + \frac{1}{6}u^{(3)}(x_i)\Delta x^3 +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2}+\\ &\frac{2u(x_i)-2u(x_i)}{\Delta x^2} -u''(x_i) +\\
  &\frac{-u'(x_i)\Delta x +0.5u''(x_i)\Delta x^2 - \frac{1}{6}u^{(3)}(x_i)\Delta x^3 +\frac{1}{24}u^{(4)}(x_i)\Delta x^4 +\mathcal{O}(\Delta x^5)}{\Delta x^2} \\
-&R = u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \mathcal{O}(\Delta x^5)  -u''(x_i) = \mathcal{O}(\Delta x^2) 
+&R = u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \frac{\mathcal{O}(\Delta x^5)}{\Delta x^2}  -u''(x_i) \\
+&R\sim \mathcal{O}(\Delta x^2) 
 \end{align*}
 There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative. \\
-For the Random walk we know from statistical mechanics that the fluctuations around a steady state is related to the number of walkers through eq. \ref{RW_error_estimate}.
+
+
+Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
+Statistical mechanics states that statistical fluctuations around a steady state is related to the number of samples, $N$, which in this case is the number of walkers, through eq. \eqref{RW_error_estimate}.
 \begin{equation}\label{RW_error_estimate}
  \langle\Delta u\rangle \propto \frac{1}{\sqrt{N}}
 \end{equation}
+
 In the combined solver, we assume that equation \ref{RW_error_estimate} still holds for the RW-part of the solution even though we can only say for certain that it is correct for the first time-step. 
 The number of walkers, $N$ is now given by the defined conversion factor $Hc$ as 
 \begin{equation}
  N(x,y,t) = Hc\cdot U(x,y,t)
 \end{equation}
 and the total number of walkers is the sum of the walkers on all the mesh-points. 
-In each mesh-point the fluctuations are of the order $\sqrt{N(x_i,y_j,t_n)}^{-1}$, meaning that the convergence rate in each mesh-point is $\frac{1}{2}$. 
+In each mesh-point the fluctuations are of the order $\sqrt{N(x_i,y_j,t_n)}^{-1}$, meaning that the convergence rate in each mesh-point is $\frac{1}{2}$.
 
-Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
-So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
-Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
-This will be such a costly operation that it will not necessarily be worth it.\\
+A lot of time has gone into forcing this error to be negligible by introducing many walkers and fining a clever way to combine the RW solution with the PDE solution. 
+Two problems turn out to make this a lot harder than it seems:
+\begin{itemize}
+ \item The required number of walkers is very large. 
+ \item The walkers must be ``reset'' at each time-step.
+\end{itemize}
+At this point there does not seem to be any solution to this, and so only a similar example can be presented to show that the principle works, no actual evidence.
+
+% So far the error seems to behave as expected, meaning that introducing very many walkers might reduce the error to $\mathcal{O}(\Delta t^2)$ if the number of walkers, $N$ is proportionate to $N\propto\frac{1}{\Delta t^2}$. 
+% Since $\Delta t \leq\frac{D\Delta x^2}{2}$ by the stability constraint (in 1D), we will already for small meshes of some 20 points need to introduce $\sim600000$ walkers per unit ``concentration'' per mesh-point in the walk-area. 
+% This will be such a costly operation that it will not necessarily be worth it.\\
 % \subsection{Extension to 3 spatial dimensions}
 % 
 % As we see in the appendix the assembly of the linear problem that arises from the BE discretization in 2d with a variable diffusion constant is a rather messy thing. 
@@ -557,7 +614,7 @@ This will be such a costly operation that it will not necessarily be worth it.\\
 % In other words the computiational cost is now quite high ($\mathcal{O}(n^6)$).
 % For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
-\subsection{Tridiagonal linear systems}
+\subsection{Tridiagonal linear systems}\label{tridiagonal_linear_systems}
 The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
 The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
 The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed below.
@@ -602,7 +659,7 @@ Since most entries are zero we can easily get away with only doing one forward s
 
 \lstinputlisting{Figures/tridiag.cpp}
 We can also modify the tridiagonal solver from the one-dimensional case so we can use it on block-tridiagonal systems. 
-The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. The result of rewriting the $2n$-band diagonal matrix is the block matrix in equation \ref{block_tridiagonal_matrix}.
+The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{block_tridiag_alg}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. The result of rewriting the $2n$-band diagonal matrix is the block matrix in equation \ref{block_tridiagonal_matrix}.
 
 \begin{align}\label{block_tridiagonal_matrix}
    \left(\begin{array}{c c c c c c c c c}
@@ -624,12 +681,12 @@ The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_m
 which we can also express as $\mathbf M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
 
 There is a forward substitution
-\begin{align*}
+\begin{align}\label{block_tridiag_alg}
  H_1 &= -B_1^{-1}C_1\nonumber \\
  H_i &= -\left(B_i+A_iH_{i-1}\right)^{-1}C_i \nonumber \\
  \mathbf{g}_1 &= B_1^{-1}\mathbf{k}_1 \nonumber\\
- \mathbf{g}_1 &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{k}_i-A_i\mathbf{g}_{i-1}\right)\nonumber
- \end{align*}
+ \mathbf{g}_1 &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{k}_i-A_i\mathbf{g}_{i-1}\right)
+ \end{align}
  Followed by a backward substitution
  \begin{align*}
   \mathbf{x}_{n-1} &= \mathbf{g}_{n-1}\nonumber\\
@@ -697,42 +754,45 @@ This also further supports the claim that there is no need to find a very precis
  
 In this chapter we will identify and discuss a few obvious difficulties we can expect to run into in our planned project. As far as possible we will also explain how to solve the problems or how to live with them.
 
-\begin{itemize}
- \item Different timescales\\
+\subsubsection{Different timescales}
   The PDE-solver will be operating with some time-step $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
   The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the time-step on the PDE level. 
   Depending on the coupling chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
   Running some number of steps, N, on the random-walk level should eventually sum up to the time-step on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
   It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
- \item Boundary conditions\\
+
+\subsubsection{Boundary conditions}
  To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
  Finding a boundary condition that accurately models the actual system turns out to be quite straightforward.
  We can assume that the number of walkers in the walk-domain is conserved for each PDE time-step, and thus no walkers can escape the domain. 
  Implementing perfectly reflecting boundaries solves this quite well. 
  This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
  Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until we have the desired concentration of walkers.
- \item Negative concentration of walkers \\
+ 
+\subsubsection{Negative concentration of walkers}
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
  Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems if the solution of the PDE takes negative values (which it most likely will not do). 
  I can find no good solutions to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
  This workaround has a problem in that a transition from positive to negative value will lead to a ``valley'' in the absolute-value solution. 
  A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again.
- \item Smooth solutions\\
+
+\subsubsection{Smooth solutions}
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
  When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one time-step to the next. 
  In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
  The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
  A polynomial regression model was implemented in 1d, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
  Another idea is to implement a cubic spline interpolation over the area, but this too has its problems. An interpolation forces the solution to have a value at the interpolating points, and seeing as we cannot say for certain which value is correct how shall we pick the interpolating points?
- \item Number of time-steps on the random walk level\\
+
+\subsubsection{Number of time-steps on the random walk level}
  As the time-step on the PDE level is increased above the stability criterion of the FE scheme towards more efficient sizes we are faced with the problem of whether or not to increase the number of time-steps on the RW level. 
  Strictly speaking we do not have to do this, seeing as we adjust the step-length of the walkers with respect to the time-step (see eq \ref{steplength}). 
  As an initial value we put the number of time-steps to 100, but this was more a guess of how many are necessary for the central limit theorem to have effect than anything else. 
  The question really boils down to how we define our model, which we have yet to do in an accurate way.
- \item Random walks in 3D\\
+
+\subsubsection{Random walks in 3D}
  Both 1 and 2 dimensional space are spanned completely by a random walk, but space of 3 or more dimensions is not. 
  This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
-\end{itemize}
 
 \subsection{Probability distribution and time-steps}\label{probability_distribution_and_timesteps}
 As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
@@ -777,7 +837,7 @@ Further we suggested that the error from the RW simulation is proportional to th
 Combined with the demand to the number of walkers we will quickly end up with an extreme computational demand if we want to force our model to have first order convergence (not to mention second order convergence). 
 Fortunately we will ignore this demand outside of verification because there is little physical meaning left if we use the demanded number of walkers.
 
-\section{Geometry}
+\section{Geometry}\label{geometry}
 Any finite difference method is problematic to solve on anything else than a rectangular grid. 
 When we additionally use an implicit FD method we will add a ``demand'' of having a square grid as well. 
 Fortunately the implicit solvers we use are stable. \\
