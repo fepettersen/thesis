@@ -197,7 +197,7 @@ void Dendrite::Solve(void){
 	/*Write information about spine heads to a separate file*/
 	ofstream spine_info;
 	spine_info.open("spine_info.txt",ios_base::app);
-	sprintf(diffT,"%04d  %d",t,int(spines.size()));
+	sprintf(diffT,"%04d  %d",t,spines.size());
 	spine_info<<diffT<<endl;
 
 	for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){

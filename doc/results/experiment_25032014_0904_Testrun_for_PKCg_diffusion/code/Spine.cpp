@@ -4,53 +4,46 @@ using namespace arma;
 
 Spine::Spine(int spine_start, int spine_stop, double D, double dt){
 	rng = new Random();
-	
-	_x0  =_y0 = 0.0;
-
-	double some_factor = 0.04;		/*This needs to be dx on the PDE level!!!!*/
+	double some_factor = 0.1;
 	max_spike_size = 15;
-	d = 2;							/*dimensionality*/
+	d = 2;
 	dendrite_gridpoints = spine_stop - spine_start;
 	pos = spine_start;
 	spike_probability = 0.0;
 
 	neck_width = some_factor*dendrite_gridpoints;
-	neck_length = 0.29 + 0.74*rng->uniform();	/*numbers chosen to coincide with Arellano et.al 2007*/	//(1-0.5*rng->uniform())*neck_width;
-	_y1 = neck_length + 1.3*neck_length*rng->uniform();	/*numbers chosen to give reasonable spine sizes*/
-	head_height = _y1 - neck_length;
-	
-	head_width = 2*neck_width + 1.5*rng->uniform();	//0.5*(1-neck_width);
-	_x1 = head_width;
+	neck_length = (1-0.5*rng->uniform())*neck_width;
+	head_height = 1-neck_length;
+	head_width = 0.5*(1-neck_width);
 	a = head_height/head_width;
-	left_neck_limit = 0.5*(_x1 - neck_width);
-	right_neck_limit = 0.5*(_x1 + neck_width);
-	
+	left_neck_limit = 0.5*(1 - neck_width);
+	right_neck_limit = 0.5*(1 + neck_width);
 	drift = 0;
 	step_length = sqrt(2*D*dt);
 	
-	cout<<"neck_width = "<<neck_width<<endl<<"neck_length = "<<neck_length<<endl;
-	cout<<"head_height = "<<head_height<<endl<<"head_width = "<<head_width<<endl;
-	cout<<"step_length = "<<step_length<<endl;
-
-
+	_x1 = _y1 = 1.0;
+	_x0  =_y0 = 0.0;
 	dx = (dendrite_gridpoints>1)?(1.0/(dendrite_gridpoints-1)):(1.0);
+	cout<<"dx = "<<dx<<endl;
+	// cout<<endl<<"Values: "<<endl<<"neck_width = "<<neck_width<<endl;
+	// cout<<"neck_length = "<<neck_length<<endl<<"a = "<<a<<endl;
 }
 
 void Spine::AddSpike(void){
 	int amplitude = max_spike_size*rng->uniform();
 	for (int i = 0; i < amplitude; ++i){
 		/*Add a random walker in the proximity of the PSD*/
-		Walker* tmp = new Walker(rng->uniform(),_y1-rng->uniform());
+		Walker* tmp = new Walker(rng->uniform(),1.0-rng->uniform());
 		Ions.push_back(tmp);
 	}
-	cout<<"Spike of size "<<amplitude<<endl;
+	cout<<" of size "<<amplitude<<endl;
 }
 
 void Spine::Solve(void){
 	bool delete_me;
 	ions_in_spine_head = 0;
 	if (rng->uniform()<spike_probability){
-		// cout<<"Spike";
+		cout<<"Spike";
 		AddSpike();
 	}
 	// cout<<Ions.size()<<"  ";

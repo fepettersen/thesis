@@ -13,7 +13,7 @@ public:
 		return a*(x-0.5*(1+neck_width))+neck_length;
 	};
 	double left_limit(double x){
-		return _y1-a*x;
+		return 1.0-a*x;
 	};
 	bool checkpos(Walker*);
 	void Solve(void);

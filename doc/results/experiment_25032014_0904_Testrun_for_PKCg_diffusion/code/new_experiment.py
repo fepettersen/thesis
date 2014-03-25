@@ -410,7 +410,7 @@ def GaussianPulse(x,y,t=0):
 	return np.exp(-(x-x0)**2/(2*sigma**2))
 	
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -423,7 +423,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 5001
 	n = 1
-	T = 9000/50 		# no.of timesteps, [dt*T] = seconds
+	T = 9000 		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 50 		#um
@@ -460,7 +460,7 @@ if __name__ == '__main__':
 
 	for i in Hc:
 		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0]*50)
+		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 		run.RunSimulation(i)
 	# run.ConvergenceTest(Hc)
 	leg = ['Hc = %g'%i for i in Hc]
@@ -494,7 +494,7 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None)
+	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)

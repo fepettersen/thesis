@@ -19,7 +19,7 @@ Spine::Spine(int spine_start, int spine_stop, double D, double dt){
 	_y1 = neck_length + 1.3*neck_length*rng->uniform();	/*numbers chosen to give reasonable spine sizes*/
 	head_height = _y1 - neck_length;
 	
-	head_width = 2*neck_width + 1.5*rng->uniform();	//0.5*(1-neck_width);
+	head_width = neck_width + 3.3*rng->uniform();	//0.5*(1-neck_width);
 	_x1 = head_width;
 	a = head_height/head_width;
 	left_neck_limit = 0.5*(_x1 - neck_width);
