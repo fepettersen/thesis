@@ -17,7 +17,7 @@ dt = 0.001
 os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %g'%(tofile,x0,x1,y0,y1,m,n,T,result_path,filename,Hc,dt))
 # exit()
 mpl.ion()
-for step in sorted(glob.glob('spine_*.txt')):
+for step in sorted(glob.glob('spine_n*.txt')):
 	tmp = np.loadtxt(step)
 	if len(np.shape(tmp))==1:
 		break

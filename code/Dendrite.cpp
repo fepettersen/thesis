@@ -3,11 +3,14 @@ using namespace std;
 using namespace arma;
 
 Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,double **DiffTensor, double factor, double Dt):Combine(M,N,X0,X1,Y0,Y1,DiffTensor,factor,Dt){
-	max_spine_contact_point = 4;
+	min_spine_contact_point = 0.09/dx;		/*spine neck diameter min = 0.09 micrometer (Arellano et.al. 2007)*/
+	max_spine_contact_point = 0.51/dx;		/*spine neck diameter max = 0.51 micrometer (Arellano et.al. 2007)*/
+
 	left_spine_pos_limit = 2;
 	right_spine_pos_limit = m - 2;
-	diffusie_into_spine_probability = 1e-3;
+	diffusie_into_spine_probability = 0.01*dx;	/*Should this be something special?*/
 	dt = Dt;
+	RW_timesteps = 100;
 	num_spines = t = 0;
 
 	ofstream spine_info;
@@ -76,19 +79,17 @@ void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
 }
 
 void Dendrite::AddSpine(double drift){
-	int m0[2];
-	m0[0] = 0;
-	m0[0] = left_spine_pos_limit + right_spine_pos_limit*rng->uniform();
-	m0[1] = m + 1;
-	while(m0[1]>=m){
-		m0[1] = m0[0]+1 +rng->uniform()*max_spine_contact_point;
+	int spine_position = left_spine_pos_limit+ right_spine_pos_limit*rng->uniform();
+	int spine_length_in_gridpoints = m + 1;
+	while(spine_length_in_gridpoints >= max_spine_contact_point){
+		spine_length_in_gridpoints = min_spine_contact_point +rng->uniform()*max_spine_contact_point;
 	}
-	spine_placements.push_back(m0);
-	Spine* tmp = new Spine(m0[0],m0[1],aD[0][0],dt);
+	// spine_placements.push_back(spine_position);
+	Spine* tmp = new Spine(spine_position,spine_length_in_gridpoints + spine_position,aD[0][0],dt/RW_timesteps, dx);
 	spines.push_back(tmp);
 	spines[num_spines]->SetDrift(drift);
 	num_spines ++;
-	cout<<"Added spine at "<<m0[0]<<" to "<<m0[1]<<endl;
+	cout<<"Added spine at "<<spine_position<<" to "<<spine_length_in_gridpoints + spine_position<<endl;
 }
 
 void Dendrite::AddWalkArea(double* x, double* y, string cmd, string path, string excecutable_name){
@@ -166,8 +167,9 @@ void Dendrite::Solve(void){
 	// }
 	t += 1;
 	double step_length = sqrt(2*d*aD[0][0]*dt);
-	for(int i=0;i<100;i++){
+	for(int i=0;i<RW_timesteps;i++){
 		for(vector<Walker*>::iterator Ion = dendrite_walkers.begin(); Ion != dendrite_walkers.end(); ++Ion){
+			/*This loop is currently not used, and is ment for only using walkers on the dendrite*/
 			(*Ion)->r[0] += pow(-1,int(2*rng->uniform()))*(step_length);
 			if ((*Ion)->r[0] < x0 - dx/2.0){
 				(*Ion)->r[0] += (x0-dx/2.0) - (*Ion)->r[0];
@@ -177,8 +179,11 @@ void Dendrite::Solve(void){
 			}
 		}
 		for (vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
-			if(rng->uniform()<diffusie_into_spine_probability){
-				/*Particle diffusing into spine*/
+			if (t==1){
+				cout<<"prob = "<<diffusie_into_spine_probability*(*spine)->dendrite_gridpoints<<endl;
+			}
+			if(rng->uniform()<diffusie_into_spine_probability*(*spine)->dendrite_gridpoints){
+				/*Particle diffusing into spine. Probabiliy increases with spine neck width*/
 				int position = (*spine)->pos + int(rng->uniform()*(*spine)->dendrite_gridpoints);
 				if (U[position][0]>1.0/Hc){
 					fprintf(stderr,"Particle diffusing into spine\n");
@@ -195,22 +200,26 @@ void Dendrite::Solve(void){
 		}
 	}
 	/*Write information about spine heads to a separate file*/
-	ofstream spine_info;
-	spine_info.open("spine_info.txt",ios_base::app);
-	sprintf(diffT,"%04d  %d",t,int(spines.size()));
-	spine_info<<diffT<<endl;
-
+	vector<string*> v;
+	int counter = 0;
 	for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
-		if ((*spine)->ions_in_spine_head > 0 && t>1){
-			/*Introduce this test in order to limit ammount of data*/
-			spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;	
-		}
-		else if (t==1){
-			/*Write info about all spines at least once*/
-			spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;	
-		}
+		counter += (*spine)->ions_in_spine_head;
 	}
-	spine_info.close();
+	if(counter != 0 || t==1){
+		ofstream spine_info;
+		spine_info.open("spine_info.txt",ios_base::app);
+		sprintf(diffT,"%04d  %d",t,int(spines.size()));
+		spine_info<<diffT<<endl;
+		for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
+			if ((*spine)->ions_in_spine_head > 0 && t>1){
+				spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;
+			}
+			else if (t==1){
+				spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;
+			}
+		}		
+		spine_info.close();
+	}
 	
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){

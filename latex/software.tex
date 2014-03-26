@@ -105,3 +105,9 @@ This limits the spatial resolution by demanding the narrowest spine necks to con
 The model can without very much effort be extended to model an entire neuron with a dendrite tree (some modification to the dendrite class is required in order to add a dendrite to an existing dendrite) by making a neuron class containing a dendrite tree linked list and possibly a soma object should one wish to model the soma individually. 
 Other possible extensions include adding and removing spines according to the rules proposed by (\emph{artikkelen Gaute snakket om}) in order to investigate how this affects various diffusion processes in dendrites or dendrite trees. 
 Recall that the possibility to add spikes in spines is already built-in.
+
+\subsection{Parameters}
+
+As is the general problem in computational neuroscience this project requires setting a lot of parameters whose values are not known. 
+There are of course a lot of parameters with known values as well, like the diffusion coefficient for PKC$\gamma$. 
+A summary of the parameters of particular interest is shown in table \ref{parameter_values}, with an indication of where the values are taken from, if they are calculated or if they are simply given a value to ensure reasonable behaviour

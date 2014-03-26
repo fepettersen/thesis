@@ -105,30 +105,30 @@ int main(int argc, char** argv)
 	string RWname = "spine";
 	bool test_convergence = false;
 
-	Spine* s = new Spine(5,8,1.0,0.01);
-	s->AddSpike();
+	// Spine* s = new Spine(5,8,1.0,0.01);
+	// s->AddSpike();
 
-	for (int i = 0; i < T; ++i){
-		s->Solve();
-		s->Write(make_filename(buffer,RWname,conversion_factor,i));
+	// for (int i = 0; i < T; ++i){
+	// 	s->Solve();
+	// 	s->Write(make_filename(buffer,RWname,conversion_factor,i));
+	// }
+	Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
+	BlackBox.SetInitialCondition(Up,m,n);
+	
+	for (int i = 0; i < 10; ++i){
+		/*Adds some number of spines to the dendrite*/
+		BlackBox.AddSpine();
 	}
-	// Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
-	// BlackBox.SetInitialCondition(Up,m,n);
 	
-	// for (int i = 0; i < 10; ++i){
-	// 	/*Adds some number of spines to the dendrite*/
-	// 	BlackBox.AddSpine();
-	// }
-	
-	// cout<<"done!"<<endl;
-	// for(int t=0; t<T; t++){
-	// 	BlackBox.Solve();
-	// 	if(tofile){
-	// 		// output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
-	// 		output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
-	// 	}
-	// 	cout<<"t = "<<t+1<<" of "<<T<<endl;
-	// }
+	cout<<"done!"<<endl;
+	for(int t=0; t<T; t++){
+		BlackBox.Solve();
+		if(tofile){
+			// output(&outfile,BlackBox.U,buffer,path,filename,m,n,int(1/Dt),t);
+			output(&outfile,BlackBox.U,buffer,path,filename,m,n,conversion_factor,t);
+		}
+		cout<<"t = "<<t+1<<" of "<<T<<endl;
+	}
 
 	return 0;
 }
