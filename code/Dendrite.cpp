@@ -8,14 +8,15 @@ Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,doub
 
 	left_spine_pos_limit = 2;
 	right_spine_pos_limit = m - 2;
-	diffusie_into_spine_probability = 0.01*dx;	/*Should this be something special?*/
 	dt = Dt;
+	diffuse_into_spine_probability = 0.5*dt*dx;
 	RW_timesteps = 100;
 	num_spines = t = 0;
 
 	ofstream spine_info;
 	spine_info.open("spine_info.txt");
 	spine_info.close();
+	cout<<"diffuse_into_spine_probability = "<<diffuse_into_spine_probability<<endl;
 	}
 
 void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
@@ -179,13 +180,15 @@ void Dendrite::Solve(void){
 			}
 		}
 		for (vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
-			if (t==1){
-				cout<<"prob = "<<diffusie_into_spine_probability*(*spine)->dendrite_gridpoints<<endl;
-			}
-			if(rng->uniform()<diffusie_into_spine_probability*(*spine)->dendrite_gridpoints){
+
+			if(rng->uniform()<diffuse_into_spine_probability*(*spine)->dendrite_gridpoints){
 				/*Particle diffusing into spine. Probabiliy increases with spine neck width*/
 				int position = (*spine)->pos + int(rng->uniform()*(*spine)->dendrite_gridpoints);
-				if (U[position][0]>1.0/Hc){
+				double integral = 0;
+				for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
+					integral += U[j][0];
+				}
+				if (integral*dx>1.0/Hc){
 					fprintf(stderr,"Particle diffusing into spine\n");
 
 					(*spine)->AddIonFromDendrite();

@@ -31,3 +31,15 @@
 	author = "Graham, Bruce and Gillies, Andrew and Willshaw, David"
 }
 
+@article{craske2005spines,
+	author = "Craske, Madeleine L and Fivaz, Marc and Batada, Nizar N and Meyer, Tobias",
+	title = "{Spines and neurite branches function as geometric attractors that enhance protein kinase C action}"
+}
+
+@article{hjorth2011computational,
+	author = "Hjorth-Jensen, Morten",
+	journal = "Lecture notes",
+	title = "{Computational physics}",
+	year = "2011"
+}
+

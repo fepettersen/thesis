@@ -615,11 +615,11 @@ At this point there does not seem to be any solution to this, and so only a simi
 % For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
 \subsection{Tridiagonal linear systems}\label{tridiagonal_linear_systems}
-The implicit discretization gives us a set of linear equations, or a linear system, to solve at each timestep. 
-The physics of the system gives us a special form of linear system, namely a band diagonal system, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions we are in. 
-The one dimensional case gives us a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed below.
-In two spatial dimensions we are not quite as fortunate as in one dimension. We get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). 
-Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form gives us a tridiagonal matrix, where the entries are $n\times n$ matrices. 
+The implicit discretization results in a set of linear equations, or a linear system, to solve at each timestep. 
+Neumann boundaries combined with a first derivative in time makes the linear system band diagonal, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions the problem is solved in. 
+In one spatial dimension this reduces to a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed below.
+In two spatial dimensions we are not quite as fortunate as in one dimension, and get a banded matrix with 2n bands and five non-zero bands, where n is the spatial resolution (which is equal in x and y direction). 
+Rewriting the assembled matrix (see eq. \ref{linear_system_BE2D}) to a block-matrix form makes the matrix tridiagonal again, but the entries are $n\times n$ matrices. 
 
 
 Assuming the system has a solution, the fool-proof way to solve a linear equation $\mathbf{M}\mathbf{x} = \mathbf{b}$ where $\mathbf{M}$ is not a sparse matrix, by Gaussian elimination.
@@ -653,12 +653,13 @@ and further to
  0 & 0 & (\tilde{a}_{43}-\frac{\tilde{a}_{42}\tilde{a}_{23}}{\tilde{a}_{22}}) & (\tilde{a}_{44}-\frac{\tilde{a}_{42}\tilde{a}_{34}}{\tilde{a}_{22}})
  \end{array} \right)\mathbf{x} = \tilde{\mathbf{b}}
 \end{align}
-until we have an upper triangular matrix. We then do a backwards sweep to solve for one element of the unknown vector, $\mathbf{x}$ at a time. 
+
+finally resulting in an upper triangular matrix. A backwards sweep is then performed to solve for one element of the unknown vector, $\mathbf{x}$ at a time. 
 
 Since most entries are zero we can easily get away with only doing one forward sweep down the matrix, eliminating all the sub-diagonal matrix-entries, and then one backward sweep, which calculates the unknown vector $\mathbf{x}$. The algorithm is listed below as a function implemented in C++.
 
 \lstinputlisting{Figures/tridiag.cpp}
-We can also modify the tridiagonal solver from the one-dimensional case so we can use it on block-tridiagonal systems. 
+The tridiagonal solver from the one-dimensional case can be modified so it can be used on block-tridiagonal systems. 
 The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{block_tridiag_alg}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. The result of rewriting the $2n$-band diagonal matrix is the block matrix in equation \ref{block_tridiagonal_matrix}.
 
 \begin{align}\label{block_tridiagonal_matrix}
@@ -678,7 +679,7 @@ The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_m
              \mathbf{u}^{n+1}_{n}
              \end{array}\right) = \mathbf{u}^{n}
 \end{align}
-which we can also express as $\mathbf M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
+which can also be expressed as $\mathbf M\mathbf{x} = \mathbf{k}$. Block-matrices named $B_i$ are tridiagonal, and the ones named $A_i$ or $C_i$ are strictly diagonal. 
 
 There is a forward substitution
 \begin{align}\label{block_tridiag_alg}
@@ -693,15 +694,15 @@ There is a forward substitution
   \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
  \end{align*}
 The algorithm requires inverting approximately 3n $n\times n$ matrices, which might be expensive. 
-However, we only need to to the inversion once as long as the mass-matrix, $\mathbf M$ is unchanged so the expense is reduced. 
-This should give us a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. 
+However, the inversion only needs to be done once as long as the mass-matrix, $\mathbf M$ is unchanged, and so the expense is reduced. 
+This should result in a computational intensity of around $\mathcal{O}(n^2)$ seeing as we only need to do one matrix-matrix multiplication where one matrix is diagonal, and two matrix-vector multiplications. 
 All of which demand $\mathcal{O}(n^2)$ operations. This reduction in computational cost makes the implicit scheme as effective as the implicit FE scheme.
 
 In three dimensions we are even more unfortunate and get an $2n^2$-banded matrix and seven non-zero bands. 
-As we can see in the appendix (eq. \ref{BE3D_linear_system}) we can write this so it looks like the block tridiagonal linear system we got in 2d, and that could be solved by the block-tridiagonal solver. 
-The difference is that the entries i n the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that we must work with $n^2\times n^2$ matrices. 
-All in all we should get a performance of around $\mathcal{O}(n^3)$ if we take care to save the inverted matrices from the forward substitution. 
-This is about the same performance as the explicit scheme gives us, but again without the stability issue.
+As the appendix shows (eq. \ref{BE3D_linear_system}) this can be written so it looks like the block tridiagonal linear system from the 2d case, and that could be solved by the block-tridiagonal solver. 
+The difference is that the entries i n the block-matrices $A_i$, $B_i$ and $C_i$ are block-matrices themselves meaning that the block tridiagonal solver must work with $n^2\times n^2$ matrices rather than $n\times n$. 
+All in all the performance should be around $\mathcal{O}(n^3)$ if the inverted matrices from the forward substitution are saved as in the 2d case. 
+This is about the same performance as the explicit scheme gives, but without the stability issue.
 
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\
@@ -744,42 +745,43 @@ A schematic of the algorithm is provided in figure \ref{schematic}.
 
 \subsection{Convergence rate}
 
-In chapter \ref{truncation_error} we discussed the error that arises as a result of adding random walkers on parts of the mesh. 
-We found that the amplitude of the fluctuations per mesh-point is proportionate to $\frac{1}{\sqrt{N}}$ where N is the number of walkers related to the mesh-point. 
-Combining the two models means adding fluctuations to the approximation to the exact solution. Seeing as we send this combined solution to the PDE-solver as an ``initial condition'' for the next time-step we have made a compromise in accuracy. The error-estimate we will define later is still dependent of $\Delta t$, but the dependency is now of the order $\mathcal{O}(\sqrt{\Delta t})$. 
+In chapter \ref{truncation_error} the error that arises as a result of adding random walkers on parts of the mesh was discussed. 
+The amplitude of the fluctuations per mesh-point was found proportionate to $\frac{1}{\sqrt{N}}$ where N is the number of walkers related to the mesh-point. 
+Combining the two models means adding fluctuations to the approximation to the exact solution. Seeing as this combined solution is sent to the PDE-solver as an ``initial condition'' for the next time-step we have made a compromise in accuracy. The error-estimate, which will be defined later, is still dependent of $\Delta t$, but the dependency is now of the order $\mathcal{O}(\sqrt{\Delta t})$. 
 This also further supports the claim that there is no need to find a very precise scheme to solve the PDE.\\
 \emph{We will test this by doing a convergence test in time keeping the number of walkers constant.}
 
 \subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
  
-In this chapter we will identify and discuss a few obvious difficulties we can expect to run into in our planned project. As far as possible we will also explain how to solve the problems or how to live with them.
+This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.
 
 \subsubsection{Different timescales}
   The PDE-solver will be operating with some time-step $\Delta t$ which will, depending on the discretization of the PDE, have some constraints and will definitely have an impact on the error. 
   The walkers will, as we have just seen, solve the diffusion equation as well, but with some different $\Delta \tilde{t}$ which is smaller than the time-step on the PDE level. 
   Depending on the coupling chosen between the two models this difference will have some effect or a catastrophic effect on the error. 
   Running some number of steps, N, on the random-walk level should eventually sum up to the time-step on the PDE level, $\sum\limits_{i=0}^N \Delta\tilde{t} = \Delta t$. 
-  It turns out, as we will see in section \ref{probability_distribution_and_timesteps} that we can make sure the coupling is as good as it gets by restricting the step length of the walkers.
+  Section \ref{probability_distribution_and_timesteps} shows that restricting the step length of the walkers will improve the coupling between the two solvers as far as possible.
 
 \subsubsection{Boundary conditions}
- To combine the two models we will need to put restricting boundary conditions on the random walks. This is not usually done (as far as I have seen), but not very difficult. 
+ To combine the two models, some restricting boundary conditions must be put on the random walkers. 
+ This is not usually done (as far as I have seen), but not very difficult. 
  Finding a boundary condition that accurately models the actual system turns out to be quite straightforward.
- We can assume that the number of walkers in the walk-domain is conserved for each PDE time-step, and thus no walkers can escape the domain. 
+ The assumption that the number of walkers in the walk-domain is conserved for each PDE time-step can be made, and thus no walkers can escape the domain. 
  Implementing perfectly reflecting boundaries solves this quite well. 
  This means that the flux of walkers out of a boundary is zero, which is the same as Neumann boundary conditions on the PDE level. \\
- Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until we have the desired concentration of walkers.
+ Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until the desired concentration of walkers is reached.
  
 \subsubsection{Negative concentration of walkers}
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
  Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems if the solution of the PDE takes negative values (which it most likely will not do). 
- I can find no good solutions to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
+ No good solutions have been found to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
  This workaround has a problem in that a transition from positive to negative value will lead to a ``valley'' in the absolute-value solution. 
  A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again.
 
 \subsubsection{Smooth solutions}
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
- When we introduce a stochastic process, we will potentially also introduce fast fluctuations from one time-step to the next. 
- In this case we are faced with a dilemma; on the one hand there is the smoothness of the solution to consider, on the other hand we have introduced the stochastic term believing that it adds detail to our model. 
+ When a stochastic process is introduced, rapid fluctuations from one time-step to the next might follow.
+ In this case a dilemma arises; on the one hand there is the smoothness of the solution to consider, on the other hand the stochastic term was introduced believing that it adds detail to the model. 
  The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
  A polynomial regression model was implemented in 1d, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
  Another idea is to implement a cubic spline interpolation over the area, but this too has its problems. An interpolation forces the solution to have a value at the interpolating points, and seeing as we cannot say for certain which value is correct how shall we pick the interpolating points?
@@ -795,68 +797,76 @@ In this chapter we will identify and discuss a few obvious difficulties we can e
  This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
 
 \subsection{Probability distribution and time-steps}\label{probability_distribution_and_timesteps}
-As we saw in section \ref{more_general_random_walks} the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
-In our application, however, we are not interested in finding the walker at an exact position, but in an interval around the mesh-points sent to the walk-solver. 
+As section \ref{more_general_random_walks} shows, the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
+In this application, however, finding the walker at an exact position is not of interest, but finding it in an interval around the mesh-points sent to the walk-solver is. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
-We will also run the walk solver for some $N$ time-steps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
-This slightly modifies our distribution into
+The walk solver will also run for some $N$ time-steps on the random-walk scale (where $N$ steps on the random walk scale is the same as one step on the PDE scale). 
+This slightly modifies the distribution into
 \begin{equation}
  P(x_i\pm\Delta x,t_{n+1}) = \frac{1}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
 \end{equation}
-This makes the concentration of walkers $C(x,t) = MP(x,t)$
+Making the concentration of walkers $C(x,t) = MP(x,t)$
 \begin{equation}
  C(x_i\pm\Delta x,t_{n+1}) = \frac{M}{\sqrt{4\pi DN\Delta \tilde{t}}}\exp\left(\frac{(x\pm\Delta x)^2}{4DN\Delta \tilde{t}}\right)
 \end{equation}
-For each PDE time-step we reset the walkers to have some new initial condition. 
-We do this because the concentration over the ``walk-area'' will change with each PDE time-step.
+
+For each PDE time-step the walkers are reset to have some new initial condition. 
+This is done because the concentration over the ``walk-area'' will change with each PDE time-step.
 The point is that $ C(x_i\pm\Delta x,t_{n+1})$ will be dependent on the initial condition $ C(x_i\pm\Delta x,t_{n})$.
 
 
-Looking at the difference in time-step size between the two length scales we see from equation \ref{descrete_gaussian_distr} that the step-size on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
+Equation \eqref{descrete_gaussian_distr} shows that the step-size on the random walk scale is dependent on the variance in the actual steps (This is in principle the Einstein relation). 
 \begin{equation}
  \sigma^2 = \langle\Delta x^2\rangle = 2DN\Delta\tilde{t} \implies \Delta\tilde{t} = \frac{\langle\Delta x^2\rangle}{2DN}
 \end{equation}
-Equating this with \ref{random_walk_variance} gives us a first order approximation to the step-length, $l$
+Equating this with \ref{random_walk_variance} gives a first order approximation to the step-length, $l$
 \begin{align}
  \langle\Delta x^2\rangle &= 4pqNl^2 = 2DN\Delta\tilde{t} \nonumber \\ 
  l &= \sqrt{2D\Delta\tilde{t}}. \label{steplength}
 \end{align}
-Of course this is assuming that we use a random walk algorithm of fixed step-length.\\
+
+Of course this is assuming that a random walk algorithm of fixed step-length is used.\\
 Equation \ref{steplength} is proportional to the square-root of the adjusted time-step. 
 We have already suggested that the error term from the RW simulation depends on the number of walkers we use (or the conversion rate). This equation suggests that the error term also depends on the time step. 
-Though this might seem a bit frustrating at first glance, but it answers a question we asked earlier; how many time-steps do we need to take at the RW-level. 
+Though this might seem a bit frustrating at first glance, it answers a question asked earlier; how many time-steps are needed at the RW-level. 
 We have the intuitive relation between the RW time-step, $\Delta \tilde t$ and the PDE time-step through the number of steps at the RW level, $T$:
 \begin{equation*}
  \Delta \tilde t = \frac{\Delta t}{T}
 \end{equation*}
-Further we suggested that the error from the RW simulation is proportional to the root of the time-step $\epsilon \propto \sqrt{\Delta \tilde t} = \sqrt{\frac{\Delta t}{T}}$. We want to force this error to behave as $\mathcal O(\Delta t)$, and see that we can adjust the number of time-steps at the RW level in order to make this happen.
+Further, the error from the RW simulation was suggested to be proportional to the square root of the time-step $\epsilon \propto \sqrt{\Delta \tilde t} = \sqrt{\frac{\Delta t}{T}}$. 
+Forcing the error to behave as $\epsilon\propto\mathcal O(\Delta t)$ might be achieved by adjusting the number of time-steps taken at the RW level (but actually not).
+% We want to force this error to behave as $\mathcal O(\Delta t)$, and see that adjusting the number of time-steps at the RW level can make this happen.
+
 \begin{equation}
  \mathcal O(\Delta t)>\sqrt \frac{\Delta t}{T} \implies T>\frac{1}{\Delta t}
 \end{equation}
 
-Combined with the demand to the number of walkers we will quickly end up with an extreme computational demand if we want to force our model to have first order convergence (not to mention second order convergence). 
-Fortunately we will ignore this demand outside of verification because there is little physical meaning left if we use the demanded number of walkers.
+Combined with the demand to the number of walkers this will quickly result in an extreme computational demand in order to force our model to have first order convergence (not to mention second order convergence). 
+Fortunately, this demand will be ignored outside of verification because there is little physical meaning left if the demanded number of walkers is used.
 
 \section{Geometry}\label{geometry}
 Any finite difference method is problematic to solve on anything else than a rectangular grid. 
-When we additionally use an implicit FD method we will add a ``demand'' of having a square grid as well. 
-Fortunately the implicit solvers we use are stable. \\
-In the physical scope of this thesis we do not find any rectangular shapes to apply our system to. 
-Actually we do not have any well defined geometry to apply our system on, but that is of less importance. 
+Using an implicit FD method will add an additional ``demand'' of having a square grid as well. 
+Fortunately, using an implicit solver will eliminate the stability issue. \\
+% In the physical scope of this thesis there are few rectangular shapes to apply our system to. 
 The purpose of this project is to investigate the actual coupling of two models for the same problem. \\
 If we want to model diffusion on a general geometry by a FD method we could transform the grid to a unit-square through a general transform.
 \begin{equation*}
  \vec{r} = \mathbf{T}(\vec{q})
 \end{equation*}
-Where $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. After a lot of math, including some differential geometry we find that the diffusion equation in computational space still can be written as
+Where $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. 
+After a lot of math, including some differential geometry the diffusion equation in computational space is found to still have the form
+
 \begin{equation*}
  \frac{\d C}{\d t} -\nabla\cdot\vec{J} = 0
 \end{equation*}
 but the total flux vector $\vec{J} = \vec{f} + \phi$ now has the properties
+
 \begin{align*}
  \nabla\cdot\vec{f} = \frac{1}{g}\cdot\left(\vec{f}\cdot\frac{\d}{\d\xi}\left(\frac{\d y}{\d\eta},\frac{-\d x}{\d \eta}\right) + \vec{f}\cdot\frac{\d}{\d\eta}\left(\frac{-\d y}{\d\xi},\frac{\d x}{\d \xi}\right)\right) \\
  \nabla\phi = \frac{1}{g}\left(\phi\cdot\frac{\d}{\d\xi}\left(\frac{\d y}{\d\eta},\frac{-\d x}{\d\eta}\right)+\phi\cdot\frac{\d}{\d\eta}\left(\frac{-\d y}{\d\xi},\frac{\d x}{\d\xi}\right)\right)
 \end{align*}
-where $g$ is the Jacobian of the transformation $\mathbf{T}$. In other words we would need to discretize a completely new and much more complicated equation in order to solve for a general geometry. We would also need to have some idea of what the functions $x(\xi,\eta)$ and $y(\xi,\eta)$ are, which is not necessarily something we have access to. 
-Furthermore we already have access to Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change the PDE-solver in the developed software to a FEniCS solver.
-
+where $g$ is the Jacobian of the transformation $\mathbf{T}$. 
+In other words, a whole new and much more complicated equation must be discretized in order to solve for a general geometry. 
+Some idea of what the functions $x(\xi,\eta)$ and $y(\xi,\eta)$ are is also required, and this information is generally not available. 
+Furthermore, there already exists Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change the PDE-solver in the developed software to a FEniCS solver.

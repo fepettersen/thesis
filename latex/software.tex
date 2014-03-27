@@ -110,4 +110,56 @@ Recall that the possibility to add spikes in spines is already built-in.
 
 As is the general problem in computational neuroscience this project requires setting a lot of parameters whose values are not known. 
 There are of course a lot of parameters with known values as well, like the diffusion coefficient for PKC$\gamma$. 
-A summary of the parameters of particular interest is shown in table \ref{parameter_values}, with an indication of where the values are taken from, if they are calculated or if they are simply given a value to ensure reasonable behaviour
+A summary of the parameters of particular interest is shown in table \ref{parameter_values}, with an indication of where the values are taken from, if they are calculated or if they are simply given a value to ensure reasonable behaviour.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.13\textwidth}|p{0.21\textwidth}|p{0.18\textwidth}|p{0.37\textwidth}|}
+\hline
+\textbf{Parameter} & \textbf{Explanation} &\textbf{Expression/ typical value}& \textbf{Origin} \\
+\hline
+$\Delta t$ & time-step & $\Delta x^2$ & stability criterion (sect. \ref{stability}) \\
+\hline
+$\Delta x$ & spatial resolution & $\frac{1}{2}$min(spine neck diameter) & estimated \\
+\hline
+$Hc$ & conversion factor & 5-24 & estimated by calculations of concentration levels taken from \cite{light1996protein} and spine/dendrite volume ratios. See later for discussion. \\
+\hline
+$u(t=0)$ & initial condition value & 5$\frac{\text{nMol}}{\text{L}}$ & estimated from values found in \cite{light1996protein}\\
+\hline
+$p_{ds}$ & probability to diffuse into a spine & $0.1\cdot\Delta x\cdot\Delta t$& estimated. An important ability of this parameter should be that wide necked spines have larger probability and that a certain flux is maintained (on average), meaning that the flux should be independent of $\Delta t$ \\
+\hline
+$p_{ab}$ & probability for PKC$\gamma$ to be absorbed, and removed from simulation, per time-step taken in spine head & 100\% & estimated\\
+\hline
+\end{tabular}
+\caption[Important parameters]{Parameters which play an important role in the simulation of PKC$\gamma$ diffusion into dendritic spines with explanations, expressions/typical values and an indication as to where the value/expression has its origin.}
+\label{table:parameters}
+\end{table}
+
+The conversion factor $Hc$ which was defined in equation \eqref{Hc_definition} must also take reasonable values in the simulation, and this might mean changing it to another expression. 
+Light et.al. \cite{light1996protein} state that the concentration of conventional PKC which PKC$\gamma$ is a part of, is typically 20$\frac{\text{nMol}}{\text{L}}$ in cardiac cells. 
+There is reason to believe that these values are typical for all cells. 
+Since there are four conventional PKC types ( $\alpha$, $\beta_{I}$, $\beta_{II}$ and $\gamma$), the assumption that PKC$\gamma$ makes up for a quarter of this concentration (5$\frac{\text{nMol}}{\text{L}}$) is made. 
+The dendrite is already being modeled as a one-dimensional object, meaning that it is assumed to be much wider than a spine. 
+Wide dendrites can have a diameter of around 10$\mu$m and around $50\mu$m long before they start branching \cite{wikipedia??}, making the volume some $3900\mu\text m^3$. 
+
+The unit $\frac{\text{nMol}}{\text{L}}$ is converted to more manageable units below 
+\begin{align*}
+ 1\frac{\text{nMol}}{\text{L}} &= 10^{-15}\frac{\text{nMol}}{\mu\text{m}^3}\\
+ &= 10^{-24}\frac{\text{Mol}}{\mu\text{m}^3}\\
+ &\simeq 0.6\frac{\text{particles}}{\mu\text{m}^3}
+\end{align*}
+
+Craske et.al. measured an increase of $5\frac{\text{nMol}}{\text{L}}$ in the spine heads they were investigating \cite{craske2005spines} which, using numbers from \cite{arellano2007ultrastructure} for average spine volumes, is roughly one PKC$\gamma$ particle. 
+In the simulations, this means that the total available concentration at the contact-point between the dendrite and a spine must exceed one particle. 
+Assuming that the dendrite is cylindrical gives a cylinder volume segment with height equal to the neck width of the spine in question in which a concentration equal to at lest one particle must be present before any diffusion into the spine can take place. 
+This makes $Hc \in (5,24)$ since that is the way we have defined $Hc$. 
+In other words, the integrated concentration must exceed some value defined either directly by the spine neck width or some average neck width depending on how much control we want to have over $Hc$.
+
+The initial condition is open to discussion, but at the moment a skewed Gaussian function i used with a peak value between 1 and 5. 
+Release of PKC$\gamma$ into dendrites is followed by binding of PKC$\gamma$ on the dendrite-wall, but in any case this resembles simply removing some portion from the simulation. 
+This step can just as well be dropped, seeing as it does not provide any extra information, and so only some initial pulse is required. 
+The Gaussian distribution is chosen for simplicity. 
+
+All values in the simulations are scaled to reduce round-off errors. 
+Positions are measured in $\mu$m, concentrations in nMol/L or as particle-numbers when in spines. Only the timescale has normal units of seconds. 
+Craske et.al. did experiments on the scale of $<3$min, but most of the simulations go for even shorter times.

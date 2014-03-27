@@ -424,6 +424,7 @@ if __name__ == '__main__':
 	m = 5001
 	n = 1
 	T = 9000/50 		# no.of timesteps, [dt*T] = seconds
+	T = 50
 
 	x_start = 0
 	x_end = 50 		#um
