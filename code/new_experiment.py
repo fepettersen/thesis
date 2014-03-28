@@ -424,7 +424,7 @@ if __name__ == '__main__':
 	m = 5001
 	n = 1
 	T = 9000/50 		# no.of timesteps, [dt*T] = seconds
-	T = 50
+	T = 180
 
 	x_start = 0
 	x_end = 50 		#um
@@ -440,7 +440,7 @@ if __name__ == '__main__':
 	else:
 		x = np.linspace(x_start,x_end,m)
 		y = np.zeros(m)
-	Hc = [40]
+	Hc = [15]
 	# Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'

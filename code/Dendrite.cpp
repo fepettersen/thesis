@@ -9,7 +9,7 @@ Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,doub
 	left_spine_pos_limit = 2;
 	right_spine_pos_limit = m - 2;
 	dt = Dt;
-	diffuse_into_spine_probability = 0.5*dt*dx;
+	diffuse_into_spine_probability = 0.2*dt*dx;
 	RW_timesteps = 100;
 	num_spines = t = 0;
 
@@ -192,7 +192,9 @@ void Dendrite::Solve(void){
 					fprintf(stderr,"Particle diffusing into spine\n");
 
 					(*spine)->AddIonFromDendrite();
-					U[position][0] -= 1.0/Hc;
+					for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
+						U[j][0] -= 1.0/(Hc*(*spine)->dendrite_gridpoints);
+					}
 				}
 				/*Pick a random random walker at relevant position and delete it*/
 				// dendrite_walkers.delete()
