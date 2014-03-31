@@ -12,6 +12,7 @@ Dendrite::Dendrite(int M, int N, double X0, double X1, double Y0, double Y1,doub
 	diffuse_into_spine_probability = 0.2*dt*dx;
 	RW_timesteps = 100;
 	num_spines = t = 0;
+	ammount_last_step = 0;
 
 	ofstream spine_info;
 	spine_info.open("spine_info.txt");
@@ -166,34 +167,35 @@ void Dendrite::Solve(void){
 	// 	}
 	// 	ConvertFromWalkers(U,inifilenames[i],indeces[i]);
 	// }
+		// for(vector<Walker*>::iterator Ion = dendrite_walkers.begin(); Ion != dendrite_walkers.end(); ++Ion){
+		// 	/*This loop is currently not used, and is ment for only using walkers on the dendrite*/
+		// 	(*Ion)->r[0] += pow(-1,int(2*rng->uniform()))*(step_length);
+		// 	if ((*Ion)->r[0] < x0 - dx/2.0){
+		// 		(*Ion)->r[0] += (x0-dx/2.0) - (*Ion)->r[0];
+		// 	}
+		// 	if ((*Ion)->r[0] < x1 + dx/2.0){
+		// 		(*Ion)->r[0] += (x1 + dx/2.0) - (*Ion)->r[0];
+		// 	}
+		// }
 	t += 1;
 	double step_length = sqrt(2*d*aD[0][0]*dt);
 	for(int i=0;i<RW_timesteps;i++){
-		for(vector<Walker*>::iterator Ion = dendrite_walkers.begin(); Ion != dendrite_walkers.end(); ++Ion){
-			/*This loop is currently not used, and is ment for only using walkers on the dendrite*/
-			(*Ion)->r[0] += pow(-1,int(2*rng->uniform()))*(step_length);
-			if ((*Ion)->r[0] < x0 - dx/2.0){
-				(*Ion)->r[0] += (x0-dx/2.0) - (*Ion)->r[0];
-			}
-			if ((*Ion)->r[0] < x1 + dx/2.0){
-				(*Ion)->r[0] += (x1 + dx/2.0) - (*Ion)->r[0];
-			}
-		}
 		for (vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
 
-			if(rng->uniform()<diffuse_into_spine_probability*(*spine)->dendrite_gridpoints){
+			if(rng->uniform()<(*spine)->probability_factor*diffuse_into_spine_probability){
 				/*Particle diffusing into spine. Probabiliy increases with spine neck width*/
-				int position = (*spine)->pos + int(rng->uniform()*(*spine)->dendrite_gridpoints);
+				int position = (*spine)->pos + int((*spine)->dendrite_gridpoints*rng->uniform());
 				double integral = 0;
 				for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
 					integral += U[j][0];
 				}
-				if (integral*dx>1.0/Hc){
+				// cout<<(*spine)->pos<<"  "<<integral<<endl;
+				if (integral*dx>=1.0/Hc){
 					fprintf(stderr,"Particle diffusing into spine\n");
 
 					(*spine)->AddIonFromDendrite();
 					for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
-						U[j][0] -= 1.0/(Hc*(*spine)->dendrite_gridpoints);
+						U[j][0] -= 1.0/((*spine)->dendrite_gridpoints*Hc);
 					}
 				}
 				/*Pick a random random walker at relevant position and delete it*/
@@ -205,27 +207,42 @@ void Dendrite::Solve(void){
 		}
 	}
 	/*Write information about spine heads to a separate file*/
-	vector<string*> v;
+
 	int counter = 0;
+	bool flag = false;
 	for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
 		counter += (*spine)->ions_in_spine_head;
+		double integral = 0;
+		for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
+			integral += U[j][0];
+		}
+		if(integral*dx>=1.0/Hc && not (*spine)->is_reported){
+			(*spine)->to_report = true;
+			flag = true;
+		}
 	}
-	if(counter != 0 || t==1){
+	if(counter != ammount_last_step || t==1 || flag){
 		ofstream spine_info;
 		spine_info.open("spine_info.txt",ios_base::app);
 		sprintf(diffT,"%04d  %d",t,int(spines.size()));
 		spine_info<<diffT<<endl;
 		for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
+			// cout<<"Hei, jeg har ID "<<(*spine)->pos<<endl;
 			if ((*spine)->ions_in_spine_head > 0 && t>1){
 				spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;
 			}
 			else if (t==1){
 				spine_info<<(*spine)->ions_in_spine_head<<"  "<<(*spine)->neck_length<<"  "<<(*spine)->pos<<"  "<<(*spine)->dendrite_gridpoints<<endl;
 			}
+			else if((*spine)->to_report){
+				spine_info<<"spine at "<<(*spine)->pos<<" has enough available"<<endl;
+				(*spine)->is_reported = true;
+				(*spine)->to_report = false;
+			}
 		}		
 		spine_info.close();
 	}
-	
+	ammount_last_step = counter;
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
 			Up[k][l] = U[k][l];

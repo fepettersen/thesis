@@ -1,11 +1,10 @@
-\nomenclatureentry{aECS@[{ECS}]\begingroup Extra Cellular Space\nomeqref {1.0}|nompageref}{6}
-\nomenclatureentry{aPSD@[{PSD}]\begingroup Post Synaptic Density\nomeqref {1.5}|nompageref}{8}
-\nomenclatureentry{aLTP@[{LTP}]\begingroup Long-term potentiation\nomeqref {1.5}|nompageref}{8}
-\nomenclatureentry{aLTD@[{LTD}]\begingroup Long-term depression\nomeqref {1.5}|nompageref}{8}
-\nomenclatureentry{aPKC$\gamma$@[{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.5}|nompageref}{8}
-\nomenclatureentry{aRNG@[{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.24}|nompageref}{21}
-\nomenclatureentry{aFDM@[{FDM}]\begingroup Finite Difference Methods\nomeqref {2.24}|nompageref}{22}
-\nomenclatureentry{aPDE@[{PDE}]\begingroup Parital Differential Equation\nomeqref {2.26}|nompageref}{23}
-\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.27}|nompageref}{23}
-\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.27}|nompageref}{23}
-\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.32}|nompageref}{25}
+\nomenclatureentry{aPSD@[{PSD}]\begingroup Post Synaptic Density\nomeqref {1.0}|nompageref}{8}
+\nomenclatureentry{aLTP@[{LTP}]\begingroup Long-term potentiation\nomeqref {1.0}|nompageref}{8}
+\nomenclatureentry{aLTD@[{LTD}]\begingroup Long-term depression\nomeqref {1.0}|nompageref}{8}
+\nomenclatureentry{aPKC$\gamma$@[{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.0}|nompageref}{8}
+\nomenclatureentry{aRNG@[{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.24}|nompageref}{19}
+\nomenclatureentry{aFDM@[{FDM}]\begingroup Finite Difference Methods\nomeqref {2.24}|nompageref}{20}
+\nomenclatureentry{aPDE@[{PDE}]\begingroup Parital Differential Equation\nomeqref {2.26}|nompageref}{21}
+\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.27}|nompageref}{21}
+\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.27}|nompageref}{21}
+\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.32}|nompageref}{23}

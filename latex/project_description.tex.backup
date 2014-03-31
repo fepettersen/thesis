@@ -1,0 +1,39 @@
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+ This chapter describes both the scope of this project and the various places where a lot of time was spent.
+
+\section{The project}
+In the fall of 2014 a new interdisciplinary research project on brain plasticity will start at the University of Oslo and will include people from biology, neuroscience, statistical mechanics and applied mathematics among others. 
+There are many processes in the brain which are difficult to describe in any methodology, and in that manner behave as meso-scale processes. 
+Processes which are on a length scale between continuum and statistical mechanics. 
+Today, there are some alternatives which might be plausible alternatives for modeling such processes, namely molecular dynamics and various offspring of this like direct simulation Mote Carlo. 
+Both of which possess a few problems. 
+
+Molecular dynamics seek to model systems of atoms or molecules by Newtonian mechanics in the sense that each particle is affected by some well known potential which in turn lets us calculate the forces on the particle, and integrate the position. 
+Though these calculations are a viable alternative in many applications, like nanoporous fluid flow, they suffer from the weakness of immense computational cost and can only effectively model something like a few cubic micrometers. 
+More importantly, they are limited to small molecules like SiO$_2$ or water, and to my knowledge no potential is known which might describe macromolecules like proteins or enzymes. 
+
+Direct simulation Monte Carlo is a more plausible candidate than normal molecular dynamics. 
+(To my knowledge) it replaces the computationally costly potential calculations with Monte Carlo simulation by drawing some number of random particle-pairs which collide and give each particle a new velocity by some rule (like conservation of temperature). 
+This is done in combination with calculating collisions with any walls which might be present in the system. 
+Although DSMC is a sort of scaled up version of MD it too suffers from some problems which might make it unsuitable for modeling processes in the brain. 
+DSMC is mainly tailored to recreate the properties of Argon gas. This does not have to be as big a weakness as it sounds; it only means that charge neutrality is assumed. 
+
+
+This thesis enters as the first attempt at trying to combine a well known continuum model of diffusion processes with stochastic model of the same diffusion process. 
+Although this might seem a bit unnecessary at first there are quite a few diffusion processes in the brain where this might be the only reasonable model. 
+For example, the extracellular space in gray-matter is so narrow in some places that it is problematic to assume continuity. 
+Transport processes in and out of dentritic spines are also assumed to be diffusion governed, but only consist of some ten or less particles (this converts to $\frac{\text{nMol}}{\text L}$ concentrations). 
+
+\section{Progress of the project}
+The combination of stochastic and continuum models immediately raise the question of where the limit between the two scales is. 
+As was done by \emph{dendritic solidification article} one way to postpone answering this question is by introducing some conversion parameter, which will define how many stochastic units one unit of concentration is equivalent to. 
+In addition to this, the initial model was built with testing in mind, which makes the exact limit rather uninteresting. 
+
+The stochastic model chosen in this project is random walks because of its mathematical equivalence to the diffusion equation (see sections \ref{further_introduction} and \ref{more_general_random_walks}), its conceptual simplicity and because of how easy it is to add complexity to the model. 
+Seeing as there is a mathematical equivalence between the two models an initial goal was to force the error-term from the random walk part of the solver to smaller than the error term from the numerical solution of the partial differential equation. 
+A lot of time went into making this work by experimenting with the required conversion ratio, the required number of time-steps in the random walk model per time-step on the PDE solver, various curve-fitting possibilities and a lot of (needless) debugging. 
+At one point it seemed that everything behaved as expected, but this turned out to be a bug which ment 
+ 
+\end{document}

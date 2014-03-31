@@ -28,7 +28,8 @@ public:
 
 	Random* rng;
 	int max_spike_size, d, pos, dendrite_gridpoints, ions_in_spine_head;
-	double dx,neck_length;
+	double dx,neck_length, probability_factor;
+	bool is_reported, to_report;
 	/* data */
 private:
 	/* data */

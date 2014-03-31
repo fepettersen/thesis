@@ -3,7 +3,7 @@ using namespace std;
 using namespace arma;
 
 Spine::Spine(int spine_start, int spine_stop, double D, double dt, double DX){
-	rng = new Random();
+	rng = new Random(spine_start);
 	
 	_x0  =_y0 = 0.0;
 
@@ -38,6 +38,9 @@ Spine::Spine(int spine_start, int spine_stop, double D, double dt, double DX){
 	*/
 
 	dx = (dendrite_gridpoints>1)?(1.0/(dendrite_gridpoints-1)):(1.0);
+	is_reported = false;
+	to_report = false;
+	probability_factor = dendrite_gridpoints;
 }
 
 void Spine::AddSpike(void){
@@ -81,6 +84,7 @@ bool Spine::checkpos(Walker* ion){
 	if (ion->r[1]>=neck_length){
 		/*The "Ion" is located in the spine head*/
 		ions_in_spine_head += 1;
+		probability_factor *= 0.1;
 		double minimum_y_value_right = right_limit(ion->r[0]);
 		double minimum_y_value_left = left_limit(ion->r[0]);
 		if (ion->r[1]<minimum_y_value_right){

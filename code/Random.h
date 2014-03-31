@@ -8,7 +8,7 @@
 class Random
 {
 public:
-	Random(void);
+	Random(int seed = 1);
 	double uniform(void);
 	double ran0(void);
 	/* data */

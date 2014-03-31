@@ -6,3 +6,16 @@ In other words, our model converges to the continuum model in the limit of suffi
 
 % The results of the testing done in the Analysis-chapter, particularly the convergence tests based on varying the conversion-factor, Hc, to exceed the expected numerical error arising from the scheme itself based on equation \ref{}, suggest that the implementation of our model is correct. 
 % The mathematics overlap, as we have seen in chapter \ref{}, and if we introduce enough walkers there seems to be no difference between adding an area on the mesh where random walks solve the equation, and not doing so. 
+
+\section{Diffusion times into spines}
+
+Craske et.al. suggest that the neck of spines act as diffusion barriers which slow down, but don't completely stop the diffusion of PKC$\gamma$ into spines. 
+The function of this barrier is a bit unclear, but the presence of it is undisputed. 
+In their measurements they found a delay of around $5-10$ seconds from elevated concentration levels in the dendrite until a similarly elevated concentration level occurred in the spine. 
+Using parameter values which resemble the values found in actual (rodent) neurons and neurites in the developed software, the observed delay-times have been recreated. 
+Seeing as there are no additional complexities added to the random walk model we can assume that the spine neck does in fact function as a diffusion barrier.
+
+Through the simulations it became apparent that there must be some sort of limiting factor which limits the number of PKC$\gamma$ particles that are let into the spine. 
+In real life this is achieved by a concentration gradient which tends to zero (or negative values) meaning that no particles will diffuse into the spine after it is ``filled'' up. 
+A random walker will not feel this concentration gradient unless it is explicitly told so. 
+The alternative solution then, is to reduce the probability for particles to diffuse into a spine for each particle that get caught in the spine head by some reasonable factor. 

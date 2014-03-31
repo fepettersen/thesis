@@ -19,6 +19,7 @@ public:
 	double minimum,maximum,dt;
 	int t;
 	
+	int ammount_last_step;	
 	int max_spine_contact_point, min_spine_contact_point, num_spines, left_spine_pos_limit, right_spine_pos_limit;
 	double diffuse_into_spine_probability, RW_timesteps;
 

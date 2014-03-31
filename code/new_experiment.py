@@ -402,12 +402,13 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return x+y
-	return np.ones(np.shape(x))*5.45
+	return np.ones(np.shape(x))*0.33
 
 def GaussianPulse(x,y,t=0):
 	x0 = 0;
 	sigma = 1.0
-	return np.exp(-(x-x0)**2/(2*sigma**2))
+	A = 2.5
+	return A*np.exp(-(x-x0)**2/(2*sigma**2))
 	
 if __name__ == '__main__':
 	DEBUG = True
@@ -421,10 +422,10 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 1.0
 	y1 = 0.7
-	m = 5001
+	m = 4001
 	n = 1
 	T = 9000/50 		# no.of timesteps, [dt*T] = seconds
-	T = 180
+	T = 300
 
 	x_start = 0
 	x_end = 50 		#um

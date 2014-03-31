@@ -8,8 +8,8 @@ using namespace std;
 #define IR 2836
 #define MASK 123459876
 
-Random::Random(void){
-	srand (time(NULL));
+Random::Random(int seed){
+	srand (seed*time(NULL));
 	x = rand(); y = rand(); z = rand();
 	w = rand(); v = rand();
 	idum = -1*rand();
