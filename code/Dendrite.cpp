@@ -83,7 +83,7 @@ void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
 void Dendrite::AddSpine(double drift){
 	int spine_position = left_spine_pos_limit+ right_spine_pos_limit*rng->uniform();
 	int spine_length_in_gridpoints = m + 1;
-	while(spine_length_in_gridpoints >= max_spine_contact_point){
+	while(spine_length_in_gridpoints >= max_spine_contact_point && spine_position + spine_length_in_gridpoints > m){
 		spine_length_in_gridpoints = min_spine_contact_point +rng->uniform()*max_spine_contact_point;
 	}
 	// spine_placements.push_back(spine_position);
@@ -189,7 +189,6 @@ void Dendrite::Solve(void){
 				for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
 					integral += U[j][0];
 				}
-				// cout<<(*spine)->pos<<"  "<<integral<<endl;
 				if (integral*dx>=1.0/Hc){
 					fprintf(stderr,"Particle diffusing into spine\n");
 
@@ -213,19 +212,25 @@ void Dendrite::Solve(void){
 	for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
 		counter += (*spine)->ions_in_spine_head;
 		double integral = 0;
-		for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
-			integral += U[j][0];
-		}
-		if(integral*dx>=1.0/Hc && not (*spine)->is_reported){
-			(*spine)->to_report = true;
-			flag = true;
+		if(t>1){	
+			for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
+				integral += U[j][0];
+			}
+			if(integral*dx>=1.0/Hc && not (*spine)->is_reported){
+				(*spine)->to_report = true;
+				flag = true;
+			}
 		}
 	}
 	if(counter != ammount_last_step || t==1 || flag){
 		ofstream spine_info;
 		spine_info.open("spine_info.txt",ios_base::app);
-		sprintf(diffT,"%04d  %d",t,int(spines.size()));
+		sprintf(diffT,"t = %04d  %d",t,int(spines.size()));
 		spine_info<<diffT<<endl;
+		if (t==1){
+			sprintf(diffT,"dx = %g  dt = %g",dx,dt);
+			spine_info<<diffT<<endl;
+		}
 		for(vector<Spine*>::iterator spine = spines.begin(); spine != spines.end(); ++spine){
 			// cout<<"Hei, jeg har ID "<<(*spine)->pos<<endl;
 			if ((*spine)->ions_in_spine_head > 0 && t>1){

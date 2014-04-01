@@ -404,11 +404,8 @@ def D(x,y,t=0):
 	# return x+y
 	return np.ones(np.shape(x))*0.33
 
-def GaussianPulse(x,y,t=0):
-	x0 = 0;
-	sigma = 1.0
-	A = 2.5
-	return A*np.exp(-(x-x0)**2/(2*sigma**2))
+def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
+	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
 	
 if __name__ == '__main__':
 	DEBUG = True
@@ -425,7 +422,7 @@ if __name__ == '__main__':
 	m = 4001
 	n = 1
 	T = 9000/50 		# no.of timesteps, [dt*T] = seconds
-	T = 300
+	T = 450
 
 	x_start = 0
 	x_end = 50 		#um
@@ -462,10 +459,11 @@ if __name__ == '__main__':
 
 	for i in Hc:
 		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0]*50)
+		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0]*25)
 		run.RunSimulation(i)
 	# run.ConvergenceTest(Hc)
 	leg = ['Hc = %g'%i for i in Hc]
+	os.system('python spine_statistics.py')
 	# run.PlotError(leg)
 
 	### --- Run for time-step --- ###
@@ -496,7 +494,7 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None)
+	# run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)
@@ -505,4 +503,3 @@ if __name__ == '__main__':
 	# a = raw_input('press return >>')
 
 	run.Finish()
-
