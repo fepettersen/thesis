@@ -3,11 +3,11 @@
 This chapter will contain most of the numerical error analysis and some of the discussion of this analysis as well as a recap of the methods used for error analysis in general, and how they are adapted to this particular problem.\\
 
 
-In the numerical setup chosen for this project we will potentially introduce several new error sources in addition to the normal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
-When a part of the solution acquired is replaced by the solution from a stochastic model, we will change the initial condition to the next iteration in time. 
-This might have a number of effects on our final solution. 
-Figure \ref{illustrate_approximate_derivatives} we can see the typical effects of solving an equation numerically. When we impose a stochastic solution on top of this again, we will get fluctuations around the approximations to the solution at the new time-step which most likely worsens our approximation.
-The aim of this chapter is to verify our implementation and investigate the effects of adding the stochastic solution to the normal PDE solution.
+In the numerical setup chosen for this project several new error sources might be introduced in addition to the normal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
+When a part of the solution acquired is replaced by the solution from a stochastic model, the initial condition to the next iteration in time will be changed. 
+This might have a number of effects on the final solution. 
+Figure \ref{illustrate_approximate_derivatives} shows the typical effects of solving an equation numerically. When a stochastic solution is imposed on top of this again, it will lead to fluctuations around the approximations to the solution at the new time-step which most likely worsens the approximation.
+The aim of this chapter is to verify the implementation and investigate the effects of adding a stochastic solution to a normal PDE solution.
 % This can be done by choosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
 % As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
 % We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
@@ -45,19 +45,19 @@ Another error estimate we will use later is the maximum value of the error. This
 \end{equation}
 
 \subsection{Verification techniques}
-There are quite a few ways to verify an implementation. In this thesis we will focus on three which I think are adequate for no particular reason.
+There are quite a few ways to verify an implementation. This thesis will focus on three which are considered adequate for no particular reason.
 \begin{itemize}
  \item Method of manufactured solutions\\
  A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
-Since the software contains both an explicit FE scheme and an implicit BE scheme we will verify the two of them alongside one another. 
-We will start with the simplest diffusion equation (eq. \ref{simple_diffusion_equation}) and add complexity until we have the desired expression. 
+Since the software contains both an explicit FE scheme and an implicit BE scheme they will both be verified alongside one another. 
+We will start with the simplest diffusion equation (eq. \eqref{simple_diffusion_equation}) and add complexity until we have the desired expression. 
 Both schemes are expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
-The next thing we do is decide that the solution to the diffusion equation should be equation \ref{manifactured_solution_1D} which satisfies our equation if we set the diffusion constant to 1. 
+Next, the solution to the diffusion equation is set to be equation \eqref{manifactured_solution_1D} which satisfies our equation if the diffusion constant is 1. 
 \item Exact numerical solutions\\
-At least for the explicit schemes we can find an exact solution to the scheme itself seeing as the scheme is a difference equation. The calculations are shown step-by-step in chapter \ref{exact_numerical_solution}.
+For the explicit schemes, exact solutions to the scheme itself can be found seeing as the scheme is a difference equation. The calculations are shown step-by-step in chapter \ref{exact_numerical_solution}.
 \item Convergence tests\\
-This must be combined with the manufactured solution, but takes a slightly different approach to quantifying the error estimate. We start bu calculating some form of error estimate, and chose a value to represent the error of the entire simulation. This could be the maximum error for the entire simulation, or an integrated measure. 
-We do multiple simulations while improving the parameter we want to investigate, say how the size of the time-step influences the error. 
+This must be combined with the manufactured solution, but takes a slightly different approach to quantifying the error estimate. We start by calculating some form of error estimate, and chose a value to represent the error of the entire simulation. This could be the maximum error for the entire simulation, or an integrated measure. 
+Multiple simulations will be done while improving the parameter of interest, for example how the size of the time-step influences the error. 
 Finally, using equation \ref{} we get a number indicating the improvement in the error estimate by improving the parameter in question. 
 This number indicates the order of convergence which is one for FE and BE since the error goes as $\mathcal{O}(\Delta t)$, and two for our approximation to the second derivative in space since the error goes as $\mathcal O(\Delta x^2)$.
 A convergence rate of 1 means that halving the parameter will (roughly) halve the error, while the same reduction for a second order convergence will reduce the error by 4.

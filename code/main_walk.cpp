@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 	Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	
-	for (int i = 0; i < 10; ++i){
+	for (int i = 0; i < 20; ++i){
 		/*Adds some number of spines to the dendrite*/
 		BlackBox.AddSpine();
 	}

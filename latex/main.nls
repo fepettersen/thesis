@@ -2,21 +2,23 @@
 
  \nomgroup{A}
 
-  \item [{BE}]\begingroup Backward Euler\nomeqref {2.25}\nompageref{21}
-  \item [{ECS}]\begingroup Extra Cellular Space\nomeqref {1.0}
-		\nompageref{6}
-  \item [{FDM}]\begingroup Finite Difference Methods\nomeqref {2.22}
+  \item [{BE}]\begingroup Backward Euler\nomeqref {2.27}\nompageref{21}
+  \item [{FDM}]\begingroup Finite Difference Methods\nomeqref {2.24}
 		\nompageref{20}
-  \item [{FE}]\begingroup Forward Euler\nomeqref {2.25}\nompageref{21}
-  \item [{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.30}
-		\nompageref{22}
-  \item [{LTD}]\begingroup Long-term depression\nomeqref {1.5}
+  \item [{FE}]\begingroup Forward Euler\nomeqref {2.27}\nompageref{21}
+  \item [{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.32}
+		\nompageref{23}
+  \item [{LTD}]\begingroup Long-term depression\nomeqref {1.0}
 		\nompageref{8}
-  \item [{LTP}]\begingroup Long-term potentiation\nomeqref {1.5}
+  \item [{LTP}]\begingroup Long-term potentiation\nomeqref {1.0}
 		\nompageref{8}
-  \item [{PDE}]\begingroup Parital Differential Equation\nomeqref {2.24}
+  \item [{PDE}]\begingroup Parital Differential Equation\nomeqref {2.26}
 		\nompageref{21}
-  \item [{PSD}]\begingroup Post Synaptic Density\nomeqref {1.5}
+  \item [{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.0}
 		\nompageref{8}
+  \item [{PSD}]\begingroup Post Synaptic Density\nomeqref {1.0}
+		\nompageref{8}
+  \item [{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.24}
+		\nompageref{19}
 
 \end{thenomenclature}

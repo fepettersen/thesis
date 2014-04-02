@@ -421,8 +421,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 4001
 	n = 1
-	T = 9000/50 		# no.of timesteps, [dt*T] = seconds
-	T = 450
+	T = 3600 		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 50 		#um
@@ -430,7 +429,7 @@ if __name__ == '__main__':
 	dx = (x_end-x_start)/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = [5/1e3]
+	dt = [1.0/60]
 
 
 	if n>1:
@@ -459,7 +458,7 @@ if __name__ == '__main__':
 
 	for i in Hc:
 		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0]*25)
+		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 		run.RunSimulation(i)
 	# run.ConvergenceTest(Hc)
 	leg = ['Hc = %g'%i for i in Hc]

@@ -1,3 +1,8 @@
+\documentclass[main.tex]{subfiles}
+
+\begin{document}
+ 
+
 \section{Validity of the model}
 As we saw in the introduction to the analysis chapter it is possible to introduce enough walkers so that there is no mathematical difference between the combined model and the PDE-model. 
 For all practical purposes, however we will not use that many walkers, because it is not the reason we introduced them in the first place. 
@@ -9,4 +14,39 @@ In other words, our model converges to the continuum model in the limit of suffi
 
 \section{Diffusion times into spines}
 
-Craske et.al. suggest that the neck of spines act as diffusion barriers which slow down, but don't complete
+Craske et.al. suggest that the neck of spines act as diffusion barriers which slow down, but don't completely stop the diffusion of PKC$\gamma$ into spines. 
+The function of this barrier is a bit unclear, but the presence of it is undisputed. 
+In their measurements they found a delay of around $5-10$ seconds from elevated concentration levels in the dendrite until a similarly elevated concentration level occurred in spines with necks longer than $0.5\mu$m. 
+Using parameter values which resemble the values found in actual (rodent) neurons and neurites in the developed software, the observed delay-times have been recreated. 
+Figure \ref{results:spine_diffusion_stats} shows plots of the observed diffusion times into spines. 
+This figure shows a clear trend for longer diffusion times as the neck length of the spine increases. 
+Figure \ref{results:boxplot_relative_diffusiontime_long_neck} further support this claim and implies the average diffusion time for PKC$\gamma$ into long necked spines to be of accordance to the results from Craske et.al.
+Seeing as there are no additional complexities added to the random walk model we can assume that the spine neck does in fact function as a diffusion barrier.
+
+\begin{figure}[H]
+ \centering
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{Figures/spine_stats_fulltime_nl.eps}
+ \caption{}
+ \label{results:spine_diffusion_stats:fulltime}
+ \includegraphics[width=\textwidth]{Figures/spine_stats_reltime_nl.eps}
+ \caption{}
+ \label{results:spine_diffusion_stats:reltime}
+\end{subfigure}
+\caption[]{}
+\label{results:spine_diffusion_stats}
+\end{figure}
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
+ \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Crase et.al. and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
+\end{figure}
+
+Through the simulations it became apparent that there must be some sort of limiting factor which limits the number of PKC$\gamma$ particles that are let into the spine. 
+In real life this is achieved by a concentration gradient which tends to zero (or negative values) meaning that no particles will diffuse into the spine after it is ``filled'' up. 
+A random walker will not feel this concentration gradient unless it is explicitly told so. 
+The alternative solution then, is to reduce the probability for particles to diffuse into a spine for each particle that get caught in the spine head by some reasonable factor. 
+
+
+\end{document}

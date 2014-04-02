@@ -83,7 +83,8 @@ void Dendrite::ConvertToWalkers(double **u, string filename, int **index){
 void Dendrite::AddSpine(double drift){
 	int spine_position = left_spine_pos_limit+ right_spine_pos_limit*rng->uniform();
 	int spine_length_in_gridpoints = m + 1;
-	while(spine_length_in_gridpoints >= max_spine_contact_point && spine_position + spine_length_in_gridpoints > m){
+	int max_spine_length_this_spine = min(max_spine_contact_point,m-spine_position);
+	while(spine_length_in_gridpoints >= max_spine_length_this_spine){
 		spine_length_in_gridpoints = min_spine_contact_point +rng->uniform()*max_spine_contact_point;
 	}
 	// spine_placements.push_back(spine_position);
@@ -184,7 +185,7 @@ void Dendrite::Solve(void){
 
 			if(rng->uniform()<(*spine)->probability_factor*diffuse_into_spine_probability){
 				/*Particle diffusing into spine. Probabiliy increases with spine neck width*/
-				int position = (*spine)->pos + int((*spine)->dendrite_gridpoints*rng->uniform());
+				// int position = (*spine)->pos + int((*spine)->dendrite_gridpoints*rng->uniform());
 				double integral = 0;
 				for(int j=(*spine)->pos; j < ((*spine)->pos + (*spine)->dendrite_gridpoints);j++){
 					integral += U[j][0];

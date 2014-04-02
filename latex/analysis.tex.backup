@@ -387,16 +387,16 @@ Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}). For the sake
  f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
 \end{equation}
 This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
-By the relation we found in chapter \ref{} (eq. \ref{}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+By the relation we found in chapter \ref{} (eq. \eqref{definition_Hc_first}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
 \begin{align*}
  \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
  N \simeq \frac{1}{\Delta x^4} = N_x^4
 \end{align*}
 The following output is from a program generously donated by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
 It uses the relation described, but multiplies with a constant, giving us 
-\begin{equation*}
+\begin{equation}\label{num_walkers_MC_integration}
  N = 2000\times N_x^4
-\end{equation*}
+\end{equation}
 
 \begin{lstlisting}
   N_x	    N_MC	   error       MC_error   MP_error
@@ -415,7 +415,7 @@ total  MP     MC
 \end{lstlisting}
 We see that the convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
 Another thing to notice it the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
-As the listed output and equation \ref{} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
+As the listed output and equation \ref{num_walkers_MC_integration} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
 
 \subsection{Introducing walkers}
 
@@ -529,7 +529,3 @@ This particular equation has steady state $u(t\to\infty,x) = 0$, and so not havi
 \caption[Errorplot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
 \label{errorplot_FE_walk_long}
 \end{figure}
-
-
-
-
