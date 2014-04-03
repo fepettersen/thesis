@@ -6,7 +6,7 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Algorithm}}{32}{figure.caption.6}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Algorithm}}{33}{figure.caption.6}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
@@ -14,9 +14,9 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.2}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{44}{figure.caption.14}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \ref {simple_diffusion_equation}).\relax }}{45}{figure.caption.15}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \textup {\hbox {\mathsurround \z@ \normalfont (\ignorespaces \ref {simple_diffusion_equation}\unskip \@@italiccorr )}}).\relax }}{45}{figure.caption.15}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence test FE 2d}}{46}{figure.caption.16}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence test FE 2D}}{46}{figure.caption.16}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.5}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{48}{figure.caption.17}
 \defcounter {refsection}{0}\relax 

@@ -475,12 +475,19 @@ which is arranged as
 
 
 \nomenclature{FLOPs}{Floating Point Operations Per second}
-If the system of equations is solved by the fool-proof Gaussian elimination, some $\mathcal O(n^3)$ FLOPs are required per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2d and $\mathcal O(n^9)$ in 3d. 
+If the system of equations is solved by the fool-proof Gaussian elimination, some $\mathcal O(n^3)$ FLOPs are required per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2D and $\mathcal O(n^9)$ in 3D. 
 As a comparison the explicit scheme will make due with $\mathcal O(n^d)$ FLOPs.
 There are, however ways to improve this. Seeing as the matrix $\mathbf M$ does not change as long as none of the parameters change a LU-decomposition can be used. 
 This will demand a decomposition of $\mathcal{O}(n^3)$ FLOPs, but all the subsequent steps will be $\mathcal{O}(n^2)$ FLOPs ($\mathcal O(n^{2d})$ for higher dimensions). 
 This is still not quite at the level of the explicit scheme, but it is a clear improvement. \\
 Looking closer at $\mathbf M$ we notice that it is not only sparse, but tridiagonal. This calls for further optimization which brings the required number of FLOPs down to $\mathcal O(n)$ making it equally efficient to the explicit scheme. More on tridiagonal Gaussian elimination later.
+
+Though the applications covered by this project do not cover advection diffusion (diffusion with a drift term), a simple version will be added to the implementation to match the derived expression for RW with a drift term (see section \ref{random_walks_and_drift}). 
+Recall the advection diffusion equation derived in section \ref{random_walks_and_drift} 
+
+\begin{equation*} 
+\frac{\d C}{\d t} = D\nabla^2 C -\vec v \cdot \nabla C
+\end{equation*}
 
 
 \subsection{Stability}\label{stability}
@@ -846,24 +853,27 @@ Fortunately, this demand will be ignored outside of verification because there i
 
 \section{Geometry}\label{geometry}
 Any finite difference method is problematic to solve on anything else than a rectangular grid. 
-When we additionally use an implicit FD method we will add a ``demand'' of having a square grid as well. 
-Fortunately the implicit solvers we use are stable. \\
-In the physical scope of this thesis we do not find any rectangular shapes to apply our system to. 
-Actually we do not have any well defined geometry to apply our system on, but that is of less importance. 
+Using an implicit FD method will add an additional ``demand'' of having a square grid as well. 
+Fortunately, using an implicit solver will eliminate the stability issue. \\
+% In the physical scope of this thesis there are few rectangular shapes to apply our system to. 
 The purpose of this project is to investigate the actual coupling of two models for the same problem. \\
 If we want to model diffusion on a general geometry by a FD method we could transform the grid to a unit-square through a general transform.
 \begin{equation*}
  \vec{r} = \mathbf{T}(\vec{q})
 \end{equation*}
-Where $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. After a lot of math, including some differential geometry we find that the diffusion equation in computational space still can be written as
+Where $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. 
+After a lot of math, including some differential geometry the diffusion equation in computational space is found to still have the form
+
 \begin{equation*}
  \frac{\d C}{\d t} -\nabla\cdot\vec{J} = 0
 \end{equation*}
 but the total flux vector $\vec{J} = \vec{f} + \phi$ now has the properties
+
 \begin{align*}
  \nabla\cdot\vec{f} = \frac{1}{g}\cdot\left(\vec{f}\cdot\frac{\d}{\d\xi}\left(\frac{\d y}{\d\eta},\frac{-\d x}{\d \eta}\right) + \vec{f}\cdot\frac{\d}{\d\eta}\left(\frac{-\d y}{\d\xi},\frac{\d x}{\d \xi}\right)\right) \\
  \nabla\phi = \frac{1}{g}\left(\phi\cdot\frac{\d}{\d\xi}\left(\frac{\d y}{\d\eta},\frac{-\d x}{\d\eta}\right)+\phi\cdot\frac{\d}{\d\eta}\left(\frac{-\d y}{\d\xi},\frac{\d x}{\d\xi}\right)\right)
 \end{align*}
-where $g$ is the Jacobian of the transformation $\mathbf{T}$. In other words we would need to discretize a completely new and much more complicated equation in order to solve for a general geometry. We would also need to have some idea of what the functions $x(\xi,\eta)$ and $y(\xi,\eta)$ are, which is not necessarily something we have access to. 
-Furthermore we already have access to Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change the PDE-solver in the developed software to a FEniCS solver.
-
+where $g$ is the Jacobian of the transformation $\mathbf{T}$. 
+In other words, a whole new and much more complicated equation must be discretized in order to solve for a general geometry. 
+Some idea of what the functions $x(\xi,\eta)$ and $y(\xi,\eta)$ are is also required, and this information is generally not available. 
+Furthermore, there already exists Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change the PDE-solver in the developed software to a FEniCS solver.

@@ -1,4 +1,3 @@
-\section{Some discussion}
 
 This chapter will contain most of the numerical error analysis and some of the discussion of this analysis as well as a recap of the methods used for error analysis in general, and how they are adapted to this particular problem.\\
 
@@ -36,10 +35,11 @@ Throughout this thesis the term error is used quite lazily, but unless something
 \begin{equation}
  \epsilon(t_i) = ||u_e(t_i)-u(t_i)||_2
 \end{equation}
-where $u_e$ is the exact (manufactured) solution to the equation, and $u$ is the result from the numerical simulation. 
+where $u_e$ is an exact (manufactured) solution to the equation, and $u$ is the result from the numerical simulation. 
 We use this error-estimate because it is time-dependent, thus letting us explicitly see how the error evolves over time. 
 The error is calculated over the entire mesh, letting us see clearly if the error from the random-walk areas are dominating, or (otherwise) how the PDE-scheme is holding up.
-Another error estimate we will use later is the maximum value of the error. This will be used for the convergence tests to make sure that we overlook any effects of simulating for a long time. 
+Another error estimate we will use later is the maximum value of the error. 
+This will be used for the convergence tests to make sure that no effects of simulating for a long time are overlooked. 
 \begin{equation}
  \epsilon = max(\epsilon(t_i))
 \end{equation}
@@ -48,47 +48,56 @@ Another error estimate we will use later is the maximum value of the error. This
 There are quite a few ways to verify an implementation. This thesis will focus on three which are considered adequate for no particular reason.
 \begin{itemize}
  \item Method of manufactured solutions\\
- A normal way of checking that our scheme of choice is implemented correctly is by making an exact solution to the equation and checking that the error is of the expected order. 
+ A normal way of checking that our scheme of choice is implemented correctly is by constructing an exact solution to the equation and checking that the error is of the expected order. 
 Since the software contains both an explicit FE scheme and an implicit BE scheme they will both be verified alongside one another. 
-We will start with the simplest diffusion equation (eq. \eqref{simple_diffusion_equation}) and add complexity until we have the desired expression. 
+We will start with the simplest diffusion equation (eq. \eqref{simple_diffusion_equation}) and add complexity until the expression verifies all parts of the implementation. 
 Both schemes are expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
-Next, the solution to the diffusion equation is set to be equation \eqref{manifactured_solution_1D} which satisfies our equation if the diffusion constant is 1. 
+Next, the initial condition for a simulation is set to the exact solution at $t=0$, and the simulation can be run with different parameter values. 
+This approach makes it trivial to calculate the error, seeing as the solution is known, and to check that it takes the expected values.
+
 \item Exact numerical solutions\\
-For the explicit schemes, exact solutions to the scheme itself can be found seeing as the scheme is a difference equation. The calculations are shown step-by-step in chapter \ref{exact_numerical_solution}.
+For the explicit schemes, exact solutions to the scheme itself can be found seeing as the scheme is a difference equation. The calculations are shown step-by-step in section \ref{exact_numerical_solution}.
 \item Convergence tests\\
 This must be combined with the manufactured solution, but takes a slightly different approach to quantifying the error estimate. We start by calculating some form of error estimate, and chose a value to represent the error of the entire simulation. This could be the maximum error for the entire simulation, or an integrated measure. 
 Multiple simulations will be done while improving the parameter of interest, for example how the size of the time-step influences the error. 
-Finally, using equation \ref{} we get a number indicating the improvement in the error estimate by improving the parameter in question. 
+Finally, a number indicating the improvement in the error estimate by improving the parameter in question is calculated. 
 This number indicates the order of convergence which is one for FE and BE since the error goes as $\mathcal{O}(\Delta t)$, and two for our approximation to the second derivative in space since the error goes as $\mathcal O(\Delta x^2)$.
 A convergence rate of 1 means that halving the parameter will (roughly) halve the error, while the same reduction for a second order convergence will reduce the error by 4.
 \end{itemize}
 
 
 \section{Verification of PDE solvers}
-To verify the implementation of the PDE-solvers we will now run through the steps outlined in the previous chapter. 
-We will also add complexity along the way, but this will be described when we get there. First of all we will test the simplest possible implementation which is equation \ref{}. 
-Since both the FE and BE discretization have been implemented we will test both of them, but mostly we will use the BE discretization because it has no stability criterion. 
-For most of the tests we will force the solution to be equation \ref{manifactured_solution_1D} in 1d which satisfies our equation if we set the diffusion constant to 1.
+To verify the implementation of the PDE-solvers, the steps outlined in the previous section will now be performed. 
+The approach will be to begin the testing on the simplest diffusion equation using the full implementation, and add complexity along the way. 
+This is another way of verifying that the implementation is correct since the average of the anisotropic diffusion coefficient at three mesh-points is the same as the diffusion constant if there is no change over the mesh-points. Effectively this is the same as having only a constant. 
+The same applies to setting the drift-velocity equal to zero. 
 
-Despite testing the simple cases first we will do all the tests on the same implementation (the full one) because it should be able to recreate the simple cases as well. 
-Setting $D(x,y) = 0.5$ as an array with all entries equal and inserting this into the schemes will return the average of $D(x,y)$ at different mesh-points, and effectively this is the same as having only a constant. 
-We will also do all verification without random walkers.
+Since both the FE and BE discretization have been implemented both of them will be tested, but for the most part the BE discretization will be used in simulations because of its unconditional stability.
+For most of the tests the exact (manufactured) solution will be equation \eqref{manufactured_solution_2D} which satisfies the diffusion equation if the diffusion constant is 1 and $x\in[0,1]$. 
+In 1D the solution will be correct since $y=0$ over the entire mesh. 
+\begin{equation}\label{manufactured_solution_2D}
+ e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1
+\end{equation}
+
+
+All of the verification on the PDEs will be done without adding random walkers. The implementation of these will be done individually, along with some tests of the combined solver in the end.
 
 \subsection{Manufactured Solutions}
 
-As mentioned we force the solution to be equation \ref{manifactured_solution_1D} because it fulfills the boundary conditions we have chosen.
+As mentioned the solution
 \begin{equation}\label{manifactured_solution_1D}
  u(x,t) = e^{-t\pi^2}\cos(\pi x) +1
 \end{equation}
-Equations \ref{manufactured_prof_pt1} and \ref{manufactured_prof_pt2} prove that the manufactured solution we have chosen will indeed fulfill the diffusion equation (eq. \ref{simple_diffusion_equation}).
+is chosen because it fulfills the chosen boundary conditions.
+Equations \eqref{manufactured_prof_pt1} and \eqref{manufactured_prof_pt2} prove that the manufactured solution does indeed fulfill the diffusion equation (eq. \ref{simple_diffusion_equation}).
 \begin{align}
  \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\label{manufactured_prof_pt1}\\
  -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1\label{manufactured_prof_pt2}
 \end{align}
 
 The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and, in the FE case, the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. 
-In 1D we get the plots in figure \ref{errorplot_FE1D_noWalk} of error described in chapter \ref{error_estimate}, with the corresponding plots of the convergence rates in figure \ref{} that verify the order of the error term.
-For longer simulations, we expect the analytic solution to reach a steady state which we find in the limit of large $t$. 
+In 1D we get the plots in Figure \ref{errorplot_FE1D_noWalk} of error (described in chapter \ref{error_estimate}), with the corresponding plots of the convergence rates in Figure \ref{} that verify the order of the error term.
+For longer simulations, the analytic solution is expected to reach a steady state which is found in the limit of large $t$, 
 
 \begin{equation}
  u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
@@ -100,7 +109,7 @@ Figures \ref{} and \ref{} seem to show the expected behaviour from the error est
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
 \includegraphics[width=\textwidth]{../doc/results/experiment_31102013_1017/results/deterministic_errorplot.eps}
-\caption{}
+\caption{}% Replace this figure with a convergence rate plot for the FE discretization.
 \label{errorplot_FE1D_noWalk}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
@@ -112,16 +121,18 @@ Figures \ref{} and \ref{} seem to show the expected behaviour from the error est
 \label{errorplot_FE1D_noWalk_super}
 \end{figure}
 
-As we discussed in section \ref{random_walks_and_anisotropy} we should also be able to model diffusion where the diffusion constant is not a constant. 
-The scheme we derived in section \ref{discretizing} already takes this into account, and so all we need to do is to add the drift term which was discussed in section \ref{effect_of_drift_on_walkers} to the scheme. 
-Like before we should verify that the scheme solves the equation to the expected accuracy by using a manufactured solution \ref{manifactured_solution_1D} and tweaking the source term so this function solved the equation \ref{convection_diffusion_equation}. 
-When $v=0$ and $D(x) = \pi x$ the source term becomes
+Testing of more advanced implementations requires some additional calculations in order to still have the same manufactured solution as before. 
+The variable diffusion coefficient 
+$$D(x) = \pi x$$
+is introduced and the drift term is still zero. 
+The new source term required is 
+
 \begin{align*}
  -\pi^2\exp\left(-\pi^2t\right)\cos\left(\pi x\right) &= -\pi\exp\left(-\pi^2t\right)\frac{\d}{\d x}\pi x\sin(\pi x) +f(x,t) \\
  -\pi^2\cos\left(\pi x\right) &= -\pi^2\left(\sin(\pi x) + \pi x\cos(\pi x)\right) +\tilde{f}(x) \\
  \tilde{f}(x) &= \pi^2\left(\sin(\pi x) +\cos(\pi x)(\pi x-1)\right)
 \end{align*}
-Once again $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$. Figure \ref{anisotropic_diffusion_verification} shows the error norm of the result of simulations of this equation with different values of $\Delta t$.
+where $f(x,t) = \exp\left(-\pi^2t\right)\tilde{f}(x)$. Figure \ref{anisotropic_diffusion_verification} shows the error norm of the result of simulations of this equation with different values of $\Delta t$.
 
 \begin{figure}[H]
 \centering
@@ -145,17 +156,17 @@ Again, the error is of the order of $\Delta t$ and is roughly halved by halving 
 The next step in testing the implementation will be to perform a convergence test in time. 
 We omit the spatial convergence test because an incorrect implementation of the spatial derivative would be clearly visible both in the visualization of the simulation (the solution blows up), and in the error plot seeing as the spatial error would dominate.
 We carry out the convergence test by doing several simulations with different values for $\Delta t$ and comparing the errors by equation \ref{convergence_rate_def}. 
-A result of such an experiment for the FE scheme using the $\Delta t$ values listed below is found in figure \ref{convergence_test_FE}. 
-The expected value of r is approximately 1. The result is not perfect, but still close to 1. 
-For the BE scheme we get the convergence rate shown in figure \ref{convergence_test_BE}. Again, the expected order of convergence is 1 and this time the result is almost perfect.
-
 \begin{equation}\label{convergence_rate_def}
  r = \frac{\ln(E_{i+1}/E_i)}{\ln(\Delta t_{i+1}/\Delta t_i)}
 \end{equation}
+A result of such an experiment for the FE scheme using the $\Delta t$ values listed below is found in figure \ref{convergence_test:FE}. 
+The expected value of r is approximately 1. The result is not perfect, but still close to 1. 
+For the BE scheme we get the convergence rate shown in figure \ref{convergence_test:BE}. Again, the expected order of convergence is 1 and this time the result is almost perfect.
 
-\begin{lstlisting}
- dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
-\end{lstlisting}
+
+% \begin{lstlisting}
+%  dt = [1e-4,1e-5,1e-6,1e-7,1e-8]
+% \end{lstlisting}
 
 \begin{figure}[H]
  \centering
@@ -169,17 +180,17 @@ For the BE scheme we get the convergence rate shown in figure \ref{convergence_t
  \caption{Convergence test for the BE scheme. The x axis is $\Delta t$, the y-axis (though a little hard to see) is zoomed in around r=1.}
  \label{convergence_test:BE}
 \end{subfigure}
-\caption{Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \ref{simple_diffusion_equation}).}
+\caption{Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \eqref{simple_diffusion_equation}).}
 \label{convergence_test}
 \end{figure}
 
-We can also do a convergence test, equal to the one we did in 1d, to check that the scheme converges to 1 (by equation \ref{convergence_rate_def}) for smaller $\Delta t$. 
-The results of this test are shown in figure \ref{convergence_test_FE_2d} and it does converge nicely to one.
+We can also do a convergence test, equal to the one we did in 1D, to check that the scheme converges to 1 (by equation \eqref{convergence_rate_def}) for smaller $\Delta t$ in 2D as well. 
+The results of this test are shown in Figure \ref{convergence_test_FE_2d} and it does converge nicely to one.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
-\caption[Convergence test FE 2d]{Convergence test for the FE scheme in 2d using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
+\caption[Convergence test FE 2D]{Convergence test for the FE scheme in 2D using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
 \label{convergence_test_FE_2d}
 \end{figure}
 

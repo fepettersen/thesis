@@ -475,12 +475,29 @@ which is arranged as
 
 
 \nomenclature{FLOPs}{Floating Point Operations Per second}
-If the system of equations is solved by the fool-proof Gaussian elimination, some $\mathcal O(n^3)$ FLOPs are required per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2d and $\mathcal O(n^9)$ in 3d. 
+If the system of equations is solved by the fool-proof Gaussian elimination, some $\mathcal O(n^3)$ FLOPs are required per time-step. This will get even worse in more spatial dimensions; $\mathcal O(n^6)$ in 2D and $\mathcal O(n^9)$ in 3D. 
 As a comparison the explicit scheme will make due with $\mathcal O(n^d)$ FLOPs.
 There are, however ways to improve this. Seeing as the matrix $\mathbf M$ does not change as long as none of the parameters change a LU-decomposition can be used. 
 This will demand a decomposition of $\mathcal{O}(n^3)$ FLOPs, but all the subsequent steps will be $\mathcal{O}(n^2)$ FLOPs ($\mathcal O(n^{2d})$ for higher dimensions). 
 This is still not quite at the level of the explicit scheme, but it is a clear improvement. \\
 Looking closer at $\mathbf M$ we notice that it is not only sparse, but tridiagonal. This calls for further optimization which brings the required number of FLOPs down to $\mathcal O(n)$ making it equally efficient to the explicit scheme. More on tridiagonal Gaussian elimination later.
+
+Though the applications covered by this project do not cover advection diffusion (diffusion with a drift term), a simple version will be added to the implementation to match the derived expression for RW with a drift term (see section \ref{random_walks_and_drift}). 
+Recall the advection diffusion equation derived in section \ref{random_walks_and_drift}, 
+
+\begin{equation*} 
+\frac{\d C}{\d t} = D\nabla^2 C -\vec v \cdot \nabla C
+\end{equation*}
+
+This equation has a first order spatial derivative which will make the numerical scheme less accurate if discretized the wrong way. 
+Seeing as the spatial resolution is (often) coarser than the resolution in time, a term with a residual of the order $\mathcal{O}(\Delta x)$ would dominate the error of the scheme. 
+It will therefore be necessary to use a more accurate approximation to the first derivative. 
+The approximation 
+\begin{align*}
+ \vec v \cdot \nabla C \approx v\frac{C_{i+1}-C_{i-1}}{2\Delta x}
+\end{align*}
+will not only reduce the residual to $\mathcal{O}(\Delta x^2)$, it is also incredibly simple to implement both in the FE and BE scheme seeing as the Neumann boundary conditions forces this term to be zero at the boundary. The resulting extra implementation therefore consists of adding a simple term on the diagonals of the assembled matrix in the BE discretization, and an equally simple term in the FE scheme.
+
 
 
 \subsection{Stability}\label{stability}
