@@ -190,20 +190,20 @@ The results of this test are shown in Figure \ref{convergence_test_FE_2d} and it
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
-\caption[Convergence test FE 2d]{Convergence test for the FE scheme in 2d using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
+\caption[Convergence test FE 2D]{Convergence test for the FE scheme in 2D using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
 \label{convergence_test_FE_2d}
 \end{figure}
 
 \subsection{Exact numerical solution}\label{exact_numerical_solution}
 
-The FE scheme also has an exact solution seeing as it is in fact a difference equation. 
-We can find this (for this exact initial condition, eq. \ref{manifactured_solution_1D}) if we formulate the scheme as 
+The FE scheme has an exact solution seeing as it is in fact a difference equation. 
+This solution can be found if the scheme is reformulated as 
 
 \begin{equation}
  u^{n+1} = D\Delta t u_{xx}^n + u^n
 \end{equation}
 
-and insert for the first few iterations. 
+and the first few iterations are inserted. 
 
 \begin{align*}
  u^1 &= D\Delta t u_{xx}^0 + u^0 \\
@@ -214,21 +214,24 @@ and insert for the first few iterations.
  u^4 &= D\Delta t u_{xx}^3 + u^3 = \dots \\
  &= \left(D\Delta t\right)^4 u_{8x}^0 + 4\left(D\Delta t\right)^3 u_{6x}^0+ 6\left(D\Delta t\right)^2 u_{4x}^0 + 4D\Delta t u_{2x}^0 + u^0 
 \end{align*}
-Which we can generalize to 
+
+This can be generalized to 
 \begin{equation}
  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^iu^0_{2ix}
 \end{equation}
-where we have
+
+where the initial condition is known from equation \eqref{manifactured_solution_1D}
 \begin{equation*}
  u^0_{2ix} = \left(-1\right)^i\pi^{2i}\cos(\pi x)
 \end{equation*}
-from the initial condition. This finally gives us the exact numerical solution of the FE scheme in time. 
+
+Inserting the initial condition results in the exact solution to the FE scheme
 \begin{equation}
  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\pi^{2i}\left(-1\right)^i\left(D\Delta t\right)^i\cos(\pi x)
 \end{equation}
 
-Notice that we have not used the approximation to the spatial derivative, but rather the analytical derivative. 
-We find the approximation that the computer uses to the spatial derivative in the same way as for the time derivative. 
+Notice that the analytical spatial derivative has been used rather than the approximation to the spatial derivative. 
+In the same way as for the time derivative, the approximation to the spatial derivative must be inserted. 
 \begin{align*}
  u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
  &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
@@ -236,15 +239,17 @@ We find the approximation that the computer uses to the spatial derivative in th
  &= \frac{4}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
  &\dots
 \end{align*}
-We immediately see that this pattern continues, and we get the general formula in equation \ref{numerical_solution} for the exact numerical solution.
+
+This pattern continues, and the exact numerical solution can be expressed by equation \eqref{numerical_solution} in 1D for the previously mentioned initial condition.
 \begin{equation}\label{numerical_solution}
   u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x)
 \end{equation}
-We expect the FE scheme to represent this solution more or less to machine precision, at least to $15$ digits. 
-There are, however two issues with the solution \ref{numerical_solution}:
+
+The FE scheme is expected to represent this solution more or less to machine precision, at least to $15$ digits. 
+There are, however two issues with the solution \eqref{numerical_solution}:
 \begin{itemize}
  \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again ruins the simulation. This can be fixed rather simply by testing if $\Delta x^{2i}>0$ and returning zero if the test returns false.
- \item ${n\choose i}$ goes to infinity for large n and i. We will eventually (for $n>\sim170$) meet overflow. Figure \ref{convergence_exact_numerical_1d_n145} shows that at least for relatively few time steps  we can drop the troublesome terms, but effectively this limits ous simulation to some 170 steps.
+ \item ${n\choose i}$ goes to infinity for large n and i. The computer will eventually (for $n>\sim170$) meet overflow. Figure \ref{convergence_exact_numerical_1d_n145} shows that at least for relatively few time steps the troublesome terms can be dropped, but effectively this limits the simulation to some 170 steps regardless of the value of $\Delta t$.
 \end{itemize}
 
 \begin{figure}[H]
@@ -253,30 +258,30 @@ There are, however two issues with the solution \ref{numerical_solution}:
  \caption{Testing the relation between $\left(D\Delta t\right)^i$ and the binomial coefficients.}
  \label{convergence_exact_numerical_1d_n145}
 \end{figure}
-The results from testing the FE scheme are found in figure \ref{errorplot_numerical_exact_FE_1D}. We see that the error in the worst case is about an order of magnitude worse than we expected. This is most likely due to the fact that we are cutting part of the solution, and over several time steps the error we do might accumulate.
+The results from testing the FE scheme are found in Figure \ref{errorplot_numerical_exact_FE_1D}. We see that the error in the worst case is about an order of magnitude worse than expected. This is most likely due to the fact that we are cutting part of the solution, and over several time steps the error we do might accumulate.
+This is most likely a 
 
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{Figures/exact_numerical_1d_n130.eps}
- \caption[Verification for exact numerical solution]{Error plot for 1d FE scheme compared to the exact numerical solution \ref{numerical_solution} with the modifications suggested earlier.}
+ \caption[Verification for exact numerical solution]{Error plot for 1d FE scheme compared to the exact numerical solution \ref{numerical_solution} with a few modifications, like ignoring terms where $\Delta x$ is truncated to zero, added.}
  \label{errorplot_numerical_exact_FE_1D}
 \end{figure}
-
-We find the exact numerical solution to the 2d diffusion equaiton with eq \ref{initial_condition_2d_numex} as initial condition by using the same method as we did in 1d. 
-The exact numerical solution of the FE scheme can be found in equation \ref{exact_numerical_solution_2d}, and again we expect the scheme to be able to reproduce this to more or less machine precision. 
-
+The exact numerical solution to the 2d diffusion equaiton with eq \ref{initial_condition_2d_numex} as initial condition is found by using the same method as for the 1D case.
+It is listed in equation \eqref{exact_numerical_solution_2d}, and the FE scheme is expected to reproduce this to more or less machine precision as well. 
 \begin{equation}\label{initial_condition_2d_numex}
  u(x,y,t=0) = \cos(\pi x)\cos(\pi y)
 \end{equation}
 
-The result of a test simulation of this is shown in figure \ref{exact_numerical_2d_n130}. 
-Again, as in we did in 1d, we see that although the error is very small, and start out with machine precision, it does increase and even more than in the 1d case. 
-This is \emph{probably} because of the terms we have do drop in the exact numerical solution due to overflow and so on, which accumulate in the numerical solution from the scheme. 
-We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
-
+The same problems with truncation of small values apply to a larger degree than in the 1D case, however and as a result some accumulation of error terms might be expected. 
 \begin{equation}\label{exact_numerical_solution_2d}
  u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
 \end{equation}
+
+The result of a test simulation of this is shown in Figure \ref{exact_numerical_2d_n130}. 
+Again, as was the case in 1D, the error is very small and starts out at machine precision. It does, however increase with time as the truncated terms begin to accumulate, and even more so than in the 1D case. 
+We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
+
 
 \begin{figure}[H]
  \centering
@@ -290,32 +295,36 @@ We should, in other words, be pleased that the error starts out with machine pre
 
 
 To verify our implementation, and perhaps gain some new insight we will do some testing on the random walks implementation as well. 
-This means that we have to find a solution of the diffusion equation \ref{simple_diffusion_equation} for an initial condition we can recreate with random walkers to the best possible precision. 
-The absolute simplest initial condition to recreate is the Heaviside step function, defined in equation \ref{Heaviside_def}. 
+This means that we have to find a solution of the diffusion equation \eqref{simple_diffusion_equation} for an initial condition we can recreate with random walkers to the best possible precision. 
+The absolute simplest initial condition to recreate is the Heaviside step function, defined in equation \eqref{Heaviside_def}. 
 \begin{equation}\label{Heaviside_def}
  H(x-a) = \begin{cases}
            1\;\;x\geq a\\
            0\;\;x<a
           \end{cases}
 \end{equation}
-In order to verify our implementation we must solve the diffusion equation \ref{simple_diffusion_equation} for this new initial condition. 
+In order to verify our implementation we must solve the diffusion equation \eqref{simple_diffusion_equation} for this new initial condition. 
 This is most easily done through separation of variables. We have
-\begin{align*}
- \frac{\d u}{\d t} = D\frac{\d^2 u}{\d x^2};\;\; \frac{\d u(0,t)}{\d x} = \frac{\d u(1,t)}{\d x} = 0 \\
- u(x,0) = H\left(x-\frac{1}{2}\right);\;\; D = 1
-\end{align*}
+\begin{align}
+ \frac{\d u}{\d t} &= D\frac{\d^2 u}{\d x^2}\\
+ \frac{\d u(0,t)}{\d x} &= \frac{\d u(1,t)}{\d x} = 0 \\
+ u(x,0) &= H\left(x-\frac{1}{2}\right)\\
+ D &= 1
+\end{align}
 and
 \begin{align*}
  u(x,t) = F(x)T(t) \implies \frac{T'(t)}{T(t)} = \frac{F''(x)}{F(x)}
 \end{align*}
 where the primes denotes the respective derivatives. We separate the equation using a separation constant $\lambda$
 \begin{align*}
- T'(t)-\lambda T(t) = 0 \implies T(t) = C\exp(\lambda t)\\
- F''(x) -\lambda F(x) = 0 \implies F(x) = C_1\exp(\sqrt{\lambda}x) + C_2\exp(-\sqrt{\lambda}x)
+ T'(t)-\lambda T(t) &= 0 \\
+ \implies T(t) &= C\exp(\lambda t)\\
+ F''(x) -\lambda F(x) &= 0 \\
+ \implies F(x) &= C_1\exp(\sqrt{\lambda}x) + C_2\exp(-\sqrt{\lambda}x)
 \end{align*}
-Where $C$, $C_1$ and $C_2$ are arbitrary constants. 
+where $C$, $C_1$ and $C_2$ are arbitrary constants. 
 Choosing $\lambda = -\mu^2$ lets us rewrite the spatial solution in terms of sines and cosines. 
-There are really three choises here; $\lambda = -\mu^2$, $\lambda = \mu^2$ and $\lambda = ?$ but we chose the former because the results of the other choises are unphysical.
+There are really three choices here; $\lambda = -\mu^2$, $\lambda = \mu^2$ and $\lambda = ?$ but we chose the first because the results of the other choices are unphysical.
 \begin{equation*}
  F(x) = a\cos(\mu x) + b\sin(\mu x)
 \end{equation*}
@@ -323,13 +332,14 @@ The boundary conditions gives us
 \begin{align*}
  F'(0)T(t) = F'(1)T(t) = 0
 \end{align*}
-Since the time dependent solution cannot be exactly zero and is independen of position by construction ($C\exp(\lambda t)|_{x=0} = C\exp(\lambda t) \neq 0$), the first derivative of the spatial solution must be zero at the boundaries
+Since the time dependent solution cannot be exactly zero and is independent of position by construction ($C\exp(\lambda t)|_{x=0} = C\exp(\lambda t) \neq 0$), the first derivative of the spatial solution must be zero at the boundaries
 \begin{align*}
  F'(x) &= -a\mu\sin(\mu x) + b\mu\cos(\mu x) \\
- F'(0) &= -a \mu\sin(0) + b\mu\cos(\mu x) = b\mu\cos(\mu x) \implies b=0 \\
+ F'(0) &= -a \mu\sin(0) + b\mu\cos(\mu x) \\
+ &= b\mu\cos(\mu x) \implies b=0 \\
  F(1) &= a\cos(\mu) \implies \mu = n\pi
 \end{align*}
-Telling us that a Fourier series in cosines is the solution to the equation, and it will look like this.
+Which suggests that a Fourier series in cosines is the solution to the equation, and it will look like this.
 \begin{equation}
  u(x,t) = a_0 + \sum\limits_{n=1}^\infty a_n\exp\left(-(n\pi)^2t\right)\cos(n\pi x)
 \end{equation}
@@ -337,33 +347,37 @@ Telling us that a Fourier series in cosines is the solution to the equation, and
 The coefficients are found by approximating the initial condition
 \begin{align*}
  a_0 &= \int\limits_0^1H(x-0.5)dx = \frac{1}{2} \\
- a_n &= 2\int\limits_0^1H(x-0.5)\cos(n\pi x)dx = 2\int\limits_{0.5}^1\cos(n\pi x)dx \\
- &= \frac{2}{n\pi}\left[sin(n\pi x)\right]_{0.5}^1 = \frac{2}{n\pi}\sin(n\pi) - \sin(\frac{n\pi}{2}) \\
+ a_n &= 2\int\limits_0^1H(x-0.5)\cos(n\pi x)dx \\
+ &= 2\int\limits_{0.5}^1\cos(n\pi x)dx \\
+ &= \frac{2}{n\pi}\left[sin(n\pi x)\right]_{0.5}^1 \\
+ &= \frac{2}{n\pi}\sin(n\pi) - \sin(\frac{n\pi}{2}) \\
  a_n &= \frac{2\sin(\frac{n\pi}{2})}{n\pi}
 \end{align*}
 which gives us the final solution
 \begin{equation}
- u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}\exp\left(-(n\pi)^2t\right)\cos(n\pi x)
+ u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
 \end{equation}
-This will be the manufactures solution we will test our simulations against for the verification of the RW implemetation.
+This is the manufactured solution the simulations will be tested against for the verification of the RW implementation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-We can now perform a convergence test to find the convergence rate for the random walkers.
-We will modify it slightly by testing for the number of walkers rather than the time step. 
+A convergence test can now be performed to find the convergence rate for the random walkers.
+It will be slightly modified by testing for the number of walkers rather than the time step. 
 
 
-Using the maximum of the error measure already in use, we have tested the convergence rate measure for the following measures of Hc:
+Using the maximum of the error measure already in use, the convergence rate has been tested for the following measures of Hc:
 \begin{lstlisting}
  Hc = [200,1400,5600,10400,32000]
 \end{lstlisting}
-The convergence test suggests that the convergence rate for random walks follows the proportionality in equation \ref{convergence_rate_RW}. 
-This relation tells us just what we have been expecting the whole time; while increasing the number of walkers will reduce the error, the convergence is slow. 
-Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $\epsilon\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $\epsilon\sim\mathcal{O}(\Delta t^2)$. Clearly we will have enough trouble for the simpler cases.
 
+The convergence test suggests that the convergence rate for random walks follows the proportionality in equation \eqref{convergence_rate_RW}. 
 \begin{equation}\label{convergence_rate_RW}
 err \propto Hc^{\frac{-1}{2}}
 \end{equation}
+This relation says that while increasing the number of walkers will in fact reduce the error, the convergence is very slow. 
+Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $\epsilon\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $\epsilon\sim\mathcal{O}(\Delta t^2)$. 
+Clearly there will be enough trouble for the simpler cases...
+
 
 
 \begin{figure}[H]
@@ -375,42 +389,42 @@ err \propto Hc^{\frac{-1}{2}}
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{../doc/results/experiment_18022014_1413_RW_convergencetest_1d/results/errorplot.eps}
- \caption[Error plot RW]{A ``normal'' error plot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to couple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a step length calculated from equation \ref{steplength}}
+ \caption[Error plot RW]{An error plot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to couple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a step length calculated from equation \eqref{steplength}}
 \end{figure}
 
 
 
 
 \section{Testing the combined solution}
-In this chapter we will combine the PDE-solution on some part of the mesh with the result from a random walk simulation using the same initial condition as the PDE-solver was given. 
+In this section we will combine the PDE-solution on some part of the mesh with the result from a random walk simulation using the same initial condition as the PDE-solver was given. 
 As we will discuss in chapter \ref{Software:About} there are many candidates as to the combination of the solutions, but we will use one of the simplest ones; the average of the two. 
 Before we start with the verification, however, we will take a quick look at a simplified problem which in principle is the same.
 
 \subsection{A simplified version of the algorithm}\label{simplified_test}
 
-Monte Carlo methods are immensely important in modern computational science (\emph{reference}), and can be used to solve integrals as well as random walks. 
-As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \ref{ODE}. 
+Monte Carlo (MC\nomenclature{MC}{Monte Carlo}) methods are immensely important in modern computational science (\emph{reference}), and can be used to solve integrals as well as random walks. 
+As a simplified analogy to our method for solving the diffusion equation we ca look to the Ordinary Differential Equation (ODE) in equation \eqref{ODE}. 
 \begin{equation}\label{ODE}
- \frac{\d f}{\d x} = a(x)\;\text{,}\; x\in [a,c]
+ \frac{\d f}{\d x} = g(x)\;\text{,}\; x\in [a,c]
 \end{equation}
-Equation \ref{ODE} is easily solvable (see eq. \ref{ODE_solution}). For the sake of illustration we also specify that $a(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
+Equation \eqref{ODE} is easily solvable (see eq. \eqref{ODE_solution}). For the sake of illustration we also specify that $g(x) = \frac{1}{x}$ and divide the integral in two parts, introducing $b\in (a,c)$.
 \begin{equation}\label{ODE_solution}
- f(x) = \int\limits_a^b a(x)\,dx + \int\limits_b^c a(x)\,dx
+ f(x) = \int\limits_a^b g(x)\,dx + \int\limits_b^c g(x)\,dx
 \end{equation}
-This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration. The convergence rates of these methods are $2$ and $0.5$ respectively. 
-By the relation we found in chapter \ref{} (eq. \eqref{definition_Hc_first}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration, respectively. The convergence rates of these methods are $2$ and $0.5$ respectively. 
+By the relation found in chapter \ref{} (eq. \eqref{definition_Hc_first}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
 \begin{align*}
  \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
  N \simeq \frac{1}{\Delta x^4} = N_x^4
 \end{align*}
-The following output is from a program generously donated by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
+The following output is from a program (donated) by Hans Petter Langtangen which does the required integration and calculates the convergence rates. 
 It uses the relation described, but multiplies with a constant, giving us 
 \begin{equation}\label{num_walkers_MC_integration}
  N = 2000\times N_x^4
 \end{equation}
-
+\clearpage
 \begin{lstlisting}
-  N_x	    N_MC	   error       MC_error   MP_error
+  N_x	      N_MC	        error       MC_error   MP_error
    1        2000 (   1)  2.650E-02   2.648E-02   2.391E-05
    2       32000 (   1)  7.392E-03   7.433E-03  -4.136E-05
    4      512000 (   1)  1.918E-03   1.927E-03  -8.954E-06
@@ -418,24 +432,25 @@ It uses the relation described, but multiplies with a constant, giving us
   16   131072000 ( 131)  1.176E-04   1.220E-04  -4.320E-06
   
   Convergence rates
-total  MP     MC
+total    MP    MC
 -1.84 -1.83  0.20
 -1.95 -1.95 -0.55
 -2.03 -1.99  0.26
 -1.99 -2.00 -0.52
 \end{lstlisting}
-We see that the convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
-Another thing to notice it the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
-As the listed output and equation \ref{num_walkers_MC_integration} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
+The convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
+Another thing to notice is the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
+As the listed output and equation \eqref{num_walkers_MC_integration} weshows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
 
 \subsection{Introducing walkers}
 
 First of all, using random walkers on parts of the mesh will have a considerable, negative impact on the error estimate. 
 As we have discussed before, the solution from the random walkers will fluctuate around the ``correct'' (it is in fact correct while verifying) solution with amplitude proportional to $\frac{1}{\sqrt{N_{ij}}}$ which will depend on the PDE-solution in the mesh-point. 
 It will also, as demonstrated in chapter \ref{simplified_test}, be possible to force the combined solution to have the desired properties in terms of error-estimates but at considerable computational cost. 
-While doing the various error-testing for the combined solution we will therefore stick to the implicit scheme since we can choose the time-step more freely and by extension reduce the number of random walkers required.\\
-Keeping in mind that the spatial error goes like $\Delta x^2$ we should at least choose the time-step so that $\Delta t> \Delta x^2$ to make sure the error from the time derivative is dominant. 
-Starting off, we have a 2d simulation of isotropic diffusion with $\Delta t = 0.01$ and $\Delta x = \frac{1}{75}$ over the full interesting course of the solution, meaning that the solution more or less at steady state the last time-steps. The error-plot from this simulation is shown in figure \ref{errorplot_combined_BE2d}. We can see that although the error-term from the combined solution does not converge onto the error-curve from the deterministic solution, the error term is of the same order. 
+While doing the various error-testing for the combined solution we will therefore stick to the implicit scheme since the time-step can be chosen more freely and by extension reduce the number of random walkers required.\\
+Keeping in mind that the spatial error goes like $\Delta x^2$ the time-step should be chosen so that $\Delta t> \Delta x^2$ to make sure the error from the time derivative is dominant. 
+Starting off, a 2D simulation of isotropic diffusion is done with $\Delta t = 0.01$ and $\Delta x = \frac{1}{75}$ over the full interesting course of the solution, meaning that the solution more or less at steady state the last time-steps. 
+The error-plot from this simulation is shown in figure \ref{errorplot_combined_BE2d}. The figure shows that although the error-term from the combined solution does not converge onto the error-curve from the deterministic solution, it is of the same order as the deterministic simulation. 
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{../doc/results/experiment_17022014_1541/results/errorplot.eps}
@@ -461,10 +476,10 @@ One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
 \subsection{Increasing the time step and the relative size of walk-area}\label{increasing_dt}
 
 Now that we have an estimate of how to adjust the step length of the walkers in order to adjust for the time step, $\Delta t$, on the PDE level we would like to investigate the actual effects of running the simulation with a larger time step to verify our calculations. 
-First off all, figure \ref{errorplot_BE1D_noWalk} shows the error norm of a simulation of the simplest diffusion equation \ref{simple_diffusion_equation} discretized by the Backward Euler scheme \ref{BE_discretisation_isotropic} using a time step which would make the Forward Euler discretization unstable (There is something strange about its convergence). 
+First off all, Figure \ref{errorplot_BE1D_noWalk} shows the error norm of a simulation of the simplest diffusion equation \eqref{simple_diffusion_equation} discretized by the BE scheme \eqref{BE_discretisation_isotropic} using a time step which would make the FE discretization unstable (There is something strange about its convergence). 
 Figure \ref{errorplot_BE1D_Walk} shows the same simulation for various conversion parameters for the random walk. 
 These simulations have input from the random walk model on some 20\% of the mesh points. 
-As a comparison we can turn to figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} which have 5\% and 35\% of the mesh points affected by walkers.
+As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} have 5\% and 35\% of the mesh points affected by walkers.
 
 \begin{figure}[H]
 \centering

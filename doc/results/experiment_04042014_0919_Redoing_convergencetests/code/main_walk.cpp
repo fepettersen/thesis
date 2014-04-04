@@ -79,6 +79,7 @@ int main(int argc, char** argv)
 
     string buffer;
     ofstream outfile;
+
 	double *x = new double[2];
 	double *y = new double[2];
 	x[0] = x0; x[1] = x1;

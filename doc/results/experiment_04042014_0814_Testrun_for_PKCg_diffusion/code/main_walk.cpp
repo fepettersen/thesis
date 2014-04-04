@@ -79,13 +79,14 @@ int main(int argc, char** argv)
 
     string buffer;
     ofstream outfile;
+
 	double *x = new double[2];
 	double *y = new double[2];
 	x[0] = x0; x[1] = x1;
 	y[0] = y0; y[1] = y1;
 
 	double x_start = 0;
-	double x_end = 1.0;
+	double x_end = 50;
 
 	double dx = (x_end-x_start)/(m-1);
 	double dy = 1.0/(n-1);

@@ -121,6 +121,7 @@ class Experiment:
 			tmp = np.zeros(self.T)
 			j=0
 			for step in sorted(glob.glob(filename)):
+				# print step
 				infile = np.loadtxt(step)
 				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
@@ -137,7 +138,7 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
-		# print self.error
+		print self.error
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
@@ -401,7 +402,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return x+y
-	return np.ones(np.shape(x))
+	return np.ones(np.shape(x))*0.33
 
 def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
@@ -420,10 +421,10 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 4001
 	n = 1
-	T = 7500 		# no.of timesteps, [dt*T] = seconds
+	T = 150 		# no.of timesteps, [dt*T] = seconds
 
-	x_start = 0750
-	x_end = 1 		#um
+	x_start = 0
+	x_end = 50 		#um
 
 	dx = (x_end-x_start)/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -440,7 +441,6 @@ if __name__ == '__main__':
 	# Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_Redoing_convergencetests'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
@@ -474,29 +474,26 @@ if __name__ == '__main__':
 	# leg = ['dt = %g'%i for i in dt]
 
 	## --- Run for h --- ###
-	h = [0.1,0.025,0.05,0.025,0.01]
-	# h = [0.01]
-	dt = []
+	h = [0.2,0.1,0.05]
+	# h = [0.05]
+
 	for i in h:
 		timestep = i*i/4.0
-		dt.append(timestep)
 		m = (1/i)+1
 		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
 		run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
 		run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
-		# hc = int(round(1.0/((i*i/2.0)**2)))
-		hc = m
+		hc = int(round(1.0/((i*i/2.0)**2)))
 		print i," , ", timestep, " , ", hc
 		run.RunSimulation(10*hc)
-	leg = ['dt = %g'%i for i in dt]
-	run.ConvergenceTest(dt)
+	leg = ['h = %g'%i for i in h]
+	run.ConvergenceTest(h)
 	run.PlotError(leg)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	# run.Visualize(viz_type=None)
-	# run.Visualize(viz_type='exact')
+	run.Visualize(viz_type=None)
 
 	# run.Visualize(viz_type='difference')
 	# run.Visualize(filename='/Deterministic_n',viz_type=None)

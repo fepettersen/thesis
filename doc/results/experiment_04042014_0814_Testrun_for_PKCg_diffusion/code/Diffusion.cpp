@@ -42,7 +42,7 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	_Dx = dt/(dx*dx);
 	aD = D;
 	d = (dy>0)?2:1;
-	solver = 2;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
+	solver = 3;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
 	if(d==2 && solver==2){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = dt/(dx*dx);
