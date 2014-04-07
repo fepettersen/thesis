@@ -22,9 +22,9 @@ The python script also does some other more or less clever stuff at each run. Th
 As with any software there are limitations. The limitations discussed in this chapter will be with regard to physical problems, and not memory or CPU limitations which are described later. \\
 Assuming the dendritic spines stuff will be the final application:\\
 First of all, to specify a source function, one must program it in the Diffusion class (Diffusion::f()). This might be fixed in a later version using inheritance.\\
-The geometry is, currently, limited to a square. Of course we can argue that we have scaled the size to a unit square, but as discussed in chapter \ref{} the actual geometry remains a unit square. 
+The geometry is, currently, limited to a square. Of course we can argue that we have scaled the size to a unit square, but as discussed in chapter \ref{geometry} the actual geometry remains a unit square. 
 Furthermore the same issue arises on the random walks. \\
-As of now, it is unclear if 3d-modeling is supported. This is actually a smaller issue since there is usually little more to learn from switching from 2d to 3d. In any case, the extension to 3d is most likely not very hard, provided we use an array of slices from the cubic matrix describing the solution.
+As of now, it is unclear if 3D-modeling is supported. This is actually a smaller issue since there is usually little more to learn from switching from 2D to 3D. In any case, the extension to 3D is most likely not very hard, provided we use an array of slices from the cubic matrix describing the solution.
 
 \section{Adaptivity}
 
@@ -44,17 +44,17 @@ The program as it stands now (v 1.$\infty$) uses the BE discretization and a hig
 The random walk-part of the software has been excreted as a stand-alone program which communicates with the main-program through a binary .xyz file containing the positions of all walkers in 3d space. This makes it easier to change solver, and implement more advanced solvers like the Direct Simulation Monte Carlo (DSMC) Molecular Dynamics (MD) simulator written by Anders Hafreager (see chapter \ref{}). 
 There are three expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
 \begin{itemize}
-\item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \ref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost. 
+\item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \eqref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost. 
+\begin{equation}\label{calls_to_ran}
+ N_{\text{calls}} \propto Hc\frac{(x_1-x_0)}{\Delta x}\frac{(y_1-y_0)}{\Delta y}\tilde{T}
+\end{equation}
+where $\tilde{T}$ denotes the number of time steps on the PDE level times the number of time-steps one PDE-step corresponds to on the RW level. Note that this expression will NOT be zero in 1D, and that it is dependent on the PDE-solution.
 As an additional problem we will encounter some overhead upon calling the program, initializing variables and instances and so on. 
 The computationally most demanding function seems to be the round-off function, which is used to place the walkers on the coarse-grained PDE-mesh.
 \item Communicating the positions of all the walkers between the two programs each time-step is very costly.
 \item Translating the positions of the walkers from the unit-square they are walking on to the coarse-grained PDE grid requires calling the ``round'' function from the math library in C++. This function is rather slow, and the program suffers from it. 
 \end{itemize}
 
-\begin{equation}\label{calls_to_ran}
- N_{\text{calls}} \propto Hc\frac{(x_1-x_0)}{\Delta x}\frac{(y_1-y_0)}{\Delta y}\tilde{T}
-\end{equation}
-where $\tilde{T}$ denotes the number of timesteps on the PDE level times the number of time-steps one PDE-step corresponds to on the RW level. Note that this expression will NOT be zero in 1d, and that it is dependent on the PDE-solution.
 
 \subsection{Parallelizability}
 In the final algorithm there are the following stages
@@ -155,3 +155,11 @@ Assuming that the dendrite is cylindrical gives a cylinder volume segment with h
 This makes $Hc \in (5,24)$ since that is the way we have defined $Hc$. 
 In other words, the integrated concentration must exceed some value defined either directly by the spine neck width or some average neck width depending on how much control we want to have over $Hc$.
 
+The initial condition is open to discussion, but at the moment a skewed Gaussian function i used with a peak value between 1 and 5. 
+Release of PKC$\gamma$ into dendrites is followed by binding of PKC$\gamma$ on the dendrite-wall, but in any case this resembles simply removing some portion from the simulation. 
+This step can just as well be dropped, seeing as it does not provide any extra information, and so only some initial pulse is required. 
+The Gaussian distribution is chosen for simplicity. 
+
+All values in the simulations are scaled to reduce round-off errors. 
+Positions are measured in $\mu$m, concentrations in nMol/L or as particle-numbers when in spines. Only the timescale has normal units of seconds. 
+Craske et.al. did experiments on the scale of $<3$min, but most of the simulations go for even shorter times.

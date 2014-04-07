@@ -146,7 +146,7 @@ The moral behind this little story is that you should make 100\% sure that every
 Furthermore, if you rewrite your code, you should remove the old parts as soon as possible. If you use some kind of version control software, which you definitely should, you will have older versions saved in the version control anyways. Do not be nostalgic and simply comment out the old parts just in case something, this makes your code very messy, and leaves the possibility of something slipping past you.
 
 Another point to be made is that it will probably be helpful to construct the different parts of your code in such a way that they can be run as independently of each other as possible. 
-As an example, both the PDE-solver, its tridiagonal linear system solver and the spine object can with relatively small changes to the main-fine be run independently. 
+As an example, both the PDE-solver, its tridiagonal linear system solver and the spine object can with relatively small changes to the main-file be run independently. 
 This allows for easier testing of the various parts of the code, and makes it more likely that the code will be reused in other projects.
 
 \subsection{When you cannot find the bug}

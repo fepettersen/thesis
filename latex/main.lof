@@ -28,7 +28,7 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.9}{\ignorespaces Error plot RW}}{54}{figure.caption.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac {1}{75}$. Simulations doen with the BE scheme for 100 steps.\relax }}{57}{figure.caption.22}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac {1}{75}$. Simulations done with the BE scheme for 100 steps.\relax }}{57}{figure.caption.22}
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.11}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{58}{figure.caption.23}
 \defcounter {refsection}{0}\relax 
