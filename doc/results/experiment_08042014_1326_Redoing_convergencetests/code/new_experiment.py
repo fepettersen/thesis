@@ -324,21 +324,17 @@ class Experiment:
 		error = []
 		fig = mpl.figure()
 		x = np.linspace(0,1,self.m)
-		y = np.zeros(np.shape(x))
-		# x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-		# dx = x[1,1]-x[0,0]
-		# dy = y[1,1]-y[0,0]
-		dx = x[1]-x[0]
-		dy = 1
+		x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+		dx = x[1,1]-x[0,0]
+		dy = y[1,1]-y[0,0]
 		for i in sorted(glob.glob(self.result_path+filename)):
 			infile = np.loadtxt(i)
-			# im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt),'b-'))
+			im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt)-infile,'b-'))
 			error.append(np.linalg.norm(func(counter,x,y,dx,dy,self.dt)-infile))
 			counter += 1
-		# ani = animation.ArtistAnimation(fig,im)
-		# mpl.show()
-		# print error
-		mpl.plot(error)
+		ani = animation.ArtistAnimation(fig,im)
+		mpl.show()
+		mpl.plot(error[1:])
 		mpl.show()
 
 	def SetInitialCondition(self,init):
@@ -373,7 +369,7 @@ def f(x,y,t):
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y) +1
 	# return np.pi*np.ones(np.shape(x))
 
 def F(x,y,t):
@@ -423,17 +419,17 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 1.0
 	y1 = 0.7
-	m = 11
+	m = 10
 	n = 1
 	T = 160 		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
-	x_end = 1.0 		#um
+	x_end = 1 		#um
 
-	dx = (x_end-x_start)/(m-1.0)
+	dx = (x_end-x_start)/(m-1)
 	dy = 1.0/(n-1) if n>1 else 0
 	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = [0.3*dx**2]
+	dt = [dx**2/3.0]
 	# dt = [0.01,0.005,0.001,0.0005]
 
 
@@ -456,10 +452,11 @@ if __name__ == '__main__':
 	run.SetDiffusionTensor(D(x,y))
 
 	run.compile()
+	
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 	run.RunSimulation(10)
-	run.Compare('/results_FE_Hc*.txt',numerical_exact)
+	run.Compare(run.result_path+'results_FE_Hc*.txt',numerical_exact)
 	run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
@@ -502,7 +499,7 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	# run.Visualize(viz_type=None)
+	run.Visualize(viz_type=None)
 	# run.Visualize(viz_type='exact')
 
 	# run.Visualize(viz_type='difference')
