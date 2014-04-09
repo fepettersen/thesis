@@ -13,14 +13,15 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	dy = _dy;
 	D = _D;
 	d = (dy>0)?2:1;
-	solver = 0;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
+	solver = 3;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
 	if(d==2 && solver==0){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = D*dt/(dx*dx);
 		_Dy = D*dt/(dy*dy);
 	}
 	else if(d==1 && solver==0){
-		dt = (Dt>(dx*dx/2.0))? (dx*dx/(3.0)):Dt;
+		// dt = (Dt>(dx*dx/2.0))? (dx*dx/(3.0)):Dt;
+		dt = Dt;
 		_Dx = D*dt/(dx*dx);
 	}
 	else{
@@ -42,7 +43,7 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	_Dx = dt/(dx*dx);
 	aD = D;
 	d = (dy>0)?2:1;
-	solver = 2;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
+	solver = 3;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
 	if(d==2 && solver==2){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = dt/(dx*dx);
@@ -55,8 +56,8 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	}
 	t=1;
 	v = _v;
-	vdtdx2 = (v*dt)/(2*dx);
-	vdtdy2 = (v*dt)/(2*dy);
+	vdtdx2 = (_v*dt)/(2*dx);
+	vdtdy2 = (_v*dt)/(2*dy);
 	isotropic = 0;
 	linalg = new Tridiag();
 }
@@ -254,23 +255,19 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 	if(t==1 || beta != D*dt/(dy*dy) ){
 		beta = D*dt/(dy*dy);
 		alpha = D*dt/(dx*dx);
-		mat A = zeros(N,N);
 		if(not isotropic){
-			Lower = AssembleAnisotropic(dt/(2*dx*dx),dt/(2*dx*dx),m,n);
+			Lower = AssembleAnisotropic(dt/(2.0*dx*dx),dt/(2.0*dx*dx),m,n);
 		}
 		else{
 			Lower = Assemble(alpha,beta,m,n);
 		}
+		mat inverse = inv(Lower);
+		inverse.save("BE_matrix_inverse.txt",raw_ascii);
 		linalg->precondition(Lower,m,n);
 	}
 	vec Uptmp = zeros(N);
 	vec Utmp = zeros(N);
-    /*Backward substitution for the equations 
-    Lower*y = Uptmp(+f)
-    Upper*Utmp = y*/
-    
-    double y[N];
-    double LUtemp;
+
 	int k=0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n; j++){

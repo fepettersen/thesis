@@ -49,6 +49,7 @@ void FromFile(double **array, string filename,int m, int n){
 		for(int j=0;j<n;j++){
 			sub = "";
 			iss >>sub;
+			// array[i][k] = strtod(sub.c_str(),NULL);
 			array[i][k] = atof(sub.c_str());
 			k++;
 		}
@@ -111,7 +112,7 @@ int main(int argc, char** argv)
 	// 	s->Solve();
 	// 	s->Write(make_filename(buffer,RWname,conversion_factor,i));
 	// }
-	Combine BlackBox(m,n,x_start,x_end,0,1,1.0,conversion_factor,Dt);
+	Combine BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	// Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
 	

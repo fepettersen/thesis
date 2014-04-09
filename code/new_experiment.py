@@ -309,7 +309,7 @@ class Experiment:
 			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
 		print r
 		print E
-		mpl.plot((Hc[:-1]),np.abs(r),'b-x')
+		mpl.plot((Hc[:-1]),r,'b-x')
 		mpl.xlabel('dt')
 		mpl.ylabel('r')
 		mpl.title('Convergence rate')
@@ -318,23 +318,31 @@ class Experiment:
 			mpl.savefig(self.result_path+'/ConvergenceTest.png')
 		mpl.show()
 
-	def Compare(self,filename,func):
+	def Compare(self,filename,func,mat=None,U0=None):
 		counter = 1
 		im = []
 		error = []
 		fig = mpl.figure()
 		x = np.linspace(0,1,self.m)
 		y = np.zeros(np.shape(x))
-		# x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-		# dx = x[1,1]-x[0,0]
-		# dy = y[1,1]-y[0,0]
-		dx = x[1]-x[0]
-		dy = 1
-		for i in sorted(glob.glob(self.result_path+filename)):
-			infile = np.loadtxt(i)
-			# im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt),'b-'))
-			error.append(np.linalg.norm(func(counter,x,y,dx,dy,self.dt)-infile))
-			counter += 1
+		if mat!=None and U0!=None:
+			print 'balleneger'
+			for i in sorted(glob.glob(self.result_path+filename)):
+				infile = np.loadtxt(i)
+				error.append(np.linalg.norm(np.dot(mat**counter,U0)))
+
+				counter += 1
+		else:
+			# x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+			# dx = x[1,1]-x[0,0]
+			# dy = y[1,1]-y[0,0]
+			dx = x[1]-x[0]
+			dy = 1
+			for i in sorted(glob.glob(self.result_path+filename)):
+				infile = np.loadtxt(i)
+				# im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt),'b-'))
+				error.append(np.linalg.norm(func(counter,x,y,dx,dy,self.dt)-infile))
+				counter += 1
 		# ani = animation.ArtistAnimation(fig,im)
 		# mpl.show()
 		# print error
@@ -343,7 +351,7 @@ class Experiment:
 
 	def SetInitialCondition(self,init):
 		# save the initial condition (init) as a numpy-array
-		np.savetxt('InitialCondition.txt',init)
+		np.savetxt('InitialCondition.txt',init,fmt = '%.18f')
 
 	def SetDiffusionTensor(self,tensor):
 		# save the anisotropic diffusion "tensor" as a numpy-array
@@ -387,12 +395,14 @@ def F(x,y,t):
 
 from scipy.special import binom
 
+
 def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	u = np.zeros(np.shape(x))
 	def u_xx(i,x,y):
-		#return (-1)**i*(np.pi**(2*i))*np.cos(np.pi*x)
+		# return (-1)**i*(np.pi**(2*i))*np.cos(np.pi*x)
 		if dx**(2*i)>0 and type(2**i)!=type(long()):
-			return 2**(i-1)*np.cos(np.pi*y)*np.cos(np.pi*x)*((np.cos(np.pi*dx)-1)**i/(dx**(2*i)) +(np.cos(np.pi*dy)-1)**i/(dy**(2*i)))
+			# return 2**(i-1)*np.cos(np.pi*y)*np.cos(np.pi*x)*((np.cos(np.pi*dx)-1)**i/(dx**(2*i)) +(np.cos(np.pi*dy)-1)**i/(dy**(2*i)))
+			return 2**(i)*(np.cos(np.pi*dx)-1)**i/(dx**(2*i))
 		else:
 			return 0
 	
@@ -402,7 +412,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 		else:
 			tmp = np.zeros(np.shape(u))
 		u[:] += tmp
-	return u
+	return np.cos(np.pi*x)*u
 
 def D(x,y,t=0):
 	# return x+y
@@ -423,9 +433,9 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 1.0
 	y1 = 0.7
-	m = 11
+	m = 51
 	n = 1
-	T = 160 		# no.of timesteps, [dt*T] = seconds
+	T = 170 		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -433,7 +443,8 @@ if __name__ == '__main__':
 	dx = (x_end-x_start)/(m-1.0)
 	dy = 1.0/(n-1) if n>1 else 0
 	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	dt = [0.3*dx**2]
+	bla = 0.3*dx**2
+	dt = [bla]
 	# dt = [0.01,0.005,0.001,0.0005]
 
 
@@ -459,7 +470,9 @@ if __name__ == '__main__':
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 	run.RunSimulation(10)
-	run.Compare('/results_FE_Hc*.txt',numerical_exact)
+	M = np.loadtxt("BE_matrix_inverse.txt")
+	u0 = run.exact(x,y,0)
+	run.Compare('/results_FE_Hc*.txt',numerical_exact,M,u0)
 	run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
@@ -483,7 +496,7 @@ if __name__ == '__main__':
 	# ## --- Run for h --- ###
 	h = [0.1,0.075,0.05,0.025,0.01]
 	# h = [0.01]
-	dt = []
+	# dt = []
 	# for i in h:
 	# 	timestep = i*i/4.0
 	# 	dt.append(timestep)
