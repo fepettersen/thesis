@@ -1,6 +1,6 @@
 
 This chapter will deal with random walks in general and the transition from the statistical view to PDEs. 
-Different algorithms to produce random walks (and pseudo-random numbers?) will be discussed, highlighting their pros and cons in light of this project along with some details which prove either problematic or helpful. 
+Different algorithms to produce random walks will be discussed, highlighting their pros and cons in light of this project along with some details which prove either problematic or helpful. 
 Numerical solution of PDEs will also be discussed, also with emphasis on what is relevant for this project. 
 Finally an algorithm for combining random walk diffusion solvers and normal PDE diffusion solvers will be introduced and discussed.
 
@@ -195,13 +195,15 @@ which is the diffusion equation.
 Insertion of the Gaussian distribution \eqref{rw_gaussian_distribution}) verifies that the Gaussian distribution fulfills the diffusion equation. 
 Starting with only the time derivative gives
 \begin{align*}
- \frac{\d P}{\d t} = -\frac{4\pi De^{-\frac{x^2}{4Dt}}}{2\sqrt{(4\pi Dt)^3}}&+\frac{x^2e^{-\frac{x^2}{4Dt}}}{4Dt^2\sqrt{4\pi Dt}} \\
- = e^{-\frac{x^2}{4Dt}}\left(\frac{8Dx^2}{2\sqrt{\pi}(4Dt)^{5/2}} -\frac{(4D)^2t}{2\sqrt{\pi}(4Dt)^{5/2}}\right)&= \frac{4De^{-\frac{x^2}{4Dt}}(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
+ \frac{\d P}{\d t} &= -\frac{4\pi De^{-\frac{x^2}{4Dt}}}{2\sqrt{(4\pi Dt)^3}}+\frac{x^2e^{-\frac{x^2}{4Dt}}}{4Dt^2\sqrt{4\pi Dt}} \\
+ &= e^{-\frac{x^2}{4Dt}}\left(\frac{8Dx^2}{2\sqrt{\pi}(4Dt)^{5/2}} -\frac{(4D)^2t}{2\sqrt{\pi}(4Dt)^{5/2}}\right)\\
+ &= \frac{4De^{-\frac{x^2}{4Dt}}(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
 \end{align*}
  Which is balanced by the spatial derivative
 \begin{align*}
  D\frac{\d^2 P}{\d x^2} &= \frac{D}{\sqrt{4\pi Dt}}\frac{\d}{\d x}\left[-e^{\frac{-x^2}{4Dt}}\left(\frac{-2x}{4Dt}\right)\right]\\
- = \frac{2D}{4Dt\sqrt{4\pi Dt}}&e^{\frac{-x^2}{4Dt}}\left[1-x\left(\frac{2x}{4Dt}\right)\right] = \frac{4De^{-\frac{x^2}{4Dt}}(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
+ &= \frac{2D}{4Dt\sqrt{4\pi Dt}}e^{\frac{-x^2}{4Dt}}\left[1-x\left(\frac{2x}{4Dt}\right)\right] \\
+ &= \frac{4De^{-\frac{x^2}{4Dt}}(x^2-2Dt)}{\sqrt{\pi}(4Dt)^{5/2}}
 \end{align*}
 meaning that the diffusion equation is satisfied.
 
@@ -276,7 +278,7 @@ Which in many cases will simplify to
  \frac{\d C}{\d t} = D\nabla^2 C-\vec{v}\cdot\nabla C
 \end{equation}
 
-In order to determine all the parameters of the convection diffusion equation \eqref{convection_diffusion_equation} we will need to go through some of the calculations from chapter \ref{introduction_to_random_walks}. 
+In order to determine all the parameters of the convection diffusion equation \eqref{convection_diffusion_equation} we will need to go through some of the calculations from section \ref{introduction_to_random_walks}. 
 The situation is the same, a walker in one dimension which can jump left or right, but this time will also move a finite distance $d$ each time-step. 
 This will make the expected net displacement
 \begin{equation*}
@@ -381,7 +383,7 @@ The extension to 3d is trivial, as is the 1d version.
 The drift term will be omitted in the beginning because this also results in a simple addition to the numerical scheme. The equation to be discussed is 
 
 \begin{equation}
- \frac{\d u}{\d t} = \nabla D\nabla u +f
+ \frac{\d u}{\d t} = \nabla(D\cdot\nabla u) +f
 \end{equation}
 
 where f is some source term. 
@@ -504,15 +506,15 @@ will not only reduce the residual to $\mathcal{O}(\Delta x^2)$, it is also incre
 
 In section \ref{discretizing} the Forward Euler was used as an approximation to the time derivative. 
 Unfortunately the resulting scheme is potentially unstable, as this section will demonstrate. 
-First, the solution to \eqref{simple_diffusion_equation} ($u(x,t)$) is assumed to be on the form 
+First, the solution to equation \eqref{simple_diffusion_equation} ($u(x,t)$) is assumed to be on the form 
 
 \begin{equation}\label{von_neumann_fourier_solution}
  u(x,t) = A^n e^{(ikp\Delta x)}
 \end{equation}
 
-where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which, for the solution \eqref{von_neumann_fourier_solution} ideally should be $e^{-\pi^2t}$, but will be something else in the numerical case. 
+where $i^2=-1$ is the imaginary unit and $A^n$ is an amplification factor which, for the solution (eq. \eqref{von_neumann_fourier_solution}) ideally should be $e^{-\pi^2t}$, but will be something else in the numerical case. 
 Notice the restriction $\left|A\right|\leq 1$ if $u$ is to not blow up. 
-Inserting \eqref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives the following
+Inserting eq. \eqref{von_neumann_fourier_solution} in the simplified version of the variable coefficient scheme (where the coefficient is constant) gives the following
 
 \begin{align*}
  e^{(ikp\Delta x)}\left(A^{n+1}-A^n\right) &=  A^n\frac{D\Delta t}{\Delta x^2}\left(e^{(ik(p+1)\Delta x)}-2e^{(ikp\Delta x)} +e^{(ik(p-1)\Delta x)}\right)\\
@@ -523,13 +525,13 @@ Using the well known identities
 $$e^{(iax)}+e^{(-iax)} = \frac{1}{2}\cos^2\left(\frac{ax}{2}\right)$$
 and 
 $$\cos^2(ax)-1 = \sin^2(ax)$$
-gives the intermediate expression \eqref{intermediate_FE}
+gives the intermediate expression eq. \eqref{intermediate_FE}
 
 \begin{equation}\label{intermediate_FE}
  A-1 = \frac{D\Delta t}{\Delta x^2}\sin^2\left(\frac{k\Delta x}{2}\right)
 \end{equation}
 
-The ``worst case scenario'' in \eqref{intermediate_FE} is  $max(\sin^2\left(\frac{k\Delta x}{2}\right))= 1$. Inserting this extreme value helps find the worst possible error term
+The ``worst case scenario'' in eq. \eqref{intermediate_FE} is  $max(\sin^2\left(\frac{k\Delta x}{2}\right))= 1$. Inserting this extreme value helps find the worst possible error term
 
 \begin{equation}
  A = \frac{D\Delta t}{2\Delta x^2}+1 \implies \Delta t\leq\frac{\Delta x^2}{2D}
@@ -546,7 +548,7 @@ which leads to
 \begin{equation}\label{stability_BE}
 A = \frac{1}{ 1+\frac{D\Delta t}{\Delta x^2}}
 \end{equation}
-Equation \ref{stability_BE} is smaller than 1 for all $\Delta t>0$ which means that the scheme is unconditionally stable.
+Equation \eqref{stability_BE} is smaller than 1 for all $\Delta t>0$ which means that the scheme is unconditionally stable.
 
 \subsection{Truncation error}\label{truncation_error}
 
@@ -589,7 +591,7 @@ Doing the expansions and cleaning up a bit
 &R = u''(x_i) +\frac{1}{12}u^{(4)}(x_i)\Delta x^2 + \frac{\mathcal{O}(\Delta x^5)}{\Delta x^2}  -u''(x_i) \\
 &R\sim \mathcal{O}(\Delta x^2) 
 \end{align*}
-There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative \ref{stability} will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative. \\
+There are discretizations that can reduce this residual even further (although a second order scheme is usually considered adequate), but this time the stability criterion on the time derivative (eq. \eqref{stability}) will always be of the order $\mathcal{O}(\Delta x^2)$ and so we will never get a smaller error than this unless we change the time derivative. \\
 
 
 Quantifying an error term for the random walk solver is not straightforward, but naturally it will be closely coupled to the number of walkers used. 
@@ -632,6 +634,7 @@ At this point there does not seem to be any solution to this, and so only a simi
 % For the actual decomposition the cost is $\mathcal{O}(N^3) = \mathcal{O}(n^9)$
 
 \subsection{Tridiagonal linear systems}\label{tridiagonal_linear_systems}
+
 The implicit discretization results in a set of linear equations, or a linear system, to solve at each timestep. 
 Neumann boundaries combined with a first derivative in time makes the linear system band diagonal, where the number of non-zero bands on the matrix is dependent on the number of spatial dimensions the problem is solved in. 
 In one spatial dimension this reduces to a tridiagonal system, which can be solved extremely efficiently by the ``tridiag'' function listed below.
@@ -677,7 +680,7 @@ Since most entries are zero we can easily get away with only doing one forward s
 
 \lstinputlisting{Figures/tridiag.cpp}
 The tridiagonal solver from the one-dimensional case can be modified so it can be used on block-tridiagonal systems. 
-The modified algorithm for the block-tridiagonal matrix \ref{block_tridiagonal_matrix} is listed in \ref{block_tridiag_alg}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. The result of rewriting the $2n$-band diagonal matrix is the block matrix in equation \ref{block_tridiagonal_matrix}.
+The modified algorithm for the block-tridiagonal matrix \eqref{block_tridiagonal_matrix} is listed in \eqref{block_tridiag_alg}, and is in fact only the linear algebra version of the ``tridiag'' function, replacing the $1.0/btmp$ -terms with $\left(B_i+A_iH_{i-1}\right)^{-1}$. The result of rewriting the $2n$-band diagonal matrix is the block matrix in equation \eqref{block_tridiagonal_matrix}.
 
 \begin{align}\label{block_tridiagonal_matrix}
    \left(\begin{array}{c c c c c c c c c}
@@ -735,7 +738,7 @@ If a random walker in the spine comes in contact with the position labeled as th
 Similarly, at each time-step a part of the PDE-solution corresponding to one walker will diffuse into the spine with a certain probability. 
 It might be desirable for a walker to only be able to diffuse out of the spine with some probability as well, or for the walkers which diffuse into the spine to have some drift term, but these are minor updates and might be added later if needed. \\
 
-There is also the possibility of modeling parts of the dendrite-mesh as random walk (This can be done in 2d as well as 1d). 
+There is also the possibility of modeling parts of the dendrite-mesh as random walk (this can be done in 2d as well as 1d). 
 This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
 Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{farnell2005monte}. 
 At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 

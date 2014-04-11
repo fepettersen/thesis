@@ -73,12 +73,11 @@ Combine::Combine(int M, int N, double X0, double X1, double Y0, double Y1,double
 void Combine::Solve(){
 	if(debug){cout<<"Combine::Solve"<<endl;}
 	int num_procs = 2;
-	pde_solver->advance(U,Up,m,n);
-	double diffnorm = norm(U,Up,m,n);
+	// double diffnorm = norm(U,Up,m,n);
 	char cmd[100];
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
-		ConvertToWalkers(U,inifilenames[i],indeces[i]);
+		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
 		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
 		// sprintf(cmd,"mpirun -np %d stochastic/%s %d %d %d %g",num_procs,prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt);
 		sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
@@ -90,19 +89,20 @@ void Combine::Solve(){
 			cout<<endl<<endl;
 			exit(1);
 		}
-		ConvertFromWalkers(U,inifilenames[i],indeces[i]);
+		ConvertFromWalkers(Up,inifilenames[i],indeces[i]);
 	}
+	pde_solver->advance(U,Up,m,n);
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
 			Up[k][l] = U[k][l];
 		}
 	}
-	if (diffnorm<0.1*pde_solver->dt && pde_solver->dt <0.01)
-	{
-		int lkjh=0;
-		// pde_solver->dt *=10;
-		// cout<<"changing dt"<<endl;
-	}
+	// if (diffnorm<0.1*pde_solver->dt && pde_solver->dt <0.01)
+	// {
+	// 	int lkjh=0;
+	// 	// pde_solver->dt *=10;
+	// 	// cout<<"changing dt"<<endl;
+	// }
 }
 
 void Combine::AddWalkArea(double *x, double *y){
@@ -225,7 +225,7 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 			nwalkers += Conc[k][l];
 		}
 	}	
-
+	cout<<"nwalkers = "<<nwalkers<<endl;
 	if(debug){cout<<"nwalkers = "<<nwalkers<<endl;}
 	inifile<<nwalkers<<endl<<endl;		/*Write xyz-header*/
 	

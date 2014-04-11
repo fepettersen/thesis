@@ -115,11 +115,10 @@ class Experiment:
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
 		exact = True if self.exact(X,Y,0)!=None else False
 		if exact:
-			print filename
 			tmp = np.zeros(self.T)
 			j=0
 			for step in sorted(glob.glob(filename)):
-				print step
+				# print step
 				infile = np.loadtxt(step)
 				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
@@ -324,10 +323,12 @@ class Experiment:
 		x = np.linspace(0,1,self.m)
 		y = np.zeros(np.shape(x))
 		if mat!=None and U0!=None:
+			temp = mat
 			print 'dt = ',self.dt
 			for i in sorted(glob.glob(self.result_path+filename)):
 				infile = np.loadtxt(i)
-				temp = np.linalg.matrix_power(mat,counter)
+				# temp = np.linalg.matrix_power(mat,counter)
+				temp = np.dot(mat,temp)
 				error.append(np.linalg.norm(infile-np.dot(temp,U0)))
 				# im.append(mpl.plot(infile-np.dot(temp,U0),'b-'))
 				counter += 1
@@ -467,7 +468,7 @@ if __name__ == '__main__':
 
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	run.VerifyDeterministicError()
+	# run.VerifyDeterministicError()
 	# run.RunSimulation(10)
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
@@ -475,14 +476,14 @@ if __name__ == '__main__':
 	# run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
-	for i in Hc:
-		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-		run.RunSimulation(i)
-	run.ConvergenceTest(Hc)
-	leg = ['Hc = %g'%i for i in Hc]
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	# 	run.RunSimulation(i)
+	# run.ConvergenceTest(Hc)
+	# leg = ['Hc = %g'%i for i in Hc]
 	# os.system('python spine_statistics.py')
-	run.PlotError(leg)
+	# run.PlotError(leg)
 
 	## --- Run for time-step --- ###
 	# for i in dt:
@@ -493,23 +494,22 @@ if __name__ == '__main__':
 	# leg = ['dt = %g'%i for i in dt]
 
 	# ## --- Run for h --- ###
-	h = [0.1,0.075,0.05,0.025,0.01]
-	# h = [0.01]
-	# dt = []
-	# for i in h:
-	# 	timestep = i*i/4.0
-	# 	dt.append(timestep)
-	# 	m = (1/i)+1
-	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-	# 	run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
-	# 	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
-	# 	# hc = int(round(1.0/((i*i/2.0)**2)))
-	# 	hc = m
-	# 	print i," , ", timestep, " , ", hc
-	# 	run.RunSimulation(10*hc)
-	# leg = ['dt = %g'%i for i in dt]
-	# run.ConvergenceTest(dt)
-	# run.PlotError(leg)
+	h = [0.1,0.075,0.05]
+	dt = []
+	for i in h:
+		timestep = i
+		dt.append(timestep)
+		m = (1/i)+1
+		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+		run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
+		run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
+		hc = int(round(1.0/(timestep**2)))
+		# hc = m
+		print i," , ", timestep, " , ", hc
+		run.RunSimulation(1000*hc)
+	leg = ['dt = %g'%i for i in dt]
+	run.ConvergenceTest(dt)
+	run.PlotError(leg)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
