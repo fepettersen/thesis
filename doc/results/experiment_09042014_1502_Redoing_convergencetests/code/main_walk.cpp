@@ -9,7 +9,7 @@ string make_filename(string buffer,string filename,int conversion_factor,int ste
 		sprintf(buff,"/results_FE_Hc%d_n%04d.txt",conversion_factor,step_no);
 	}
 	else{
-		sprintf(buff,"/%s_n%04d.txt",filename.c_str(),step_no);
+		sprintf(buff,"%s_n%04d.txt",filename.c_str(),step_no);
 	}
   	buffer = buff;
   	// delete[] buff;
@@ -115,8 +115,6 @@ int main(int argc, char** argv)
 	Combine BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	// Dendrite BlackBox(m,n,x_start,x_end,0,1,aD,conversion_factor,Dt);
 	BlackBox.SetInitialCondition(Up,m,n);
-
-	BlackBox.AddWalkArea(x,y);
 	
 	// for (int i = 0; i < 20; ++i){
 	// 	Adds some number of spines to the dendrite

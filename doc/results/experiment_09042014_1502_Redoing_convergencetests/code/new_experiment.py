@@ -90,6 +90,9 @@ class Experiment:
 		# Run a simulation with the parameters specified in SetupRun 
 		# disregarding random walks
 		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %g'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0,self.dt))
+		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
+			# self.walk.append(np.fromfile(step,sep=" "))
+			self.walk.append(np.loadtxt(step))
 		name = self.result_path+'/Deterministic*.txt'
 		self.CalculateError(name)
 
@@ -115,11 +118,9 @@ class Experiment:
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
 		exact = True if self.exact(X,Y,0)!=None else False
 		if exact:
-			print filename
 			tmp = np.zeros(self.T)
 			j=0
 			for step in sorted(glob.glob(filename)):
-				print step
 				infile = np.loadtxt(step)
 				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
@@ -136,6 +137,7 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
+		# print self.error
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
@@ -150,7 +152,7 @@ class Experiment:
 				mpl.plot(self.error[i],color[i],label=legend[i])
 		mpl.legend(loc=0)
 		mpl.xlabel('timestep no.')
-		mpl.ylabel('errornorm (l2)')
+		mpl.ylabel('max(abs(simulation-exact))')
 		mpl.title('Error plot; dt = %g'%self.dt)
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
@@ -296,18 +298,19 @@ class Experiment:
 
 	def ConvergenceTest(self,Hc,save=True):
 		E = []
+		print Hc
 		if self.runcounter != len(self.error):
 			for i in xrange(len(Hc)):
 				E.append(np.sqrt(Hc[i]*np.sum(self.error[i+1])))
 		else:
 			for i in xrange(len(Hc)):
-				E.append(np.sqrt(Hc[i]*np.sum(self.error[i]**2)))
+				E.append(np.sqrt(Hc[i]*np.sum(self.error[i])))
 		r = [0]*(len(E)-1)
 		for j in xrange(len(E)-1):
 			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
 		print r
 		print E
-		mpl.plot((Hc[:-1]),r,'b-x')
+		mpl.plot((Hc[:-1]),np.abs(r),'b-x')
 		mpl.xlabel('dt')
 		mpl.ylabel('r')
 		mpl.title('Convergence rate')
@@ -316,35 +319,26 @@ class Experiment:
 			mpl.savefig(self.result_path+'/ConvergenceTest.png')
 		mpl.show()
 
-	def Compare(self,filename,func,mat=None,U0=None):
+	def Compare(self,filename,func):
 		counter = 1
 		im = []
 		error = []
 		fig = mpl.figure()
 		x = np.linspace(0,1,self.m)
 		y = np.zeros(np.shape(x))
-		if mat!=None and U0!=None:
-			print 'dt = ',self.dt
-			for i in sorted(glob.glob(self.result_path+filename)):
-				infile = np.loadtxt(i)
-				temp = np.linalg.matrix_power(mat,counter)
-				error.append(np.linalg.norm(infile-np.dot(temp,U0)))
-				# im.append(mpl.plot(infile-np.dot(temp,U0),'b-'))
-				counter += 1
-		else:
-			# x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-			# dx = x[1,1]-x[0,0]
-			# dy = y[1,1]-y[0,0]
-			dx = x[1]-x[0]
-			dy = 1
-			for i in sorted(glob.glob(self.result_path+filename)):
-				infile = np.loadtxt(i)
-				# im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt),'b-'))
-				error.append(np.linalg.norm(func(counter,x,y,dx,dy,self.dt)-infile))
-				counter += 1
+		# x,y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
+		# dx = x[1,1]-x[0,0]
+		# dy = y[1,1]-y[0,0]
+		dx = x[1]-x[0]
+		dy = 1
+		for i in sorted(glob.glob(self.result_path+filename)):
+			infile = np.loadtxt(i)
+			# im.append(mpl.plot(func(counter,x,y,dx,dy,self.dt),'b-'))
+			error.append(np.linalg.norm(func(counter,x,y,dx,dy,self.dt)-infile))
+			counter += 1
 		# ani = animation.ArtistAnimation(fig,im)
 		# mpl.show()
-
+		# print error
 		mpl.plot(error)
 		mpl.show()
 
@@ -380,7 +374,7 @@ def f(x,y,t):
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y) +1
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 	# return np.pi*np.ones(np.shape(x))
 
 def F(x,y,t):
@@ -394,14 +388,13 @@ def F(x,y,t):
 
 from scipy.special import binom
 
-
 def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	u = np.zeros(np.shape(x))
 	def u_xx(i,x,y):
 		# return (-1)**i*(np.pi**(2*i))*np.cos(np.pi*x)
 		if dx**(2*i)>0 and type(2**i)!=type(long()):
 			# return 2**(i-1)*np.cos(np.pi*y)*np.cos(np.pi*x)*((np.cos(np.pi*dx)-1)**i/(dx**(2*i)) +(np.cos(np.pi*dy)-1)**i/(dy**(2*i)))
-			return 2**(i)*(np.cos(np.pi*dx)-1)**i/(dx**(2*i))
+			return 2**(i)*np.cos(np.pi*x)*(np.cos(np.pi*dx)-1)**i/(dx**(2*i))
 		else:
 			return 0
 	
@@ -411,7 +404,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 		else:
 			tmp = np.zeros(np.shape(u))
 		u[:] += tmp
-	return np.cos(np.pi*x)*u
+	return u
 
 def D(x,y,t=0):
 	# return x+y
@@ -428,13 +421,13 @@ if __name__ == '__main__':
 
 	this_dir = right_split(os.getcwd(),'/')
 
-	x0 = 0.3
+	x0 = 0.1
 	y0 = 0.5
-	x1 = 0.5
+	x1 = 1.0
 	y1 = 0.7
 	m = 51
 	n = 1
-	T = 100		# no.of timesteps, [dt*T] = seconds
+	T = 50 		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -442,9 +435,8 @@ if __name__ == '__main__':
 	dx = (x_end-x_start)/(m-1.0)
 	dy = 1.0/(n-1) if n>1 else 0
 	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
-	bla = 0.3*dx**2
-	# dt = [bla]
-	dt = [0.01]
+	dt = [0.3*dx**2]
+	# dt = [0.01,0.005,0.001,0.0005]
 
 
 	if n>1:
@@ -452,8 +444,8 @@ if __name__ == '__main__':
 	else:
 		x = np.linspace(x_start,x_end,m)
 		y = np.zeros(m)
-	# Hc = [1500]
-	Hc = [200,1400,5600,10400,22000,150000]
+	Hc = [15]
+	# Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
 	info='_Redoing_convergencetests'
@@ -467,22 +459,20 @@ if __name__ == '__main__':
 
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	run.VerifyDeterministicError()
+	# run.VerifyDeterministicError()
 	# run.RunSimulation(10)
-	# M = np.loadtxt("BE_matrix_inverse.txt")
-	# u0 = run.exact(x,y,0)
-	# run.Compare('/results_FE_Hc*.txt',numerical_exact,M,u0)
+	# run.Compare('/results_FE_Hc*.txt',numerical_exact)
 	# run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
-	for i in Hc:
-		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-		run.RunSimulation(i)
-	run.ConvergenceTest(Hc)
-	leg = ['Hc = %g'%i for i in Hc]
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	# 	run.RunSimulation(i)
+	# # run.ConvergenceTest(Hc)
+	# leg = ['Hc = %g'%i for i in Hc]
 	# os.system('python spine_statistics.py')
-	run.PlotError(leg)
+	# # run.PlotError(leg)
 
 	## --- Run for time-step --- ###
 	# for i in dt:
@@ -495,21 +485,21 @@ if __name__ == '__main__':
 	# ## --- Run for h --- ###
 	h = [0.1,0.075,0.05,0.025,0.01]
 	# h = [0.01]
-	# dt = []
-	# for i in h:
-	# 	timestep = i*i/4.0
-	# 	dt.append(timestep)
-	# 	m = (1/i)+1
-	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-	# 	run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
-	# 	run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
-	# 	# hc = int(round(1.0/((i*i/2.0)**2)))
-	# 	hc = m
-	# 	print i," , ", timestep, " , ", hc
-	# 	run.RunSimulation(10*hc)
-	# leg = ['dt = %g'%i for i in dt]
-	# run.ConvergenceTest(dt)
-	# run.PlotError(leg)
+	dt = []
+	for i in h:
+		timestep = i*i/4.0
+		dt.append(timestep)
+		m = (1/i)+1
+		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+		run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
+		run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
+		# hc = int(round(1.0/((i*i/2.0)**2)))
+		hc = m
+		print i," , ", timestep, " , ", hc
+		run.RunSimulation(10*hc)
+	leg = ['dt = %g'%i for i in dt]
+	run.ConvergenceTest(dt)
+	run.PlotError(leg)
 	# run.Compare('/Deterministic_n*',numerical_exact)
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])

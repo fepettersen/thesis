@@ -290,6 +290,48 @@ We should, in other words, be pleased that the error starts out with machine pre
  \label{exact_numerical_2d_n130}
 \end{figure}
 
+For the BE scheme the exact numerical solution is more implicit than for the FE scheme. 
+As for the FE scheme, the numerical exact solution is simply the solution to the difference equation that the PDE is rewritten as. 
+However, the BE scheme is implicit and results in a system of linear equations. 
+This was derived in section \ref{discretizing} and the resulting linear system is
+
+\begin{equation*}
+ \mathbf M \vec u^{n+1} = \vec u^n
+\end{equation*}
+
+The solution to this linear system is trivial
+\begin{equation*}
+ \vec u^{n+1} = \mathbf M^{-1} \vec u^n
+\end{equation*}
+
+though it is an inefficient way of solving the system in this case. 
+As indicated in section \ref{discretizing} all the information about the system lies in the mass matrix $\mathbf M$, and this matrix must be carefully assembled. 
+It is then preconditioned and the system is solved by the ``tridiag'' solver mentioned earlier. 
+In principle this is the same as doing and storing the inverse of $\mathbf M$ and then multiplying this inverse by the solution at the previous time-step. 
+Another way of doing this is by raising $\mathbf M$ to the required power and then doing the multiplication with the initial condition as stated in equation \eqref{BE_numex}.
+
+\begin{equation}\label{BE_numex}
+ \vec u^{n+1} = \left(\mathbf M^{-1}\right)^{n+1} \vec u^0
+\end{equation}
+
+Equation \eqref{BE_numex} is the numerical exact solution to the BE scheme, but it has a few problems compared to the exact solution to the FE scheme. 
+Testing is done by storing the inverse of the assembled matrix, solving eq. \eqref{BE_numex} for the desired number of steps and comparing the solution with the result of a simulation. 
+The problem with this approach is that the inverse of $\mathbf M$ gives a lot of round off errors, especially with entries of $10^{-20}$ and smaller. 
+These entries would be zero if the analytical inverse was taken, but are clearly not zero in the matrix. 
+Terms of this magnitude give rise to a lot of potential uncertainty, and the result is that the desired accuracy must be reduced. 
+Figure \ref{numex:BE1D} shows the accuracy of the simulation compared to the result of a simulation with the BE discretization. 
+Although the accuracy is some $5$ orders of magnitude worse than the numerical exact for the FE scheme, it is still not too bad. 
+
+% \begin{figure}[H]
+%  \centering
+%  \includegraphics[scale=0.7]{}
+%  \caption[Numerical exact errorplot for BE scheme]{../doc/results/}
+%  \label{numex:BE1D}
+% \end{figure}
+
+
+
+
 \section{Testing the Random walk implementation}\label{testing_random_walks}
 
 
@@ -450,23 +492,25 @@ It will also, as demonstrated in chapter \ref{simplified_test}, be possible to f
 While doing the various error-testing for the combined solution we will therefore stick to the implicit scheme since the time-step can be chosen more freely and by extension reduce the number of random walkers required.\\
 Keeping in mind that the spatial error goes like $\Delta x^2$ the time-step should be chosen so that $\Delta t> \Delta x^2$ to make sure the error from the time derivative is dominant. 
 Starting off, a 2D simulation of isotropic diffusion is done with $\Delta t = 0.01$ and $\Delta x = \frac{1}{75}$ over the full interesting course of the solution, meaning that the solution more or less at steady state the last time-steps. 
-The error-plot from this simulation is shown in figure \ref{errorplot_combined_BE2d}. The figure shows that although the error-term from the combined solution does not converge onto the error-curve from the deterministic solution, it is of the same order as the deterministic simulation. 
+The error-plot from this simulation is shown in Figure \ref{errorplot_combined_BE2d}. The figure shows that although the error-term from the combined solution does not converge onto the error-curve from the deterministic solution, it is of the same order as the deterministic simulation. 
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{../doc/results/experiment_17022014_1541/results/errorplot.eps}
- \caption{Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac{1}{75}$. Simulations doen with the BE scheme for 100 steps.}
+ \caption{Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac{1}{75}$. Simulations done with the BE scheme for 100 steps.}
  \label{errorplot_combined_BE2d}
 \end{figure}
 
 %%%%%%%%%%% Cut this %%%%%%%%%%%%%%%%%%%%%%%%%
 
-We then introduce an area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation where the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \ref{conversion_rate}. In this case we have used the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$. 
+An area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation is then introduced. For each time step the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \eqref{conversion_rate}.
+In this case the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$ have been used. 
 These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
-\begin{equation}\label{conversion_rate}
+
+'\begin{equation}\label{conversion_rate}
  C_{ij} = \frac{a}{\Delta t}U_{ij}
 \end{equation}
-Mostly we will rewrite equation \ref{conversion_rate} to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
-As of now, the conversion factor, $Hc$, is defined in equation \ref{definition_Hc_first}. 
+For the most part, equation \eqref{conversion_rate}  will be rewritten to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
+As of now, the conversion factor, $Hc$, is defined in equation \eqref{definition_Hc_first}. 
 One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
 \begin{equation}\label{definition_Hc_first}
  Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
@@ -476,7 +520,7 @@ One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
 \subsection{Increasing the time step and the relative size of walk-area}\label{increasing_dt}
 
 Now that we have an estimate of how to adjust the step length of the walkers in order to adjust for the time step, $\Delta t$, on the PDE level we would like to investigate the actual effects of running the simulation with a larger time step to verify our calculations. 
-First off all, Figure \ref{errorplot_BE1D_noWalk} shows the error norm of a simulation of the simplest diffusion equation \eqref{simple_diffusion_equation} discretized by the BE scheme \eqref{BE_discretisation_isotropic} using a time step which would make the FE discretization unstable (There is something strange about its convergence). 
+First off all, Figure \ref{errorplot_BE1D_noWalk} shows the error norm of a simulation of the simplest diffusion equation \eqref{simple_diffusion_equation} discretized by the BE scheme using a time step which would make the FE discretization unstable (There is something strange about its convergence). 
 Figure \ref{errorplot_BE1D_Walk} shows the same simulation for various conversion parameters for the random walk. 
 These simulations have input from the random walk model on some 20\% of the mesh points. 
 As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} have 5\% and 35\% of the mesh points affected by walkers.
@@ -513,14 +557,15 @@ As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_B
 \label{testing_walk_area_size_BE}
 \end{figure}
 
-These experiments have been done using the Backward Euler discretization so that we can simulate for a longer time and still see the effects to their full extent. 
-We have also investigated the effects of changing the time step (also using the BE discretization to avoid instabilities and be able to do longer simulations). 
+These experiments have been done using the BE discretization so that simulate can be done for a longer time and still show the effects to their full extent. 
+The effects of changing the time step (also using the BE discretization to avoid instabilities and be able to do longer simulations) have also been investigated. 
 The results are summarized in figure \ref{testing_dt_size}. 
-We notice something a bit unexpected in figure \ref{errorplot_BE1D_walk_large_dt}. 
+Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 
 Unlike almost all the other comparable plots, it seems that using the least amount of walkers gives the best result here. 
 This might be because the system quickly reaches its steady state, and will then be very well described by the continuum model. 
 Having a small conversion factor, Hc, will mean that very quickly there will be no walkers which sort of ruins the point. 
-This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
+This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. 
+What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
 
 
 

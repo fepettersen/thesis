@@ -24,24 +24,24 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {figure}{\numberline {3.7}{\ignorespaces Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac {\Delta x \Delta y}{5} = 8e-05$.\relax }}{50}{figure.caption.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Convergence test RW}}{53}{figure.caption.20}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Convergence test RW}}{54}{figure.caption.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Error plot RW}}{54}{figure.caption.21}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Error plot RW}}{55}{figure.caption.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac {1}{75}$. Simulations done with the BE scheme for 100 steps.\relax }}{57}{figure.caption.22}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac {1}{75}$. Simulations done with the BE scheme for 100 steps.\relax }}{58}{figure.caption.22}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{58}{figure.caption.23}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Numerical error for 1D Backward Euler discretization}}{59}{figure.caption.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.12}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{59}{figure.caption.24}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.\relax }}{60}{figure.caption.24}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.13}{\ignorespaces \relax }}{60}{figure.caption.25}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces \relax }}{61}{figure.caption.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.14}{\ignorespaces Errorplot, long simulation}}{60}{figure.caption.26}
-\defcounter {refsection}{0}\relax 
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Errorplot, long simulation}}{61}{figure.caption.26}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Diffusion time for long necked spines}}{73}{figure.caption.29}
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Diffusion time for long necked spines}}{75}{figure.caption.29}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }

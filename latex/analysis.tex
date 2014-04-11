@@ -290,6 +290,48 @@ We should, in other words, be pleased that the error starts out with machine pre
  \label{exact_numerical_2d_n130}
 \end{figure}
 
+For the BE scheme the exact numerical solution is more implicit than for the FE scheme. 
+As for the FE scheme, the numerical exact solution is simply the solution to the difference equation that the PDE is rewritten as. 
+However, the BE scheme is implicit and results in a system of linear equations. 
+This was derived in section \ref{discretizing} and the resulting linear system is
+
+\begin{equation*}
+ \mathbf M \vec u^{n+1} = \vec u^n
+\end{equation*}
+
+The solution to this linear system is trivial
+\begin{equation*}
+ \vec u^{n+1} = \mathbf M^{-1} \vec u^n
+\end{equation*}
+
+though it is an inefficient way of solving the system in this case. 
+As indicated in section \ref{discretizing} all the information about the system lies in the mass matrix $\mathbf M$, and this matrix must be carefully assembled. 
+It is then preconditioned and the system is solved by the ``tridiag'' solver mentioned earlier. 
+In principle this is the same as doing and storing the inverse of $\mathbf M$ and then multiplying this inverse by the solution at the previous time-step. 
+Another way of doing this is by raising $\mathbf M$ to the required power and then doing the multiplication with the initial condition as stated in equation \eqref{BE_numex}.
+
+\begin{equation}\label{BE_numex}
+ \vec u^{n+1} = \left(\mathbf M^{-1}\right)^{n+1} \vec u^0
+\end{equation}
+
+Equation \eqref{BE_numex} is the numerical exact solution to the BE scheme, but it has a few problems compared to the exact solution to the FE scheme. 
+Testing is done by storing the inverse of the assembled matrix, solving eq. \eqref{BE_numex} for the desired number of steps and comparing the solution with the result of a simulation. 
+The problem with this approach is that the inverse of $\mathbf M$ gives a lot of round off errors, especially with entries of $10^{-20}$ and smaller. 
+These entries would be zero if the analytical inverse was taken, but are clearly not zero in the matrix. 
+Terms of this magnitude give rise to a lot of potential uncertainty, and the result is that the desired accuracy must be reduced. 
+Figure \ref{numex:BE1D} shows the accuracy of the simulation compared to the result of a simulation with the BE discretization. 
+Although the accuracy is some $5$ orders of magnitude worse than the numerical exact for the FE scheme, it is still not too bad. 
+
+% \begin{figure}[H]
+%  \centering
+%  \includegraphics[scale=0.7]{}
+%  \caption[Numerical exact errorplot for BE scheme]{../doc/results/}
+%  \label{numex:BE1D}
+% \end{figure}
+
+
+
+
 \section{Testing the Random walk implementation}\label{testing_random_walks}
 
 
@@ -351,11 +393,15 @@ The coefficients are found by approximating the initial condition
  &= 2\int\limits_{0.5}^1\cos(n\pi x)dx \\
  &= \frac{2}{n\pi}\left[sin(n\pi x)\right]_{0.5}^1 \\
  &= \frac{2}{n\pi}\sin(n\pi) - \sin(\frac{n\pi}{2}) \\
- a_n &= \frac{2\sin(\frac{n\pi}{2})}{n\pi}
+ &= \frac{2\sin(\frac{n\pi}{2})}{n\pi}\\
+ a_n &= \frac{2}{\pi m} (-1)^m\;\;\;\; m=2n+1
 \end{align*}
 which gives us the final solution
+% \begin{equation}
+%  u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
+% \end{equation}
 \begin{equation}
- u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
+ u(x,t) = \frac{1}{2} + \sum\limits_{m=0}^\infty \frac{2(-1)^m}{m\pi}e^{-(m\pi)^2t}\cos(m\pi x)
 \end{equation}
 This is the manufactured solution the simulations will be tested against for the verification of the RW implementation.
 
@@ -515,7 +561,7 @@ As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_B
 \label{testing_walk_area_size_BE}
 \end{figure}
 
-These experiments have been done using the Backward Euler discretization so that simulate can be done for a longer time and still show the effects to their full extent. 
+These experiments have been done using the BE discretization so that simulate can be done for a longer time and still show the effects to their full extent. 
 The effects of changing the time step (also using the BE discretization to avoid instabilities and be able to do longer simulations) have also been investigated. 
 The results are summarized in figure \ref{testing_dt_size}. 
 Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 

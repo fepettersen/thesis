@@ -90,6 +90,9 @@ class Experiment:
 		# Run a simulation with the parameters specified in SetupRun 
 		# disregarding random walks
 		os.system('./main_walk %d %f %f %f %f %d %d %d %s %s %f %g'%(self.tofile,0,0,0,0,self.m,self.n,self.T,self.result_path,"Deterministic",0,self.dt))
+		for step in sorted(glob.glob(self.result_path+'/Deterministic*.txt')):
+			# self.walk.append(np.fromfile(step,sep=" "))
+			self.walk.append(np.loadtxt(step))
 		name = self.result_path+'/Deterministic*.txt'
 		self.CalculateError(name)
 
@@ -115,11 +118,9 @@ class Experiment:
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
 		exact = True if self.exact(X,Y,0)!=None else False
 		if exact:
-			print filename
 			tmp = np.zeros(self.T)
 			j=0
 			for step in sorted(glob.glob(filename)):
-				print step
 				infile = np.loadtxt(step)
 				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
@@ -136,6 +137,7 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
+		# print self.error
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
@@ -150,7 +152,7 @@ class Experiment:
 				mpl.plot(self.error[i],color[i],label=legend[i])
 		mpl.legend(loc=0)
 		mpl.xlabel('timestep no.')
-		mpl.ylabel('errornorm (l2)')
+		mpl.ylabel('max(abs(simulation-exact))')
 		mpl.title('Error plot; dt = %g'%self.dt)
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
@@ -380,7 +382,7 @@ def f(x,y,t):
 	# D = v = 1
 	# tmp  = (1.0/np.sqrt(4*np.pi*D*t))*np.exp(-(x-v*t)**2/(4*D*t))
 	# return tmp/np.sum(tmp)
-	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y) +1
+	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y)
 	# return np.pi*np.ones(np.shape(x))
 
 def F(x,y,t):
@@ -434,7 +436,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 1
-	T = 100		# no.of timesteps, [dt*T] = seconds
+	T = 275		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -452,8 +454,8 @@ if __name__ == '__main__':
 	else:
 		x = np.linspace(x_start,x_end,m)
 		y = np.zeros(m)
-	# Hc = [1500]
-	Hc = [200,1400,5600,10400,22000,150000]
+	Hc = [1500]
+	# Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
 	info='_Redoing_convergencetests'
@@ -467,7 +469,7 @@ if __name__ == '__main__':
 
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	run.VerifyDeterministicError()
+	# run.VerifyDeterministicError()
 	# run.RunSimulation(10)
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
@@ -479,7 +481,7 @@ if __name__ == '__main__':
 		print "Hc = %g"%i
 		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 		run.RunSimulation(i)
-	run.ConvergenceTest(Hc)
+	# run.ConvergenceTest(Hc)
 	leg = ['Hc = %g'%i for i in Hc]
 	# os.system('python spine_statistics.py')
 	run.PlotError(leg)
@@ -514,7 +516,7 @@ if __name__ == '__main__':
 
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	# run.Visualize(viz_type=None)
+	run.Visualize(viz_type=None)
 	# run.Visualize(viz_type='exact')
 
 	# run.Visualize(viz_type='difference')

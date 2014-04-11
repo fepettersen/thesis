@@ -53,11 +53,11 @@ int main(int argc, char** argv)
 		}
 	}
 	int t=0;
-    cout<<"RW-solver; dt = "<<Dt<<", running "<<T<<" steps...";
+    // cout<<"RW-solver; dt = "<<Dt<<", running "<<T<<" steps...";
 	for(t=0; t<T; t++){
 		solver.Advance();
 	}
-	cout<<"..done! "<<t<<" steps completed"<<endl;
+	// cout<<"..done! "<<t<<" steps completed"<<endl;
 	outfile.open(infile.c_str(),ios::out | ios::binary);
 	outfile<<solver.nwalkers<<endl<<endl;
 	for(int i=0; i<solver.nwalkers; i++){

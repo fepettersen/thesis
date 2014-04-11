@@ -9,7 +9,7 @@ string make_filename(string buffer,string filename,int conversion_factor,int ste
 		sprintf(buff,"/results_FE_Hc%d_n%04d.txt",conversion_factor,step_no);
 	}
 	else{
-		sprintf(buff,"/%s_n%04d.txt",filename.c_str(),step_no);
+		sprintf(buff,"%s_n%04d.txt",filename.c_str(),step_no);
 	}
   	buffer = buff;
   	// delete[] buff;

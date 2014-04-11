@@ -136,6 +136,7 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
+		print self.error
 		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
@@ -150,7 +151,7 @@ class Experiment:
 				mpl.plot(self.error[i],color[i],label=legend[i])
 		mpl.legend(loc=0)
 		mpl.xlabel('timestep no.')
-		mpl.ylabel('errornorm (l2)')
+		mpl.ylabel('max(abs(simulation-exact))')
 		mpl.title('Error plot; dt = %g'%self.dt)
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
@@ -453,7 +454,7 @@ if __name__ == '__main__':
 		x = np.linspace(x_start,x_end,m)
 		y = np.zeros(m)
 	# Hc = [1500]
-	Hc = [200,1400,5600,10400,22000,150000]
+	Hc = [200,1400,5600,10400,22000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
 	info='_Redoing_convergencetests'
@@ -465,24 +466,24 @@ if __name__ == '__main__':
 	# run.SetInitialCondition(GaussianPulse(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
 
-	run.compile()
+	# run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	run.VerifyDeterministicError()
 	# run.RunSimulation(10)
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
 	# run.Compare('/results_FE_Hc*.txt',numerical_exact,M,u0)
-	# run.PlotError('dt = %g'%dt[0])
+	run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
-	for i in Hc:
-		print "Hc = %g"%i
-		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-		run.RunSimulation(i)
-	run.ConvergenceTest(Hc)
-	leg = ['Hc = %g'%i for i in Hc]
-	# os.system('python spine_statistics.py')
-	run.PlotError(leg)
+	# for i in Hc:
+	# 	print "Hc = %g"%i
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	# 	run.RunSimulation(i)
+	# run.ConvergenceTest(Hc)
+	# leg = ['Hc = %g'%i for i in Hc]
+	# # os.system('python spine_statistics.py')
+	# run.PlotError(leg)
 
 	## --- Run for time-step --- ###
 	# for i in dt:

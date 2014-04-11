@@ -78,7 +78,10 @@ void Combine::Solve(){
 	char cmd[100];
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
-		ConvertToWalkers(U,inifilenames[i],indeces[i]);
+		// (*it1)->drift = 0;
+		// ConvertToWalkers(U,inifilenames[i],indeces[i]);
+		// (*it1)->ResetInitialCondition(c[counter]);
+		// (*it1)->InhomogenousAdvance(c[counter],pde_solver->dt);
 		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
 		// sprintf(cmd,"mpirun -np %d stochastic/%s %d %d %d %g",num_procs,prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt);
 		sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
@@ -163,9 +166,13 @@ void Combine::AddWalkArea(double *x, double *y){
 	walk_steps = 250;
 	prgm = "walk_solver";
 	indeces.push_back(index);
+	// int **Ctmp = new int*[M];
+	// signmap = new int*[M];
+	// for(int k=0; k<M;k++){
+	// 	Ctmp[k] = new int[N];
+	// 	signmap[k] = new int[N];
+	// }
 	ConvertToWalkers(Up,name,index);
-
-
 	// tmp->SetInitialCondition(Ctmp,M,N);		/*The solution in the relevant area converted to walkers*/
 	// walk_solvers.push_back(tmp);		/*Throws std::bad_alloc*/
 	// c.push_back(Ctmp);
@@ -211,8 +218,8 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	int** Conc = new int*[M];
 	int nwalkers = 0;
 	double test = 0;
-	// ofstream inifile (filename.c_str());
-	ofstream inifile (filename.c_str(), ios::out | ios::binary);
+	ofstream inifile (filename.c_str());
+	// ofstream inifile (filename.c_str(), ios::out | ios::binary);
 
 	
 	vec x = linspace(0,1,M);
@@ -226,7 +233,6 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 		}
 	}	
 
-	if(debug){cout<<"nwalkers = "<<nwalkers<<endl;}
 	inifile<<nwalkers<<endl<<endl;		/*Write xyz-header*/
 	
 	for(int i=0; i<M; i++){
@@ -261,8 +267,8 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	int M,N,m0,n0; 
 	double DX=0,DY=0;
 	
-	ifstream infile (filename.c_str(), ios::in | ios::binary);
-	// ifstream infile (filename.c_str());
+	// ifstream infile (filename.c_str(), ios::in | ios::binary);
+	ifstream infile (filename.c_str());
 	string line, sub;
 
 	M = index[0][1]-index[0][0];

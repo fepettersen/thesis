@@ -43,7 +43,7 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	_Dx = dt/(dx*dx);
 	aD = D;
 	d = (dy>0)?2:1;
-	solver = 3;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
+	solver = 2;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
 	if(d==2 && solver==2){
 		// dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = dt/(dx*dx);
@@ -261,6 +261,7 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 		else{
 			Lower = Assemble(alpha,beta,m,n);
 		}
+		cout<<"alpha = "<<alpha<<endl;
 		mat inverse = inv(Lower);
 		inverse.save("BE_matrix_inverse.txt",raw_ascii);
 		linalg->precondition(Lower,m,n);
