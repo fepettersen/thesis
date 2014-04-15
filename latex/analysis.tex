@@ -194,6 +194,28 @@ The results of this test are shown in Figure \ref{convergence_test_FE_2d} and it
 \label{convergence_test_FE_2d}
 \end{figure}
 
+Figure \ref{spatial_convergence_test} shows the converge for the spatial error. 
+This test is done only using the implicit scheme since it is an advantage for the spatial error, which is of second order, to be larger than the error from the time discretization. 
+Because of the stability criterion for the FE scheme it will break down for these tests, and not give the desired results. 
+Another complicating factor is having the time step sufficiently smaller than the spatial resolution. 
+As Figure \ref{spatial_convergence_test} shows, the test was not perfect, however it starts out with a convergence of almost 2 done on a coarser mesh. 
+The normal error plot is also included in the figure to illustrate that the improvement is significant. 
+
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{../doc/results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{../doc/results/experiment_14042014_1303_convergence_tests_etc/results/ConvergenceTest.eps}
+  \caption{}
+ \end{subfigure}
+ \caption[]{}
+ \label{spatial_convergence_test}
+\end{figure}
+
+
 \subsection{Exact numerical solution}\label{exact_numerical_solution}
 
 The FE scheme has an exact solution seeing as it is in fact a difference equation. 
@@ -203,7 +225,7 @@ This solution can be found if the scheme is reformulated as
  u^{n+1} = D\Delta t u_{xx}^n + u^n
 \end{equation}
 
-and the first few iterations are inserted. 
+where $u_{xx}^n$ denotes the double derivative of $u$ at time step $t^n$, and the first few iterations are inserted. 
 
 \begin{align*}
  u^1 &= D\Delta t u_{xx}^0 + u^0 \\
@@ -322,12 +344,14 @@ Terms of this magnitude give rise to a lot of potential uncertainty, and the res
 Figure \ref{numex:BE1D} shows the accuracy of the simulation compared to the result of a simulation with the BE discretization. 
 Although the accuracy is some $5$ orders of magnitude worse than the numerical exact for the FE scheme, it is still not too bad. 
 
-% \begin{figure}[H]
-%  \centering
-%  \includegraphics[scale=0.7]{}
-%  \caption[Numerical exact errorplot for BE scheme]{../doc/results/}
-%  \label{numex:BE1D}
-% \end{figure}
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{../doc/results/experiment_14042014_0759_BE1D_numerical_exact/results/numerical_exact.eps}
+ \caption[Numerical exact errorplot for BE scheme]{Error plot showing the norm of the difference between the numerical exact solution for the BE scheme in 1D (eq. \ref{BE_numex}) and a simulation. 
+ The error is not machine precision, but significantly smaller than $\Delta t$ which for this simulation is $\Delta t=0.01$. 
+ This increased error most likely originates in the many roundoff errors in the inverted matrix where a lot of terms which analytically would be zero are represented as $10^{-16}$ and smaller.}
+ \label{numex:BE1D}
+\end{figure}
 
 
 
@@ -442,9 +466,15 @@ Clearly there will be enough trouble for the simpler cases...
 
 
 \section{Testing the combined solution}
-In this section we will combine the PDE-solution on some part of the mesh with the result from a random walk simulation using the same initial condition as the PDE-solver was given. 
-As we will discuss in chapter \ref{Software:About} there are many candidates as to the combination of the solutions, but we will use one of the simplest ones; the average of the two. 
-Before we start with the verification, however, we will take a quick look at a simplified problem which in principle is the same.
+
+This section will test how combining the RW model with the PDE model affects the error, and whether it is possible to make the error term have first order convergence.
+As will be discussed in chapter \ref{Software:About} there are many candidates as to the combination of the solutions, but it turns out that simply replacing the solution in the relevant area with the solution from a RW simulation before the PDE integration is done is sufficient. 
+\begin{quotation}
+ A scientific theory should be as simple as possible, but no simpler
+\end{quotation}
+It will therefore be unnecessary to add any fancy curve fitting when it is not needed. 
+
+Before we start with the verification, however, a simplified problem which in principle is the same as the diffusion - RW problem, will be presented.
 
 \subsection{A simplified version of the algorithm}\label{simplified_test}
 
@@ -486,23 +516,50 @@ total    MP    MC
 \end{lstlisting}
 The convergence rate for the whole integral is roughly $2$ which is what we expect. This suggests that the idea behind the algorithm is sound. \\
 Another thing to notice is the convergence rate of the MC method which is sort off all over the place, this illustrates how difficult it is to verify the simulations. 
-As the listed output and equation \eqref{num_walkers_MC_integration} weshows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
+As the listed output and equation \eqref{num_walkers_MC_integration} shows, the number of walkers or MC samples grows very fast making it computationally very demanding to do the calculations.
 
 \subsection{Introducing walkers}
+
 
 First of all, using random walkers on parts of the mesh will have a considerable, negative impact on the error estimate. 
 As we have discussed before, the solution from the random walkers will fluctuate around the ``correct'' (it is in fact correct while verifying) solution with amplitude proportional to $\frac{1}{\sqrt{N_{ij}}}$ which will depend on the PDE-solution in the mesh-point. 
 It will also, as demonstrated in chapter \ref{simplified_test}, be possible to force the combined solution to have the desired properties in terms of error-estimates but at considerable computational cost. 
-While doing the various error-testing for the combined solution we will therefore stick to the implicit scheme since the time-step can be chosen more freely and by extension reduce the number of random walkers required.\\
+The various error tests will therefore be carried out using only the implicit scheme since the time-step can be chosen more freely, thus reducing the required number of walkers.\\
 Keeping in mind that the spatial error goes like $\Delta x^2$ the time-step should be chosen so that $\Delta t> \Delta x^2$ to make sure the error from the time derivative is dominant. 
-Starting off, a 2D simulation of isotropic diffusion is done with $\Delta t = 0.01$ and $\Delta x = \frac{1}{75}$ over the full interesting course of the solution, meaning that the solution more or less at steady state the last time-steps. 
-The error-plot from this simulation is shown in Figure \ref{errorplot_combined_BE2d}. The figure shows that although the error-term from the combined solution does not converge onto the error-curve from the deterministic solution, it is of the same order as the deterministic simulation. 
+Figure \ref{combined_BE1d} shows the results of a test where $\Delta x$ was fixed at $\frac{1}{100}$ and both the time step and the conversion rate for walkers were improved over three simulations. 
+The figure shows that most of the fluctuations are irrelevant in the beginning of the simulation, but the become increasingly more important as steady state is reached. 
+A convergence rate of 1 is also reached, suggesting that the walkers are converging to the PDE solution. 
+
+% \begin{figure}[H]
+% %  This figure shows how the simulations behaved before the order of integration was changed (in 2d)
+%  \centering
+%  \includegraphics[scale=0.7]{../doc/results/experiment_17022014_1541/results/errorplot.eps}
+%  \caption{Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac{1}{75}$. Simulations done with the BE scheme for 100 steps.}
+%  \label{errorplot_combined_BE2d}
+% \end{figure}
+
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.7]{../doc/results/experiment_17022014_1541/results/errorplot.eps}
- \caption{Error-plot of the combined solution using an increasing number of walkers. Parameters of importance are $\Delta t = 0.01$, $\Delta x = \frac{1}{75}$. Simulations done with the BE scheme for 100 steps.}
- \label{errorplot_combined_BE2d}
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_15042014_0608_convergence_tests_etc/results/errorplot.eps}
+\caption{}  
+ \label{combined_BE1d:errorplot}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{../doc/results/experiment_15042014_0608_convergence_tests_etc/results/ConvergenceTest.eps}
+  \caption{}
+   \label{combined_BE1d:convergence}
+ \end{subfigure}
+ \caption[Error test for BE combined with RW in 1D]{\ref{combined_BE1d:errorplot} shows the error plot for a test where $\Delta x$ was fixed at $\Delta x = \frac{1}{100}$ and $\Delta t$ was reduced from $0.05$ to $0.01$ and finally to $0.005$. 
+ The conversion rate, $Hc$ was updated for each simulation to have the value $Hc = \frac{1}{\Delta t^2}$, meaning the error from the walkers should be smaller than the error from the time derivative. 
+ Walkers are placed on 10\% of the mesh from $x=0.4$ to $x=0.5$. 
+ \ref{combined_BE1d:convergence} shows the convergence rate in time for the same test.}
+ \label{combined_BE1d}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Rewrite from here down, and redo the experiments %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%% Cut this %%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -532,16 +589,18 @@ As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_B
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1514/results/deterministic_errorplot.eps}
+% \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1514/results/deterministic_errorplot.eps}
+\includegraphics[width=\textwidth]{Figures/errorplot_BE1D_deterministic.eps}
 \caption{}
 \label{errorplot_BE1D_noWalk}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1514/results/errorplot.eps}
- \caption{}
+%  \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1514/results/errorplot.eps}
+\includegraphics[width=\textwidth]{Figures/errorplot_BE1D_few_walkes.eps}
+\caption{}
  \label{errorplot_BE1D_Walk}
 \end{subfigure}
-\caption[Numerical error for 1D Backward Euler discretization]{Numerical error for 1D Backward Euler discretization of the PDE. In figure b there has been added walkers to the solution in the area $x\in[0.5,0.7]$.}
+\caption[Error for 1D BE scheme with to few walkers]{Error for 1D BE scheme combined with RW solver using increasing number of walkers, but at most 1\% of the required number. In figure b there has been added walkers to the solution in the area $x\in[0.5,0.7]$ with $\Delta x = \frac{1}{50}$, which adds up to 20\% of the mesh. Compared to only the deterministic error in a, the 1\% simulation is not that bad.}
 \label{errorplot_BE1D_first}
 \end{figure}
 
@@ -561,7 +620,7 @@ As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_B
 \label{testing_walk_area_size_BE}
 \end{figure}
 
-These experiments have been done using the BE discretization so that simulate can be done for a longer time and still show the effects to their full extent. 
+These experiments have been done using the BE discretization so that simulations can be done for a longer time and still show the effects to their full extent. 
 The effects of changing the time step (also using the BE discretization to avoid instabilities and be able to do longer simulations) have also been investigated. 
 The results are summarized in figure \ref{testing_dt_size}. 
 Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 

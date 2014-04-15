@@ -71,11 +71,35 @@ Extending the model to three spatial dimensions gives a very similar matrix to t
              \end{array}\right) = \mathbf{u}^{n}
 \end{align}
 In equation \ref{BE3D_linear_system} $I$ denotes the $n\times n$ identity, $D_{ij}$ denotes the tridiagonal $n\times n$ matrix with entries similar to the ones in eq. \ref{general_scheme_BE2D}, and off-diagonal entries similar to the ones in eq. \ref{general_scheme_BE2D}. 
-All $0$'s denote the $n\times n$ zero-matrix. The values $\alpha$ and $\beta$ are the relevant coefficient matrices for the calculations in question. These will be diagonal as well (or simly numbers in the isotropic case). 
+All $0$'s denote the $n\times n$ zero-matrix. The values $\alpha$ and $\beta$ are the relevant coefficient matrices for the calculations in question. These will be diagonal as well (or simply numbers in the isotropic case). 
 Note also that the vector entries $u^{n+1}_{ijk}$ are column vectors, making the vector $\mathbf{u}^{n+1}$ have the shape $1\times n^3$.
 
 % \caption{Algorithm for Gaussian elimination of a tridiagonal linear system.}
 % \label{tridiag}
+
+\section{Alternatives to Random walks}
+This section will mention some alternatives to the random walk model used in this project and discuss how realistic they are to combine with a diffusion PDE as one goal in this project has been. 
+Both applications towards computational neuroscience and more general applications will be discussed. \\
+These models are pretty complex with many details, and this project does not in any way try to do more than introduce them. 
+Further reading is cited in the end of each section.
+
+\subsection{Molecular Dynamics}
+Molecular dynamics is the simulation of the dynamics of atoms and molecules using classical, Newtonian mechanics in the sense that the molecules are affected by a potential, and that the sum of forces describes the dynamics. 
+Their dynamics are then integrated forward in time, and used to describe for example flow in nanoporous media. 
+This means that the system is fully described by the position and velocities of all the atoms. 
+Of course, there is a vast variety in the level of complexity here and we will only look at the simplest example, namely the Lennard-Jones potential, eq. (\ref{LJ}). 
+This potential consists of an $r^{-12}$ term which denotes the Pauli repulsion at short ranges, and an $r^{-6}$ long range, attractive Van Der Waals term. 
+The relative distance between two atoms is denoted by $r$. 
+The Lennard-Jones potential is derived to simulate Argon in the Van Der Waals equation of state.
+\begin{equation}\label{LJ}
+ U = 4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12}-\left(\frac{\sigma}{r}\right)^{6}\right]
+\end{equation}
+It is possible to do simulations of flow in nanoporous materials using the Lennard-Jones potential, although it is a far from perfect model, by only allowing some of the atoms to move. 
+This will result in a matrix of stationary atoms, simulating a wall (note that there will still be forces acting from these atoms), and a liquid inside this matrix. \\
+
+\subsection{Direct simulation Monte Carlo}\label{DSMC_description}
+Direct simulation Monte Carlo (\nomenclature{Direct simulation Monte Carlo}{DSMC}DSMC) is a numerical method first developed by 
+
 
 \section{Debugging}\label{debugging}
 
@@ -145,13 +169,19 @@ It turned out that I sent an empty array to the random walk class as a new initi
 The moral behind this little story is that you should make 100\% sure that every part of every function you write does exactly what you think it does, and nothing else. 
 Furthermore, if you rewrite your code, you should remove the old parts as soon as possible. If you use some kind of version control software, which you definitely should, you will have older versions saved in the version control anyways. Do not be nostalgic and simply comment out the old parts just in case something, this makes your code very messy, and leaves the possibility of something slipping past you.
 
-Another point to be made is that it will probably be helpfull to construct the different parts of your code in such a way that they can be run as independently of eachother as possible. 
-As an example, both the PDE-solver, its tridiagonal linear system solver and the spine object can with relatively small changes to the main-fine be run independently. 
+Another point to be made is that it will probably be helpful to construct the different parts of your code in such a way that they can be run as independently of each other as possible. 
+As an example, both the PDE-solver, its tridiagonal linear system solver and the spine object can with relatively small changes to the main-file be run independently. 
 This allows for easier testing of the various parts of the code, and makes it more likely that the code will be reused in other projects.
 
 \subsection{When you cannot find the bug}
 
-While debugging (or any other repetative task involving your own work) it is remarkably easy to become blind to your mistakes. 
+While debugging (or any other repetitive task involving your own work) it is remarkably easy to become blind to your mistakes. 
 The psychology behind this is (probably) that you have a clear idea of what should happen in each statement, and so you read that in stead of what the statement actually says. 
 When it comes to proof-reading you can supposedly read backwards word by word, but can you do something similar when reading code? 
-While I have never tried 
+While I have never tried reading my code backwards because a statement usually depends on the previous statement, I have tried doing hand-calculations for almost every statement. 
+Although hand calculations do not always show where things go wrong, they point out what variable or array entry etc. is wrong, and so the previous calculations can be checked. 
+For finite difference schemes one can reduce the number of spatial mesh points to something manageable like three or four, and then do the same calculations that you think the computer does. If the solution is a matrix you can pinpoint the invalid matrix-entries with this method.\\
+
+Another very important point if you are stuck is to never use ``nice'' values. 
+If a parameter is set to zero or one just because it needs to be something, the probability that a potential problem disappears because it cancels out increases dramatically. 
+Similarly, never do matrix calculations for $3\times 3$ matrices. Use $4\times4$ matrices instead. The reasoning behind this is that banded matrices might fool you on $3\times 3$ matrices, making you think your problem is tridiagonal when it in fact is n-band diagonal for example.
