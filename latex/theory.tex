@@ -727,6 +727,26 @@ This is about the same performance as the explicit scheme gives, but without the
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\
 
+\subsection{Changing between length scales}
+As was mentioned in the introduction to this thesis, the combination of two length scales immediately raises the question of exactly where the limit between the two scales goes, and why exactly there. 
+This question is usually answered with ``models are switched when effects from the smaller scale becomes negligible'' when moving from small to larger scales, and similarly ``models are switched when effects from the smaller scale become dominant'' in the opposite case. 
+In effect this is what is done for the applications of this project, but an attempt to combine the two models in one simulation will also be done. 
+An are of the computational mesh will be solved by a RW model first, representing a small length scale, and this solution will be used as input for the PDE solver. 
+This approach requires a way to quickly convert from a concentration to a distribution of walkers, and back. 
+The conversion is done by a conversion factor which will be named $Hc$ (as it was named by \emph{someone (cite)}, albeit they used a conversion field) which is introduced in equation \eqref{conversion_rate}. 
+
+\begin{equation}\label{conversion_rate}
+ C_{ij} = \frac{a}{\Delta t}U_{ij}
+\end{equation}
+% In this case the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$ have been used. 
+% These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
+For the most part, equation \eqref{conversion_rate}  will be rewritten to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
+As of now, the conversion factor, $Hc$, is defined in equation \eqref{definition_Hc_first}. 
+One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
+\begin{equation}\label{definition_Hc_first}
+ Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
+\end{equation}
+
 \subsection{The basic algorithm}\label{basic_algorithm}
 
 The basic structure of the program is rather similar to the physical problem.

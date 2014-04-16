@@ -727,6 +727,23 @@ This is about the same performance as the explicit scheme gives, but without the
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\
 
+\subsection{Changing between length scales}
+As was mentioned in the introduction to this thesis, the combination of two length scales immediately raises the question of exactly where the limit between the two scales goes, and why exactly there. 
+
+An area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation is then introduced. For each time step the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \eqref{conversion_rate}.
+
+'\begin{equation}\label{conversion_rate}
+ C_{ij} = \frac{a}{\Delta t}U_{ij}
+% In this case the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$ have been used. 
+% These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
+\end{equation}
+For the most part, equation \eqref{conversion_rate}  will be rewritten to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
+As of now, the conversion factor, $Hc$, is defined in equation \eqref{definition_Hc_first}. 
+One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
+\begin{equation}\label{definition_Hc_first}
+ Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
+\end{equation}
+
 \subsection{The basic algorithm}\label{basic_algorithm}
 
 The basic structure of the program is rather similar to the physical problem.
@@ -738,7 +755,7 @@ If a random walker in the spine comes in contact with the position labeled as th
 Similarly, at each time-step a part of the PDE-solution corresponding to one walker will diffuse into the spine with a certain probability. 
 It might be desirable for a walker to only be able to diffuse out of the spine with some probability as well, or for the walkers which diffuse into the spine to have some drift term, but these are minor updates and might be added later if needed. \\
 
-There is also the possibility of modeling parts of the dendrite-mesh as random walk (This can be done in 2d as well as 1d). 
+There is also the possibility of modeling parts of the dendrite-mesh as random walk (this can be done in 2d as well as 1d). 
 This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
 Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{farnell2005monte}. 
 At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 

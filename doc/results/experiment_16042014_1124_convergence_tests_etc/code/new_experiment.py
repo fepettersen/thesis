@@ -43,11 +43,7 @@ class Experiment:
 		t = time.gmtime()
 		self.datetime = '%02d%02d%d_%02d%02d'%(t.tm_mday,t.tm_mon,t.tm_year,t.tm_hour,t.tm_min)
 		self.url = 'https://raw.github.com/fepettersen/thesis/master/doc/results'+'/experiment_%s/results'%self.datetime
-		if self.debug:
-			self.parent_path = this_dir +'/doc/results/experiment_%s%s_DELETE_ME'%(self.datetime,info)
-		else:
-			self.parent_path = this_dir +'/doc/results/experiment_%s%s'%(self.datetime,info)
-
+		self.parent_path = this_dir +'/doc/results/experiment_%s%s'%(self.datetime,info)
 		# self.parent_path = this_dir + '/doc/results/experiment_04122013_1259_convergenceTest_combinedSimulation_2d'
 		self.code_path = self.parent_path+'/code'
 		self.parameter_path = self.parent_path+'/parameters'
@@ -430,7 +426,7 @@ def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
 	
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -439,9 +435,9 @@ if __name__ == '__main__':
 
 	x0 = 0.3
 	y0 = 0.5
-	x1 = 0.65
+	x1 = 0.35
 	y1 = 0.7
-	m = 21
+	m = 101
 	n = 1
 	T = 500		# no.of timesteps, [dt*T] = seconds
 
@@ -453,7 +449,7 @@ if __name__ == '__main__':
 	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
 	bla = 0.3*dx**2
 	# dt = [bla]
-	dt = [0.5*2.5*1e-3]
+	dt = [0.005]
 
 
 	if n>1:
@@ -465,7 +461,7 @@ if __name__ == '__main__':
 	Hc = [200,1400,5600,10400,22000,150000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_tests_regular_timestep'
+	info='_convergence_tests_etc'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
@@ -476,7 +472,7 @@ if __name__ == '__main__':
 
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	# run.VerifyDeterministicError()
+	run.VerifyDeterministicError()
 	# run.RunSimulation(10*int(round(1.0/(dt[0]*dt[0]))))
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
@@ -503,28 +499,27 @@ if __name__ == '__main__':
 	# leg = ['dt = %g'%i for i in dt]
 
 	# ## --- Run for h --- ###
-	h = [0.05,0.1,0.005]
-	# h = [100,1000,10000]
+	# h = [0.05,0.01,0.005]
+	h = [100,1000,10000]
 	dt = []
-	dx = 0.1
-	timestep = 0.5*2.5*1e-3
+	dx = 0.05
+	timestep = 0.005
 	for i in h:
 		# i = 1.0/j
 		# timestep = i*i/3.0
-		timestep = i
-		dt.append(timestep)
+		# timestep = i
+		# dt.append(timestep)
 		m = (1/dx)+1
 		# m = j+1
 		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
 		run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
 		run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
-		hc = int(round(1.0/(timestep**2)))
-		# hc = i
+		# hc = int(round(1.0/(timestep**2)))
+		hc = i
 		print i," , ", timestep, " , ", hc
 		run.RunSimulation(1*hc)
 	leg = ['Hc = %g'%i for i in h]
-	# run.ConvergenceTest(h)
-	leg = ['dt = %g'%i for i in dt]
+	run.ConvergenceTest(h)
 	run.PlotError(leg)
 	# print 'dx =',dx
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])

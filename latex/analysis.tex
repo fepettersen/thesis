@@ -561,22 +561,6 @@ A convergence rate of 1 is also reached, suggesting that the walkers are converg
 %% Rewrite from here down, and redo the experiments %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%%%%%%%%%% Cut this %%%%%%%%%%%%%%%%%%%%%%%%%
-
-An area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation is then introduced. For each time step the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \eqref{conversion_rate}.
-In this case the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$ have been used. 
-These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
-
-'\begin{equation}\label{conversion_rate}
- C_{ij} = \frac{a}{\Delta t}U_{ij}
-\end{equation}
-For the most part, equation \eqref{conversion_rate}  will be rewritten to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
-As of now, the conversion factor, $Hc$, is defined in equation \eqref{definition_Hc_first}. 
-One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
-\begin{equation}\label{definition_Hc_first}
- Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
-\end{equation}
-%%%%%%%%%%% And paste somewhere smart %%%%%%%%%%
 
 \subsection{Increasing the time step and the relative size of walk-area}\label{increasing_dt}
 
@@ -584,7 +568,11 @@ Now that we have an estimate of how to adjust the step length of the walkers in 
 First off all, Figure \ref{errorplot_BE1D_noWalk} shows the error norm of a simulation of the simplest diffusion equation \eqref{simple_diffusion_equation} discretized by the BE scheme using a time step which would make the FE discretization unstable (There is something strange about its convergence). 
 Figure \ref{errorplot_BE1D_Walk} shows the same simulation for various conversion parameters for the random walk. 
 These simulations have input from the random walk model on some 20\% of the mesh points. 
-As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} have 5\% and 35\% of the mesh points affected by walkers.
+As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} have 5\% and 35\% of the mesh points affected by walkers. 
+An interesting property of both these figures is the instability in the error for very low conversion factors. 
+\emph {There seems to be a limit as to how large of an inaccuracy the scheme can handle and still produce meaningful results. }
+Another thing to notice from these figures is that a larger relative area of walkers implies more walkers are required in order to make the scheme as exact as it will get. 
+Apparently, the introduction of walkers will give an increased error no matter how many are used.
 
 \begin{figure}[H]
 \centering
@@ -607,22 +595,22 @@ As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_B
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1559/results/errorplot.eps}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_16042014_1139_convergence_tests_etc/results/errorplot.eps}
  \caption{Having walkers on 5\% of the mesh points.}
  \label{errorplot_BE1D_walk_5_percent}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1603/results/errorplot.eps}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_16042014_1202_tests_35percent_walkers/results/errorplot.eps}
  \caption{Having walkers on 35\% of the mesh points.}
  \label{errorplot_BE1D_walk_35_percent}
 \end{subfigure}
-\caption{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.001$ using the BE discretization.}
+\caption{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.05$ and $\Delta x = 0.01$ using the BE discretization.}
 \label{testing_walk_area_size_BE}
 \end{figure}
 
-These experiments have been done using the BE discretization so that simulations can be done for a longer time and still show the effects to their full extent. 
-The effects of changing the time step (also using the BE discretization to avoid instabilities and be able to do longer simulations) have also been investigated. 
-The results are summarized in figure \ref{testing_dt_size}. 
+The effects of changing the time step have also been investigated, and the results are shown in Figure \ref{testing_dt_size}. 
+This test illustrates that the step length tweaking derived in section \ref{probability_distribution_and_timesteps} works since the error stabilizes around the size of $\Delta t$ and the fluctuations seem to be around $\sqrt{\frac{1}{N}}$ as predicted.\\
+
 Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 
 Unlike almost all the other comparable plots, it seems that using the least amount of walkers gives the best result here. 
 This might be because the system quickly reaches its steady state, and will then be very well described by the continuum model. 
@@ -631,22 +619,27 @@ This particular equation has steady state $u(t\to\infty,x) = 0$, and so not havi
 What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
 
 
-
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1625/results/errorplot.eps}
- \caption{Using a normal $\Delta t = 0.0001$.}
- \label{errorplot_BE1D_small_dt}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1627/results/errorplot.eps}
- \caption{Using a large $\Delta t = 0.01$.}
- \label{errorplot_BE1D_walk_large_dt}
-\end{subfigure}
-\caption{}
+\includegraphics[scale=0.7]{Figures/errorplot_timestep_test.eps}
+\caption[Effect of increasing time step]{Error norm of three tests where the spatial resolution was fixed at $\Delta x = \frac{1}{10}$ and the time step and conversion factor were changed. $\Delta t$ started at the stability criterion for the FE scheme $\Delta t = 0.5\cdot\Delta x^2$ and was increased up to $\Delta t = \Delta x$, maintaining the demand of $Hc = \frac{1}{\Delta t^2}$ for all the tests. }
 \label{testing_dt_size}
 \end{figure}
+% \begin{figure}[H]
+% \centering
+% \begin{subfigure}[b]{0.48\textwidth}
+%  \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1625/results/errorplot.eps}
+%  \caption{Using a normal $\Delta t = 0.0001$.}
+%  \label{errorplot_BE1D_small_dt}
+% \end{subfigure}
+% \begin{subfigure}[b]{0.48\textwidth}
+%  \includegraphics[width=\textwidth]{../doc/results/experiment_19112013_1627/results/errorplot.eps}
+%  \caption{Using a large $\Delta t = 0.01$.}
+%  \label{errorplot_BE1D_walk_large_dt}
+% \end{subfigure}
+% \caption{}
+% \label{testing_dt_size}
+% \end{figure}
 
 \begin{figure}[H]
  \centering
@@ -660,6 +653,6 @@ What we should read from this figure is rather that the simulation with the most
 \caption{}
 \label{errorplot_FE_walk_long:deterministic}
  \end{subfigure}
-\caption[Errorplot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
+\caption[Error plot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
 \label{errorplot_FE_walk_long}
 \end{figure}
