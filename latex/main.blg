@@ -4,7 +4,6 @@ The style file: biblatex.bst
 A level-1 auxiliary file: theory.aux
 A level-1 auxiliary file: analysis.aux
 A level-1 auxiliary file: software.aux
-A level-1 auxiliary file: results.aux
 A level-1 auxiliary file: appendix.aux
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Database file #1: main-blx.bib
@@ -12,45 +11,45 @@ Database file #2: references.bib
 Warning--I didn't find a database entry for "wikipedia??"
 Biblatex version: 1.7
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
-You've used 8 entries,
+You've used 9 entries,
             6019 wiz_defined-function locations,
-            1164 strings with 9344 characters,
-and the built_in function-call counts, 23708 in all, are:
-= -- 935
-> -- 831
-< -- 236
-+ -- 289
-- -- 300
-* -- 1749
-:= -- 1586
+            1169 strings with 9496 characters,
+and the built_in function-call counts, 27041 in all, are:
+= -- 1066
+> -- 949
+< -- 271
++ -- 326
+- -- 343
+* -- 2013
+:= -- 1779
 add.period$ -- 0
-call.type$ -- 8
-change.case$ -- 116
+call.type$ -- 9
+change.case$ -- 135
 chr.to.int$ -- 34
-cite$ -- 14
-duplicate$ -- 2610
-empty$ -- 2419
-format.name$ -- 522
-if$ -- 5373
+cite$ -- 16
+duplicate$ -- 2979
+empty$ -- 2762
+format.name$ -- 592
+if$ -- 6137
 int.to.chr$ -- 0
-int.to.str$ -- 17
+int.to.str$ -- 20
 missing$ -- 0
-newline$ -- 210
-num.names$ -- 347
-pop$ -- 2310
+newline$ -- 237
+num.names$ -- 399
+pop$ -- 2619
 preamble$ -- 1
-purify$ -- 139
+purify$ -- 161
 quote$ -- 0
-skip$ -- 1422
+skip$ -- 1628
 stack$ -- 0
-substring$ -- 524
-swap$ -- 831
-text.length$ -- 214
-text.prefix$ -- 8
+substring$ -- 605
+swap$ -- 963
+text.length$ -- 242
+text.prefix$ -- 9
 top$ -- 1
-type$ -- 292
+type$ -- 330
 warning$ -- 0
-while$ -- 169
+while$ -- 188
 width$ -- 0
-write$ -- 201
+write$ -- 227
 (There was 1 warning)

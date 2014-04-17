@@ -4,10 +4,20 @@
  
 
 \section{Validity of the model}
-As we saw in the introduction to the analysis chapter it is possible to introduce enough walkers so that there is no mathematical difference between the combined model and the PDE-model. 
-For all practical purposes, however we will not use that many walkers, because it is not the reason we introduced them in the first place. 
-The simulations done in the analysis-chapter are largely done for verification purposes (see chapter \ref{debugging} in the appendix).
-In other words, our model converges to the continuum model in the limit of sufficient walkers.
+
+Section \ref{introduction_to_random_walks} shows that a random walk can be described by the Gaussian distribution and that it satisfies the diffusion equation as well as deriving the diffusion equation from a random walk. 
+Mathematically these models are considered equivalent in the limit of sufficiently many walkers. 
+This limit is defined by the time step as 
+\begin{equation}
+ N \geq \Delta t^2
+\end{equation}
+Figure \ref{combined_BE1d:convergence} verifies that given a sufficient amount of walkers, the convergence in time is unaffected by the walkers. 
+Thus supporting the claim that the models are equivalent, and that they can be combined in a meaningful way. \\
+
+For all practical purposes, however, the demand for walkers is too high, and will generally only be met for verification purposes. 
+This is no problem, since the models were combined to study effects from both length scales, which would not be meaningful to study if the demand for walkers is met. 
+
+In other words, the model converges to the continuum model in the limit of sufficient walkers, but this limit is seldom met.
 
 % The results of the testing done in the Analysis-chapter, particularly the convergence tests based on varying the conversion-factor, Hc, to exceed the expected numerical error arising from the scheme itself based on equation \ref{}, suggest that the implementation of our model is correct. 
 % The mathematics overlap, as we have seen in chapter \ref{}, and if we introduce enough walkers there seems to be no difference between adding an area on the mesh where random walks solve the equation, and not doing so. 
@@ -43,6 +53,7 @@ Seeing as there are no additional complexities added to the random walk model we
  \centering
  \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
  \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Crase et.al. and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
+ \label{results:boxplot_relative_diffusiontime_long_neck}
 \end{figure}
 
 Through the simulations it became apparent that there must be some sort of limiting factor which limits the number of PKC$\gamma$ particles that are let into the spine. 

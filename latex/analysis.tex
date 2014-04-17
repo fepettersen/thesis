@@ -611,12 +611,12 @@ Apparently, the introduction of walkers will give an increased error no matter h
 The effects of changing the time step have also been investigated, and the results are shown in Figure \ref{testing_dt_size}. 
 This test illustrates that the step length tweaking derived in section \ref{probability_distribution_and_timesteps} works since the error stabilizes around the size of $\Delta t$ and the fluctuations seem to be around $\sqrt{\frac{1}{N}}$ as predicted.\\
 
-Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 
-Unlike almost all the other comparable plots, it seems that using the least amount of walkers gives the best result here. 
-This might be because the system quickly reaches its steady state, and will then be very well described by the continuum model. 
-Having a small conversion factor, Hc, will mean that very quickly there will be no walkers which sort of ruins the point. 
-This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. 
-What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
+% Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 
+% Unlike almost all the other comparable plots, it seems that using the least amount of walkers gives the best result here. 
+% This might be because the system quickly reaches its steady state, and will then be very well described by the continuum model. 
+% Having a small conversion factor, Hc, will mean that very quickly there will be no walkers which sort of ruins the point. 
+% This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. 
+% What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
 
 
 \begin{figure}[H]
@@ -640,19 +640,19 @@ What we should read from this figure is rather that the simulation with the most
 % \caption{}
 % \label{testing_dt_size}
 % \end{figure}
-
-\begin{figure}[H]
- \centering
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot}.eps}
- \caption{}
- \label{errorplot_FE_walk_long:normal}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/deterministic_errorplot}.eps}
-\caption{}
-\label{errorplot_FE_walk_long:deterministic}
- \end{subfigure}
-\caption[Error plot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
-\label{errorplot_FE_walk_long}
-\end{figure}
+% 
+% \begin{figure}[H]
+%  \centering
+% \begin{subfigure}[b]{0.48\textwidth}
+% \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot}.eps}
+%  \caption{}
+%  \label{errorplot_FE_walk_long:normal}
+% \end{subfigure}
+% \begin{subfigure}[b]{0.48\textwidth}
+%  \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/deterministic_errorplot}.eps}
+% \caption{}
+% \label{errorplot_FE_walk_long:deterministic}
+%  \end{subfigure}
+% \caption[Error plot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
+% \label{errorplot_FE_walk_long}
+% \end{figure}

@@ -61,14 +61,17 @@ In the final algorithm there are the following stages
 \begin{itemize}
  \item Initialization\\
  Read parameters from command-line, initial condition and diffusion ``tensor'' from file. Setup instances of solvers etc. Practically no point in parallelizing this.
- \item LU-decomposition\\
- The actual LU-decomposition is a sort of Gaussian Elimination which is costly ($\mathcal{O}(N^3)$). Although the decomposition is pre-implemented at this point, the plan is to implement my own version of this. This step should be possible to parallelize.
+ \item Forward sweep\\
+  As is explained in section \ref{tridiagonal_linear_systems} the solution is done by a forward and a backward sweep of the mass matrix. 
+  Since the forward sweep is both the most computationally intensive and independent of time it can be done just once and stored for future use. 
+  The forward sweep consists of two matrix-matrix multiplications and one matrix inversion, all of which require some $\mathcal O(N^3)$ FLOPs depending on what algorithm is used. 
+  $N$ is here the size of the block matrix in the mass matrix, typically $n^{d-1}$ where $n$ is the spatial resolution and $d$ is the spatial dimension.
  \item Solving\\
- This step includes a back-transform of the decomposed matrix which is expensive for $d>1$. This step should be parallelizable. It also includes the random walk part which is both expensive (depending on the number of walkers left) and highly parallelizable. We also write stuff to file which is quite costly. This is probably not possible to parallelize.
+ This step includes a backward sweep of the mass matrix, only consisting of matrix-vector multiplications and additions which are not computationally intensive. It also includes the random walk part which is both expensive (depending on the number of walkers left) and highly parallelizable. We also write stuff to file which is quite costly. This is probably not possible to parallelize.
 \end{itemize}
 
 Parallelization of the random walk solver should scale linearly because the only form of communication required is shared memory. 
-The LU decomposition and back-substitution require some communication and will not scale linearly, but will still benefit from parallelizing. 
+Solving the linear system might be parallelizable, but will not scale linearly due to communication. This step is not the bottleneck at this point.
 
 \subsection{Some fancy title about changing stuff}
 
@@ -115,7 +118,7 @@ Recall that the possibility to add spikes in spines is already built-in.
 
 As is the general problem in computational neuroscience this project requires setting a lot of parameters whose values are not known. 
 There are of course a lot of parameters with known values as well, like the diffusion coefficient for PKC$\gamma$. 
-A summary of the parameters of particular interest is shown in table \ref{parameter_values}, with an indication of where the values are taken from, if they are calculated or if they are simply given a value to ensure reasonable behaviour.
+A summary of the parameters of particular interest is shown in Table \ref{table:parameters}, with an indication of where the values are taken from, if they are calculated or if they are simply given a value to ensure reasonable behaviour.
 
 \begin{table}[H]
 \centering

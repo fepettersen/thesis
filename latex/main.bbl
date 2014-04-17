@@ -209,6 +209,34 @@
   \field{year}{2001}
 \endentry
 
+\entry{plapp2000multiscale}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Plapp}{P.}%
+     {Mathis}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Karma}{K.}%
+     {Alain}{A.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Elsevier}%
+  }
+  \strng{namehash}{PMKA1}
+  \strng{fullhash}{PMKA1}
+  \field{sortinit}{P}
+  \field{number}{2}
+  \field{pages}{592\bibrangedash 619}
+  \field{title}{{Multiscale finite-difference-diffusion-Monte-Carlo method for
+  simulating dendritic solidification}}
+  \field{volume}{165}
+  \field{journaltitle}{Journal of Computational Physics}
+  \field{year}{2000}
+\endentry
+
 \lossort
 \endlossort
 

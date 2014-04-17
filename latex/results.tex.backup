@@ -4,6 +4,14 @@
  
 
 \section{Validity of the model}
+Section \ref{introduction_to_random_walks} shows that a random walk can be described by the Gaussian distribution and that it satisfies the diffusion equation as well as deriving the diffusion equation from a random walk. 
+Mathematically these models are considered equivalent in the limit of sufficiently many walkers. 
+This limit is defined by the time step as 
+\begin{equation}
+ N \geq \Delta t^2
+\end{equation}
+
+
 As we saw in the introduction to the analysis chapter it is possible to introduce enough walkers so that there is no mathematical difference between the combined model and the PDE-model. 
 For all practical purposes, however we will not use that many walkers, because it is not the reason we introduced them in the first place. 
 The simulations done in the analysis-chapter are largely done for verification purposes (see chapter \ref{debugging} in the appendix).
@@ -29,11 +37,13 @@ Seeing as there are no additional complexities added to the random walk model we
  \includegraphics[width=\textwidth]{Figures/spine_stats_fulltime_nl.eps}
  \caption{}
  \label{results:spine_diffusion_stats:fulltime}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{Figures/spine_stats_reltime_nl.eps}
  \caption{}
  \label{results:spine_diffusion_stats:reltime}
 \end{subfigure}
-\caption[]{}
+\caption[]{This is a meaningless caption.}
 \label{results:spine_diffusion_stats}
 \end{figure}
 

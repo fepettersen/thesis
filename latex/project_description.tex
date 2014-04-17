@@ -28,7 +28,7 @@ Transport processes in and out of dentritic spines are also assumed to be diffus
 
 \section{Progress of the project}
 The combination of stochastic and continuum models immediately raise the question of where the limit between the two scales is. 
-As was done by \emph{dendritic solidification article} one way to postpone answering this question is by introducing some conversion parameter, which will define how many stochastic units one unit of concentration is equivalent to. 
+As was done by Plapp and Krama \cite{plapp2000multiscale} one way to postpone answering this question is by introducing some conversion parameter, which will define how many stochastic units one unit of concentration is equivalent to. 
 In addition to this, the initial model was built with testing in mind, which makes the exact limit rather uninteresting. 
 
 The stochastic model chosen in this project is random walks because of its mathematical equivalence to the diffusion equation (see sections \ref{further_introduction} and \ref{more_general_random_walks}), its conceptual simplicity and because of how easy it is to add complexity to the model. 
@@ -40,7 +40,7 @@ Finally, and explanation to the difficulty of this seemingly simple problem was 
 After forcing the error terms to behave properly was abandoned, an attempt at combining the diffusion equation solver with DSMC code developed by Anders Hafreager during his masters thesis was made. 
 Although this combination to some extent works, it suffers from a difference in dimensionality. 
 The DSMC code runs in three spatial dimensions, whereas the code developed in this thesis at the moment is limited to two spatial dimensions because more were not required. 
-The extension to three spatial dimensions should not be too hard, however, and both the ``backened'' linear algebra solver and the random walk module should already support 3d modeling. 
+The extension to three spatial dimensions should not be too hard, however, and both the ``backened'' linear algebra solver and the random walk module should already support 3D modeling. 
 
 Finally, to prove that the developed software can be used to something reasonable it was slightly modified to fit a real life diffusion problem in which an enzyme diffuses through a wide dendrite into a very narrow dendritic spine ($<1\mu$m). 
 A thorough description of this problem is found in section \ref{}.
