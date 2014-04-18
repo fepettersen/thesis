@@ -2,11 +2,19 @@
 This chapter will contain most of the numerical error analysis and some of the discussion of this analysis as well as a recap of the methods used for error analysis in general, and how they are adapted to this particular problem.\\
 
 
-In the numerical setup chosen for this project several new error sources might be introduced in addition to the normal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
+In the numerical setup chosen for this project some new error sources might be introduced in addition to the normal errors introduced by numerical solution of any equation (see section \ref{some_words_on_PDEs}). 
 When a part of the solution acquired is replaced by the solution from a stochastic model, the initial condition to the next iteration in time will be changed. 
 This might have a number of effects on the final solution. 
 Figure \ref{illustrate_approximate_derivatives} shows the typical effects of solving an equation numerically. When a stochastic solution is imposed on top of this again, it will lead to fluctuations around the approximations to the solution at the new time-step which most likely worsens the approximation.
 The aim of this chapter is to verify the implementation and investigate the effects of adding a stochastic solution to a normal PDE solution.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.6]{Figures/numerical_error_illustrated.eps}
+ \caption[Numerical errors illustration]{Illustration of how numerical errors appear. The dashed line shows the numerical integration of the equation $\frac{du}{dt} = -e^{-t}$ calculated with $6$ points, while the full line is the exact solution $u(t)= e^{-t}$. The numerical scheme approximates the derivative as a constant between two points, an approximation which will become increasingly good as the resolution improves. }
+ \label{illustrate_approximate_derivatives}
+\end{figure}
+
 % This can be done by choosing a solution to the PDE, doing a simulation which should yield the same solution and then comparing the two answers. 
 % As argued in section \ref{} we will struggle with making the error from the random walk solver be much smaller than $\mathcal{O}(\Delta t)$. 
 % We will therefore start by using a simple discretization of the PDE which also has a truncation error of $\mathcal{O}(\Delta t)$. 
@@ -27,22 +35,22 @@ The aim of this chapter is to verify the implementation and investigate the effe
 %  \caption[Initial condition in 2d]{Initial condition of manufactured solution in 2d and the simulation.}
 %  \label{initial_condition_2d}
 % \end{figure}
-
+\section{Introduction}
 \subsection{The error estimate}\label{error_estimate}
-
-Before we do anything we should specify what we use to measure the error which will be denoted as $\epsilon$. 
+First and foremost the error measure, which will be denoted $\epsilon$ will be specified.
 Throughout this thesis the term error is used quite lazily, but unless something else is specified we refer to the expression 
 \begin{equation}
  \epsilon(t_i) = ||u_e(t_i)-u(t_i)||_2
 \end{equation}
 where $u_e$ is an exact (manufactured) solution to the equation, and $u$ is the result from the numerical simulation. 
-We use this error-estimate because it is time-dependent, thus letting us explicitly see how the error evolves over time. 
-The error is calculated over the entire mesh, letting us see clearly if the error from the random-walk areas are dominating, or (otherwise) how the PDE-scheme is holding up.
-Another error estimate we will use later is the maximum value of the error. 
-This will be used for the convergence tests to make sure that no effects of simulating for a long time are overlooked. 
+This error-estimate is used because it is time-dependent, thus explicitly showing how the error evolves over time. 
+The error is calculated over the entire mesh, which will clearly show if the error from the random-walk areas are dominating, or (otherwise) how the PDE-scheme is holding up.
+Another error estimate that will be used later is the integrated norm of the previously mentioned error estimate. 
+This will be used for the convergence tests to make sure that no effects of simulating for a long time are overlooked, and is defined as 
 \begin{equation}
- \epsilon = max(\epsilon(t_i))
+ \epsilon = \sqrt{\sum\limits_i h^2\epsilon(t_i)}
 \end{equation}
+where $h$ is the parameter in question (usually $\Delta t$).
 
 \subsection{Verification techniques}
 There are quite a few ways to verify an implementation. This thesis will focus on three which are considered adequate for no particular reason.
@@ -53,7 +61,10 @@ Since the software contains both an explicit FE scheme and an implicit BE scheme
 We will start with the simplest diffusion equation (eq. \eqref{simple_diffusion_equation}) and add complexity until the expression verifies all parts of the implementation. 
 Both schemes are expected to have an error-term of the order of $\Delta t$, which in the FE case is limited by a stability criterion. 
 Next, the initial condition for a simulation is set to the exact solution at $t=0$, and the simulation can be run with different parameter values. 
-This approach makes it trivial to calculate the error, seeing as the solution is known, and to check that it takes the expected values.
+This approach makes it trivial to calculate the error, seeing as the solution is known, and to check that it takes the expected values.\\
+There are some variations of this method which should be mentioned. 
+Setting the manufactured solution to a constant (or a linear polynomial if the boundary conditions allow it) should eliminate the error completely since the derivative is zero which eliminates the numerical error. 
+This is also a nice way of verifying that the scheme conserves energy (or matter for that matter).
 
 \item Exact numerical solutions\\
 For the explicit schemes, exact solutions to the scheme itself can be found seeing as the scheme is a difference equation. The calculations are shown step-by-step in section \ref{exact_numerical_solution}.
@@ -69,7 +80,7 @@ A convergence rate of 1 means that halving the parameter will (roughly) halve th
 \section{Verification of PDE solvers}
 To verify the implementation of the PDE-solvers, the steps outlined in the previous section will now be performed. 
 The approach will be to begin the testing on the simplest diffusion equation using the full implementation, and add complexity along the way. 
-This is another way of verifying that the implementation is correct since the average of the anisotropic diffusion coefficient at three mesh-points is the same as the diffusion constant if there is no change over the mesh-points. Effectively this is the same as having only a constant. 
+This is another way of verifying that the implementation is correct since the average of the anisotropic diffusion coefficient at two mesh-points is the same as the diffusion constant if there is no change over the mesh-points. Effectively this is the same as having only a constant. 
 The same applies to setting the drift-velocity equal to zero. 
 
 Since both the FE and BE discretization have been implemented both of them will be tested, but for the most part the BE discretization will be used in simulations because of its unconditional stability.
@@ -92,33 +103,36 @@ is chosen because it fulfills the chosen boundary conditions.
 Equations \eqref{manufactured_prof_pt1} and \eqref{manufactured_prof_pt2} prove that the manufactured solution does indeed fulfill the diffusion equation (eq. \ref{simple_diffusion_equation}).
 \begin{align}
  \frac{\d }{\d t}e^{-t\pi^2}\cos(\pi x) +1 &= D\frac{\d^2}{\d x^2}e^{-t\pi^2}\cos(\pi x) +1\label{manufactured_prof_pt1}\\
- -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \implies 1 = 1\label{manufactured_prof_pt2}
+ -\pi^2e^{-t\pi^2}\cos(\pi x) &= -\pi^2e^{-t\pi^2}\cos(\pi x) +1 \label{manufactured_prof_pt2}\\
+ \implies 1 &= 1 \nonumber
 \end{align}
 
-The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and, in the FE case, the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. 
-In 1D we get the plots in Figure \ref{errorplot_FE1D_noWalk} of error (described in chapter \ref{error_estimate}), with the corresponding plots of the convergence rates in Figure \ref{} that verify the order of the error term.
+The error in space is determined by two factors, the actual error caused by the approximation to the second derivative, which is of the order of $\Delta x^2$ and, in the FE case, the error term coming from the time derivative due to the stability criterion (eq. \ref{stability}), which is also of the order $\Delta x^2$. \\
+Figure \ref{verification_FE1D} shows error and convergence plots for the FE scheme in 1D. 
 For longer simulations, the analytic solution is expected to reach a steady state which is found in the limit of large $t$, 
 
 \begin{equation}
  u(x,t\to\infty) \to e^{-\infty}\cos(\pi x) +1 \to 1
 \end{equation}
 The numerical scheme should be able to represent this to machine precision ($10^{-16}$), meaning that the numerical solution should start converging to zero after some number of times steps, but this might depend on how the derivatives as estimated so we say that it should in the very least stabilize. 
-Figures \ref{} and \ref{} seem to show the expected behaviour from the error estimate, which implies that the implementation is correct so far.
+The error plots in Figure \ref{verification_FE1D:errorplot} clearly show that the error tends to zero as the steady state is reached. 
+As for the convergence, it is not perfect, but it could have been worse. There might be some effects from the spatial error which influences the error, but due to the stability criterion the time step cannot be increased beyond $\frac{\Delta x^2}{2}$ which prevents isolating the error from the time derivative. 
+Considering the tests which will be done later with respect to the numerical exact, the scheme seems to be performing fairly good, if not perfect.
 
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{../doc/results/experiment_31102013_1017/results/deterministic_errorplot.eps}
+\includegraphics[width=\textwidth]{../doc/results/experiment_18042014_1014_convergencetest_FE1D/results/errorplot.eps}
 \caption{}% Replace this figure with a convergence rate plot for the FE discretization.
-\label{errorplot_FE1D_noWalk}
+\label{verification_FE1D:errorplot}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_18112013_0830/results/deterministic_errorplot.eps}
+\includegraphics[width=\textwidth]{../doc/results/experiment_18042014_1014_convergencetest_FE1D/results/ConvergenceTest.eps}
  \caption{}
- \label{errorplot_FE1D_noWalk_long}
+ \label{verification_FE1D:convergence}
 \end{subfigure}
-\caption[Numerical error for 1D Forward Euler discretization]{Numerical error for 1D Forward Euler discretization of the PDE. Nothing else is done to the simulation.}
-\label{errorplot_FE1D_noWalk_super}
+\caption[Error plot for 1D Forward Euler scheme]{Numerical error for 1D Forward Euler discretization of the PDE. Nothing else is done to the simulation.}
+\label{verification_FE1D}
 \end{figure}
 
 Testing of more advanced implementations requires some additional calculations in order to still have the same manufactured solution as before. 
@@ -569,8 +583,8 @@ First off all, Figure \ref{errorplot_BE1D_noWalk} shows the error norm of a simu
 Figure \ref{errorplot_BE1D_Walk} shows the same simulation for various conversion parameters for the random walk. 
 These simulations have input from the random walk model on some 20\% of the mesh points. 
 As a comparison Figures \ref{errorplot_BE1D_walk_5_percent} and \ref{errorplot_BE1D_walk_35_percent} have 5\% and 35\% of the mesh points affected by walkers. 
-An interresting property of both these figures is the instability in the error for very low conversion factors. 
-\emph {There seems to be a limit as to how large of an inaccuracy the scheme can handle and still produce meaningfull results. }
+An interesting property of both these figures is the instability in the error for very low conversion factors. 
+\emph {There seems to be a limit as to how large of an inaccuracy the scheme can handle and still produce meaningful results. }
 Another thing to notice from these figures is that a larger relative area of walkers implies more walkers are required in order to make the scheme as exact as it will get. 
 Apparently, the introduction of walkers will give an increased error no matter how many are used.
 
@@ -608,19 +622,21 @@ Apparently, the introduction of walkers will give an increased error no matter h
 \label{testing_walk_area_size_BE}
 \end{figure}
 
-The effects of changing the time step have also been investigated, adn the results are summarized in Figure \ref{testing_dt_size}. 
-Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 
-Unlike almost all the other comparable plots, it seems that using the least amount of walkers gives the best result here. 
-This might be because the system quickly reaches its steady state, and will then be very well described by the continuum model. 
-Having a small conversion factor, Hc, will mean that very quickly there will be no walkers which sort of ruins the point. 
-This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. 
-What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
+The effects of changing the time step have also been investigated, and the results are shown in Figure \ref{testing_dt_size}. 
+This test illustrates that the step length tweaking derived in section \ref{probability_distribution_and_timesteps} works since the error stabilizes around the size of $\Delta t$ and the fluctuations seem to be around $\sqrt{\frac{1}{N}}$ as predicted.\\
+
+% Figure \ref{errorplot_BE1D_walk_large_dt} shows something a little bit unexpected. 
+% Unlike almost all the other comparable plots, it seems that using the least amount of walkers gives the best result here. 
+% This might be because the system quickly reaches its steady state, and will then be very well described by the continuum model. 
+% Having a small conversion factor, Hc, will mean that very quickly there will be no walkers which sort of ruins the point. 
+% This particular equation has steady state $u(t\to\infty,x) = 0$, and so not having any walkers will be perfect. 
+% What we should read from this figure is rather that the simulation with the most walkers converges to an acceptable error, and that this is achieved just as fast as for the other two simulations.
 
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{Figures/errorplot_timestep_test.eps}
-\caption[Effect of increasing timestep]{Errornorm of three tests where the spatial resolution was fixed at $\Delta x = \frac{1}{10}$ and the time step and conversion factor were changed. $\Delta t$ started at the stability criterion for the FE scheme $\Delta t = 0.5\cdot\Delta x^2$ and was increased up to $\Delta t = \Delta x$, maintaining the demand of $Hc = \frac{1}{\Delta t^2}$ for all the tests. }
+\caption[Effect of increasing time step]{Error norm of three tests where the spatial resolution was fixed at $\Delta x = \frac{1}{10}$ and the time step and conversion factor were changed. $\Delta t$ started at the stability criterion for the FE scheme $\Delta t = 0.5\cdot\Delta x^2$ and was increased up to $\Delta t = \Delta x$, maintaining the demand of $Hc = \frac{1}{\Delta t^2}$ for all the tests. }
 \label{testing_dt_size}
 \end{figure}
 % \begin{figure}[H]
@@ -638,19 +654,19 @@ What we should read from this figure is rather that the simulation with the most
 % \caption{}
 % \label{testing_dt_size}
 % \end{figure}
-
-\begin{figure}[H]
- \centering
-\begin{subfigure}[b]{0.48\textwidth}
-\includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot}.eps}
- \caption{}
- \label{errorplot_FE_walk_long:normal}
-\end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/deterministic_errorplot}.eps}
-\caption{}
-\label{errorplot_FE_walk_long:deterministic}
- \end{subfigure}
-\caption[Errorplot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
-\label{errorplot_FE_walk_long}
-\end{figure}
+% 
+% \begin{figure}[H]
+%  \centering
+% \begin{subfigure}[b]{0.48\textwidth}
+% \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/errorplot}.eps}
+%  \caption{}
+%  \label{errorplot_FE_walk_long:normal}
+% \end{subfigure}
+% \begin{subfigure}[b]{0.48\textwidth}
+%  \includegraphics[width=\textwidth]{{../doc/results/experiment_02122013_1309_long_simulations_1d/results/deterministic_errorplot}.eps}
+% \caption{}
+% \label{errorplot_FE_walk_long:deterministic}
+%  \end{subfigure}
+% \caption[Error plot, long simulation]{The deterministic error and the error from simulations with walkers for long simulations.}
+% \label{errorplot_FE_walk_long}
+% \end{figure}

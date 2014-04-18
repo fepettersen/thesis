@@ -43,7 +43,7 @@ Diffusion::Diffusion(double _dx, double _dy, double **D, double Dt, double _v){
 	_Dx = dt/(dx*dx);
 	aD = D;
 	d = (dy>0)?2:1;
-	solver = 3;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
+	solver = 2;		/*solver=2 ==> Forward Euler; solver=3 ==> BE*/
 	if(d==2 && solver==2){
 		// dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = dt/(dx*dx);
@@ -133,7 +133,7 @@ void Diffusion::advance(double **U,double **Up, int m, int n){
 				for(int j=0;j<1;j++){
 					U[i][j] = (_Dx/2.0)*((aD[i+1][j]+aD[i][j])*(Up[i+1][j]-Up[i][j]) -
 						(aD[i][j]+aD[i-1][j])*(Up[i][j]-Up[i-1][j])) +Up[i][j] - 
-					((dt*v)/(2.0*dx))*(Up[i+1][j]-Up[i-1][j]) + dt*f(i*dx,0,(t+1)*dt);
+					((dt*v)/(2.0*dx))*(Up[i+1][j]-Up[i-1][j]) + dt*f(i*dx,0,t*dt);
 				}
 			}
 			boundary(U,Up,m,n);
@@ -236,10 +236,10 @@ double Diffusion::f(double x,double y, double t){
 	/*Source term. This should be possible to specify from somewhere. 
 	Perhaps by inheritence*/
 	double pi = 3.1415926535897932;
-	// return -pi*pi*exp(-t*pi*pi)*(cos(pi*x)*(1-pi*x)-sin(pi*x));
+	// return exp(-t*pi*pi)*pi*pi*(sin(pi*x)+cos(pi*x)*(pi*x-1));
 	// return -pi*sin(pi*x)*exp(-t*pi*pi);
-	// double py = pi*y;
-	// double px = pi*x;
+	double py = pi*y;
+	double px = pi*x;
 	// return pi*exp(-t*pi*pi)*(2*pi*cos(px)*cos(py)*(x+y-0.5) + cos(px)*sin(py) +sin(px)*cos(py));
 	return 0.0;
 }
@@ -271,7 +271,7 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 	int k=0;
 	for(int i=0; i<m;i++){
 		for(int j=0; j<n; j++){
-			Uptmp[k] = Up[i][j] +dt*f(i*dx,j*dy,(t+1)*dt);
+			Uptmp[k] = Up[i][j] +dt*f(i*dx,j*dy,t*dt);
 			k++;
 		}
 	}

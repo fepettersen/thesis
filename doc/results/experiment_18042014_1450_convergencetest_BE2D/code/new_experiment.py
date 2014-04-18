@@ -432,7 +432,7 @@ def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
 	
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -445,7 +445,7 @@ if __name__ == '__main__':
 	y1 = 0.7
 	m = 51
 	n = 1
-	T = 100		# no.of timesteps, [dt*T] = seconds
+	T = 1000		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -508,14 +508,14 @@ if __name__ == '__main__':
 	# h = [100,1000,10000]
 	dt = []
 	dx = 0.02
-	h = [0.05]
+	h = [0.05,0.005,0.0005]
 	# h = [dx*dx/(2*np.pi)]
 	for i in h:
 		# i = 1.0/j
-		timestep = i*i/5.0
-		# timestep = i
+		# timestep = i*i/2.0
+		timestep = i
 		dt.append(timestep)
-		m = (1/i)+1
+		m = (1/dx)+1
 		n = m
 		# m = int(round(1.0/i)) +1
 		if n==1:
@@ -537,7 +537,7 @@ if __name__ == '__main__':
 	# print 'dx =',dx
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None)
+	# run.Visualize(viz_type=None)
 	# run.Visualize(viz_type='exact')
 
 	# run.Visualize(viz_type='difference')

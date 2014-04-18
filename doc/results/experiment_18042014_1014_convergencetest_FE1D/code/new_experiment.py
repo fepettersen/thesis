@@ -311,7 +311,6 @@ class Experiment:
 			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
 		print r
 		print E
-		mpl.ylim(0.0,1.1)
 		mpl.plot((Hc[:-1]),r,'b-x')
 		mpl.xlabel('dt')
 		mpl.ylabel('r')
@@ -392,7 +391,6 @@ def f(x,y,t):
 	# return tmp/np.sum(tmp)
 	return np.exp(-t*np.pi**2)*np.cos(np.pi*x)*np.cos(np.pi*y) +1
 	# return np.pi*np.ones(np.shape(x))
-	# return x+np.pi*t
 
 def F(x,y,t):
 	tmp = np.zeros(np.shape(x))
@@ -425,14 +423,14 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 	return np.cos(np.pi*x)*u
 
 def D(x,y,t=0):
-	# return np.pi*x
-	return np.ones(np.shape(x))*0.5
+	# return x+y
+	return np.ones(np.shape(x))
 
 def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
 	
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -443,9 +441,9 @@ if __name__ == '__main__':
 	y0 = 0.5
 	x1 = 0.65
 	y1 = 0.7
-	m = 51
+	m = 21
 	n = 1
-	T = 100		# no.of timesteps, [dt*T] = seconds
+	T = 2500		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -455,7 +453,7 @@ if __name__ == '__main__':
 	# dt = dx*dy/4.0 if n>1 else dx**2/5.0
 	bla = 0.3*dx**2
 	# dt = [bla]
-	dt = [0.01]
+	dt = [0.5*2.5*1e-3]
 
 
 	if n>1:
@@ -467,7 +465,7 @@ if __name__ == '__main__':
 	Hc = [200,1400,5600,10400,22000,150000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_convergencetest_BE2D'
+	info='_convergencetest_FE1D'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
@@ -476,8 +474,8 @@ if __name__ == '__main__':
 	# run.SetInitialCondition(GaussianPulse(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
 
-	# run.compile()
-	# run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	run.compile()
+	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 	# run.RunSimulation(10*int(round(1.0/(dt[0]*dt[0]))))
 	# M = np.loadtxt("BE_matrix_inverse.txt")
@@ -507,25 +505,18 @@ if __name__ == '__main__':
 	# ## --- Run for h --- ###
 	# h = [100,1000,10000]
 	dt = []
-	dx = 0.02
-	h = [0.05]
-	# h = [dx*dx/(2*np.pi)]
+	dx = 0.05
+	h = [0.2,0.1,0.05,0.025]
 	for i in h:
 		# i = 1.0/j
-		timestep = i*i/5.0
+		timestep = i*i/2.0
 		# timestep = i
 		dt.append(timestep)
-		m = (1/i)+1
-		n = m
-		# m = int(round(1.0/i)) +1
-		if n==1:
-			x = np.linspace(0,1,m)
-			y = np.zeros(m)
-		elif n==m:
-			x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
+		# m = (1/dx)+1
+		m = int(round(1.0/i)) +1
 		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-		run.SetInitialCondition(run.exact(x,y,0))
-		run.SetDiffusionTensor(D(x,y))
+		run.SetInitialCondition(run.exact(np.linspace(0,1,m),np.zeros(m),0))
+		run.SetDiffusionTensor(D(np.ones(m),np.zeros(m)))
 		# hc = int(round(1.0/(timestep**2)))
 		hc = int(round(1.0/i))
 		print i," , ", timestep, " , ", hc
@@ -537,7 +528,7 @@ if __name__ == '__main__':
 	# print 'dx =',dx
 	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None)
+	# run.Visualize(viz_type=None)
 	# run.Visualize(viz_type='exact')
 
 	# run.Visualize(viz_type='difference')
