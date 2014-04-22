@@ -53,7 +53,11 @@ This will be used for the convergence tests to make sure that no effects of simu
 where $h$ is the parameter in question (usually $\Delta t$).
 
 \subsection{Verification techniques}
-There are quite a few ways to verify an implementation. This thesis will focus on three which are considered adequate for no particular reason.
+There are quite a few ways to verify an implementation. This thesis will focus on three which are considered adequate for no particular reason. 
+Unfortunately some of the tests require isolating one error-term, meaning that the test works better if the stability criterion for the FE scheme is broken. 
+The result of this is that some of the tests are only done on the BE scheme. 
+Fortunately, the BE scheme will be used for the actual simulations and will see more thorough verification.
+
 \begin{itemize}
  \item Method of manufactured solutions\\
  A normal way of checking that our scheme of choice is implemented correctly is by constructing an exact solution to the equation and checking that the error is of the expected order. 
@@ -167,9 +171,10 @@ Again, the error is of the order of $\Delta t$ and is roughly halved by halving 
 
 \subsection{Convergence Tests}
 
+
 The next step in testing the implementation will be to perform a convergence test in time. 
-We omit the spatial convergence test because an incorrect implementation of the spatial derivative would be clearly visible both in the visualization of the simulation (the solution blows up), and in the error plot seeing as the spatial error would dominate.
-We carry out the convergence test by doing several simulations with different values for $\Delta t$ and comparing the errors by equation \ref{convergence_rate_def}. 
+The spatial convergence test is toned down because an incorrect implementation of the spatial derivative would be clearly visible both in the visualization of the simulation (the solution blows up), and in the error plot seeing as the spatial error would dominate.
+As mentioned, the convergence tests are carried out by doing several simulations with different values for $\Delta t$ and comparing the errors by equation \ref{convergence_rate_def}. 
 \begin{equation}\label{convergence_rate_def}
  r = \frac{\ln(E_{i+1}/E_i)}{\ln(\Delta t_{i+1}/\Delta t_i)}
 \end{equation}
@@ -184,13 +189,14 @@ For the BE scheme we get the convergence rate shown in figure \ref{convergence_t
 
 \begin{figure}[H]
  \centering
- \begin{subfigure}[b]{0.48\textwidth}
+ \begin{subfigure}[t]{0.48\textwidth}
  \includegraphics[width=\textwidth]{../doc/results/experiment_27112013_1017/results/ConvergenceTest.eps}
  \caption{Convergence test for the FE scheme. The x axis is $\ln(\Delta t)$.}
  \label{convergence_test:FE}
 \end{subfigure}
-\begin{subfigure}[b]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../doc/results/experiment_13012014_0925_Simple1DConvergenceTestBE/results/ConvergenceTest.eps}
+\begin{subfigure}[t]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_18042014_1450_convergencetest_BE2D/results/ConvergenceTest.eps}
+ %remove folders : [experiment_13012014_0925_Simple1DConvergenceTestBE]
  \caption{Convergence test for the BE scheme. The x axis is $\Delta t$, the y-axis (though a little hard to see) is zoomed in around r=1.}
  \label{convergence_test:BE}
 \end{subfigure}
@@ -203,10 +209,12 @@ The results of this test are shown in Figure \ref{convergence_test_FE_2d} and it
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.7]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
+\includegraphics[scale=0.5]{../doc/results/experiment_29112013_1709/results/ConvergenceTest.eps}
 \caption[Convergence test FE 2D]{Convergence test for the FE scheme in 2D using $\Delta t$ ranging from the stability criterion $\frac{\Delta x\Delta y}{5}$ to the same ratio divided by 100000 in increments of $10^{-1}$.}
 \label{convergence_test_FE_2d}
 \end{figure}
+
+\subsubsection{Spatial convergence}
 
 Figure \ref{spatial_convergence_test} shows the converge for the spatial error. 
 This test is done only using the implicit scheme since it is an advantage for the spatial error, which is of second order, to be larger than the error from the time discretization. 
@@ -232,14 +240,20 @@ The normal error plot is also included in the figure to illustrate that the impr
 
 \subsection{Exact numerical solution}\label{exact_numerical_solution}
 
-The FE scheme has an exact solution seeing as it is in fact a difference equation. 
-This solution can be found if the scheme is reformulated as 
+Both schemes can be reformulated as difference equations, and will therefore have some form of exact solution. 
+Comparing a simulation to the expected exact numerical solution is a good way to verify that the implementation does what it is expected to do. 
+The numerical exacts are expected to be represented to more or less machine precision, though some deviances might occur.
 
-\begin{equation}
- u^{n+1} = D\Delta t u_{xx}^n + u^n
+As was done in section \ref{some_words_on_PDEs}, the schemes must first be reformulated as a theta-rule discretization
+\begin{equation}\label{theta_rule_difference_equation}
+  \frac{u^{n+1}-u^n}{\Delta t} =\theta D\Delta t u_{xx}^{n+1} +(1-\theta)D\Delta t u_{xx}^n
 \end{equation}
 
-where $u_{xx}^n$ denotes the double derivative of $u$ at time step $t^n$, and the first few iterations are inserted. 
+where $u_{xx}^n$ denotes the double derivative of $u$ at time step $t^n$.
+
+\subsubsection{The FE scheme}
+
+Inserting $\theta=0$ in equation \eqref{theta_rule_difference_equation} yields the FE scheme. The first few iterations are written out as
 
 \begin{align*}
  u^1 &= D\Delta t u_{xx}^0 + u^0 \\
@@ -271,10 +285,12 @@ In the same way as for the time derivative, the approximation to the spatial der
 \begin{align*}
  u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
  &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
- u^0_{4x} &= [u^0_xx]_{xx} = \frac{1}{\Delta x^2}\left[\frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
+ u^0_{4x} &= [u^0_{xx}]_{xx} \frac{1}{\Delta x^2}\left[\frac{u^0_{xx}}{\cos(\pi x)}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
  &= \frac{4}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
  &\dots
 \end{align*}
+
+% u^0_{4x} &= [u^0_{xx}]_{xx} \frac{1}{\Delta x^2}\left[\frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
 
 This pattern continues, and the exact numerical solution can be expressed by equation \eqref{numerical_solution} in 1D for the previously mentioned initial condition.
 \begin{equation}\label{numerical_solution}
@@ -284,13 +300,13 @@ This pattern continues, and the exact numerical solution can be expressed by equ
 The FE scheme is expected to represent this solution more or less to machine precision, at least to $15$ digits. 
 There are, however two issues with the solution \eqref{numerical_solution}:
 \begin{itemize}
- \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again ruins the simulation. This can be fixed rather simply by testing if $\Delta x^{2i}>0$ and returning zero if the test returns false.
- \item ${n\choose i}$ goes to infinity for large n and i. The computer will eventually (for $n>\sim170$) meet overflow. Figure \ref{convergence_exact_numerical_1d_n145} shows that at least for relatively few time steps the troublesome terms can be dropped, but effectively this limits the simulation to some 170 steps regardless of the value of $\Delta t$.
+ \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. This can be fixed rather simply by testing if $\Delta x^{2i}>0$ and returning zero if the test returns false.
+ \item ${n\choose i}$ goes to infinity for large n and i. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$. Figure \ref{convergence_exact_numerical_1d_n145} shows that at least for relatively few time steps the troublesome terms can be dropped, but effectively this limits the simulation to some 170 steps regardless of the value of $\Delta t$.
 \end{itemize}
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.7]{Figures/convergence_exact_numerical_1d_n145}
+ \includegraphics[scale=0.5]{Figures/convergence_exact_numerical_1d_n145}
  \caption{Testing the relation between $\left(D\Delta t\right)^i$ and the binomial coefficients.}
  \label{convergence_exact_numerical_1d_n145}
 \end{figure}
@@ -322,10 +338,11 @@ We should, in other words, be pleased that the error starts out with machine pre
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
- \caption{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8e-05$.}
+ \caption{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8\cdot10^{-5}$.}
  \label{exact_numerical_2d_n130}
 \end{figure}
 
+\subsubsection{The BE scheme}
 For the BE scheme the exact numerical solution is more implicit than for the FE scheme. 
 As for the FE scheme, the numerical exact solution is simply the solution to the difference equation that the PDE is rewritten as. 
 However, the BE scheme is implicit and results in a system of linear equations. 
@@ -368,15 +385,16 @@ Although the accuracy is some $5$ orders of magnitude worse than the numerical e
 \end{figure}
 
 
-
+% \clearpage
 
 \section{Testing the Random walk implementation}\label{testing_random_walks}
 
 
+The RW implementation will be verified using the same techniques that were used to verify the PDE solvers with the exception of a numerical exact solution since there is none. 
+However, the initial condition used for the PDE solvers cannot be represented to a satisfying accuracy by a distribution of walkers. 
+A Heaviside step function on the other hand can be perfectly represented by said distribution and is defined in equation \eqref{Heaviside_def}. 
 
-To verify our implementation, and perhaps gain some new insight we will do some testing on the random walks implementation as well. 
-This means that we have to find a solution of the diffusion equation \eqref{simple_diffusion_equation} for an initial condition we can recreate with random walkers to the best possible precision. 
-The absolute simplest initial condition to recreate is the Heaviside step function, defined in equation \eqref{Heaviside_def}. 
+
 \begin{equation}\label{Heaviside_def}
  H(x-a) = \begin{cases}
            1\;\;x\geq a\\
@@ -384,7 +402,8 @@ The absolute simplest initial condition to recreate is the Heaviside step functi
           \end{cases}
 \end{equation}
 In order to verify our implementation we must solve the diffusion equation \eqref{simple_diffusion_equation} for this new initial condition. 
-This is most easily done through separation of variables. We have
+Numerically there is no change, but an exact solution must also be found, this is done by separation of variables
+
 \begin{align}
  \frac{\d u}{\d t} &= D\frac{\d^2 u}{\d x^2}\\
  \frac{\d u(0,t)}{\d x} &= \frac{\d u(1,t)}{\d x} = 0 \\

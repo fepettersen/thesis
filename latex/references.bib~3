@@ -43,3 +43,8 @@
 	year = "2011"
 }
 
+@article{light1996protein,
+	author = "Light, Peter E and Sabir, Aftab A and Allen, Bruce G and Walsh, Michael P and French, Robert J",
+	title = "{Protein Kinase C--Induced Changes in the Stoichiometry of ATP Binding Activate Cardiac ATP-Sensitive K+ Channels A Possible Mechanistic Link to Ischemic Preconditioning}"
+}
+
