@@ -1,0 +1,19 @@
+\section{Properties of the model}
+
+
+
+\section{Future work}
+The developed model shows clear signs of being a first approach to the problem, and is in some ways a bit simple. 
+Several improvements can be suggested to create a more realistic model both with respect to the diffusion processes on both length scales, and when it comes to the combination of the two models. 
+This section will mention some of the improvements that can be done.
+
+\subsection{PDE solver}
+Although there is a well expressed limitation to the accuracy of the model determined by the stochastic term, an interesting extension to the software will be to introduce a finite element PDE Solver. 
+Depending on which solver is implemented, this step will ensure that more complex (and realistic) properties of a diffusion process like nonlinearity can be introduced with relative simplicity. 
+Another question is how this can be implemented in the lower-scale model..\\
+A finite element solver will also, as discussed in section \ref{geometry}, vastly simplify the implementation of more realistic mesh geometries in more than 1D. \\
+Experimenting with time derivative approximations that are better than first order could also be interesting seeing as a second order convergence was achieved by the similar model described in section \ref{simplified_test}. 
+The actual benefit of introducing a better approximation to the time derivative must of course be tested.
+
+\subsection{Lower scale models}
+
