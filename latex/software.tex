@@ -41,7 +41,7 @@ None of these pose any problems.
 
 \subsection{CPU time}
 The program as it stands now (v 1.$\infty$) uses the BE discretization and a highly specialized tridiagonal solver. 
-The random walk-part of the software has been excreted as a stand-alone program which communicates with the main-program through a binary .xyz file containing the positions of all walkers in 3d space. This makes it easier to change solver, and implement more advanced solvers like the Direct Simulation Monte Carlo (DSMC) Molecular Dynamics (MD) simulator written by Anders Hafreager (see chapter \ref{}). 
+The random walk-part of the software has been excreted as a stand-alone program which communicates with the main-program through a binary .xyz file containing the positions of all walkers in 3d space. This makes it easier to change solver, and implement more advanced solvers like the Direct Simulation Monte Carlo (DSMC) Molecular Dynamics (MD) simulator written by Anders Hafreager (see chapter \ref{DSMC_description}). 
 There are three expensive operations in the algorithm as it stands now with the BE discretization using standard LU-decomposition.
 \begin{itemize}
 \item Random walks are expensive if there are many walkers. The number of calls to the random number generator follows eq. \eqref{calls_to_ran} and for the verification process, which required a lot of walkers, this represented a considerable cost. 
@@ -143,7 +143,7 @@ $p_{ab}$ & probability for PKC$\gamma$ to be absorbed, and removed from simulati
 \label{table:parameters}
 \end{table}
 
-The conversion factor $Hc$ which was defined in equation \eqref{Hc_definition} must also take reasonable values in the simulation, and this might mean changing it to another expression. 
+The conversion factor $Hc$ which was defined in equation \eqref{definition_Hc_first} must also take reasonable values in the simulation, and this might mean changing it to another expression. 
 Light et.al. \cite{light1996protein} state that the concentration of conventional PKC which PKC$\gamma$ is a part of, is typically 20$\frac{\text{nMol}}{\text{L}}$ in cardiac cells. 
 There is reason to believe that these values are typical for all cells. 
 Since there are four conventional PKC types ( $\alpha$, $\beta_{I}$, $\beta_{II}$ and $\gamma$), the assumption that PKC$\gamma$ makes up for a quarter of this concentration (5$\frac{\text{nMol}}{\text{L}}$) is made. 

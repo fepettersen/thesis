@@ -401,8 +401,8 @@ A Heaviside step function on the other hand can be perfectly represented by said
            0\;\;x<a
           \end{cases}
 \end{equation}
-In order to verify our implementation we must solve the diffusion equation \eqref{simple_diffusion_equation} for this new initial condition. 
-Numerically there is no change, but an exact solution must also be found, this is done by separation of variables
+In order to verify the RW implementation an initial distribution of walkers which follows the Heaviside step function is given to the program, and a simulation is run for some number of time steps. 
+An exact solution must also be found to the diffusion equation (eq. \ref{simple_diffusion_equation}) for error calculations and this is done by separation of variables. We have
 
 \begin{align}
  \frac{\d u}{\d t} &= D\frac{\d^2 u}{\d x^2}\\
@@ -423,14 +423,18 @@ where the primes denotes the respective derivatives. We separate the equation us
 \end{align*}
 where $C$, $C_1$ and $C_2$ are arbitrary constants. 
 Choosing $\lambda = -\mu^2$ lets us rewrite the spatial solution in terms of sines and cosines. 
-There are really three choices here; $\lambda = -\mu^2$, $\lambda = \mu^2$ and $\lambda = ?$ but we chose the first because the results of the other choices are unphysical.
+There are really three choices here; $\lambda = -\mu^2$, $\lambda = \mu^2$ and $\lambda = 0$, but the first is chosen because the results of the other choices are unphysical or uninteresting. 
+Inserting $\lambda = -\mu^2$ into the expression found for $F(x)$ gives
+
 \begin{equation*}
  F(x) = a\cos(\mu x) + b\sin(\mu x)
 \end{equation*}
-The boundary conditions gives us 
+
+The boundary conditions result in
 \begin{align*}
  F'(0)T(t) = F'(1)T(t) = 0
 \end{align*}
+
 Since the time dependent solution cannot be exactly zero and is independent of position by construction ($C\exp(\lambda t)|_{x=0} = C\exp(\lambda t) \neq 0$), the first derivative of the spatial solution must be zero at the boundaries
 \begin{align*}
  F'(x) &= -a\mu\sin(\mu x) + b\mu\cos(\mu x) \\
@@ -451,7 +455,7 @@ The coefficients are found by approximating the initial condition
  &= \frac{2}{n\pi}\left[sin(n\pi x)\right]_{0.5}^1 \\
  &= \frac{2}{n\pi}\sin(n\pi) - \sin(\frac{n\pi}{2}) \\
  &= \frac{2\sin(\frac{n\pi}{2})}{n\pi}\\
- a_n &= \frac{2}{\pi m} (-1)^m\;\;\;\; m=2n+1
+ a_n &= \frac{2}{\pi m} (-1)^m\;\;;\;\; m=2n+1
 \end{align*}
 which gives us the final solution
 % \begin{equation}

@@ -3,8 +3,8 @@ def_graphic_ext=
 img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
-kileversion=2.1.0
-lastDocument=analysis.tex
+kileversion=2.1.3
+lastDocument=main.tex
 masterDocument=
 name=Project
 pkg_extIsRegExp=false
@@ -45,6 +45,15 @@ Highlighting=LaTeX
 Indentation Mode=normal
 Mode=LaTeX
 ReadWrite=true
+
+[document-settings,item:discussion.tex]
+Bookmarks=
+Encoding=UTF-8
+FoldedColumns=
+FoldedLines=
+Highlighting=LaTeX
+Indentation Mode=normal
+Mode=LaTeX
 
 [document-settings,item:main.tex]
 Bookmarks=
@@ -103,15 +112,15 @@ encoding=UTF-8
 highlight=LaTeX
 line=62
 mode=LaTeX
-open=true
+open=false
 order=2
 
 [item:analysis.tex]
 archive=true
-column=36
+column=217
 encoding=UTF-8
 highlight=LaTeX
-line=492
+line=13
 mode=LaTeX
 open=true
 order=0
@@ -126,55 +135,65 @@ mode=LaTeX
 open=true
 order=1
 
-[item:main.tex]
+[item:discussion.tex]
 archive=true
-column=47
+column=3
 encoding=UTF-8
 highlight=LaTeX
-line=41
-mode=LaTeX
-open=true
-order=6
-
-[item:project_description.tex]
-archive=true
-column=175
-encoding=UTF-8
-highlight=LaTeX
-line=42
+line=24
 mode=LaTeX
 open=true
 order=7
 
-[item:results.tex]
+[item:main.tex]
 archive=true
-column=56
+column=17
 encoding=UTF-8
 highlight=LaTeX
-line=55
+line=16
+mode=LaTeX
+open=true
+order=5
+
+[item:project_description.tex]
+archive=true
+column=103
+encoding=UTF-8
+highlight=LaTeX
+line=37
+mode=LaTeX
+open=true
+order=6
+
+[item:results.tex]
+archive=true
+column=285
+encoding=UTF-8
+highlight=LaTeX
+line=47
+mode=LaTeX
+open=true
+order=2
+
+[item:software.tex]
+archive=true
+column=0
+encoding=UTF-8
+highlight=LaTeX
+line=56
 mode=LaTeX
 open=true
 order=3
 
-[item:software.tex]
+[item:theory.tex]
 archive=true
-column=32
+column=53
 encoding=UTF-8
 highlight=LaTeX
-line=0
+line=37
 mode=LaTeX
 open=true
 order=4
-
-[item:theory.tex]
-archive=true
-column=70
-encoding=UTF-8
-highlight=LaTeX
-line=431
-mode=LaTeX
-open=true
-order=5
 
 [view-settings,view=0,item:Intro.tex]
 CursorColumn=46
@@ -183,8 +202,8 @@ JumpList=
 ViMarks=
 
 [view-settings,view=0,item:analysis.tex]
-CursorColumn=36
-CursorLine=492
+CursorColumn=217
+CursorLine=13
 JumpList=
 ViMarks=
 
@@ -194,32 +213,38 @@ CursorLine=119
 JumpList=
 ViMarks=
 
+[view-settings,view=0,item:discussion.tex]
+CursorColumn=3
+CursorLine=24
+JumpList=
+ViMarks=
+
 [view-settings,view=0,item:main.tex]
-CursorColumn=47
-CursorLine=41
+CursorColumn=17
+CursorLine=16
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:project_description.tex]
-CursorColumn=175
-CursorLine=42
+CursorColumn=103
+CursorLine=37
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:results.tex]
-CursorColumn=56
-CursorLine=55
+CursorColumn=285
+CursorLine=47
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:software.tex]
-CursorColumn=32
-CursorLine=0
+CursorColumn=0
+CursorLine=56
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:theory.tex]
-CursorColumn=70
-CursorLine=431
+CursorColumn=53
+CursorLine=37
 JumpList=
 ViMarks=

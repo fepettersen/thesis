@@ -9,7 +9,7 @@ Section \ref{introduction_to_random_walks} shows that a random walk can be descr
 Mathematically these models are considered equivalent in the limit of sufficiently many walkers. 
 This limit is defined by the time step as 
 \begin{equation}
- N \geq \Delta t^2
+ N \geq \frac{1}{\Delta t^2}
 \end{equation}
 Figure \ref{combined_BE1d:convergence} verifies that given a sufficient amount of walkers, the convergence in time is unaffected by the walkers. 
 Thus supporting the claim that the models are equivalent, and that they can be combined in a meaningful way. \\
@@ -37,15 +37,15 @@ Seeing as there are no additional complexities added to the random walk model we
  \centering
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{Figures/spine_stats_fulltime_nl.eps}
- \caption{}
+ \caption{Absolute diffusion times.}
  \label{results:spine_diffusion_stats:fulltime}
  \end{subfigure}
  \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{Figures/spine_stats_reltime_nl.eps}
- \caption{}
+ \caption{Relative diffusion times.}
  \label{results:spine_diffusion_stats:reltime}
 \end{subfigure}
-\caption[]{This is a meaningless caption.}
+\caption[Diffusion times with least squares fit]{Absolute (a) and relative (b) diffusion times into spines. The lines represent a least squares fit of the results. This least squares fit should have been done after removing outliers and should have an expression written out somewhere.}
 \label{results:spine_diffusion_stats}
 \end{figure}
 

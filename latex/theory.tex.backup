@@ -2,6 +2,7 @@
 This chapter will deal with random walks in general and the transition from the statistical view to PDEs. 
 Different algorithms to produce random walks will be discussed, highlighting their pros and cons in light of this project along with some details which prove either problematic or helpful. 
 Numerical solution of PDEs will also be discussed, also with emphasis on what is relevant for this project. 
+Some words on (computational) neuroscience are needed, and can be found in section \ref{theory:physical_scope} along with a description of the physical application of this project. 
 Finally an algorithm for combining random walk diffusion solvers and normal PDE diffusion solvers will be introduced and discussed.
 
 \section{Notation}
@@ -33,6 +34,10 @@ The latter is mainly used when the expression $C$ is large, like a fraction, to 
 However, this is abandoned if there might be room for misconception. 
 As an example, the calculations in section \ref{more_general_random_walks} are done using $e^C$ rather than $\exp(C)$ even though $C$ might be a fraction.
 This is done because the exponential at some point is multiplied by a parenthesis, and where this multiplication takes place might have been unclear otherwise.
+
+\section{Physical scope}\label{theory:physical_scope}
+
+\emph{Say something about neuroscience, neurons, spines}
 
 \section{Introduction to random walks}\label{introduction_to_random_walks}
 
@@ -327,7 +332,7 @@ Where $v = \frac{d}{\Delta t}$ is the velocity of the concentration and $D$ is t
 \subsection{Pseudo-random numbers}
 
 This is also a large mathematical field which will only be touched in this thesis. 
-Further reading can be found in \emph{Some RNG thing. Preferably be Gerorge Marsagla}. 
+Further reading can be found in the 1990s review by James \cite{james1990review}. 
 
 Although modern technology has made true randomness available, we do not currently have access to this and are limited to pseudo-random numbers. 
 For all purposes in this thesis, pseudo-randomness is presumed adequate. 
@@ -336,7 +341,7 @@ A pseudo random number generator (RNG\nomenclature{RNG}{(pseudo) random number g
 These operations often rely on other, engineered numbers which will maximize the RNGs period. 
 A period is the number of function calls which can be performed before the RNG starts producing the same sequence of numbers. 
 Naturally this period should be as large as possible. 
-There are quite a lot of methods to produce pseudo-random numbers \emph{cite a review article or something}, but only two are implemented in this project (not counting the built in RNGs in the ``cmath'' and ``armadillo'' modules). 
+There are quite a lot of methods to produce pseudo-random numbers \cite{james1990review}, but only two are implemented in this project (not counting the built in RNGs in the ``cmath'' and ``armadillo'' modules). 
 
 \subsubsection{ran0}
 
@@ -346,12 +351,12 @@ The period of ran0 on the other hand is rather small, only $\sim 10^8$. For shor
 
 \subsubsection{Five seeded xor-shift}
 
-This is a more complicated algorithm developed by George Marsagla. 
+This is a more complicated algorithm developed by George Marsaglia. 
 It uses five seeds which are all updated every time it is called to make a pseudo-random 64-bit unsigned integer (\emph{check this}), which can be converted to a double. 
-Implementing this algorithm is intricate, but it is found written out on the internet (\emph{Be very careful about this, and cite something}). 
+Implementing this algorithm is intricate, but it is found written out by Marsaglia \cite{marsaglia2003xorshift}. 
 As opposed to the ran0 algorithm this uses a series of bitshifts to produce the random numbers and update the seeds. 
 It is not as fast as ran0, but only some $10-30\%$ slower. 
-Because of the five seeds used, however, this algorithm has a period of $\sim10^{48}$ (\emph{This needs to come from somewhere}) making it more than good enough for most MC-simulations I have heard about, and certainly for this project.
+Because of the five seeds used, however, this algorithm has a period of $\sim10^{48}$ \cite{marsaglia2003xorshift} making it more than good enough for most MC-simulations I have heard about, and certainly for this project.
 
 \section{Some words about partial differential equations}\label{some_words_on_PDEs}
 
@@ -727,22 +732,45 @@ This is about the same performance as the explicit scheme gives, but without the
 \section{Combining the two solvers}\label{combining_the_solvers}
 This section will deal with the actual combination of the two models.\\
 
-\subsection{Changing between length scales}
+\subsection{Changing between length scales}\label{theory:changing_between_lenghtscales}
 As was mentioned in the introduction to this thesis, the combination of two length scales immediately raises the question of exactly where the limit between the two scales goes, and why exactly there. 
+This question is usually answered with ``models are switched when effects from the smaller scale becomes negligible'' when moving from small to larger scales, and similarly ``models are switched when effects from the smaller scale become dominant'' in the opposite case. 
+In effect this is what is done for the applications of this project, but an attempt to combine the two models in one simulation will also be done. 
+An are of the computational mesh will be solved by a RW model first, representing a small length scale, and this solution will be used as input for the PDE solver. 
+This approach requires a way to quickly convert from a concentration to a distribution of walkers, and back. 
+The conversion is done by a conversion factor which will be named $Hc$ (as it was named by Plapp and Karma \cite{plapp2000multiscale}, though they used a conversion field) which is introduced in equation \eqref{conversion_rate}. 
 
-An area on the domain where we switch models from the normal PDE to an average of the PDE solution and the result of a random walk simulation is then introduced. For each time step the initial condition is the last time step from the PDE converted to walkers by the conversion rate given in equation \eqref{conversion_rate}.
-
-'\begin{equation}\label{conversion_rate}
+\begin{equation}\label{conversion_rate}
  C_{ij} = \frac{a}{\Delta t}U_{ij}
+\end{equation}
 % In this case the parameters $a=3$, $\Delta t = \frac{\Delta x^2}{3.0}$, $\Delta x = \frac{1}{20}$ have been used. 
 % These parameters makes one unit of $u(x,t)$ equal to some $1000$ walkers. 
-\end{equation}
 For the most part, equation \eqref{conversion_rate}  will be rewritten to just one conversion factor times the PDE solution, giving us some flexibility should we want to add more dependencies in the conversion. 
 As of now, the conversion factor, $Hc$, is defined in equation \eqref{definition_Hc_first}. 
 One ``unit'' of $ U_{ij}$ will directly correspond to $Hc$ random walkers.
 \begin{equation}\label{definition_Hc_first}
  Hc =  \frac{a}{\Delta t} \implies C_{ij} = Hc\cdot U_{ij}
 \end{equation}
+
+\subsubsection{Methods of combination}
+Effectively the problem is solved twice as the software stands now, both by the PDE and by the RW model. These two solutions must be coupled, and there are a few possibilities as to how this can be done.
+
+% make a table of this instead?
+
+\begin{itemize}
+ \item Regression\\
+ Some kind of regression can be used, where the solution from the RW model is used as data points. 
+ This results in an expression that approximates the solution from the RW model. 
+ Alternatively, the average of the two solutions can be done before the regression. 
+ The resulting expression is used to calculate the solution over the area in question.
+ \item Average\\
+ A simple average can be used. This will to some extent follow the ``correct'' solution from the PDE method, ensuring some smoothness, and have the fluctuating properties from the RW solution.
+ \item Interpolation\\
+ This approach can ensure that the endpoints follow the solution outside the relevant area, but requires choosing some points in stead of other points from the RW solution. 
+ \item Replacing\\
+ Alternatively none of the above can be chosen, and the PDE solution can simply be replaced by the RW solution. This might well be the best approach.
+\end{itemize}
+
 
 \subsection{The basic algorithm}\label{basic_algorithm}
 
@@ -759,7 +787,7 @@ There is also the possibility of modeling parts of the dendrite-mesh as random w
 This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
 Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{farnell2005monte}. 
 At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 
-The solution from the PDE-solver is used to calculate the number of walkers by eq. \ref{} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
+The solution from the PDE-solver is used to calculate the number of walkers by eq. \ref{definition_Hc_first} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
 Because the sum of the PDE-solution over the random walk area of the mesh might be different from one time-step to the next (eq. \ref{integral_u}) the conversion from PDE-solution to random walker distribution must be done at every time-step. 
 The alternatives are to remove or add the difference at each time-step, but this will require checking that each mesh-point has the ``correct'' number of walkers and updating the number to correspond with the solution from the PDE-solver. \emph{which is what we are doing already?}
 Or the conversion factor could be adjusted at each time-step. The latter is largely a bad solution because it ruins transparency and might introduce even more fluctuations in the solution.
@@ -767,7 +795,7 @@ Or the conversion factor could be adjusted at each time-step. The latter is larg
 \begin{equation}\label{integral_u}
  \sum u_{i,j}^n \neq \sum u_{i,j}^{n+1}
 \end{equation}
-After the random walk integration the two solutions are combined by a simple average. A few other methods have been tested (see chapter \ref{}) but discarded. 
+After the random walk integration the two solutions are combined by a simple average. A few other methods have been tested (see chapter \ref{theory:changing_between_lenghtscales}) but discarded. 
 The average of the two solutions is then set as the new ``initial condition'' for the next time-step, and the  process repeats itself.
 
 The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the time-step is done. 
@@ -891,7 +919,7 @@ If we want to model diffusion on a general geometry by a FD method we could tran
 \begin{equation*}
  \vec{r} = \mathbf{T}(\vec{q})
 \end{equation*}
-Where $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. 
+Here, $\vec{r} = (x,y)$ is the position in physical space, $\vec{q} = (\xi,\eta)$ is the position on the unit-square that is the computational space and $\mathbf{T}$  is the transformation. The transformation is achieved by the functions $x(\xi,\eta)$ and $y(\xi,\eta)$. 
 After a lot of math, including some differential geometry the diffusion equation in computational space is found to still have the form
 
 \begin{equation*}
@@ -906,4 +934,5 @@ but the total flux vector $\vec{J} = \vec{f} + \phi$ now has the properties
 where $g$ is the Jacobian of the transformation $\mathbf{T}$. 
 In other words, a whole new and much more complicated equation must be discretized in order to solve for a general geometry. 
 Some idea of what the functions $x(\xi,\eta)$ and $y(\xi,\eta)$ are is also required, and this information is generally not available. 
-Furthermore, there already exists Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change the PDE-solver in the developed software to a FEniCS solver.
+Furthermore, there already exists Finite Element software which can take any geometry as a mesh, and so a simpler way of using a more interesting geometry would be to change discretization from FD to a finite element method, for example in the open-source finite element software FEniCS. 
+This is considered an extension, and will not be covered here.

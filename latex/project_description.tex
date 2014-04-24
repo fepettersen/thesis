@@ -35,7 +35,7 @@ The stochastic model chosen in this project is random walks because of its mathe
 Seeing as there is a mathematical equivalence between the two models an initial goal was to force the error-term from the random walk part of the solver to smaller than the error term from the numerical solution of the partial differential equation. 
 A lot of time went into making this work by experimenting with the required conversion ratio, the required number of time-steps in the random walk model per time-step on the PDE solver, various curve-fitting possibilities and a lot of (needless) debugging. 
 At one point it seemed that everything behaved as expected, but this turned out to be a bug which meant doing even more testing an needless debugging. 
-Finally, and explanation to the difficulty of this seemingly simple problem was found (see section \ref{}) and no more attempts were done. 
+Finally, an explanation to the difficulty of this seemingly simple problem was found (see section \ref{}) and no more attempts were done. 
 
 After forcing the error terms to behave properly was abandoned, an attempt at combining the diffusion equation solver with DSMC code developed by Anders Hafreager during his masters thesis was made. 
 Although this combination to some extent works, it suffers from a difference in dimensionality. 

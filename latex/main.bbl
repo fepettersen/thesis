@@ -151,6 +151,28 @@
   \field{year}{2011}
 \endentry
 
+\entry{james1990review}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {James}{J.}%
+     {Frederick}{F.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Elsevier}%
+  }
+  \strng{namehash}{JF1}
+  \strng{fullhash}{JF1}
+  \field{sortinit}{J}
+  \field{number}{3}
+  \field{pages}{329\bibrangedash 344}
+  \field{title}{{A review of pseudorandom number generators}}
+  \field{volume}{60}
+  \field{journaltitle}{Computer Physics Communications}
+  \field{year}{1990}
+\endentry
+
 \entry{light1996protein}{article}{}
   \name{author}{5}{}{%
     {{}%
@@ -185,6 +207,25 @@
   \field{title}{{Protein Kinase C--Induced Changes in the Stoichiometry of ATP
   Binding Activate Cardiac ATP-Sensitive K+ Channels A Possible Mechanistic
   Link to Ischemic Preconditioning}}
+\endentry
+
+\entry{marsaglia2003xorshift}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Marsaglia}{M.}%
+     {George}{G.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{MG1}
+  \strng{fullhash}{MG1}
+  \field{sortinit}{M}
+  \field{number}{14}
+  \field{pages}{1\bibrangedash 6}
+  \field{title}{{Xorshift rngs}}
+  \field{volume}{8}
+  \field{journaltitle}{Journal of Statistical Software}
+  \field{year}{2003}
 \endentry
 
 \entry{nicholson2001diffusion}{article}{}
