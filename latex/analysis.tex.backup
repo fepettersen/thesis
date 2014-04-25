@@ -11,7 +11,7 @@ The aim of this chapter is to verify the implementation and investigate the effe
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.6]{Figures/numerical_error_illustrated.eps}
- \caption[Numerical errors illustration]{Illustration of how numerical errors appear. The dashed line shows the numerical integration of the equation $\frac{du}{dt} = -e^{-t}$ calculated with $6$ points, while the full line is the exact solution $u(t)= e^{-t}$. The numerical scheme approximates the derivative as a constant between two points, an approximation which will become increasingly good as the resolution improves. }
+ \caption[Numerical errors illustration]{Illustration of how numerical errors appear. The dashed line shows the numerical solution of the equation $\frac{du}{dt} = -e^{-t}$ calculated with $6$ points using a FE scheme, while the full line is the exact solution $u(t)= e^{-t}$. The numerical scheme approximates the derivative as a constant between two points, an approximation which will become increasingly good as the resolution improves. }
  \label{illustrate_approximate_derivatives}
 \end{figure}
 
@@ -200,7 +200,7 @@ For the BE scheme we get the convergence rate shown in figure \ref{convergence_t
  \caption{Convergence test for the BE scheme. The x axis is $\Delta t$, the y-axis (though a little hard to see) is zoomed in around r=1.}
  \label{convergence_test:BE}
 \end{subfigure}
-\caption{Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \eqref{simple_diffusion_equation}).}
+\caption[Convergence tests in 1D]{Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \eqref{simple_diffusion_equation}).}
 \label{convergence_test}
 \end{figure}
 
@@ -338,7 +338,8 @@ We should, in other words, be pleased that the error starts out with machine pre
 \begin{figure}[H]
  \centering
  \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
- \caption{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2d. we have used a $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8\cdot10^{-5}$.}
+ \caption[Numerical exact error plot FE in 2D]{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2D. 
+ Parameters of importance are $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8\cdot10^{-5}$ and the diffusion coefficient $D$ which must be $D = \frac{1}{2}$ in order to fulfill the diffusion equation.}
  \label{exact_numerical_2d_n130}
 \end{figure}
 
@@ -525,7 +526,7 @@ Equation \eqref{ODE} is easily solvable (see eq. \eqref{ODE_solution}). For the 
  f(x) = \int\limits_a^b g(x)\,dx + \int\limits_b^c g(x)\,dx
 \end{equation}
 This is a case where we have complete control over all parts of the solution which is $f(x) = f(b)-f(a) + f(c)-f(b)$, and we can solve the two parts of the integral in two different ways; by the midpoint method and by MC integration, respectively. The convergence rates of these methods are $2$ and $0.5$ respectively. 
-By the relation found in chapter \ref{} (eq. \eqref{definition_Hc_first}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
+By the relation found in chapter \ref{theory:changing_between_lenghtscales} (eq. \eqref{definition_Hc_first}) the number of MC samples should be proportionate to the resolution used by the midpoint-rule to the power of four. 
 \begin{align*}
  \frac{1}{\sqrt{N}} \simeq \Delta x^2 \\
  N \simeq \frac{1}{\Delta x^4} = N_x^4
@@ -641,7 +642,7 @@ Apparently, the introduction of walkers will give an increased error no matter h
  \caption{Having walkers on 35\% of the mesh points.}
  \label{errorplot_BE1D_walk_35_percent}
 \end{subfigure}
-\caption{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.05$ and $\Delta x = 0.01$ using the BE discretization.}
+\caption[Effects of increasing relative size of walk area]{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.05$ and $\Delta x = 0.01$ using the BE discretization.}
 \label{testing_walk_area_size_BE}
 \end{figure}
 

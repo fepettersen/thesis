@@ -426,7 +426,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return np.pi*x
-	return np.ones(np.shape(x))*0.5
+	return np.ones(np.shape(x))
 
 def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
@@ -440,12 +440,12 @@ if __name__ == '__main__':
 	this_dir = right_split(os.getcwd(),'/')
 
 	x0 = 0.3
-	y0 = 0.5
-	x1 = 0.65
-	y1 = 0.7
-	m = 51
+	y0 = 0.0
+	x1 = 0.7
+	y1 = 1.0
+	m = 21
 	n = 1
-	T = 100		# no.of timesteps, [dt*T] = seconds
+	T = 170		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -464,19 +464,19 @@ if __name__ == '__main__':
 		x = np.linspace(x_start,x_end,m)
 		y = np.zeros(m)
 	# Hc = [1500]
-	Hc = [200,1400,5600,10400,22000,150000]
+	Hc = [2000]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_convergencetest_BE2D'
+	info='_retesting_RW_solver'
 	run = Experiment(this_dir,DEBUG,save_files,info)
-	run.exact = f
+	run.exact = F
 
 	run.SetInitialCondition(run.exact(x,y,0))
 	# run.SetDiffusionTensor(D(x,y))
 	# run.SetInitialCondition(GaussianPulse(x,y,0))
 	run.SetDiffusionTensor(D(x,y))
 
-	# run.compile()
+	run.compile()
 	# run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 	# run.RunSimulation(10*int(round(1.0/(dt[0]*dt[0]))))
@@ -487,14 +487,14 @@ if __name__ == '__main__':
 	# run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
-	# for i in Hc:
-	# 	print "Hc = %g"%i
-	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
-	# 	run.RunSimulation(i)
-	# run.ConvergenceTest(Hc)
-	# leg = ['Hc = %g'%i for i in Hc]
+	for i in Hc:
+		print "Hc = %g"%i
+		run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+		run.RunSimulation(i)
+	run.ConvergenceTest(Hc)
+	leg = ['Hc = %g'%i for i in Hc]
 	# os.system('python spine_statistics.py')
-	# run.PlotError(leg)
+	run.PlotError(leg)
 
 	## --- Run for time-step --- ###
 	# for i in dt:
@@ -506,37 +506,37 @@ if __name__ == '__main__':
 
 	# ## --- Run for h --- ###
 	# h = [100,1000,10000]
-	dt = []
-	dx = 0.02
-	h = [0.05]
-	# h = [dx*dx/(2*np.pi)]
-	for i in h:
-		# i = 1.0/j
-		timestep = i*i/5.0
-		# timestep = i
-		dt.append(timestep)
-		m = (1/i)+1
-		n = m
-		# m = int(round(1.0/i)) +1
-		if n==1:
-			x = np.linspace(0,1,m)
-			y = np.zeros(m)
-		elif n==m:
-			x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
-		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-		run.SetInitialCondition(run.exact(x,y,0))
-		run.SetDiffusionTensor(D(x,y))
-		# hc = int(round(1.0/(timestep**2)))
-		hc = int(round(1.0/i))
-		print i," , ", timestep, " , ", hc
-		run.RunSimulation(1*hc)
-	leg = ['Hc = %g'%i for i in h]
-	run.ConvergenceTest(dt)
-	leg = ['dt = %g'%i for i in dt]
-	run.PlotError(leg)
-	# print 'dx =',dx
-	# run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
-	# run.UpdateWebpageSpecial()
+	# dt = []
+	# dx = 0.02
+	# # h = [0.1,0.05,0.025]
+	# h = [0.025]
+	# for i in h:
+	# 	# i = 1.0/j
+	# 	timestep = i*i/5.0
+	# 	# timestep = i
+	# 	dt.append(timestep)
+	# 	m = (1/i)+1
+	# 	n = 1
+	# 	# m = int(round(1.0/i)) +1
+	# 	if n==1:
+	# 		x = np.linspace(0,1,m)
+	# 		y = np.zeros(m)
+	# 	elif n==m:
+	# 		x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+	# 	run.SetInitialCondition(run.exact(x,y,0))
+	# 	run.SetDiffusionTensor(D(x,y))
+	# 	# hc = int(round(1.0/(timestep**2)))
+	# 	hc = int(round(1.0/(i**2)))
+	# 	print i," , ", timestep, " , ", hc
+	# 	run.RunSimulation(1*hc)
+	# leg = ['Hc = %g'%i for i in h]
+	# # run.ConvergenceTest(dt)
+	# # leg = ['dt = %g'%i for i in dt]
+	# run.PlotError(leg)
+	# # print 'dx =',dx
+	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
+	# # run.UpdateWebpageSpecial()
 	run.Visualize(viz_type=None)
 	# run.Visualize(viz_type='exact')
 

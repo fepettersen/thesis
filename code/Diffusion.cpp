@@ -13,7 +13,7 @@ Diffusion::Diffusion(double _dx, double _dy, double _D, double Dt, double _v){
 	dy = _dy;
 	D = _D;
 	d = (dy>0)?2:1;
-	solver = 3;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
+	solver = 2;		/*solver=3 ==> Backward Euler; solver=0 ==> Forward Euler*/
 	if(d==2 && solver==0){
 		dt = (Dt>(dx*dy/4.0))? (dx*dy/(5.0)):Dt;
 		_Dx = D*dt/(dx*dx);

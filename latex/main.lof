@@ -6,47 +6,49 @@
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Algorithm}}{34}{figure.caption.7}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Algorithm}}{34}{figure.caption.10}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Numerical errors illustration}}{42}{figure.caption.14}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Numerical errors illustration}}{42}{figure.caption.17}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Error plot for 1D Forward Euler scheme}}{46}{figure.caption.15}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Error plot for 1D Forward Euler scheme}}{46}{figure.caption.18}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{47}{figure.caption.16}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Verification of anisotropic diffusion equation implementation}}{47}{figure.caption.19}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence tests in 1D}}{48}{figure.caption.17}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Convergence tests in 1D}}{48}{figure.caption.20}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Convergence test FE 2D}}{48}{figure.caption.18}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Convergence test FE 2D}}{48}{figure.caption.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{51}{figure.caption.22}
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Verification of spatial derivative}}{49}{figure.caption.23}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.8}{\ignorespaces Verification for exact numerical solution}}{52}{figure.caption.23}
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Testing the relation between $\left (D\Delta t\right )^i$ and the binomial coefficients.\relax }}{52}{figure.caption.25}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.9}{\ignorespaces Numerical exact error plot FE in 2D}}{53}{figure.caption.24}
+\contentsline {figure}{\numberline {3.8}{\ignorespaces Verification for exact numerical solution}}{53}{figure.caption.26}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.10}{\ignorespaces Numerical exact errorplot for BE scheme}}{55}{figure.caption.26}
+\contentsline {figure}{\numberline {3.9}{\ignorespaces Numerical exact error plot FE in 2D}}{54}{figure.caption.27}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.11}{\ignorespaces Convergence test RW}}{58}{figure.caption.27}
+\contentsline {figure}{\numberline {3.10}{\ignorespaces Numerical exact errorplot for BE scheme}}{56}{figure.caption.29}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.12}{\ignorespaces Error plot RW}}{59}{figure.caption.28}
+\contentsline {figure}{\numberline {3.11}{\ignorespaces Convergence test RW}}{59}{figure.caption.30}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.13}{\ignorespaces Error test for BE combined with RW in 1D}}{62}{figure.caption.29}
+\contentsline {figure}{\numberline {3.12}{\ignorespaces Error plot RW}}{60}{figure.caption.31}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.14}{\ignorespaces Error for 1D BE scheme with to few walkers}}{63}{figure.caption.30}
+\contentsline {figure}{\numberline {3.13}{\ignorespaces Error test for BE combined with RW in 1D}}{63}{figure.caption.32}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.15}{\ignorespaces Effects of increasing relative size of walk area}}{63}{figure.caption.31}
+\contentsline {figure}{\numberline {3.14}{\ignorespaces Error for 1D BE scheme with to few walkers}}{64}{figure.caption.33}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {3.16}{\ignorespaces Effect of increasing time step}}{64}{figure.caption.32}
+\contentsline {figure}{\numberline {3.15}{\ignorespaces Effects of increasing relative size of walk area}}{64}{figure.caption.34}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.16}{\ignorespaces Effect of increasing time step}}{65}{figure.caption.35}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Diffusion times with least squares fit}}{77}{figure.caption.34}
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Diffusion times with least squares fit}}{79}{figure.caption.37}
 \defcounter {refsection}{0}\relax 
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Diffusion time for long necked spines}}{77}{figure.caption.35}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Diffusion time for long necked spines}}{79}{figure.caption.38}
 \defcounter {refsection}{0}\relax 
 \addvspace {10\p@ }
 \defcounter {refsection}{0}\relax 

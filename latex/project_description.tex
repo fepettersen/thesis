@@ -48,23 +48,41 @@ The formalism of the software also allows for testing of diffusion processes whe
 
 
 \section{What is computational neuroscience}
-Neuroscience is the scientific study of the nervous system, but in the traditional sense it focuses very much on what parts of the brain are responsible for what. 
-Mathematical neruroscience is more focused on the physics and chemistry involved in the different parts of the brain and nervous system. 
+Neuroscience is the scientific study of the central nervous system, but in the traditional sense it focuses very much on what parts of the brain are responsible for what. 
+Computational neruroscience is more focused on the physics and chemistry involved in the different parts of the brain and nervous system. 
 An example of the power of this approach is the classical work done by Hodgkin and Huxley in 1952, earning them the Nobel price in Physiology or medicine in 1963. 
 Through four non-linear coupled differential equations they were able to predict the propagation speed of signals along the squid giant axon to a quite high precision. \\
 
 % Copied from the project
 
-The human brain consists of two types of cells; the neurons and neuroglia. 
-Neurons are tasked with signal processing and transport, while the glial cells are thought to have more janitorial tasks. 
-The neurons are bathed in a salt solution that is mainly $Na^+$ and $Cl^-$. 
+\subsubsection{The central nervous system}
+All animals except sponges and radially symmetric animals (like jellyfish) have a central nervous system (CNS\nomenclature{CNS}{Central Nervous System}) tasked with gathering and processing information about nerve impulses from the rest of the body. 
+For vertebrates (animals with a backbone), the CNS is made up of a brain and a spinal cord. 
+The spinal cord gathers information from the peripheral nervous system and relays (most of) this information to the brain where it is processed.\\
+
+The human brain is an immensely complicated structure which we will only barely begin to describe here. 
+It consists of two main types of cells; the neurons and neuroglia as well as blood vessels. 
+The neurons are located (primarily) in the neocortex, which is what one would call the folded structure of gray-matter. 
+Neurons are tasked with signal processing and transport, while the glial cells are thought to have more janitorial tasks like metabolic support and guidance of development. 
+There are some different classifications of neurons, mostly by their location in the neocortex or by their geometry. 
+This thesis focuses on pyramidal neurons, named after their triangular cell body, which are found in the hippocampus and the cerebral cortex (among others) in most (all?) mammals. 
+Pyramidal neurons are chosen because of their large apical dendrite and the presence of dendritic spines. 
+
+\subsubsection{Neurons and how they work}
+Neurons are bathed in a salt solution that is mainly $Na^+$ and $Cl^-$, but some other ions like potassium and calcium are also present and seem fairly important. 
 Inside the neurons, a highly regulated salt solution of mainly $K^+$ sets up a potential difference relative to the outside of the cell of approximately $-65$mV.
-The neurons are in constant communication with each other through action potentials, which are disturbances in the membrane potentials of neurons. 
+A common trait for pyramidal neurons is the presence of a single axon and a large dendrite at the apex of the cell body (Soma) called the apical dendrite. 
+The axon is where the outgoing signals from the cell go, after they are gathered by the dendrites and integrated in the Soma. 
+Axons can vary in length from millimeters to several centimeters, but are usually rather thin. They branch out towards the end to connect with several other neurons via synapses. \\
+
+The activity level of a neuron varies a lot, some continuously fire action potentials at a frequency of 10-100 per second, while others are mostly quiet and fire a lot of action potentials given a certain input. 
 These action potentials are generated in the body of the cell, called the soma, from where they propagate down the axon without loss of amplitude. 
 This is achieved by constantly amplifying the signal using ion pumps (see the Hodgin-Huxley model of the action potential \cite{graham2011principles}).
 After propagating down the axon, the action potential reaches a synapse which is a gate to another neuron. 
 If the action potential is of significant strength, vesicles carrying neurotransmitters merge with the synapse membrane, letting the neurotransmitters diffuse to the Post Synaptic Density (PSD\nomenclature{PSD}{Post Synaptic Density} of a spine on the receiving dendrite.
-If enough neurotransmitters reach the post-synaptic side, the signal continues propagating to the soma of this neuron, and the entire process starts over again. \\
+If enough neurotransmitters reach the post-synaptic side, the signal continues propagating to the soma of this neuron, and the entire process starts over again.
+
+\subsubsection{Spines and memory storage/learning}
 The storage of memories on a sub-cellular level is thought to partly lie in the strengthening or weakening of the receiving synapse end, the PSD \cite{}. 
 Familiar impressions will cause similar firing patterns in the sense that the same neurons tend to fire action potentials, which in turn are received by the same neurons each time. 
 If the receiving synapses are strengthened or weakened the resulting integrated signals sent to the cell body will be hastened or held back accordingly and the response is strengthened and more time-efficient (DEFINETELY CITE SOMETHING HERE, OR JUST REWRITE... \cite{}). 

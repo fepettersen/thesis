@@ -1,12 +1,13 @@
-\nomenclatureentry{aPSD@[{PSD}]\begingroup Post Synaptic Density\nomeqref {1.0}|nompageref}{8}
+\nomenclatureentry{aCNS@[{CNS}]\begingroup Central Nervous System\nomeqref {1.0}|nompageref}{8}
+\nomenclatureentry{aPSD@[{PSD}]\begingroup Post Synaptic Density\nomeqref {1.0}|nompageref}{9}
 \nomenclatureentry{aLTP@[{LTP}]\begingroup Long-term potentiation\nomeqref {1.0}|nompageref}{9}
 \nomenclatureentry{aLTD@[{LTD}]\begingroup Long-term depression\nomeqref {1.0}|nompageref}{9}
-\nomenclatureentry{aPKC$\gamma$@[{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.0}|nompageref}{9}
+\nomenclatureentry{aPKC$\gamma$@[{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.0}|nompageref}{10}
 \nomenclatureentry{aRNG@[{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.24}|nompageref}{21}
 \nomenclatureentry{aFDM@[{FDM}]\begingroup Finite Difference Methods\nomeqref {2.24}|nompageref}{22}
 \nomenclatureentry{aPDE@[{PDE}]\begingroup Parital Differential Equation\nomeqref {2.26}|nompageref}{23}
 \nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.27}|nompageref}{23}
 \nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.27}|nompageref}{23}
 \nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.32}|nompageref}{25}
-\nomenclatureentry{aMC@[{MC}]\begingroup Monte Carlo\nomeqref {3.23}|nompageref}{60}
-\nomenclatureentry{aDirect simulation Monte Carlo@[{Direct simulation Monte Carlo}]\begingroup DSMC\nomeqref {A.6}|nompageref}{85}
+\nomenclatureentry{aMC@[{MC}]\begingroup Monte Carlo\nomeqref {3.23}|nompageref}{61}
+\nomenclatureentry{aDirect simulation Monte Carlo@[{Direct simulation Monte Carlo}]\begingroup DSMC\nomeqref {A.6}|nompageref}{87}

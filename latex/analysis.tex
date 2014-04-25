@@ -227,13 +227,13 @@ The normal error plot is also included in the figure to illustrate that the impr
  \centering
  \begin{subfigure}[b]{0.48\textwidth}
   \includegraphics[width=\textwidth]{../doc/results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{}
+  \caption{Error plot}
  \end{subfigure}
  \begin{subfigure}[b]{0.48\textwidth}
   \includegraphics[width=\textwidth]{../doc/results/experiment_14042014_1303_convergence_tests_etc/results/ConvergenceTest.eps}
-  \caption{}
+  \caption{Convergence test}
  \end{subfigure}
- \caption[]{}
+ \caption[Verification of spatial derivative]{Error plot (a) and convergence test (b) focusing on the spatial error term. This test requires the time step to be much smaller than $\Delta x^2$ in order for the spatial error to dominate. As is apparent from figure b, the convergence test is difficult to get right. Notice, however that the first value in the convergence test is close to 2, and that the second one is clearly larger than 1 suggesting that other effects might be at play. The test was done in 1D using the BE discretization with $\Delta t = \frac{1}{8000}$ for all values of $\Delta x$. This value is problematic because it is only a factor $\frac{1}{5}$ smaller than $\Delta x^2$ for $\Delta x = \frac{1}{40}$ which is the last simulation.}
  \label{spatial_convergence_test}
 \end{figure}
 

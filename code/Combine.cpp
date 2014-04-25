@@ -74,7 +74,7 @@ void Combine::Solve(){
 	if(debug){cout<<"Combine::Solve"<<endl;}
 	int num_procs = 2;
 	// double diffnorm = norm(U,Up,m,n);
-	char cmd[100];
+	char cmd[120];
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
 		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
@@ -97,6 +97,12 @@ void Combine::Solve(){
 			Up[k][l] = U[k][l];
 		}
 	}
+
+	// for(int k=0; k<m; k++){
+	// 	for(int l=0; l<n; l++){
+	// 		U[k][l] = Up[k][l];
+	// 	}
+	// }
 	// if (diffnorm<0.1*pde_solver->dt && pde_solver->dt <0.01)
 	// {
 	// 	int lkjh=0;
@@ -121,6 +127,7 @@ void Combine::AddWalkArea(double *x, double *y){
 	MapAreaToIndex(x,y,index);
 	if(d==1){
 		M = index[0][1]-index[0][0];
+		cout<<"M,m = "<<M<<","<<m<<endl;
 		N = 1;
 	}
 	else if(d==2){
@@ -285,6 +292,7 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 	int j = 0;
 	getline(infile,line);
 	int nwalkers = atoi(line.c_str());
+	if(debug){cout<<"nwalkers = "<<nwalkers<<endl;}
 	getline(infile,line);		
 	for(int i=0;i<nwalkers;i++){
 		getline(infile,line);
@@ -338,7 +346,7 @@ void Combine::MapAreaToIndex(double *x,double *y, int **index){
 	if(d ==1){
 		index[0][0] = int(round(x[0]/dx));
 		index[0][1] = int(round(x[1]/dx));
-
+		cout<<"index = "<<index[0][0]<<","<<index[0][1]<<endl;
 		if(index[0][0]<0 || index[0][1]>m-1){
 			cout<<"Invalid index, exiting"<<endl;
 			exit(1);
