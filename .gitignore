@@ -46,3 +46,11 @@ nosetests.xml
 *.toc
 *.tex~
 *.aux
+*.lof
+*.ist
+*.blg
+*.glo
+*.nls
+*.backup
+*.ilg
+*.nav
