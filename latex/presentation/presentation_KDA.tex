@@ -37,84 +37,27 @@
  \tableofcontents[hideallsubsections]
 \end{frame}
 
-\section{Introduction}
-\begin{frame}
- \frametitle{Brief introduction to the brain}
-\end{frame}
-
-\begin{frame}
- \frametitle{Cells in the brain}
- \begin{columns}
-\column{2.0in} Neurons:\\
-\begin{itemize}
- \item Signal processing
-\end{itemize}
-% \begin{figure}[H]
-%  \centering
-%  \includegraphics[width=\textwidth]{neuron.jpg}
-% \end{figure}
-
-\column{2.0in} Neuroglia:\\
-\begin{itemize}
- \item Janitorial tasks
-\end{itemize}
-% \begin{figure}[H]
-%  \centering
-%  \includegraphics[width=\textwidth]{neuroglia.png}
-% \end{figure}
- \end{columns}
-\end{frame}
+\section{Introduction to neuroscience}
+\include{introduction}
 
 
-\section{Mathematical models}
+\section{Diffusion}
+\include{diffusion}
+
+
+\section{Diffusion in the brain}
+\include{diffusion_in_brain}
+
 
 \begin{frame}
- \frametitle{Basic diffusion}
- The basic diffusion equation reads
- \begin{equation}
-  \frac{\d C}{\d t} = D\nabla^2C
- \end{equation}
-Einstein relations
-\begin{equation}
- D = \frac{k_B T}{6\pi\eta r}
-\end{equation}
-\begin{equation}
- \langle r^2\rangle = 2dDt
-\end{equation}
+\begin{center}
+ \textbf{Thank you!}
+\end{center}
+% \printbibliography
 \end{frame}
 
 
 
-\section{Other possible modeling approaches}
-\begin{frame}
- \frametitle{Molecular dynamics}
- \begin{itemize}
-  \item Study of systems of atoms and their time-development
-  \item Most research towards fracture mechanics and flow in tight rocks
-  \item Much of the geometry is similar, but the length scale is a bit to small
-  \item Dissipative fluid dynamics
- \end{itemize}
- 
-\end{frame}
-
-\begin{frame}
- \frametitle{My experiment - motivation}
- \begin{columns}
-  \column{2.0in}
-  \begin{itemize}
-   \item Results from 2003 article by Hrab\v{e}tov\'{a} and Nicholson
-   \item Max value of tortuosity $\lambda \leq 1.225$
-   \item Diffusion modeling on regular geometries
-  \end{itemize}
-\column{2.0in}
-% \begin{figure}[H]
-% \centering
-% \includegraphics[width=\textwidth]{octahedra.png}
-% \end{figure}
-
- \end{columns}
-
-\end{frame}
 
 \begin{frame}
  \frametitle{My experiment - results}
@@ -180,12 +123,6 @@ Einstein relations
 %  \end{columns}
 \end{frame}
 
-\begin{frame}
-\begin{center}
- \textbf{Thank you!}
-\end{center}
-% \printbibliography
-\end{frame}
 
 \begin{frame}
 \frametitle{Output from DTI}
