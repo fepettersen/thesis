@@ -39,6 +39,7 @@ nosetests.xml
 *.txt
 *.bin
 *.mpeg
+*.mp4
 
 # Latex related files
 *.log

@@ -1,0 +1,48 @@
+This (last) chapter contains the conclusion and sums up what has been done, what went wrong and finally suggests some future improvements and extensions that would be interesting to implement.
+
+\section{Workflow}
+
+In summary this thesis has two parts; the implementation and testing of both the PDE and RW models and the software which combines them, and the implementation and simulations of the diffusion of PKC$\gamma$ into spines - problem. 
+The former has without doubt been the most time consuming, mostly because of a bug which made the results appear correct without them being so, but also because of several other minor bugs which resulted in redoing most of the verifications several times.\\
+
+Quite a lot of time went into assembly of the mass-matrix for the BE scheme in 2D. 
+This was also because of a small bug causing the boundary conditions on one boundary to rely on the wrong parts of the previous time step. 
+Assembling a mass matrix for a 3D BE scheme will probably involve some messy calculations, but is not considered difficult (since this has been done on paper already).
+
+
+\section{The model}
+
+As was mentioned in section \ref{results:validity_of_the_model} the analysis suggests that the developed model is stable and gives good results. 
+The important detail which makes the model work is to do the RW ``integration'' first, pass the result as input to the PDE model and then solve the PDE by a method of choice. 
+It is unclear whether a finite element method will give as good results, but highly probable seeing as it is the fundamental property of a diffusion process which ensures this. Namely that a diffusion process will dampen fast fluctuations more efficiently than slow fluctuations.
+
+\section{Future work}
+The developed model shows clear signs of being a first approach to the problem, and is in some ways a bit simple. 
+Several improvements can be suggested to create a more realistic model both with respect to the diffusion processes on both length scales, and when it comes to the combination of the two models. 
+This section will mention some of the improvements that can be done.
+
+\subsection{PDE solver}
+Although there is a well expressed limitation to the accuracy of the model determined by the stochastic term, an interesting extension to the software will be to introduce a finite element PDE Solver. 
+Depending on which solver is implemented, this step will ensure that more complex (and realistic) properties of a diffusion process like nonlinearity can be introduced with relative simplicity. 
+Another question is how this can be implemented in the lower-scale model..\\
+A finite element solver will also, as discussed in section \ref{geometry}, vastly simplify the implementation of more realistic mesh geometries in more than 1D. \\
+Experimenting with time derivative approximations that are better than first order could also be interesting seeing as a second order convergence was achieved by the similar model described in section \ref{simplified_test}. 
+The actual benefit of introducing a better approximation to the time derivative must of course be tested.
+
+\subsection{Lower scale models}
+In section \ref{choosing_random_walk_algorithm} the argument that the Brownian motion model converges to the Gaussian distribution was given for choosing the simple RW model. 
+The same argument can be made for most of the other possible models if they do not possess any special capabilities like drift or anisotropy. 
+However, the argument is only valid in the verification phase when the number of walkers (or whatever) is large. 
+For the actual simulations the number of walkers (or whatever) will typically be very small, and the central limit theorem does not apply. 
+This opens the possibility of adding a variety of lower scale models, some of which will be mentioned below.
+
+% \subsubsection{Molecular Dynamics}
+% 
+% \subsubsection{Direct Simulation Monte Carlo}
+% 
+\subsubsection{Variations of Random Walk}
+Although the current RW implementation supports some added complexity like anisotropy and drift, there is always the possibility to make the algorithm more complex. 
+Of course, there is not much reason to do this without an actual physical problem which results in some more complex RW algorithm, but finding these applications should not be to hard. 
+For example, some attraction/drift term could be added to simulate Coulomb-attraction.
+
+% \subsubsection{Dissipative Fluid Dynamics}

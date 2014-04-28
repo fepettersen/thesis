@@ -5,6 +5,7 @@
 \usepackage{graphicx}
 \usepackage{subfig}
 \usepackage{rotating}
+\usepackage{multimedia}
 
 \usepackage[]{biblatex}
 % \bibliography{refs/refs.bib}
@@ -73,7 +74,43 @@
 
 \begin{frame}
 \frametitle{Visual cortex}
-\movie[]{}{}
+% \movie[autostart,externalviewer=vlc,start=60]{}{Visual_cortex.mp4}
+\end{frame}
+
+\begin{frame}
+ \frametitle{Lobes}
+ Frontal lobe is associated with short term memory, social intelligence, reward, attention and planning\\
+ Pareital lobe is in charge of integrating sensory information like spatial orientation\\
+ The temporal lobes are involved in the retention of visual memories, comprehending language, storing new memories, emotion, and deriving meaning.\\
+ The Occipital lobe is mainly in charge of processing visual information.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{From RW to diffusion}
+A large number, N, of walkers can be described by their concentration $C(x,t) = NP(x,t)$.
+% If we have a large number, N, of walkers, their concentration will be $C(x,t) = NP(x,t)$. 
+The concentration is conserved, so any amount that flows out of an area must reflect as a decrease in concentration. 
+This is expressed by the flow of concentration
+\begin{equation}
+ \frac{\d C}{\d t} -\nabla\cdot\vec{J} = S
+\end{equation}
+where $\vec{J}$ is the flow vector and S is a source term which for now is zero.
+Through Fick's first law the diffusive flux is related to the concentration gradient $\vec{J} = -D\nabla C$. 
+Inserting this gives
+\begin{equation}\label{simple_diffusion_equation}
+ \frac{\d C}{\d t} = \nabla\cdot \left(D\cdot\nabla C\right)
+\end{equation}
+\end{frame}
+
+\begin{frame}
+\frametitle{Applications of RW}
+\begin{itemize}
+ \item GPS map-navigation
+ \item Percolation theory (for flow simulations)
+ \item Estimate size of internet
+\end{itemize}
+
 \end{frame}
 
 \end{document}
