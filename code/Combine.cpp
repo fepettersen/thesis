@@ -91,18 +91,18 @@ void Combine::Solve(){
 		}
 		ConvertFromWalkers(Up,inifilenames[i],indeces[i]);
 	}
-	pde_solver->advance(U,Up,m,n);
-	for(int k=0; k<m; k++){
-		for(int l=0; l<n; l++){
-			Up[k][l] = U[k][l];
-		}
-	}
-
+	// pde_solver->advance(U,Up,m,n);
 	// for(int k=0; k<m; k++){
 	// 	for(int l=0; l<n; l++){
-	// 		U[k][l] = Up[k][l];
+	// 		Up[k][l] = U[k][l];
 	// 	}
 	// }
+
+	for(int k=0; k<m; k++){
+		for(int l=0; l<n; l++){
+			U[k][l] = Up[k][l];
+		}
+	}
 	// if (diffnorm<0.1*pde_solver->dt && pde_solver->dt <0.01)
 	// {
 	// 	int lkjh=0;
@@ -245,7 +245,7 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 				// }
 				inifile<<"Ar "<<thingy<<" ";
 				if(d==2){
-					thingy = y[i]+0.99*DY*(0.5-rng->uniform());
+					thingy = y[j]+0.99*DY*(0.5-rng->uniform());
 					inifile<<thingy<<" "<<0;
 					// thingy = (DY/2.0+1.0/128.0)+ 0.984375/(1+DY+1.0/64)*(y[j]+0.99*DY*(0.5-rng->uniform()));
 					// inifile<<thingy<<" "<<0.008;

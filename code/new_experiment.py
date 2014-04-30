@@ -447,7 +447,7 @@ if __name__ == '__main__':
 	y1 = 1.0
 	m = 21
 	n = 21
-	T = 3		# no.of timesteps, [dt*T] = seconds
+	T = 30		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
