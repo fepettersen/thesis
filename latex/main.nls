@@ -5,8 +5,8 @@
   \item [{BE}]\begingroup Backward Euler\nomeqref {2.27}\nompageref{23}
   \item [{CNS}]\begingroup Central Nervous System\nomeqref {1.0}
 		\nompageref{8}
-  \item [{Direct simulation Monte Carlo}]\begingroup DSMC\nomeqref {A.6}
-		\nompageref{87}
+  \item [{DSMC}]\begingroup Direct simulation Monte Carlo\nomeqref {7.2}
+		\nompageref{88}
   \item [{FDM}]\begingroup Finite Difference Methods\nomeqref {2.24}
 		\nompageref{22}
   \item [{FE}]\begingroup Forward Euler\nomeqref {2.27}\nompageref{23}
@@ -20,7 +20,7 @@
   \item [{PDE}]\begingroup Parital Differential Equation\nomeqref {2.26}
 		\nompageref{23}
   \item [{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.0}
-		\nompageref{9}
+		\nompageref{10}
   \item [{PSD}]\begingroup Post Synaptic Density\nomeqref {1.0}
 		\nompageref{9}
   \item [{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.24}

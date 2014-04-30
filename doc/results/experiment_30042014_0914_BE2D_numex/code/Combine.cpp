@@ -77,7 +77,7 @@ void Combine::Solve(){
 	char cmd[120];
 	char diffT[40];
 	for(int i=0; i<walk_areas;i++){
-		// ConvertToWalkers(Up,inifilenames[i],indeces[i]);
+		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
 		sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
 		// sprintf(cmd,"mpirun -np %d stochastic/%s %d %d %d %g",num_procs,prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt);
 		sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
@@ -345,25 +345,25 @@ void Combine::MapAreaToIndex(double *x,double *y, int **index){
 	x[0],y[0]; x[0],y[1]; x[1],y[0]; x[1],y[1]*/
 	if(d ==1){
 		index[0][0] = int(round(x[0]/dx));
-		index[0][1] = int(round(x[1]/dx)) +1;
+		index[0][1] = int(round(x[1]/dx));
 		cout<<"index = "<<index[0][0]<<","<<index[0][1]<<endl;
-		if(index[0][0]<0 || index[0][1]>m){
+		if(index[0][0]<0 || index[0][1]>m-1){
 			cout<<"Invalid index, exiting"<<endl;
 			exit(1);
 		}
 	}
 	else if(d==2){
 		index[0][0] = int(round(x[0]/dx));
-		index[0][1] = int(round(x[1]/dx)) +1;
+		index[0][1] = int(round(x[1]/dx));
 
-		if(index[0][0]<0 || index[0][1]>m){
+		if(index[0][0]<0 || index[0][1]>m-1){
 			cout<<"Invalid index, exiting"<<endl;
 			exit(1);
 		}
 		index[1][0] = int(round(y[0]/dy));
-		index[1][1] = int(round(y[1]/dy)) +1;
+		index[1][1] = int(round(y[1]/dy));
 
-		if(index[1][0]<0 || index[1][1]>n){
+		if(index[1][0]<0 || index[1][1]>m-1){
 			cout<<"Invalid index, exiting"<<endl;
 			exit(1);
 		}

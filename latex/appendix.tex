@@ -77,45 +77,7 @@ Note also that the vector entries $u^{n+1}_{ijk}$ are column vectors, making the
 % \caption{Algorithm for Gaussian elimination of a tridiagonal linear system.}
 % \label{tridiag}
 
-\section{Alternatives to Random walks}
-This section will mention some alternatives to the random walk model used in this project and discuss how realistic they are to combine with a diffusion PDE as one goal in this project has been. 
-Both applications towards computational neuroscience and more general applications will be discussed. \\
-These models are pretty complex with many details, and this project does not in any way try to do more than introduce them. 
-Further reading is cited in the end of each section.
 
-\subsection{Molecular Dynamics}
-Molecular dynamics is the simulation of the dynamics of atoms and molecules using classical, Newtonian mechanics in the sense that the molecules are affected by a potential, and that the sum of forces describes the dynamics. 
-Their dynamics are then integrated forward in time, and used to describe for example flow in nanoporous media. 
-This means that the system is fully described by the position and velocities of all the atoms. 
-Of course, there is a vast variety in the level of complexity here and we will only look at the simplest example, namely the Lennard-Jones potential, eq. (\ref{LJ}). 
-This potential consists of an $r^{-12}$ term which denotes the Pauli repulsion at short ranges, and an $r^{-6}$ long range, attractive Van Der Waals term. 
-The relative distance between two atoms is denoted by $r$. 
-The Lennard-Jones potential is derived to simulate Argon in the Van Der Waals equation of state.
-\begin{equation}\label{LJ}
- U = 4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12}-\left(\frac{\sigma}{r}\right)^{6}\right]
-\end{equation}
-It is possible to do simulations of flow in nanoporous materials using the Lennard-Jones potential, although it is a far from perfect model, by only allowing some of the atoms to move. 
-This will result in a matrix of stationary atoms, simulating a wall (note that there will still be forces acting from these atoms), and a liquid inside this matrix. \\
-
-There are two main problems with using molecular dynamics more or less regardless of the application: 
-It requires a potential which describes the forces working on all molecules in the simulation. 
-This part may be particularly difficult when it comes to modeling macromolecules like proteins.\\
-It might be really difficult to create the desired geometry for a simulation. 
-
-For diffusion purposes this model is extremely temperature dependent, and not directly transferable to the diffusion processes described in this project. 
-Especially seeing as the diffusion coefficient is a derived quantity, not a parameter to be specified.
-
-\subsection{Direct simulation Monte Carlo}\label{DSMC_description}
-Direct simulation Monte Carlo (\nomenclature{Direct simulation Monte Carlo}{DSMC}DSMC) is a numerical method first developed by G.A.Bird to model low density gas flow. 
-With some extensions it can also model continuum flow and give results comparable to the Navier Stokes equations. 
-The DSMC method works by modeling molecules which represent a large number of fluid molecules (or atoms) in a probabilistic manner. \\
-DSMC has a lot of applications today varying from supersonic fluid flow modeling to micro electromechanical systems to micro- and nano- porous flow. \\
-
-Compared to the molecular dynamics this method has the advantage of adding general geometries with relative ease. 
-There aren't necessarily any new problems with DSMC compared to RW other than complexity of implementation, but it is primarily designed to model fluid flow. 
-
-For diffusion purposes this model is extremely temperature dependent, and not directly transferable to the diffusion processes described in this project. 
-Especially seeing as the diffusion coefficient is a derived quantity, not a parameter to be specified.
 
 
 \section{Debugging}\label{debugging}

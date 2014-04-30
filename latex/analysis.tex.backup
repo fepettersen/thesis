@@ -178,9 +178,9 @@ As mentioned, the convergence tests are carried out by doing several simulations
 \begin{equation}\label{convergence_rate_def}
  r = \frac{\ln(E_{i+1}/E_i)}{\ln(\Delta t_{i+1}/\Delta t_i)}
 \end{equation}
-A result of such an experiment for the FE scheme using the $\Delta t$ values listed below is found in figure \ref{convergence_test:FE}. 
+A result of such an experiment for the FE scheme using the $\Delta t$ values listed below is found in Figure \ref{convergence_test:FE}. 
 The expected value of r is approximately 1. The result is not perfect, but still close to 1. 
-For the BE scheme we get the convergence rate shown in figure \ref{convergence_test:BE}. Again, the expected order of convergence is 1 and this time the result is almost perfect.
+For the BE scheme we get the convergence rate shown in Figure \ref{convergence_test:BE}. Again, the expected order of convergence is 1 and this time the result is almost perfect.
 
 
 % \begin{lstlisting}
@@ -197,7 +197,7 @@ For the BE scheme we get the convergence rate shown in figure \ref{convergence_t
 \begin{subfigure}[t]{0.48\textwidth}
  \includegraphics[width=\textwidth]{../doc/results/experiment_18042014_1450_convergencetest_BE2D/results/ConvergenceTest.eps}
  %remove folders : [experiment_13012014_0925_Simple1DConvergenceTestBE]
- \caption{Convergence test for the BE scheme. The x axis is $\Delta t$, the y-axis (though a little hard to see) is zoomed in around r=1.}
+ \caption{Convergence test for the BE scheme.}
  \label{convergence_test:BE}
 \end{subfigure}
 \caption[Convergence tests in 1D]{Convergence tests for explicit and implicit schemes solving the simple diffusion equation (eq. \eqref{simple_diffusion_equation}).}
@@ -227,13 +227,13 @@ The normal error plot is also included in the figure to illustrate that the impr
  \centering
  \begin{subfigure}[b]{0.48\textwidth}
   \includegraphics[width=\textwidth]{../doc/results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{}
+  \caption{Error plot}
  \end{subfigure}
  \begin{subfigure}[b]{0.48\textwidth}
   \includegraphics[width=\textwidth]{../doc/results/experiment_14042014_1303_convergence_tests_etc/results/ConvergenceTest.eps}
-  \caption{}
+  \caption{Convergence test}
  \end{subfigure}
- \caption[]{}
+ \caption[Verification of spatial derivative]{Error plot (a) and convergence test (b) focusing on the spatial error term. This test requires the time step to be much smaller than $\Delta x^2$ in order for the spatial error to dominate. As is apparent from figure b, the convergence test is difficult to get right. Notice, however that the first value in the convergence test is close to 2, and that the second one is clearly larger than 1 suggesting that other effects might be at play. The test was done in 1D using the BE discretization with $\Delta t = \frac{1}{8000}$ for all values of $\Delta x$. This value is problematic because it is only a factor $\frac{1}{5}$ smaller than $\Delta x^2$ for $\Delta x = \frac{1}{40}$ which is the last simulation.}
  \label{spatial_convergence_test}
 \end{figure}
 
@@ -301,15 +301,24 @@ The FE scheme is expected to represent this solution more or less to machine pre
 There are, however two issues with the solution \eqref{numerical_solution}:
 \begin{itemize}
  \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. This can be fixed rather simply by testing if $\Delta x^{2i}>0$ and returning zero if the test returns false.
- \item ${n\choose i}$ goes to infinity for large n and i. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$. Figure \ref{convergence_exact_numerical_1d_n145} shows that at least for relatively few time steps the troublesome terms can be dropped, but effectively this limits the simulation to some 170 steps regardless of the value of $\Delta t$.
+ \item ${n\choose i}$ goes to infinity for large n and i. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$. 
+ The argumentation for dropping the troublesome terms is given below.
+%  Figure \ref{convergence_exact_numerical_1d_n145} shows that at least for relatively few time steps the troublesome terms can be dropped, but effectively this limits the simulation to some 170 steps regardless of the value of $\Delta t$.
 \end{itemize}
 
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.5]{Figures/convergence_exact_numerical_1d_n145}
- \caption{Testing the relation between $\left(D\Delta t\right)^i$ and the binomial coefficients.}
- \label{convergence_exact_numerical_1d_n145}
-\end{figure}
+As a side note, equation \eqref{numerical_solution} illustrates how the stability criterion (eq. \ref{stability}) comes into place. 
+The solution used in the derivation of the stability criterion assumes an amplification factor $A^n$ to replace the exponential amplification in the actual solution. 
+This amplification factor can be found in equation \eqref{numerical_solution} as 
+$$\left(\frac{2D\Delta t}{\Delta x^2}\right)^i$$
+Inserting a time step larger than the stability criterion ($\Delta t \leq \frac{\Delta x^2}{2D}$) will make the amplification factor $A$ larger than one which in turn will make the solution blow up.
+
+% 
+% \begin{figure}[H]
+%  \centering
+%  \includegraphics[scale=0.5]{Figures/convergence_exact_numerical_1d_n145}
+%  \caption{Testing the relation between $\left(D\Delta t\right)^i$ and the binomial coefficients.}
+%  \label{convergence_exact_numerical_1d_n145}
+% \end{figure}
 The results from testing the FE scheme are found in Figure \ref{errorplot_numerical_exact_FE_1D}. We see that the error in the worst case is about an order of magnitude worse than expected. This is most likely due to the fact that we are cutting part of the solution, and over several time steps the error we do might accumulate.
 This is most likely a 
 
@@ -331,7 +340,7 @@ The same problems with truncation of small values apply to a larger degree than 
 \end{equation}
 
 The result of a test simulation of this is shown in Figure \ref{exact_numerical_2d_n130}. 
-Again, as was the case in 1D, the error is very small and starts out at machine precision. It does, however increase with time as the truncated terms begin to accumulate, and even more so than in the 1D case. 
+Again, as was the case in 1D, the error is very small and starts out at machine precision. It does, however increase with time as the truncated terms begin to accumulate, and even more so than in the 1D case. http://stilldrinking.org/programming-sucks
 We should, in other words, be pleased that the error starts out with machine precision, and stays small for the amount of time steps we can simulate and still have something to compare it with.
 
 
@@ -385,6 +394,18 @@ Although the accuracy is some $5$ orders of magnitude worse than the numerical e
  \label{numex:BE1D}
 \end{figure}
 
+A nice property of the numerical exact solution to the BE scheme is that it generalizes to the 2D scheme. 
+Figure \ref{numex:BE2D} shows the accuracy of the BE scheme when compared to its numerical exact solution. 
+As for the 1D case, there will be some round-off errors which will have an effect on the accuracy. 
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.5]{../doc/results/experiment_30042014_0914_BE2D_numex/results/numerical_exact.eps}
+ \caption[Numerical exact errorplot for BE scheme in 2D]{Error plot showing the norm of the difference between the numerical exact solution for the BE scheme in 2D (eq. \ref{BE_numex}) and a simulation. 
+ The error is not machine precision, but significantly smaller than $\Delta t$ which for this simulation is $\Delta t=0.01$. 
+ This increased error most likely originates in the many roundoff errors in the inverted matrix where a lot of terms which analytically would be zero are represented as $10^{-16}$ and smaller.}
+ \label{numex:BE2D}
+\end{figure}
 
 % \clearpage
 

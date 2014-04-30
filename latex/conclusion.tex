@@ -22,12 +22,42 @@ Several improvements can be suggested to create a more realistic model both with
 This section will mention some of the improvements that can be done.
 
 \subsection{PDE solver}
-Although there is a well expressed limitation to the accuracy of the model determined by the stochastic term, an interesting extension to the software will be to introduce a finite element PDE Solver. 
+Although there is a well expressed limitation to the accuracy of the model determined by the stochastic term, there are a few possible extensions which can be made to the PDE solver. 
+Not all will necessarily improve the error term, but might introduce other properties which are of interest.
+
+\subsubsection{Finite Element Methods}
+Finite Element PDE solvers are mathematically and implementation-wise much more advanced than finite difference schemes. 
 Depending on which solver is implemented, this step will ensure that more complex (and realistic) properties of a diffusion process like nonlinearity can be introduced with relative simplicity. 
 Another question is how this can be implemented in the lower-scale model..\\
-A finite element solver will also, as discussed in section \ref{geometry}, vastly simplify the implementation of more realistic mesh geometries in more than 1D. \\
+A finite element solver will also, as discussed in section \ref{geometry}, vastly simplify the implementation of more realistic mesh geometries in more than 1D. 
+
+\subsubsection{More accurate time derivatives}
 Experimenting with time derivative approximations that are better than first order could also be interesting seeing as a second order convergence was achieved by the similar model described in section \ref{simplified_test}. 
-The actual benefit of introducing a better approximation to the time derivative must of course be tested.
+One example of a more accurate approximation to the first derivative is listed in equation \eqref{conclusion:second_order_timederivative} (no name has been found for this scheme).
+\begin{equation}\label{conclusion:second_order_timederivative}
+ \frac{\d u}{\d t} \approx \frac{3u(t^n)-4u(t^{n-1})+u(t^{n-2})}{2\Delta t}
+\end{equation}
+Note that equation \eqref{conclusion:second_order_timederivative} does not include the right-hand side of the actual equation and that this side will be evaluated at $t^n$ making the scheme implicit and (hopefully) stable. 
+The residual for the scheme proposed in equation \eqref{conclusion:second_order_timederivative} is calculated below
+
+\begin{align*}
+ R &= \frac{3u(t)-4u(t-\Delta t)+u(t-2\Delta t)}{2\Delta t} -u'(t)\\
+ &= \frac{1}{2\Delta t}\left[3u(t)-4\left(u(t)-\Delta tu'(t) +\frac{\Delta t^2}{2}u''(t) - \frac{\Delta t^3}{6}u'''(t)\right)\right] +\dots \\
+ &\frac{1}{2\Delta t}\left[u(t)- 2\Delta tu'(t) + 2\Delta t^2u''(t) -\frac{8\Delta t^3}{6}u'''(t)\right] -u'(t)\\
+ &= \frac{2\Delta tu'(t) -\frac{4\Delta t^3}{6}u'''(t)}{2\Delta t} - u'(t) \\
+ &= -\frac{\Delta t^2}{3}u'''(t)\\
+ R&\sim\mathcal O(\Delta t^2)
+\end{align*}
+
+A nice feature of this scheme is that it will result in the following linear system
+\begin{equation*}
+ \mathbf M\vec{u}^n = 4\vec{u}^{n-1}-\vec{u}^{n-2}
+\end{equation*}
+which is very similar to the system already being assembled and solved by the implemented BE scheme. 
+Only a minor modification in the assembly of the diagonal of $\mathbf M$ seems to be necessary, and this is a trivial change.
+
+
+The actual benefit of introducing a better approximation to the time derivative must of course be tested. 
 
 \subsection{Lower scale models}
 In section \ref{choosing_random_walk_algorithm} the argument that the Brownian motion model converges to the Gaussian distribution was given for choosing the simple RW model. 
@@ -36,13 +66,55 @@ However, the argument is only valid in the verification phase when the number of
 For the actual simulations the number of walkers (or whatever) will typically be very small, and the central limit theorem does not apply. 
 This opens the possibility of adding a variety of lower scale models, some of which will be mentioned below.
 
-% \subsubsection{Molecular Dynamics}
-% 
-% \subsubsection{Direct Simulation Monte Carlo}
-% 
 \subsubsection{Variations of Random Walk}
 Although the current RW implementation supports some added complexity like anisotropy and drift, there is always the possibility to make the algorithm more complex. 
 Of course, there is not much reason to do this without an actual physical problem which results in some more complex RW algorithm, but finding these applications should not be to hard. 
-For example, some attraction/drift term could be added to simulate Coulomb-attraction.
+For example, some attraction/drift term could be added to simulate Coulomb-attraction.\\
+As was mentioned in section \ref{discussion:results}, the results from simulating PKC$\gamma$ diffusion are good, but not perfect. 
+An extension where walkers in spine heads do not immediately get registered as a concentration increase might improve the results. 
+Another possibility is to model ``wall-collisions'' slightly differently by introducing a delay time where the PKC$\gamma$ particle is stationary for some number of time steps after colliding with the spine neck. 
+This approach will most likely better reflect the actual physics of the process.
+
+
+\subsubsection{Alternatives to Random walks}
+This section will mention some alternatives to the random walk model used in this project and discuss how realistic they are to combine with a diffusion PDE as one goal in this project has been. 
+Both applications towards computational neuroscience and more general applications will be discussed. \\
+These models are pretty complex with many details, and this project does not in any way try to do more than introduce them. 
+Further reading is cited in the end of each section.
+
+\subsubsection{Molecular Dynamics}
+Molecular dynamics is the simulation of the dynamics of atoms and molecules using classical, Newtonian mechanics in the sense that the molecules are affected by a potential, and that the sum of forces describes the dynamics. 
+Their dynamics are then integrated forward in time, and used to describe for example flow in nanoporous media. 
+This means that the system is fully described by the position and velocities of all the atoms. 
+Of course, there is a vast variety in the level of complexity here and we will only look at the simplest example, namely the Lennard-Jones potential, eq. (\ref{LJ}). 
+This potential consists of an $r^{-12}$ term which denotes the Pauli repulsion at short ranges, and an $r^{-6}$ long range, attractive Van Der Waals term. 
+The relative distance between two atoms is denoted by $r$. 
+The Lennard-Jones potential is derived to simulate Argon in the Van Der Waals equation of state.
+\begin{equation}\label{LJ}
+ U = 4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12}-\left(\frac{\sigma}{r}\right)^{6}\right]
+\end{equation}
+It is possible to do simulations of flow in nanoporous materials using the Lennard-Jones potential, although it is a far from perfect model, by only allowing some of the atoms to move. 
+This will result in a matrix of stationary atoms, simulating a wall (note that there will still be forces acting from these atoms), and a liquid inside this matrix. \\
+
+There are two main problems with using molecular dynamics more or less regardless of the application: 
+It requires a potential which describes the forces working on all molecules in the simulation. 
+This part may be particularly difficult when it comes to modeling macromolecules like proteins.\\
+It might be really difficult to create the desired geometry for a simulation. 
+
+For diffusion purposes this model is extremely temperature dependent, and not directly transferable to the diffusion processes described in this project. 
+Especially seeing as the diffusion coefficient is a derived quantity, not a parameter to be specified.
+
+\subsubsection{Direct simulation Monte Carlo}\label{DSMC_description}
+Direct simulation Monte Carlo (\nomenclature{DSMC}{Direct simulation Monte Carlo}DSMC) is a numerical method first developed by G.A.Bird to model low density gas flow. 
+With some extensions it can also model continuum flow and give results comparable to the Navier Stokes equations. 
+The DSMC method works by modeling molecules which represent a large number of fluid molecules (or atoms) in a probabilistic manner. \\
+DSMC has a lot of applications today varying from supersonic fluid flow modeling to micro electromechanical systems to micro- and nano- porous flow. \\
+
+Compared to the molecular dynamics this method has the advantage of adding general geometries with relative ease. 
+There aren't necessarily any new problems with DSMC compared to RW other than complexity of implementation, but it is primarily designed to model fluid flow. 
+
+For diffusion purposes this model is extremely temperature dependent, and not directly transferable to the diffusion processes described in this project. 
+Especially seeing as the diffusion coefficient is a derived quantity, not a parameter to be specified.
+
 
 % \subsubsection{Dissipative Fluid Dynamics}

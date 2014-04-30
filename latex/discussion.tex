@@ -13,3 +13,11 @@ However, this is associated with a large workload, and for some FEM software it 
 Installation of the Armadillo linear algebra library is required for the BE scheme to work. 
 This scheme is highly recommended to use both because it is the most well-tested solver, and because there is no stability criterion. 
 Compiling the code without Armadillo installed requires some changing and exclusion of the code.
+
+\section{The results}\label{discussion:results}
+
+The model gives fairly good results for the application on PKC$\gamma$ into spines which largely are in agreement with the results by Craske et.al. 
+However, the mean diffusion times found from simulations seem to consistently lie towards the lower limits of the experimental results. 
+One possible extension to the model which might fix this is to introduce an absorption probability in the spine head which is fairly large (say 80\% per second), or even increases with the amount of time spent in the spine head. 
+A setup like this should increase the average diffusion time by a few seconds. 
+It does not, however reflect the physical process to a better accuracy seeing as a concentration increase in a spine head will be measured quickly.

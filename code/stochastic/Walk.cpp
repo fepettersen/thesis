@@ -83,7 +83,7 @@ void Walk::Load(std::string filename,int M, int N){
 	x1_ = x1 + 0.99*(dx/2.0);
 	y0_ = y0 - 0.99*(dy/2.0);
 	y1_ = y1 + 0.99*(dy/2.0);
-	z0_ = z0 + 0.99*(dz/2.0);
+	z0_ = z0 - 0.99*(dz/2.0);
 	z1_ = z1 + 0.99*(dz/2.0);
 	
 	for(int k=0;k<m;k++){
