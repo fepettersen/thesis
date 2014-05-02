@@ -434,7 +434,7 @@ def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
 	
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -447,7 +447,7 @@ if __name__ == '__main__':
 	y1 = 1.0
 	m = 21
 	n = 1
-	T = 300		# no.of timesteps, [dt*T] = seconds
+	T = 500		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -469,7 +469,7 @@ if __name__ == '__main__':
 	Hc = [2000]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_Redoing_RW_tests_Hc'
+	info='_Redoing_RW_tests'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = F
 
@@ -507,18 +507,18 @@ if __name__ == '__main__':
 	# leg = ['dt = %g'%i for i in dt]
 
 	## --- Run for h --- ###
-	dt = 0.05
-	h = [300,500,1000,5000,10000]
-	# dx = 0.025
-	# h = [0.1,0.05,0.02,0.025]
+	# h = [100,1000,10000]
+	dt = []
+	dx = 0.02
+	h = [0.1,0.05,0.02,0.025]
 	# h = [0.025]
 	for i in h:
 		# i = 1.0/j
 		# timestep = i*i/5.0
-		timestep = dt
-		# dt.append(timestep)
+		timestep = i
+		dt.append(timestep)
 		# m = (1/i)+1
-		m = 21
+		m = int(round(1.0/i)) +1
 		n = 1
 		if n==1:
 			x = np.linspace(0,1,m)
@@ -529,12 +529,12 @@ if __name__ == '__main__':
 		run.SetInitialCondition(run.exact(x,y,0))
 		run.SetDiffusionTensor(D(x,y))
 		hc = int(round(1.0/(timestep**2)))
-		hc = i
+		# hc = int(round(1.0/(i**2)))
 		print m," , ", timestep, " , ", hc
 		run.RunSimulation(1*hc)
-	leg = ['Hc = %g'%i for i in h]
-	run.ConvergenceTest(h)
-	# leg = ['dt = %g'%i for i in dt]
+	# leg = ['Hc = %g'%i for i in h]
+	run.ConvergenceTest(dt)
+	leg = ['dt = %g'%i for i in dt]
 	run.PlotError(leg)
 	# # print 'dx =',dx
 	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])

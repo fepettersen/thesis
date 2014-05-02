@@ -494,37 +494,56 @@ This is the manufactured solution the simulations will be tested against for the
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-A convergence test can now be performed to find the convergence rate for the random walkers.
-It will be slightly modified by testing for the number of walkers rather than the time step. 
+% A convergence test can now be performed to find the convergence rate for the random walkers.
+% It will be slightly modified by testing for the number of walkers rather than the time step. 
+% 
+% 
+% Using the maximum of the error measure already in use, the convergence rate has been tested for the following measures of Hc:
+% \begin{lstlisting}
+%  Hc = [200,1400,5600,10400,32000]
+% \end{lstlisting}
 
-
-Using the maximum of the error measure already in use, the convergence rate has been tested for the following measures of Hc:
-\begin{lstlisting}
- Hc = [200,1400,5600,10400,32000]
-\end{lstlisting}
-
-The convergence test suggests that the convergence rate for random walks follows the proportionality in equation \eqref{convergence_rate_RW}. 
+The convergence test shown in Figure \ref{ConvergenceTestRW:Hc} suggests that the convergence rate for random walks follows the proportionality in equation \eqref{convergence_rate_RW}. 
 \begin{equation}\label{convergence_rate_RW}
-err \propto Hc^{\frac{-1}{2}}
+\epsilon \propto Hc^{\frac{-1}{2}}
 \end{equation}
 This relation says that while increasing the number of walkers will in fact reduce the error, the convergence is very slow. 
-Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $\epsilon\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $\epsilon\sim\mathcal{O}(\Delta t^2)$. 
-Clearly there will be enough trouble for the simpler cases...
+Should we wish to do so, we can force the error to $\mathcal{O}(\Delta t^2)$, but this will be extremely inefficient. In fact we can find the relation as $Hc\sim\Delta t^{-2}$ for $\epsilon\sim\mathcal{O}(\Delta t)$, and $Hc\sim\Delta t^{-4}$ for $\epsilon\sim\mathcal{O}(\Delta t^2)$. \\
+Clearly there will be enough trouble getting the scheme to recreate first order convergence where a relatively ``kind'' simulation which fulfills the stability criterion for the FE scheme using a spatial resolution of $\Delta x = \frac{1}{10}$ demands
+\begin{equation}
+ Hc = \frac{1}{\Delta t^2} \geq \frac{2D}{\Delta x^4} = 2D\cdot 10^4
+\end{equation}
+walkers per unit per mesh point. Simply improving the spatial resolution by a factor of $10$ will increase the demand for walkers by a factor of $10^4$
 
 
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.7]{../doc/results/experiment_18022014_1413_RW_convergencetest_1d/ConvergenceTest.eps}
- \caption[Convergence test RW]{A convergence test for the isotropic random walk implementation using different conversion factors, Hc. The x axis (conversion rate) is log transformed and ranges from 100 to 50000 in real numbers.}
- \label{ConvergenceTestRW}
-\end{figure}
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.7]{../doc/results/experiment_18022014_1413_RW_convergencetest_1d/results/errorplot.eps}
- \caption[Error plot RW]{An error plot for the same simulation as in figure \ref{ConvergenceTestRW}. The $\Delta t$ in question is used to couple the RW simulation and the exact solution. For each $\Delta t$ the RW simulation does 100 steps with a step length calculated from equation \eqref{steplength}}
+\begin{subfigure}[t]{0.49\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_01052014_1615_Redoing_RW_tests/results/errorplot.eps}
+ \caption{}
+ \label{ConvergenceTestRW:dt:errorplot}
+\end{subfigure}
+ \begin{subfigure}[t]{0.49\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_01052014_1615_Redoing_RW_tests/results/ConvergenceTest.eps}
+  \caption{}
+ \label{ConvergenceTestRW:dt:convergence}
+\end{subfigure}
+\caption[]{Error plot (a) and convergence test (b) for 1D RW solver using a Heaviside step function as initial condition. In these tests both the time step and the conversion factor are changed for each simulation, and the conversion factor follows the previously proposed limit $Hc\geq\frac{1}{\Delta t^2}$. For each $\Delta t$ the RW simulation does 250 steps with a step length calculated from equation \eqref{steplength}. The expected convergence rate is $0.5$, and to some extent this is achieved here, note however that due to fluctuations in the solution getting a good error measure is difficult and beyond our control.}
+ \label{ConvergenceTestRW:dt}
 \end{figure}
 
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[t]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{../doc/results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/errorplot.eps}
+ \end{subfigure}
+\begin{subfigure}[t]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../doc/results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/ConvergenceTest.eps}
+\end{subfigure}
+\caption[Test RW]{As a comparison to Figures \ref{ConvergenceTestRW:dt} this test has been done for the same 1D Heaviside step function as initial condition, but keeps the time step fixed at $\Delta t = 0.05$ and increases the conversion factor. The convergence rate (fig. b) is worse than for the time convergence test, and seems to reach a limit where increasing the number of walkers has little effect on the error.}
+\label{ConvergenceTestRW:Hc}
+\end{figure}
 
 
 

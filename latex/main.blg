@@ -6,6 +6,7 @@ A level-1 auxiliary file: theory.aux
 A level-1 auxiliary file: analysis.aux
 A level-1 auxiliary file: software.aux
 A level-1 auxiliary file: discussion.aux
+A level-1 auxiliary file: conclusion.aux
 A level-1 auxiliary file: appendix.aux
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated singl_function (elt_size=4) to 100 items from 50.
@@ -26,7 +27,7 @@ Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
 You've used 11 entries,
             6019 wiz_defined-function locations,
-            1184 strings with 9724 characters,
+            1185 strings with 9738 characters,
 and the built_in function-call counts, 32572 in all, are:
 = -- 1280
 > -- 1114
