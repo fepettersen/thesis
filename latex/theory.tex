@@ -816,7 +816,7 @@ Combining the two models means adding fluctuations to the approximation to the e
 This also further supports the claim that there is no need to find a very precise scheme to solve the PDE.\\
 \emph{We will test this by doing a convergence test in time keeping the number of walkers constant.}
 
-\subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
+\subsection{Potential problems or pitfalls}\label{problems_and_pitfalls}
  
 This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.
 
@@ -861,7 +861,7 @@ This section will identify and discuss a few obvious difficulties which might ar
  Both 1 and 2 dimensional space are spanned completely by a random walk, but space of 3 or more dimensions is not. 
  This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
 
-\subsection{Probability distribution and time-steps}\label{probability_distribution_and_timesteps}
+\subsection{Relating step length to PDE time step}\label{probability_distribution_and_timesteps}
 As section \ref{more_general_random_walks} shows, the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
 In this application, however, finding the walker at an exact position is not of interest, but finding it in an interval around the mesh-points sent to the walk-solver is. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 
