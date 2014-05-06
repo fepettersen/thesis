@@ -14,6 +14,32 @@ Installation of the Armadillo linear algebra library is required for the BE sche
 This scheme is highly recommended to use both because it is the most well-tested solver, and because there is no stability criterion. 
 Compiling the code without Armadillo installed requires some changing and exclusion of the code.
 
+\subsection{Mass conservation}
+As the model stands now, it can guarantee conservation of mass while switching between the microscopic and macroscopic to a certain point. 
+For each PDE mesh point the concentration is converted to an integer via the conversion factor by the previously mentioned relation 
+\begin{equation*}
+ C_{ij} = Hc\cdot U_{ij}
+\end{equation*}
+This is rounded to the nearest integer which gives the only uncertainty in mass conservation. 
+At each PDE mesh point there is a possible difference of $Hc\pm 0.5$ from the macroscopic to the microscopic scale. 
+Expressing this by a residual gives
+\begin{equation*}
+R =  \left(C_{ij} - Hc\cdot U_{ij}\pm0.5\right)N
+\end{equation*}
+where $N$ is the number of mesh points. 
+This means that the maximum difference in mass should be something like 
+\begin{equation*}
+ R = \frac{N}{2Hc}
+\end{equation*}
+
+For verification purposes, this is usually very good, say $R<<1\%$. For actual simulations however, the difference could potentially be somewhat lager.
+
+\subsection{Coupling between length scales}
+Flekkøy et.al. have done something similar to this thesis in 2001 \cite{flekkoy2001coupling}, but used a different coupling scheme than the approach used in this thesis. 
+Their approach, while similar to this one, separates the two models more, and keeps the microscopic simulation going without recalculating the distribution at each macroscopic time step. 
+The coupling between length scales is done by  exchanging fluxes between the two length scales as a source term at two different positions. 
+
+
 \section{The results}\label{discussion:results}
 
 The model gives fairly good results for the application on PKC$\gamma$ into spines which largely are in agreement with the results by Craske et.al. 

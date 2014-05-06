@@ -3,12 +3,44 @@
 In many ways this model has its strength in its simplicity and ease of added complexity. 
 By separating the two solvers, and having the possibility to run them both individually, changing one of them will not affect the other. 
 Of course, added complexity often means added overhead by having to initialize more variables and parameters. 
-This must be solved by adding functionality to the class in charge of running the two solvers and combining their results, which is considered a simple task. 
+This must be solved by adding functionality to the class in charge of running the two solvers and combining their results, which is considered a simple task. \\
 
 The weakness of the model is mainly the geometry question. 
 As has been mentioned before, the current version only supports quadratic meshes which of course limits the possible applications of the model. 
 One possible workaround which has been suggested consists of changing the PDE solver to a finite element solver. 
-However, this is associated with a large workload, and for some FEM software it will be nontrivial to map mesh points from the PDE solver to the RW solver.
+However, this is associated with a large workload, and for some FEM software it will be nontrivial to map mesh points from the PDE solver to the RW solver.\\
 
+Installation of the Armadillo linear algebra library is required for the BE scheme to work. 
+This scheme is highly recommended to use both because it is the most well-tested solver, and because there is no stability criterion. 
+Compiling the code without Armadillo installed requires some changing and exclusion of the code.
 
+\subsection{Mass conservation}
+As the model stands now, it can guarantee conservation of mass while switching between the microscopic and macroscopic to a certain point. 
+For each PDE mesh point the concentration is converted to an integer via the conversion factor by the previously mentioned relation 
+\begin{equation*}
+ C_{ij} = Hc\cdot U_{ij}
+\end{equation*}
+This is rounded to the nearest integer which gives the only uncertainty in mass conservation. 
+At each PDE mesh point there is a possible difference of $Hc\pm 0.5$ from the macroscopic to the microscopic scale. 
+Expressing this by a residual gives
+\begin{equation*}
+R =  \left(C_{ij} - Hc\cdot U_{ij}\pm0.5\right)N
+\end{equation*}
+where $N$ is the number of mesh points. 
+This means that the maximum difference in mass should be something like 
+\begin{equation*}
+ R = \frac{N}{2Hc}
+\end{equation*}
 
+For verification purposes, this is usually very good, say $R<<1\%$. For actual simulations however, the difference could potentially be somewhat lager.
+
+\subsection{Coupling between length scales}
+Flekk\oe y et.al. have done something similar to this thesis in 2001 \cite{}
+
+\section{The results}\label{discussion:results}
+
+The model gives fairly good results for the application on PKC$\gamma$ into spines which largely are in agreement with the results by Craske et.al. 
+However, the mean diffusion times found from simulations seem to consistently lie towards the lower limits of the experimental results. 
+One possible extension to the model which might fix this is to introduce an absorption probability in the spine head which is fairly large (say 80\% per second), or even increases with the amount of time spent in the spine head. 
+A setup like this should increase the average diffusion time by a few seconds. 
+It does not, however reflect the physical process to a better accuracy seeing as a concentration increase in a spine head will be measured quickly.

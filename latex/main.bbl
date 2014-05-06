@@ -112,6 +112,38 @@
   \field{year}{2005}
 \endentry
 
+\entry{flekkoy2001coupling}{article}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Flekk{\o}y}{F.}%
+     {EG}{E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Feder}{F.}%
+     {J}{J}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Wagner}{W.}%
+     {G}{G}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {APS}%
+  }
+  \strng{namehash}{FEFJWG1}
+  \strng{fullhash}{FEFJWG1}
+  \field{sortinit}{F}
+  \field{number}{6}
+  \field{pages}{066302}
+  \field{title}{{Coupling particles and fields in a diffusive hybrid model}}
+  \field{volume}{64}
+  \field{journaltitle}{Physical Review E}
+  \field{year}{2001}
+\endentry
+
 \entry{graham2011principles}{book}{}
   \name{author}{3}{}{%
     {{}%

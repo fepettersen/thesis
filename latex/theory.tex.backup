@@ -22,7 +22,9 @@ Note the difference between the expectation value of a quantity squared and the 
 \end{equation}
 
 For the section on discretization of partial differential equations \ref{some_words_on_PDEs} some sub- and super- scripts will be used. 
-To clarify; a superscript $t^n$ does not mean t to the n'th power, but $n\cdot\Delta t$ meaning the n'th time-step. 
+To clarify; a superscript $t^n$ does not mean t to the n'th power, but 
+$$t^n = t_0 + n\cdot\Delta t$$
+which is the n'th time-step after the starting time $t_0$ ($t_0$ will always be zero). 
 Similarly, the subscripts denote positions on the mesh. This means, finally, that $u^n_{ij}$ denotes the numerical solution to the discretized PDE evaluated at time-step n and in the i'th point in x-direction and the j'th point in y direction:
 \begin{equation*}
  u^n_{ij} = u(n\cdot\Delta t,i\cdot\Delta x, j\cdot\Delta y)
@@ -35,7 +37,7 @@ However, this is abandoned if there might be room for misconception.
 As an example, the calculations in section \ref{more_general_random_walks} are done using $e^C$ rather than $\exp(C)$ even though $C$ might be a fraction.
 This is done because the exponential at some point is multiplied by a parenthesis, and where this multiplication takes place might have been unclear otherwise.
 
-\section{Physical scope}\label{theory:physical_scope}
+\section{Physical scope}\label{theory:physical_scope }
 
 \emph{Say something about neuroscience, neurons, spines}
 
@@ -71,35 +73,51 @@ From this distribution important statistical properties of a walk consisting of 
 For example, the average number of steps to the right is
 
 \begin{align*}
- \langle R\rangle &=  \sum\limits_{R=0}^N RP_N(R) =  \sum\limits_{R=0}^N {N\choose R}Rp^Rq^{N-R} = \\
- p\frac{d}{dp} \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= p\frac{d}{dp}(p+q)^N = Np(p+q)^{N-1} = Np
+ \langle R\rangle &=  \sum\limits_{R=0}^N RP_N(R) \\
+ &=  \sum\limits_{R=0}^N {N\choose R}Rp^Rq^{N-R} \\
+ &=  p\frac{d}{dp} \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} \\
+ &= p\frac{d}{dp}(p+q)^N \\
+ &= Np(p+q)^{N-1} \\
+ &= Np
 \end{align*}
 
 The average value of the net displacement is found by using $S = R-L = R-(N-R) = 2R-N$.
 % From this we can also find the average value of the net displacement using $S = R-L = R-(N-R) = 2R-N$.
 
 \begin{align*}
- \langle S\rangle = \langle2R\rangle -N = 2Np-N(p+q) = N(2p-p-q) = N(p-q)
+ \langle S\rangle &= \langle2R\rangle -N \\
+ &= 2Np-N(p+q) \\
+ &= N(2p-p-q) \\
+ &= N(p-q)
 \end{align*}
 We notice that the average net displacement is greatly dependent on the relationship between $p$ and $q$, and that any symmetric walk will have an expected net displacement of zero. 
 In many cases the mean square displacement is of more interest than the displacement itself, because many important large scale parameters can be related to the root-mean-square displacement. 
 This can also be calculated rather straightforwardly. 
 \begin{align*}
-  \langle R^2\rangle =  \sum\limits_{R=0}^N R^2P_N(R) &=  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} = \\
- \left(p\frac{d}{dp}\right)^2 \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} &= \left(p\frac{d}{dp}\right)^2(p+q)^N \\
- = Np(p+q)^{N-1} +p^2N(N-1)(p+q)^{N-2} &= (Np)^2 +Np(1-p) = (Np)^2 +Npq
+  \langle R^2\rangle &=  \sum\limits_{R=0}^N R^2P_N(R) \\
+  &=  \sum\limits_{R=0}^N {N\choose R}R^2p^Rq^{N-R} \\
+  &= \left(p\frac{d}{dp}\right)^2 \sum\limits_{R=0}^N {N\choose R}p^Rq^{N-R} \\
+  &= \left(p\frac{d}{dp}\right)^2(p+q)^N \\
+ &= Np(p+q)^{N-1} +p^2N(N-1)(p+q)^{N-2} \\
+ &= (Np)^2 +Np(1-p) \\
+ &= (Np)^2 +Npq
 \end{align*}
 
 Like before, the average net displacement is given as $S^2 = (2R-N)^2$ and we obtain
 
 \begin{align*}
- \langle S^2\rangle = 4\langle R^2\rangle -4N\langle R\rangle + N^2 &= 4((Np)^2 +Npq) -4N^2p + N^2\\
- = N^2(4p^2 -4p +1) +4Npq &= N^2(2p-1)^2 +4Npq = N^2(p-q)^2 +4Npq.
+ \langle S^2\rangle &= 4\langle R^2\rangle -4N\langle R\rangle + N^2 \\
+ &= 4((Np)^2 +Npq) -4N^2p + N^2\\
+ &= N^2(4p^2 -4p +1) +4Npq \\
+ &= N^2(2p-1)^2 +4Npq \\
+ &= N^2(p-q)^2 +4Npq.
 \end{align*}
 which for the 1D symmetric walk gives $\langle S^2\rangle =N$ and the variance, denoted $\langle\Delta S^2\rangle = \langle\langle S^2\rangle-\langle S\rangle^2\rangle$, is found by insertion as
-\begin{align}
- \langle\Delta S^2\rangle &= \langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle= 4Npq 
-\end{align}
+\begin{align*}
+ \langle\Delta S^2\rangle &= \langle\langle S^2\rangle-\langle S\rangle^2\rangle\\
+ &=\langle N^2(p-q)^2 +4Npq - ( N(p-q))^2\rangle \\
+ &= 4Npq 
+\end{align*}
 
 When the number of steps gets very large the Bernoulli distribution (eq. \ref{bernoulli_distr}) can to a very good accuracy be approximated by the Gaussian distribution. 
 This is most easily done in the symmetric case where $p=q=\frac{1}{2}$, but it is sufficient for the step-lengths to have a finite variance (\emph{find something to refer to}). 
@@ -153,9 +171,11 @@ $$\langle x\rangle=a\langle S\rangle$$
 and 
 $$\langle x^2\rangle=a^2\langle S^2\rangle$$
 Finally, the variance is found by insertion $\langle \Delta x^2\rangle$
-\begin{equation}\label{random_walk_variance}
- \langle \Delta x^2\rangle = \langle\langle x^2\rangle -\langle x\rangle^2\rangle = \langle a^2\langle S^2\rangle -a^2\langle S\rangle^2\rangle = 4Npqa^2
-\end{equation}
+\begin{align}
+ \langle \Delta x^2\rangle &= \langle\langle x^2\rangle -\langle x\rangle^2\rangle \nonumber\\
+ &= \langle a^2\langle S^2\rangle -a^2\langle S\rangle^2\rangle \nonumber\\
+ &= 4Npqa^2\label{random_walk_variance}
+\end{align}
 
 
 \subsection{More general Random Walks}\label{more_general_random_walks}
@@ -271,7 +291,8 @@ We can set up the continuity equation for a concentration, $C(x,t) = NP(x,t)$ of
  \frac{\d C}{\d t} +\nabla\cdot\vec{j} = S
 \end{equation}
 Where $\vec{j}$ denotes the total flux of walkers through some enclosed volume and $S$ is a source/sink term. 
-Since the walkers are affected by drift the flux will consist of two terms; $\vec{j} = \vec{j}_{diff}+\vec{j}_{drift}$. 
+Since the walkers are affected by drift the flux will consist of two terms; 
+$$\vec{j} = \vec{j}_{diff}+\vec{j}_{drift}$$ 
 From Fick's first law we know that $\vec{j}_{diff} = -D\nabla C$. 
 The second flux term is the advective flux which will be equal to the average velocity of the system; $\vec{j}_{drift} = \vec{v}C$. 
 Inserting this in the continuity equation gives us the well known convection diffusion equation \eqref{convection_diffusion_equation}.
@@ -290,9 +311,10 @@ This will make the expected net displacement
  \langle S\rangle = R-L +Nd = N(p-q) + Nd
 \end{equation*}
 and the expected mean square displacement
-\begin{equation*}
- \langle S^2\rangle = (2\langle R\rangle -N)^2 +(Nd)^2 = N^2(p-q)^2 +4Npq +(Nd)^2
-\end{equation*}
+\begin{align*}
+ \langle S^2\rangle &= (2\langle R\rangle -N)^2 +(Nd)^2 \\
+ &= N^2(p-q)^2 +4Npq +(Nd)^2
+\end{align*}
 which in turn gives us the variance
 \begin{align*}
  \langle \Delta S^2\rangle &= \langle\langle S^2\rangle-\langle S\rangle^2\rangle \\
@@ -503,7 +525,7 @@ The approximation
 \begin{align*}
  \vec v \cdot \nabla C \approx v\frac{C_{i+1}-C_{i-1}}{2\Delta x}
 \end{align*}
-will not only reduce the residual to $\mathcal{O}(\Delta x^2)$, it is also incredibly simple to implement both in the FE and BE scheme seeing as the Neumann boundary conditions forces this term to be zero at the boundary. The resulting extra implementation therefore consists of adding a simple term on the diagonals of the assembled matrix in the BE discretization, and an equally simple term in the FE scheme.
+will not only reduce the residual to $\mathcal{O}(\Delta x^2)$, \emph{it is also incredibly simple to implement both in the FE and BE scheme seeing as the Neumann boundary conditions forces this term to be zero at the boundary -- this is strictly speaking not correct?}. The resulting extra implementation therefore consists of adding a simple term on the diagonals of the assembled matrix in the BE discretization, and an equally simple term in the FE scheme.
 
 
 
@@ -736,7 +758,7 @@ This section will deal with the actual combination of the two models.\\
 As was mentioned in the introduction to this thesis, the combination of two length scales immediately raises the question of exactly where the limit between the two scales goes, and why exactly there. 
 This question is usually answered with ``models are switched when effects from the smaller scale becomes negligible'' when moving from small to larger scales, and similarly ``models are switched when effects from the smaller scale become dominant'' in the opposite case. 
 In effect this is what is done for the applications of this project, but an attempt to combine the two models in one simulation will also be done. 
-An are of the computational mesh will be solved by a RW model first, representing a small length scale, and this solution will be used as input for the PDE solver. 
+An area of the computational mesh will be solved by a RW model first, representing a small length scale, and this solution will be used as input for the PDE solver. 
 This approach requires a way to quickly convert from a concentration to a distribution of walkers, and back. 
 The conversion is done by a conversion factor which will be named $Hc$ (as it was named by Plapp and Karma \cite{plapp2000multiscale}, though they used a conversion field) which is introduced in equation \eqref{conversion_rate}. 
 
@@ -772,7 +794,7 @@ Effectively the problem is solved twice as the software stands now, both by the 
 \end{itemize}
 
 
-\subsection{The basic algorithm}\label{basic_algorithm}
+\subsection{The algorithm}\label{basic_algorithm}
 
 The basic structure of the program is rather similar to the physical problem.
 There is one dendrite-object which contains the PDE-solver for the normal diffusion equation, with the possibility to use a random walk solver instead. 
@@ -783,11 +805,11 @@ If a random walker in the spine comes in contact with the position labeled as th
 Similarly, at each time-step a part of the PDE-solution corresponding to one walker will diffuse into the spine with a certain probability. 
 It might be desirable for a walker to only be able to diffuse out of the spine with some probability as well, or for the walkers which diffuse into the spine to have some drift term, but these are minor updates and might be added later if needed. \\
 
-There is also the possibility of modeling parts of the dendrite-mesh as random walk (this can be done in 2d as well as 1d). 
+There is also the possibility of modeling parts of the dendrite-mesh as random walk (this can be done in 2D as well as 1D). 
 This is done by choosing some points on the mesh and sending the to the ``AddWalkArea'' method which will map them to an index and set the initial condition for the walk. 
 Although anisotropy will follow into the random walk solver, by the method provided by Farnell and Gibson \cite{farnell2005monte}. 
 At each time-step the solve-method of the combined solver is called, which in turn calls the solve method for the PDE-solver. 
-The solution from the PDE-solver is used to calculate the number of walkers by eq. \ref{definition_Hc_first} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
+The solution from the PDE-solver is used to calculate the number of walkers by eq. \eqref{definition_Hc_first} in each mesh-point on the PDE-mesh, and then give each walker a random position in a square around its mesh-point ($\pm \frac{\Delta x}{2}$). 
 Because the sum of the PDE-solution over the random walk area of the mesh might be different from one time-step to the next (eq. \ref{integral_u}) the conversion from PDE-solution to random walker distribution must be done at every time-step. 
 The alternatives are to remove or add the difference at each time-step, but this will require checking that each mesh-point has the ``correct'' number of walkers and updating the number to correspond with the solution from the PDE-solver. \emph{which is what we are doing already?}
 Or the conversion factor could be adjusted at each time-step. The latter is largely a bad solution because it ruins transparency and might introduce even more fluctuations in the solution.
@@ -795,7 +817,7 @@ Or the conversion factor could be adjusted at each time-step. The latter is larg
 \begin{equation}\label{integral_u}
  \sum u_{i,j}^n \neq \sum u_{i,j}^{n+1}
 \end{equation}
-After the random walk integration the two solutions are combined by a simple average. A few other methods have been tested (see chapter \ref{theory:changing_between_lenghtscales}) but discarded. 
+After the random walk integration the two solutions are combined by a simple average. A few other methods have been tested (see scetion \ref{theory:changing_between_lenghtscales}) but discarded. 
 The average of the two solutions is then set as the new ``initial condition'' for the next time-step, and the  process repeats itself.
 
 The results of these are inserted in the solution from the PDE using some routine (e.g. the average of the two) and the time-step is done. 
@@ -816,7 +838,7 @@ Combining the two models means adding fluctuations to the approximation to the e
 This also further supports the claim that there is no need to find a very precise scheme to solve the PDE.\\
 \emph{We will test this by doing a convergence test in time keeping the number of walkers constant.}
 
-\subsection{Potential problems or pitfalls with combining solutions}\label{problems_and_pitfalls}
+\subsection{Potential problems or pitfalls}\label{problems_and_pitfalls}
  
 This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.
 
@@ -837,18 +859,38 @@ This section will identify and discuss a few obvious difficulties which might ar
  Dirichlet boundaries can (probably) be implemented by adding or removing walkers on the boundaries (or in a buffer-zone around them) until the desired concentration of walkers is reached.
  
 \subsubsection{Negative concentration of walkers}
+In physical systems this problem will not arise seeing as a negative concentration does not make any sense. 
+Mathematically, however an initial condition which takes negative vaules still has a solution. 
+The following is more of an oddity than an actual problem.\\
+
  The concentration of walkers is calculated as $NP(x,t)$ where $P(x,t)$ is really only an estimate of the actual probability distribution, calculated by dividing the number of walkers in one area $x\pm\frac{\Delta x}{2}$ by the total number of walkers. 
  Seeing as negative probabilities does not make sense, and neither does a negative number of walkers, we will eventually run into some problems if the solution of the PDE takes negative values (which it most likely will not do). 
  No good solutions have been found to this problem, but a workaround consists of storing the sign of the solution over each time-step, converting the absolute value to a distribution of random walkers and multiplying back with the sign after the RW solution is done. 
  This workaround has a problem in that a transition from positive to negative value will lead to a ``valley'' in the absolute-value solution. 
- A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again.
+ A normal PDE solution of this kind of initial condition will very rapidly even out the ``valley'', and so a value which should have been zero (a node-point) will get some other value (say some fraction of the conversion factor). This again leads to a larger discontinuity when the solution from the RW model is multiplied by the sign again. 
+ Figure \ref{theory:signmap_illustration} illustrates this.
+ 
+ \begin{figure}[H]
+\centering
+\begin{subfigure}[t!]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{Figures/signmap_illustration_pt1.eps}
+ \caption{}
+\end{subfigure}
+\begin{subfigure}[t!]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{Figures/signmap_illustration_pt2.eps}
+ \caption{}
+\end{subfigure}
+\caption[Workaround for negative concentrations, illustration]{An illustration of the proposed workaround for negative concentrations and its problem (b).}
+\label{theory:signmap_illustration}
+ \end{figure}
+
 
 \subsubsection{Smooth solutions}
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
  When a stochastic process is introduced, rapid fluctuations from one time-step to the next might follow.
  In this case a dilemma arises; on the one hand there is the smoothness of the solution to consider, on the other hand the stochastic term was introduced believing that it adds detail to the model. 
  The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
- A polynomial regression model was implemented in 1d, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
+ A polynomial regression model was implemented in 1D, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
  Another idea is to implement a cubic spline interpolation over the area, but this too has its problems. An interpolation forces the solution to have a value at the interpolating points, and seeing as we cannot say for certain which value is correct how shall we pick the interpolating points?
 
 \subsubsection{Number of time-steps on the random walk level}
@@ -861,7 +903,7 @@ This section will identify and discuss a few obvious difficulties which might ar
  Both 1 and 2 dimensional space are spanned completely by a random walk, but space of 3 or more dimensions is not. 
  This does not have to be a problem, seeing as we have proved that the random walk fulfills the diffusion equation (chapter \ref{more_general_random_walks}) and we are not trying to span the complete 3d space, but we could potentially meet some difficulties as a result of this property of the random walk.
 
-\subsection{Probability distribution and time-steps}\label{probability_distribution_and_timesteps}
+\subsection{Relating step length to PDE time step}\label{probability_distribution_and_timesteps}
 As section \ref{more_general_random_walks} shows, the probability of finding a walker at a position $x_i$ after some $N$ time-steps (on the walk-scale) is (in the limit of large $N$) given as the Gaussian distribution. 
 In this application, however, finding the walker at an exact position is not of interest, but finding it in an interval around the mesh-points sent to the walk-solver is. 
 This interval is (for obvious reasons) $x_i\pm\frac{\Delta x}{2}$ where $\Delta x$ is the mesh resolution on the PDE level. 

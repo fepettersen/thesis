@@ -70,3 +70,24 @@
 	year = "2000"
 }
 
+@article{marsaglia2003xorshift,
+	author = "Marsaglia, George",
+	journal = "Journal of Statistical Software",
+	number = "14",
+	pages = "1--6",
+	title = "{Xorshift rngs}",
+	volume = "8",
+	year = "2003"
+}
+
+@article{james1990review,
+	author = "James, Frederick",
+	journal = "Computer Physics Communications",
+	number = "3",
+	pages = "329--344",
+	publisher = "Elsevier",
+	title = "{A review of pseudorandom number generators}",
+	volume = "60",
+	year = "1990"
+}
+

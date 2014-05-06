@@ -3,11 +3,11 @@
 \nomenclatureentry{aLTP@[{LTP}]\begingroup Long-term potentiation\nomeqref {1.0}|nompageref}{9}
 \nomenclatureentry{aLTD@[{LTD}]\begingroup Long-term depression\nomeqref {1.0}|nompageref}{9}
 \nomenclatureentry{aPKC$\gamma$@[{PKC$\gamma$}]\begingroup protein kinase C${\gamma}$\nomeqref {1.0}|nompageref}{10}
-\nomenclatureentry{aRNG@[{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.24}|nompageref}{21}
-\nomenclatureentry{aFDM@[{FDM}]\begingroup Finite Difference Methods\nomeqref {2.24}|nompageref}{22}
-\nomenclatureentry{aPDE@[{PDE}]\begingroup Parital Differential Equation\nomeqref {2.26}|nompageref}{23}
-\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.27}|nompageref}{23}
-\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.27}|nompageref}{23}
-\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.32}|nompageref}{25}
-\nomenclatureentry{aMC@[{MC}]\begingroup Monte Carlo\nomeqref {3.24}|nompageref}{61}
-\nomenclatureentry{aDSMC@[{DSMC}]\begingroup Direct simulation Monte Carlo\nomeqref {7.2}|nompageref}{88}
+\nomenclatureentry{aRNG@[{RNG}]\begingroup (pseudo) random number generator\nomeqref {2.23}|nompageref}{22}
+\nomenclatureentry{aFDM@[{FDM}]\begingroup Finite Difference Methods\nomeqref {2.23}|nompageref}{23}
+\nomenclatureentry{aPDE@[{PDE}]\begingroup Parital Differential Equation\nomeqref {2.25}|nompageref}{24}
+\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.26}|nompageref}{24}
+\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.26}|nompageref}{24}
+\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations Per second\nomeqref {2.31}|nompageref}{26}
+\nomenclatureentry{aMC@[{MC}]\begingroup Monte Carlo\nomeqref {3.24}|nompageref}{63}
+\nomenclatureentry{aDSMC@[{DSMC}]\begingroup Direct simulation Monte Carlo\nomeqref {7.2}|nompageref}{92}

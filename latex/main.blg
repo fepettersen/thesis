@@ -25,45 +25,45 @@ Warning--I didn't find a database entry for "wikipedia??"
 Biblatex version: 1.7
 Reallocated singl_function (elt_size=4) to 100 items from 50.
 Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
-You've used 11 entries,
+You've used 12 entries,
             6019 wiz_defined-function locations,
-            1185 strings with 9738 characters,
-and the built_in function-call counts, 32572 in all, are:
-= -- 1280
-> -- 1114
-< -- 325
-+ -- 364
-- -- 391
-* -- 2382
-:= -- 2081
+            1192 strings with 9884 characters,
+and the built_in function-call counts, 36107 in all, are:
+= -- 1393
+> -- 1258
+< -- 360
++ -- 410
+- -- 455
+* -- 2717
+:= -- 2300
 add.period$ -- 0
-call.type$ -- 11
-change.case$ -- 164
+call.type$ -- 12
+change.case$ -- 178
 chr.to.int$ -- 34
-cite$ -- 20
-duplicate$ -- 3627
-empty$ -- 3394
-format.name$ -- 689
-if$ -- 7411
+cite$ -- 22
+duplicate$ -- 4012
+empty$ -- 3739
+format.name$ -- 780
+if$ -- 8209
 int.to.chr$ -- 0
-int.to.str$ -- 25
+int.to.str$ -- 28
 missing$ -- 0
-newline$ -- 278
-num.names$ -- 492
-pop$ -- 3231
+newline$ -- 310
+num.names$ -- 539
+pop$ -- 3549
 preamble$ -- 1
-purify$ -- 192
+purify$ -- 211
 quote$ -- 0
-skip$ -- 1972
+skip$ -- 2177
 stack$ -- 0
-substring$ -- 710
-swap$ -- 1187
-text.length$ -- 288
-text.prefix$ -- 11
+substring$ -- 762
+swap$ -- 1328
+text.length$ -- 324
+text.prefix$ -- 14
 top$ -- 1
-type$ -- 406
+type$ -- 444
 warning$ -- 0
-while$ -- 225
+while$ -- 243
 width$ -- 0
-write$ -- 266
+write$ -- 297
 (There was 1 warning)
