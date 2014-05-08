@@ -1,0 +1,94 @@
+\documentclass[twoside,english]{uiofysmaster}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsfonts, amssymb, amsmath}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{epstopdf}
+\usepackage{nomencl}
+\usepackage{tabularx}
+\usepackage{subfiles}
+\usepackage{color}
+\makenomenclature
+
+\usepackage{pdfpages}
+\usepackage[backend=bibtex]{biblatex}
+% \bibliography{bibtex_ref_test.bib}
+\bibliography{references.bib}
+
+\renewcommand{\d}{\partial}
+\renewcommand{\nomname}{List of Abbreviations}
+% \renewcommand{\notetoself{}}{\emph{\textcolor{red}{}}}
+
+\setlength{\headheight}{15pt}
+
+% \usepackage{fontspec}
+% \newfontfamily\listingsfont[Scale=0.85]{Droid Sans Mono}
+% \lstset {
+%     basicstyle=\footnotesize\listingsfont,
+%     keywordstyle=\color{listingskeywordcolor}\footnotesize\listingsfont,
+%     stringstyle=\color{listingsstringcolor}\footnotesize\listingsfont,
+%     commentstyle=\color{listingscommentcolor}\footnotesize\listingsfont,
+%     numberstyle=\gls{pde}\color{listingsnumbercolor}\footnotesize\listingsfont,
+%     identifierstyle=\footnotesize\listingsfont,
+% }
+
+
+
+% compile with pdflatex --shell-escape main.tex
+% makeindex main.nlo -s nomencl.ist -o main.nls
+
+%opening
+\author{Fredrik E Pettersen\\ f.e.pettersen@fys.uio.no}
+\title{\uppercase{Multiscale modeling of diffusion processes in the brain}}
+\date{June 2014}
+
+
+\begin{document}
+
+\includepdf{frontpage.pdf}
+\cleardoublepage
+
+% \begin{abstract}
+% This is an abstract text.
+% \end{abstract}
+
+% \begin{dedication}
+%   To someone
+%   \\\vspace{12pt}
+%   This is a dedication to my cat.
+% \end{dedication}
+
+% \begin{acknowledgements}
+%   I acknowledge my acknowledgements.
+% \end{acknowledgements}
+
+
+\tableofcontents
+\clearpage
+\listoffigures
+
+\clearpage
+\printnomenclature
+
+% \clearpage
+% \listoftables
+
+\chapter{Introduction}
+\clearpage
+\include{introduction}
+
+\chapter{Theory}
+\clearpage
+\include{theory}
+
+%-------Bibliography-------%
+\printbibliography
+\end{document}
+
