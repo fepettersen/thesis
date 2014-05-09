@@ -41,8 +41,8 @@
 
 
 
-% compile with pdflatex --shell-escape main.tex
-% makeindex main.nlo -s nomencl.ist -o main.nls
+% compile with pdflatex --shell-escape thesis.tex
+% makeindex main.nlo -s nomencl.ist -o thesis.nls
 
 %opening
 \author{Fredrik E Pettersen\\ f.e.pettersen@fys.uio.no}
@@ -87,6 +87,10 @@
 \chapter{Theory}
 \clearpage
 \include{theory}
+
+\chapter{Analysis}
+\clearpage
+\include{analysis}
 
 %-------Bibliography-------%
 \printbibliography

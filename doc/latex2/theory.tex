@@ -1,36 +1,61 @@
 \section{Random walks}
 
 A random walker is a point object which after a certain amount of time jumps a fixed step length either right or left with equal probability for jumping either way. 
-Say that $N$ random walkers are placed at the same position at a time $t=0$ and we want to keep track of the amount of walkers within a volume V defined in Figure \ref{}. 
-In order to do this the net number of walkers which cross the surface $A$ which limits $V$ per time step must reflect as a change in the number of walkers within $V$. 
-The number of walkers leaving $V$ is called the flux of walkers out of $V$ and is denoted a the flux vector $\vec{J}$. 
+In $d$ spatial dimensions the axis on which the jump happens is chosen at random before the direction of the jump is decided. \\
+Say a distribution of random walkers, $C$ is chosen so that all the walkers are placed within an imagined volume, $V$ of arbitrary shape. 
+$V$ is contained by a surface $S$ and the relation is shown in Figure \ref{theory:divergence_theorem}. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{Figures/divergence_theorem.png}
+ \caption[]{}
+ \label{theory:divergence_theorem}
+\end{figure}
+
+As the random walkers start to move some of them will leave the volume $V$ which results in a change in $C$. 
+The net movement of random walkers at a point is called the flux of walkers and is denoted by the flux vector $\mathbf J$. 
+To find the number of walkers that leave $V$ we integrate the normal component of $\mathbf J$ over $S$. 
+Assuming that no walkers disappear or are created the flux of walkers leaving $V$ must be balanced by the decrease in $C$, expressed in equation \eqref{theory:diffusion_integral_form}. 
 
 \begin{equation}\label{theory:diffusion_integral_form}
- \int_V \frac{\d C}{\d t}\,dV = \int_A\vec{J}\cdot \vec{n}\,dS
+ \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS
 \end{equation}
 
 Through Greens theorem equation \eqref{theory:diffusion_integral_form} can be reformulated
 
-\begin{equation}
+\begin{equation}\label{theory:integral_form}
  \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV
 \end{equation}
 
-The flux $\vec{J}$ is found by Fick's first law as the diffusive flux 
+The flux $\vec{J}$ can be expressed by Fick's first law as the diffusive flux 
 \begin{equation}
  \vec J = D\nabla C
 \end{equation}
-where $D$ is the diffusion constant. Inserting for $\vec J$ and dropping the integrals since they must be equal everywhere yields the diffusion equation
+
+where $D$ is the diffusion constant. Since $V$ was chosen as an arbitrary volume equation \eqref{theory:integral_form} is independent of the integration and the integrals can be dropped. 
+The diffusive flux $\mathbf{J}$ is also inserted to yield the diffusion equation
 
 \begin{equation}\label{theory:diffusion_equation}
  \frac{\d C}{\d t} = D\nabla^2 C
 \end{equation}
 
 Throughout this thesis $C$ will denote a spatial distribution of random walkers. 
-$C$ is best illustrated in Figure \ref{}.
+$C$ is best illustrated in Figure \ref{theory:illustration_C}.
 
-% \begin{figure}[H]
-%  \includegraphics[scale=0.6]{}
-% \end{figure}
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{Figures/illustration_C_pt1.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.48\textwidth}
+  \includegraphics[width=\textwidth]{Figures/illustration_C_pt2.eps}
+  \caption{}
+ \end{subfigure}
+ \caption[Illustration of $C(x)$]{Illustration of the difference between $u(x,t)$ in (a) which is the solution to the diffusion equation and $C(x,t)$ in (b) which is the number of random walkers within an area of $\pm\frac{\Delta x}{2}$ around each mesh point.}
+ \label{theory:illustration_C}
+\end{figure}
+
 
 \subsection{Pseudo random number generator}
 

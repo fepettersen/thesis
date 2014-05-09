@@ -1,0 +1,104 @@
+@comment{x-kbibtex-personnameformatting=<%l><, %f>}
+
+@article{farnell2005monte,
+	author = "Farnell, L and Gibson, WG",
+	journal = "Journal of Computational Physics",
+	number = "1",
+	pages = "253--265",
+	publisher = "Elsevier",
+	title = "{Monte Carlo simulation of diffusion in a spatially nonhomogeneous medium: A biased random walk on an asymmetrical lattice}",
+	volume = "208",
+	year = "2005"
+}
+
+@article{nicholson2001diffusion,
+	author = "Nicholson, Charles",
+	journal = "Reports on progress in Physics",
+	number = "7",
+	pages = "815",
+	publisher = "IOP Publishing",
+	title = "{Diffusion and related transport mechanisms in brain tissue}",
+	volume = "64",
+	year = "2001"
+}
+
+@unpublished{ravndal2005lecture,
+	author = "Ravndal, Finn",
+	title = "{Lecture Notes on Statistical Physics}"
+}
+
+@book{graham2011principles,
+	author = "Graham, Bruce and Gillies, Andrew and Willshaw, David"
+}
+
+@article{craske2005spines,
+	author = "Craske, Madeleine L and Fivaz, Marc and Batada, Nizar N and Meyer, Tobias",
+	title = "{Spines and neurite branches function as geometric attractors that enhance protein kinase C action}"
+}
+
+@article{hjorth2011computational,
+	author = "Hjorth-Jensen, Morten",
+	journal = "Lecture notes",
+	title = "{Computational physics}",
+	year = "2011"
+}
+
+@article{light1996protein,
+	author = "Light, Peter E and Sabir, Aftab A and Allen, Bruce G and Walsh, Michael P and French, Robert J",
+	title = "{Protein Kinase C--Induced Changes in the Stoichiometry of ATP Binding Activate Cardiac ATP-Sensitive K+ Channels A Possible Mechanistic Link to Ischemic Preconditioning}"
+}
+
+@article{arellano2007ultrastructure,
+	author = "Arellano, Jon I and Benavides-Piccione, Ruth and DeFelipe, Javier and Yuste, Rafael",
+	journal = "Frontiers in neuroscience",
+	number = "1",
+	pages = "131",
+	publisher = "Frontiers Research Foundation",
+	title = "{Ultrastructure of dendritic spines: correlation between synaptic and spine morphologies}",
+	volume = "1",
+	year = "2007"
+}
+
+@article{plapp2000multiscale,
+	author = "Plapp, Mathis and Karma, Alain",
+	journal = "Journal of Computational Physics",
+	number = "2",
+	pages = "592--619",
+	publisher = "Elsevier",
+	title = "{Multiscale finite-difference-diffusion-Monte-Carlo method for simulating dendritic solidification}",
+	volume = "165",
+	year = "2000"
+}
+
+@article{marsaglia2003xorshift,
+	author = "Marsaglia, George",
+	journal = "Journal of Statistical Software",
+	number = "14",
+	pages = "1--6",
+	title = "{Xorshift rngs}",
+	volume = "8",
+	year = "2003"
+}
+
+@article{james1990review,
+	author = "James, Frederick",
+	journal = "Computer Physics Communications",
+	number = "3",
+	pages = "329--344",
+	publisher = "Elsevier",
+	title = "{A review of pseudorandom number generators}",
+	volume = "60",
+	year = "1990"
+}
+
+@article{flekkoy2001coupling,
+	author = "Flekk{\o}y, EG and Feder, J and Wagner, G",
+	journal = "Physical Review E",
+	number = "6",
+	pages = "066302",
+	publisher = "APS",
+	title = "{Coupling particles and fields in a diffusive hybrid model}",
+	volume = "64",
+	year = "2001"
+}
+
