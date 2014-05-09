@@ -98,16 +98,16 @@ Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ results in a nor
  &u^{n+1}_3\left(1+2a(D_3+D_2)\right)- 2au^{n+1}_{2}(D_3+D_2) =  u^n_3
 \end{align*}
 which is arranged as 
-{\scriptsize
+
 \begin{align}\label{BE}
  \left(\begin{array}{c c c c}
-        1+2a(D_0+D_1) & -2a(D_1+D_0) &0 &0 \\
-        -a(D_1+D_0) &1+a(D_2+2D_1+D_0) & -a(D_2+D_1) &0 \\
-        0& -a(D_2+D_1) & 1+a(D_3+2D_2+D_1)& -a(D_3+D_2)\\
-        0& 0& 1+2a(D_3+D_2) & - 2a(D_3+D_2)\\
+        b_0 & c_0 &0 &0 \\
+        a_1 & b_1 & c_1 &0 \\
+        0& a_2 & b_2& c_2\\
+        0& 0& a_3 & b_3\\
        \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{align}
-}
+
 \begin{equation}\label{theory:BE:linear_system}
   \mathbf{M}\mathbf{u}^n = \mathbf{u}^{n-1}
 \end{equation}
@@ -124,31 +124,64 @@ Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algor
 
 \lstinputlisting{Figures/tridiag.cpp}
 
-In two spatial dimensions the BE discretization will result in a a $2n$ band diagonal matrix of size $n^2\times n^2$ with 5 nonzero bands. 
-This band diagonal matrix can be rewritten as a block tridiagonal matrix with $n\times n$ matrices as entries. 
-A simplified block tridiagonal linear system is shown in eq. \eqref{theory:block_tridiagonal_matrix}
+In two spatial dimensions the BE discretization gives the scheme shown in equation \eqref{general_scheme_BE2D}
 
+\begin{equation}\label{general_scheme_BE2D}
+ u^{n}_{i,j} = \underbrace{\frac{-D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{n+1}_{i+1,j}+u^{n+1}_{i-1,j}\right) +
+ \underbrace{\left(1+\frac{2D\Delta t}{\Delta x^2} +\frac{2D\Delta t}{\Delta y^2}\right)}_{\gamma}u^{n+1}_{i,j} 
+ \underbrace{-\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{n+1}_{i,j+1}+u^{n+1}_{i,j-1}\right)
+\end{equation}
 
-\begin{align}\label{theory:block_tridiagonal_matrix}
-   \left(\begin{array}{c c c c c c c c c}
-        B_0 & C_0 &0 &0 &0 &0 &0 &0 &0\\
-        A_1 & B_1 & C_1 &0 &0 &0 &0 &0 &0\\
-        0&\ddots & \ddots & 0 & 0 & \ddots &0&0&0\\
-        0 & 0&A_i & B_i & C_i& 0 &  &0&0\\
-        0& \ddots&0&\ddots & \ddots & \ddots & 0 & \ddots &0\\
-         0&0 &0 &0&0 &0&0&A_{n-1} & B_{n-1}
-       \end{array}\right) \left(\begin{array}{c}
-             \mathbf{u}^{n+1}_{0}\\
-             \mathbf{u}^{n+1}_{1}\\
-             \vdots\\
-             \mathbf{u}^{n+1}_{i}\\
-             \vdots\\
-             \mathbf{u}^{n+1}_{n}
-             \end{array}\right) = \mathbf{up}
+Equation \eqref{general_scheme_BE2D} assembles to the linear system in equation \eqref{linear_system_BE2D} when solved on a $3\times3$ mesh.
+\begin{align}\label{linear_system_BE2D}
+  \left(\begin{array}{c c c : c c c : c c c}
+        \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
+        -\beta & \gamma & -\beta &0 &-2\alpha &0 &0 &0 &0\\
+        0&-2\beta & \gamma & 0 & 0 & -2\alpha &0&0&0\\ \hdashline
+        -\alpha& 0&0 & \gamma & -2\beta & 0 & -\alpha &0&0\\
+        0& -\alpha&0&-\beta & \gamma & -\beta & 0 & -\alpha &0\\
+        0& 0& -\alpha&0&-2\beta & \gamma & 0 & 0 &-\alpha\\ \hdashline
+        0& 0 &0 &-2\alpha &0&0 & \gamma & -2\beta&0\\
+        0& 0 &0 &0 &-2\alpha&0&-\beta & \gamma &-\beta\\
+         0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
+       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{align}
 
-One should note that the $n\times n$ matrix $\mathbf u$ which solves the 2D diffusion equation has be rewritten as a vector $\mathbf{u}$ of size $n^2$. 
-The calculations for this are done in the appendix if the reader should be interested. 
+The dashed lines confine a total of nine $3\times 3$ matrices which can be used to reformulate the $2n +1 = 7$ band diagonal system as a block tridiagonal system as shown below.
+\begin{align}\label{block_tridiagonal_dashed}
+ \left(\begin{array}{c : c : c }
+        B_0 & C_0 &0  \\ \hdashline
+        A_1 & B_1 & C_1 \\ \hdashline
+        0& A_2 & B_2
+       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
+\end{align}
+
+All entries in eq. \eqref{block_tridiagonal_dashed} are $3\times3$ matrices. 
+In the general case where the diffusion equation is discretized and solved on a mesh of size $n\times n$ the resulting block tridiagonal system will consist of $n^2$ matrix entries which all are $n\times n$ matrices.
+% In two spatial dimensions the BE discretization will result in a a $2n$ band diagonal matrix of size $n^2\times n^2$ with 5 nonzero bands. 
+% This band diagonal matrix can be rewritten as a block tridiagonal matrix with $n\times n$ matrices as entries. 
+% A simplified block tridiagonal linear system is shown in eq. \eqref{theory:block_tridiagonal_matrix}
+% 
+% 
+% \begin{align}\label{theory:block_tridiagonal_matrix}
+%    \left(\begin{array}{c c c c c c c c c}
+%         B_0 & C_0 &0 &0 &0 &0 &0 &0 &0\\
+%         A_1 & B_1 & C_1 &0 &0 &0 &0 &0 &0\\
+%         0&\ddots & \ddots & 0 & 0 & \ddots &0&0&0\\
+%         0 & 0&A_i & B_i & C_i& 0 &  &0&0\\
+%         0& \ddots&0&\ddots & \ddots & \ddots & 0 & \ddots &0\\
+%          0&0 &0 &0&0 &0&0&A_{n-1} & B_{n-1}
+%        \end{array}\right) \left(\begin{array}{c}
+%              \mathbf{u}^{n+1}_{0}\\
+%              \mathbf{u}^{n+1}_{1}\\
+%              \vdots\\
+%              \mathbf{u}^{n+1}_{i}\\
+%              \vdots\\
+%              \mathbf{u}^{n+1}_{n}
+%              \end{array}\right) = \mathbf{up}
+% \end{align}
+
+One should note that the $n\times n$ matrix $\mathbf u$ which solves the 2D diffusion equation has be rewritten as a vector $\mathbf{u}$ of size $n^2$. \\ 
 
 In order to solve this block tridiagonal linear system the ''tridiag`` solver from before must be generalized to support matrices as entries in $\mathbf M$. 
 Luckily this generalization is trivial and all that is needed is to replace divisions by matrix inverses. 
@@ -156,8 +189,8 @@ An updated \emph{pseudo coded} scheme is listed in \eqref{block_tridiag_alg}
 
 There is a forward substitution
 \begin{align}\label{block_tridiag_alg}
- H_1 &= -B_1^{-1}C_1\nonumber \\
- \mathbf{g}_1 &= B_1^{-1}\mathbf{up}_1 \nonumber\\
+ H_0 &= -B_0^{-1}C_0\nonumber \\
+ \mathbf{g}_0 &= B_0^{-1}\mathbf{up}_0 \nonumber\\
  H_i &= -\left(B_i+A_iH_{i-1}\right)^{-1}C_i \nonumber \\
  \mathbf{g}_i &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{up}_i-A_i\mathbf{g}_{i-1}\right)
  \end{align}
@@ -167,6 +200,10 @@ There is a forward substitution
   \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
  \end{align*}
  
+ It is possible to solve the BE scheme in 3D by the block tridiagonal solver as well. 
+ The linear system will be $2n^2 +1$ band diagonal and must first be reduced to a block matrix which is $2n+1$ band diagonal like the one in eq. \eqref{linear_system_BE2D} before it is further reduced to a block tridiagonal form. 
+ Matrix entries will be $n^2\times n^2$ matrices.
+ 
  \subsubsection{Efficiency of the block tridiagonal algorithm}
  
  In general the Forward Euler (FE\nomenclature{FE}{Forward Euler}) scheme will solve a discrete PDE in $d$ spatial dimensions with $n$ mesh points in each dimension using
@@ -174,9 +211,9 @@ There is a forward substitution
   \mathcal O(n^d)
  \end{equation*}
 floating point operations (FLOPs\nomenclature{FLOPs}{Floating Point Operations (per second)}). 
-This is the maximum efficiency possible for a PDE in $d$ dimensions (without using some form of symmetry argument).\\
+This is the maximum efficiency possible for a PDE in $d$ dimensions (without using some form of symmetry argument) and will be the benchmark for the BE scheme as well.\\
 
-In general, a linear system can be solved by multiplying both sides of the equation with the inverse of the matrix in question. 
+Implicit schemes like BE result in linear systems which can be solved by multiplying both sides of the equation with the inverse of the matrix in question. 
 \begin{equation*}
  \mathbf M^{-1}\mathbf M\mathbf u = \mathbf{M}^{-1}\mathbf{up}
 \end{equation*}
@@ -223,7 +260,7 @@ The time scales are coupled through the step length of the random walkers which 
  l = \sqrt{2Dd\frac{\Delta t}{\tau}}
 \end{equation}
 
-Here $\tau$ is the number of time steps taken on the microscopic scale for each time step on the PDE scale, and $\Delta t$ is the time step on the PDE scale. 
+Here $\tau$ is the number of time steps taken on the microscopic scale for each time step on the PDE scale, $d$ is the number of spatial dimensions, and $\Delta t$ is the time step on the PDE scale. 
 
 \subsubsection{Boundary conditions for the random walk}
 
@@ -244,7 +281,7 @@ The workaround will at least keep the simulation from crashing, but has a fundam
  \includegraphics[width=\textwidth]{Figures/signmap_illustration_pt2.eps}
  \caption{}
 \end{subfigure}
-\caption[Workaround for negative concentrations, illustration]{An illustration of the proposed workaround for negative concentrations and an illustration of how well it works (b). The fundamental problem is that a diffusion process will even out discontinuities such as the one in (a), the result is shown in (b) as an increase in concentration in the middle mesh point in (a) which should remain equal to zero.}
+\caption[Workaround for negative concentrations, illustration]{An illustration of the proposed workaround for negative concentrations and an illustration of how well it works (b). The fundamental problem is that a diffusion process will even out discontinuities such as the one in (a). The result of this evening out is shown in (b) as an increase in concentration in the middle mesh point which should remain equal to zero.}
 \label{theory:signmap_illustration}
  \end{figure}
 

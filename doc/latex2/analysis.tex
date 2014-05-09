@@ -1,2 +1,194 @@
 \section{The error estimate}
 
+Solving PDEs numerically will result in errors because derivatives are approximated by finite differences. 
+For the schemes used in this thesis the error, $\epsilon$ will follow equation \eqref{analysis:error}
+
+\begin{equation}\label{analysis:error}
+ \epsilon = C_x\Delta x^2 + C_t\Delta t
+\end{equation}
+
+where the coefficients $C_x$ and $C_t$ are unknown. 
+Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. 
+
+The error is measured by comparing the result from a numerical simulation to an exact solution, $u_e$ and taking the norm of the difference. 
+Specifically $\epsilon$ is measured by the L2 norm which is defined in equation \eqref{analysis:def_epsilon}
+% \label{analysis:def_epsilon}
+\begin{align}
+ \epsilon(t^n) &= ||u(t^n)-u_e(t^n)||_2 \nonumber \\
+ &= \sqrt{\Delta x\Delta y\sum\limits_{i=0}^n\sum\limits_{i=0}^n \left(u(t^n,x_i,y_j)-u_e(t^n,x_i,y_j)\right)^2}\label{analysis:def_epsilon}
+ \end{align}
+ 
+$\epsilon$ is time dependent because it allows for investigation of the evolution of the error over the course of a simulation.
+Some of the error tests will require a single number as an error measure. 
+In these cases the norm of $\epsilon(t)$, defined in eq. \eqref{analysis:convergence_test_error} is used.
+\begin{equation}\label{analysis:convergence_test_error}
+ \epsilon = \sqrt{\Delta t\sum\limits_{n=0}^T\epsilon(t^n)^2}
+\end{equation}
+
+\section{Verification techniques}
+
+This thesis will focus on three verification techniques which are described below. 
+The aim for all of these techniques is to make sure that the error term follows equation \eqref{analysis:error}. 
+Since an incorrect implementation of the spatial derivative will cause the solution to be unstable which is easily noticed through visual inspection, the tests will focus on verifying the time derivative. 
+Isolating the contribution to $\epsilon(t)$ from the time derivative will be necessary and is ensured by setting $\Delta t >>\Delta x^2$. 
+A time step of this size violates the stability criterion for the FE scheme, and so some of the tests are omitted for this scheme. \\
+
+The verification techniques are
+
+\begin{itemize}
+ \item Manufactured solutions\\
+ By choosing an adequate initial condition the exact solution to the diffusion equation can be found with relative ease. 
+ The chosen solution is
+ \begin{equation}\label{manufactured_solution}
+  u(x,y,t) = e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1
+ \end{equation}
+  The point of these tests is to verify that $\epsilon \sim \Delta t$ and the tests can be done for a time step which fulfills the stability criterion.
+  \item Convergence tests \\
+  In the general case the error term is proportional to the time step to some power $r$ when the error from the time derivative is dominant.
+\begin{equation}
+ \epsilon \simeq C_t\Delta t^r
+\end{equation}
+By comparing the error from two simulations with different time steps the exponent $r$, called the convergence rate, can be found
+\begin{align*}
+ \epsilon_1 &\simeq C_t\Delta t_1^r\\
+  \epsilon_2 &\simeq C_t\Delta t_2^r
+  \end{align*}
+  the two expressions are divided
+  \begin{align*}
+   \frac{\epsilon_1}{\epsilon_2} &\simeq \frac{C_t\Delta t_1^r}{C_t\Delta t_2^r}\\
+   \log\left(\frac{\epsilon_1}{\epsilon_2}\right) &\simeq r\log\left(\frac{\Delta t_1}{\Delta t_2}\right)\\
+   r&\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}
+\end{align*}
+The FE and BE schemes have errors proportional to $\Delta t$ so the tests are expected to measure $r=1$.
+  \item Exact numerical solutions \\
+  The numerical schemes are actually reformulations of the PDE we are trying to solve as difference equations which have their own exact solutions. 
+  These will be called the numerical exact solutions, and they are slightly different from the exact solutions to the PDE. 
+  The reason for finding the numerical exact solutions is that the scheme theoretically will represent this solution with no error. 
+  In practice there will always be round off errors and other factors, but an error term starting at machine precision is expected.
+\end{itemize}
+
+\section{Testing the PDE solver}
+
+\subsection{Verification of FE scheme by exact numerical solution}
+
+Discretization of the diffusion equation by the FE scheme yields the following numerical scheme in 1D
+\begin{equation}
+ u^{n+1} = D\Delta t u^n_{xx} + u^n
+\end{equation}
+where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$. 
+To illustrate how the equation is solved by the computer, the first four iterations are written out
+\begin{align*}
+ u^1 &= D\Delta t u_{xx}^0 + u^0 \\
+ u^2 &= D\Delta t u_{xx}^1 + u^1 \\
+ &= D\Delta t\left[D\Delta t u_{4x}^0 + u_{2x}^0\right] + u^0\\
+ &= \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0 \\
+ u^3 &= D\Delta t u_{xx}^2 + u^2 \\
+ &= D\Delta t\left[\left(D\Delta t\right)^2 u_{6x}^0 + 2D\Delta t u_{4x}^0+ u_{2x}^0\right] + \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0\\
+ &= \left(D\Delta t\right)^3 u_{6x}^0 + 3\left(D\Delta t\right)^2 u_{4x}^0+ 3D\Delta tu_{2x}^0 + u^0 \\
+ u^4 &= D\Delta t u_{xx}^3 + u^3 = \dots \\
+ &= \left(D\Delta t\right)^4 u_{8x}^0 + 4\left(D\Delta t\right)^3 u_{6x}^0+ 6\left(D\Delta t\right)^2 u_{4x}^0 + 4D\Delta t u_{2x}^0 + u^0 
+\end{align*}
+
+The general pattern is 
+\begin{equation}
+ u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^iu^0_{2ix}
+\end{equation}
+The initial condition, $u^0$ is
+\begin{equation}
+ u^0 = \cos(\pi x)
+\end{equation}
+The spatial derivatives are found as
+\begin{align*}
+ u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
+ &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
+ u^0_{4x} &= [u^0_{xx}]_{xx} \frac{1}{\Delta x^2}\left[\frac{u^0_{xx}}{\cos(\pi x)}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
+ &= \frac{4}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
+ &\dots
+\end{align*}
+The pattern continues allowing the final numerical exact solution to be expressed in equation \eqref{numerical_solution}.
+\begin{equation}\label{numerical_solution}
+  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x)
+\end{equation}
+
+Although the FE scheme is expected to represent equation \eqref{numerical_solution} to machine precision ($\epsilon \approx 10^{-16}$) there are two problems with the solution which will have an effect on the error:
+\begin{itemize}
+ \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. This can be fixed rather simply by testing if $\Delta x^{2i}>0$ and returning zero if the test returns false.
+ \item ${n\choose i}$ goes to infinity for large n and i. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$. 
+ The argumentation for dropping the troublesome terms is given below.
+\end{itemize}
+
+As a side note, equation \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
+In the numerical exact solution the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^n$.
+This amplification factor can be found in equation \eqref{numerical_solution} as 
+\begin{equation}
+A^n = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i
+\end{equation}
+Inserting a time step larger than the stability criterion ($\Delta t \leq \frac{\Delta x^2}{2D}$) will make the amplification factor $A$ larger than one which in turn will make the solution blow up. \\
+The stability criterion also illustrates why the terms where 
+$$ \frac{1}{\Delta x^{2i}} \to \infty$$
+ can be dropped. 
+ By the stability criterion, the time step will cancel out $\Delta x^2$, and the result will be a number smaller than 1 raised to a rather large power, $i$, resulting in a number comparable to zero.\\
+ 
+ The results from comparing a 1D simulation to the numerical exact is shown in Figure \ref{errorplot_numerical_exact_FE_1D}. 
+ As expected the error is larger than machine precision by at most two orders of magnitude because of accumulating error terms from the dropped terms in eq. \eqref{numerical_solution}.
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{Figures/exact_numerical_1d_n130.eps}
+ \caption[Verification for exact numerical solution]{Error plot for 1d FE scheme compared to the exact numerical solution \ref{numerical_solution} with a few modifications, like ignoring terms where $\Delta x^{2i}$ is truncated to zero.}
+ \label{errorplot_numerical_exact_FE_1D}
+\end{figure}
+ 
+ Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme. 
+ \begin{equation}\label{exact_numerical_solution_2d}
+ u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
+\end{equation}
+
+The same problems as in the 1D case will apply to equation \eqref{exact_numerical_solution_2d} with the same solutions. 
+Figure \ref{exact_numerical_2d_n130} shows how the 2D simulation compares to the numerical exact solution. 
+As was the case in 1D the error is larger than machine precision, but much smaller than $\Delta t$ suggesting that the scheme is implemented correctly.
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
+ \caption[Numerical exact error plot FE in 2D]{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2D. 
+ Parameters of importance are $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8\cdot10^{-5}$ and diffusion constant $D = \frac{1}{2}$.}
+ \label{exact_numerical_2d_n130}
+\end{figure}
+
+
+\subsection{Verification of BE scheme by exact numerical solution}
+
+The exact numerical solution to the BE scheme is found by solving the linear system which arises from the discretization. 
+\begin{align*}
+ \mathbf M \mathbf u^{n+1} &= \mathbf{u}^n \\
+ \mathbf{u}^{n+1} &= \mathbf{M}^{-1} \mathbf{u}^n \\
+ &= \mathbf{M}^{-1}\left(\mathbf{M}^{-1} \mathbf{u}^{n-1}\right)
+\end{align*}
+
+Doing the separation to the end relates the $n$'th time step to the initial condition
+\begin{equation}\label{BE_numex}
+ \vec u^{n+1} = \left(\mathbf M^{-1}\right)^{n+1} \vec u^0
+\end{equation}
+
+Note that $\left(\mathbf M^{-1}\right)^{n+1}$ is the inverse of $\mathbf M$ to the $n+1$'th power.\\
+
+Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
+Doing calculations with such a matrix gives a lot of round off errors which will reduce the accuracy of the numerical exact. 
+The error should theoretically be machine precision, but is expected to at least be much smaller than $\Delta t$. 
+Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}
+
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}{0.49\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_14042014_0759_BE1D_numerical_exact/results/numerical_exact.eps}
+ \caption{}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_30042014_0914_BE2D_numex/results/numerical_exact.eps}
+ \caption{}
+\end{subfigure}
+ \caption[Numerical exact errorplots for BE scheme]{Plots showing the error for the BE scheme in 1D (a) and 2D (b) compared to the numerical exact solution. 
+ The error is not machine precision, but significantly smaller than $\Delta t$ which for these simulations is $\Delta t=0.01$. 
+ This increased error originates in the many roundoff errors in the inverted matrix where a lot of terms $10^{-16}$ and smaller.}
+ \label{numex:BE_errorplot}
+\end{figure}

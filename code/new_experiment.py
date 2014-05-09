@@ -445,9 +445,9 @@ if __name__ == '__main__':
 	y0 = 0.0
 	x1 = 1.0
 	y1 = 1.0
-	m = 21
+	m = 11
 	n = 1
-	T = 300		# no.of timesteps, [dt*T] = seconds
+	T = 2		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -479,9 +479,9 @@ if __name__ == '__main__':
 	run.SetDiffusionTensor(D(x,y))
 
 	run.compile()
-	# run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
-	# run.RunSimulation(Hc[0])
+	run.RunSimulation(Hc[0])
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
 	# run.Compare('/results_FE_Hc*.txt',numerical_exact)				# FE version
@@ -512,30 +512,30 @@ if __name__ == '__main__':
 	# dx = 0.025
 	# h = [0.1,0.05,0.02,0.025]
 	# h = [0.025]
-	for i in h:
-		# i = 1.0/j
-		# timestep = i*i/5.0
-		timestep = dt
-		# dt.append(timestep)
-		# m = (1/i)+1
-		m = 21
-		n = 1
-		if n==1:
-			x = np.linspace(0,1,m)
-			y = np.zeros(m)
-		elif n==m:
-			x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
-		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-		run.SetInitialCondition(run.exact(x,y,0))
-		run.SetDiffusionTensor(D(x,y))
-		hc = int(round(1.0/(timestep**2)))
-		hc = i
-		print m," , ", timestep, " , ", hc
-		run.RunSimulation(1*hc)
-	leg = ['Hc = %g'%i for i in h]
-	run.ConvergenceTest(h)
+	# for i in h:
+	# 	# i = 1.0/j
+	# 	# timestep = i*i/5.0
+	# 	timestep = dt
+	# 	# dt.append(timestep)
+	# 	# m = (1/i)+1
+	# 	m = 21
+	# 	n = 1
+	# 	if n==1:
+	# 		x = np.linspace(0,1,m)
+	# 		y = np.zeros(m)
+	# 	elif n==m:
+	# 		x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
+	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+	# 	run.SetInitialCondition(run.exact(x,y,0))
+	# 	run.SetDiffusionTensor(D(x,y))
+	# 	hc = int(round(1.0/(timestep**2)))
+	# 	hc = i
+	# 	print m," , ", timestep, " , ", hc
+	# 	run.RunSimulation(1*hc)
+	# leg = ['Hc = %g'%i for i in h]
+	# run.ConvergenceTest(h)
 	# leg = ['dt = %g'%i for i in dt]
-	run.PlotError(leg)
+	# run.PlotError(leg)
 	# # print 'dx =',dx
 	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# # run.UpdateWebpageSpecial()

@@ -91,7 +91,7 @@ void Combine::Solve(){
 		}
 		ConvertFromWalkers(Up,inifilenames[i],indeces[i]);
 	}
-	// pde_solver->advance(U,Up,m,n);
+	pde_solver->advance(U,Up,m,n);
 	// for(int k=0; k<m; k++){
 	// 	for(int l=0; l<n; l++){
 	// 		Up[k][l] = U[k][l];
