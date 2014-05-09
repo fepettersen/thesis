@@ -445,9 +445,9 @@ if __name__ == '__main__':
 	y0 = 0.0
 	x1 = 1.0
 	y1 = 1.0
-	m = 11
-	n = 1
-	T = 2		# no.of timesteps, [dt*T] = seconds
+	m = 100
+	n = 100
+	T = 200		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um

@@ -30,7 +30,7 @@ In these cases the norm of $\epsilon(t)$, defined in eq. \eqref{analysis:converg
 This thesis will focus on three verification techniques which are described below. 
 The aim for all of these techniques is to make sure that the error term follows equation \eqref{analysis:error}. 
 Since an incorrect implementation of the spatial derivative will cause the solution to be unstable which is easily noticed through visual inspection, the tests will focus on verifying the time derivative. 
-Isolating the contribution to $\epsilon(t)$ from the time derivative will be necessary and is ensured by setting $\Delta t >>\Delta x^2$. 
+Isolating the contribution to $\epsilon(t)$ from the time derivative will be necessary and is ensured by setting $\Delta t \gg\Delta x^2$. 
 A time step of this size violates the stability criterion for the FE scheme, and so some of the tests are omitted for this scheme. \\
 
 The verification techniques are
@@ -64,7 +64,7 @@ The FE and BE schemes have errors proportional to $\Delta t$ so the tests are ex
   The numerical schemes are actually reformulations of the PDE we are trying to solve as difference equations which have their own exact solutions. 
   These will be called the numerical exact solutions, and they are slightly different from the exact solutions to the PDE. 
   The reason for finding the numerical exact solutions is that the scheme theoretically will represent this solution with no error. 
-  In practice there will always be round off errors and other factors, but an error term starting at machine precision is expected.
+  In practice there will always be round off errors and other factors, but an error term close to machine precision is expected.
 \end{itemize}
 
 \section{Testing the PDE solver}
@@ -78,22 +78,22 @@ Discretization of the diffusion equation by the FE scheme yields the following n
 where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$. 
 To illustrate how the equation is solved by the computer, the first four iterations are written out
 \begin{align*}
- u^1 &= D\Delta t u_{xx}^0 + u^0 \\
- u^2 &= D\Delta t u_{xx}^1 + u^1 \\
+ u^1 &= D\Delta t\, u_{xx}^0 + u^0 \\
+ u^2 &= D\Delta t\, u_{xx}^1 + u^1 \\
  &= D\Delta t\left[D\Delta t u_{4x}^0 + u_{2x}^0\right] + u^0\\
  &= \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0 \\
- u^3 &= D\Delta t u_{xx}^2 + u^2 \\
+ u^3 &= D\Delta t\, u_{xx}^2 + u^2 \\
  &= D\Delta t\left[\left(D\Delta t\right)^2 u_{6x}^0 + 2D\Delta t u_{4x}^0+ u_{2x}^0\right] + \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0\\
  &= \left(D\Delta t\right)^3 u_{6x}^0 + 3\left(D\Delta t\right)^2 u_{4x}^0+ 3D\Delta tu_{2x}^0 + u^0 \\
- u^4 &= D\Delta t u_{xx}^3 + u^3 = \dots \\
+ u^4 &= D\Delta t \,u_{xx}^3 + u^3 = \dots \\
  &= \left(D\Delta t\right)^4 u_{8x}^0 + 4\left(D\Delta t\right)^3 u_{6x}^0+ 6\left(D\Delta t\right)^2 u_{4x}^0 + 4D\Delta t u_{2x}^0 + u^0 
 \end{align*}
 
-The general pattern is 
+\noindent From the iterations above a pattern emerges for iteration $n+1$\\
 \begin{equation}
  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^iu^0_{2ix}
 \end{equation}
-The initial condition, $u^0$ is
+Where $u^0$ is the initial condition
 \begin{equation}
  u^0 = \cos(\pi x)
 \end{equation}
@@ -112,9 +112,8 @@ The pattern continues allowing the final numerical exact solution to be expresse
 
 Although the FE scheme is expected to represent equation \eqref{numerical_solution} to machine precision ($\epsilon \approx 10^{-16}$) there are two problems with the solution which will have an effect on the error:
 \begin{itemize}
- \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. This can be fixed rather simply by testing if $\Delta x^{2i}>0$ and returning zero if the test returns false.
- \item ${n\choose i}$ goes to infinity for large n and i. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$. 
- The argumentation for dropping the troublesome terms is given below.
+ \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. Testing if $\Delta x^{2i}>0$ and returning zero if the test fails will fix the problem. The argumentation for ignoring the troublesome terms is given below.
+ \item ${n\choose i}$ goes to infinity for large $n$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$.
 \end{itemize}
 
 As a side note, equation \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
@@ -129,14 +128,8 @@ $$ \frac{1}{\Delta x^{2i}} \to \infty$$
  can be dropped. 
  By the stability criterion, the time step will cancel out $\Delta x^2$, and the result will be a number smaller than 1 raised to a rather large power, $i$, resulting in a number comparable to zero.\\
  
- The results from comparing a 1D simulation to the numerical exact is shown in Figure \ref{errorplot_numerical_exact_FE_1D}. 
+ The results from comparing a 1D simulation to the numerical exact is shown in Figure \ref{numerical_exact_FE:1D}. 
  As expected the error is larger than machine precision by at most two orders of magnitude because of accumulating error terms from the dropped terms in eq. \eqref{numerical_solution}.
-\begin{figure}[H]
- \centering
- \includegraphics[scale=0.7]{Figures/exact_numerical_1d_n130.eps}
- \caption[Verification for exact numerical solution]{Error plot for 1d FE scheme compared to the exact numerical solution \ref{numerical_solution} with a few modifications, like ignoring terms where $\Delta x^{2i}$ is truncated to zero.}
- \label{errorplot_numerical_exact_FE_1D}
-\end{figure}
  
  Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme. 
  \begin{equation}\label{exact_numerical_solution_2d}
@@ -144,15 +137,24 @@ $$ \frac{1}{\Delta x^{2i}} \to \infty$$
 \end{equation}
 
 The same problems as in the 1D case will apply to equation \eqref{exact_numerical_solution_2d} with the same solutions. 
-Figure \ref{exact_numerical_2d_n130} shows how the 2D simulation compares to the numerical exact solution. 
+Figure \ref{numerical_exact_FE:2D} shows how the 2D simulation compares to the numerical exact solution. 
 As was the case in 1D the error is larger than machine precision, but much smaller than $\Delta t$ suggesting that the scheme is implemented correctly.
 
 \begin{figure}[H]
  \centering
- \includegraphics[scale=0.7]{Figures/exact_numerical_2d_n130.eps}
- \caption[Numerical exact error plot FE in 2D]{Numerical solution from the FE scheme versus the exact numerical solution of the FE scheme in 2D. 
- Parameters of importance are $\Delta t$ which is almost on the stability criterion, $\Delta t = \frac{\Delta x \Delta y}{5} = 8\cdot10^{-5}$ and diffusion constant $D = \frac{1}{2}$.}
- \label{exact_numerical_2d_n130}
+ \begin{subfigure}{0.49\textwidth}
+ \includegraphics[width=\textwidth]{Figures/exact_numerical_1d_n130.eps}
+  \caption{}
+  \label{numerical_exact_FE:1D}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+ \includegraphics[width=\textwidth]{Figures/exact_numerical_2d_n130.eps}
+  \caption{}
+  \label{numerical_exact_FE:2D}
+ \end{subfigure}
+ \caption[Numerical exact error plots FE]{Numerical solution from the FE scheme in 1D (a) and 2D (b) versus the exact numerical solution of the FE scheme.
+ Some of the terms in the numerical exact solutions are ignored to prevent overflow and this is responsible for the increasing error which is slightly larger than machine precision.}
+ \label{numerical_exact_FE}
 \end{figure}
 
 

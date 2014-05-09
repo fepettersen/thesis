@@ -262,7 +262,7 @@ void Diffusion::BE2D(double **U, double **Up, int m, int n){
 			Lower = Assemble(alpha,beta,m,n);
 		}
 		mat inverse = inv(Lower);
-		inverse.save("BE_matrix_inverse.txt",raw_ascii);
+		// inverse.save("BE_matrix_inverse.txt",raw_ascii);
 		linalg->precondition(Lower,m,n);
 	}
 	vec Uptmp = zeros(N);
