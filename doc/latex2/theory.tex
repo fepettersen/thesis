@@ -57,13 +57,13 @@ $C$ is best illustrated in Figure \ref{theory:illustration_C}.
 \end{figure}
 
 
-\subsection{Pseudo random number generator}
+\subsection{Random number generator}
 
 To produce a random walk one must have random numbers. 
 The random numbers in this thesis are produced by a five seeded xor-shift algorithm copied from George Marsaglia \cite{marsaglia2003xorshift}. 
 This generator is chosen because of its very large period compared to the computational cost.
 
-\section{Numerical solution of partial differential equations}
+\section{Backward Euler schemes in 2 or more spatial dimensions}
 
 The basics of solving partial differential equations (PDEs\nomenclature{PDE}{partial differential equation}) by finite difference methods is considered to be known. 
 This section will concern the special case of how to solve PDEs by the implicit Backward Euler (BE\nomenclature{BE}{Backward Euler}) scheme, especially in more than one spatial dimension.
@@ -236,7 +236,7 @@ After setting an initial condition and diffusion constant the diffusion problem 
  \item $\mathbf{up}$ is then used as input to calculate the next time step
 \end{itemize}
 
-\section{The conversion between length scales}
+\subsection{The conversion between length scales}
 As the previous section states the result from the last PDE time step is converted to a distribution of random walkers. 
 This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp and Karma \cite{plapp2000multiscale}) which is defined in equation \eqref{theory:Hc_definition}
 
@@ -248,22 +248,37 @@ As before $u_{ij}$ is the solution to the 2D diffusion equation evaluated at $x_
 
 Equation \eqref{theory:Hc_definition} effectively states that one ''unit`` of the solution $u$ will directly correspond to $Hc$ random walkers.
 
-\section{Other possible coupling methods}
+\subsection{Coupling the models through step length}
+
+To ensure that the $\tau$ time steps performed by the RW solver sums up to one time step for the PDE solver a limitation must be imposed on the RW solver. 
+This limitation can only be imposed on the step length of the random walkers, so the task at hand is to relate the step length to the PDE time step and $\tau$. \\
+Through an Einstein relation the variance in position is coupled to the diffusion constant.
+\begin{equation}\label{theory:einstein_relation}
+ \langle\tilde{\Delta x}^2\rangle = 2Dd\tilde{\Delta t}
+\end{equation}
+Where $\tilde{\Delta t}$ is the time step for the random walkers which is exactly $\tilde{\Delta t} = \frac{\Delta t}{\tau}$. 
+Similarly $\tilde{\Delta x}$ is the spatial resolution on the micro scale which is also the step length, $l$, for the random walkers. 
+Rewriting equation \eqref{theory:einstein_relation} gives the final expression for the step length
+
+\begin{equation}\label{theory_step_length}
+ l = \sqrt{2dD\frac{\Delta t}{\tau}}
+\end{equation}
+
+\subsection{Boundary conditions for the random walk}
 
 
 \section{Potential problems or pitfalls}\label{problems_and_pitfalls}
  
 This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.
 
-\subsubsection{Different timescales}
-The time scales are coupled through the step length of the random walkers which is shown in equation \eqref{steplength}. 
-\begin{equation}\label{steplength}
- l = \sqrt{2Dd\frac{\Delta t}{\tau}}
-\end{equation}
+% \subsubsection{Different timescales}
+% The time scales are coupled through the step length of the random walkers which is shown in equation \eqref{steplength}. 
+% \begin{equation}\label{steplength}
+%  l = \sqrt{2Dd\frac{\Delta t}{\tau}}
+% \end{equation}
+% 
+% Here $\tau$ is the number of time steps taken on the microscopic scale for each time step on the PDE scale, $d$ is the number of spatial dimensions, and $\Delta t$ is the time step on the PDE scale. 
 
-Here $\tau$ is the number of time steps taken on the microscopic scale for each time step on the PDE scale, $d$ is the number of spatial dimensions, and $\Delta t$ is the time step on the PDE scale. 
-
-\subsubsection{Boundary conditions for the random walk}
 
  
 \subsubsection{Negative concentration of walkers}
@@ -290,3 +305,5 @@ The workaround will at least keep the simulation from crashing, but has a fundam
 
 
 \subsubsection{Number of time-steps on the random walk level}
+
+% \subsection{Other possible coupling methods}
