@@ -72,8 +72,99 @@ The FE and BE schemes have errors proportional to $\Delta t$ so the tests are ex
 
 \subsection{Verification by manufactured solutions}
 
+Equation \eqref{manufactured_solution} solves the diffusion equation, so using $u(x,y,t=0)$ as the initial condition for a simulation will give us both the numerical solution and the exact solution. 
+An important property of the discretization scheme is that the difference between these solutions is of the same order as the time step.
+\begin{equation*}
+ \epsilon(t) \sim \mathcal{O}(\Delta t)
+\end{equation*}
+
+Figures \ref{analysis:errorplots:FE} and \ref{analysis:errorplots:BE} show that for both the FE and BE scheme in both 1D and 2D the error is of the expected magnitude. 
+Another interesting property of the error plots is that the error tends to zero after a large number of time steps. 
+By inserting the limit $t\to\infty$ in equation \eqref{manufactured_solution} we observe that the error is expected to tend to zero because the limit value of one can be exactly recreated by both schemes.
+\begin{align*}
+ \lim_{t\to\infty} e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1 = 1
+\end{align*}
+
+\begin{figure}[h]
+% Error plots for FE in 1D (a) and 2D (b)
+ \centering
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_29112013_1709/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \caption[]{}
+ \label{analysis:errorplots:FE}
+\end{figure}
 
 
+\begin{figure}[h]
+% Error plots for BE in 1D (a) and 2D (b)
+\centering
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+ \end{subfigure}
+ \caption[]{}
+ \label{analysis:errorplots:BE}
+\end{figure}
+
+\subsection{Verification by convergence tests}
+
+The convergence tests are done by isolating the error term from either the time derivative or the spatial derivative, and refining the relevant discretization parameter over several simulations. 
+Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order while figure \ref{analysis:spatial_convergence_test} verifies the error from the spatial derivative for the BE scheme.
+
+\begin{figure}[h]
+% Error plots for BE in 1D (a) and 2D (b)
+\centering
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+ \end{subfigure}
+ \caption[]{}
+ \label{analysis:convergence_tests:FE}
+\end{figure}
+
+\begin{figure}[h]
+% Error plots for BE in 1D (a) and 2D (b)
+\centering
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+ \end{subfigure}
+ \caption[]{}
+ \label{analysis:convergence_tests:BE}
+\end{figure}
+
+\begin{figure}[h]
+% Error plots for BE in 1D (a) and 2D (b)
+\centering
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+ \end{subfigure}
+ \caption[]{}
+ \label{analysis:spatial_convergence_tests}
+\end{figure}
 \subsection{Verification of FE scheme by exact numerical solution}
 
 Discretization of the diffusion equation by the FE scheme yields the following numerical scheme in 1D

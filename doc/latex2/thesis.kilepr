@@ -54,10 +54,10 @@ Mode=LaTeX
 
 [item:analysis.tex]
 archive=true
-column=126
+column=87
 encoding=UTF-8
 highlight=LaTeX
-line=32
+line=75
 mode=LaTeX
 open=true
 order=3
@@ -77,7 +77,7 @@ archive=true
 column=0
 encoding=UTF-8
 highlight=LaTeX
-line=247
+line=307
 mode=LaTeX
 open=true
 order=0
@@ -103,8 +103,8 @@ open=true
 order=2
 
 [view-settings,view=0,item:analysis.tex]
-CursorColumn=126
-CursorLine=32
+CursorColumn=87
+CursorLine=75
 JumpList=
 ViMarks=
 
@@ -116,7 +116,7 @@ ViMarks=
 
 [view-settings,view=0,item:theory.tex]
 CursorColumn=0
-CursorLine=247
+CursorLine=307
 JumpList=
 ViMarks=
 

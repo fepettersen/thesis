@@ -12,7 +12,7 @@ $V$ is contained by a surface $S$ and the relation is shown in Figure \ref{theor
  \label{theory:divergence_theorem}
 \end{figure}
 
-As the random walkers start to move some of them will leave the volume $V$ which results in a change in $C$. 
+\noindent As the random walkers start to move some of them will leave the volume $V$ which results in a change in $C$. 
 The net movement of random walkers at a point is called the flux of walkers and is denoted by the flux vector $\mathbf J$. 
 To find the number of walkers that leave $V$ we integrate the normal component of $\mathbf J$ over $S$. 
 Assuming that no walkers disappear or are created the flux of walkers leaving $V$ must be balanced by the decrease in $C$, expressed in equation \eqref{theory:diffusion_integral_form}. 
@@ -21,25 +21,25 @@ Assuming that no walkers disappear or are created the flux of walkers leaving $V
  \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS
 \end{equation}
 
-Through Greens theorem equation \eqref{theory:diffusion_integral_form} can be reformulated
+\noindent Through Greens theorem equation \eqref{theory:diffusion_integral_form} can be reformulated
 
 \begin{equation}\label{theory:integral_form}
  \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV
 \end{equation}
 
-The flux $\vec{J}$ can be expressed by Fick's first law as the diffusive flux 
+\noindent The flux $\vec{J}$ can be expressed by Fick's first law as the diffusive flux 
 \begin{equation}
  \vec J = D\nabla C
 \end{equation}
 
-where $D$ is the diffusion constant. Since $V$ was chosen as an arbitrary volume equation \eqref{theory:integral_form} is independent of the integration and the integrals can be dropped. 
+\noindent where $D$ is the diffusion constant. Since $V$ was chosen as an arbitrary volume equation \eqref{theory:integral_form} is independent of the integration and the integrals can be dropped. 
 The diffusive flux $\mathbf{J}$ is also inserted to yield the diffusion equation
 
 \begin{equation}\label{theory:diffusion_equation}
  \frac{\d C}{\d t} = D\nabla^2 C
 \end{equation}
 
-Throughout this thesis $C$ will denote a spatial distribution of random walkers. 
+\noindent Throughout this thesis $C$ will denote a spatial distribution of random walkers. 
 $C$ is best illustrated in Figure \ref{theory:illustration_C}.
 
 \begin{figure}[H]
@@ -65,7 +65,7 @@ This generator is chosen because of its very large period compared to the comput
 
 \section{Backward Euler schemes in 2 or more spatial dimensions}
 
-The basics of solving partial differential equations (PDEs\nomenclature{PDE}{partial differential equation}) by finite difference methods is considered to be known. 
+The reader is assumed to know the basics of solving partial differential equations (PDEs\nomenclature{PDE}{partial differential equation}) by finite difference methods. 
 This section will concern the special case of how to solve PDEs by the implicit Backward Euler (BE\nomenclature{BE}{Backward Euler}) scheme, especially in more than one spatial dimension.
 First, let us look at the BE discretization of the diffusion equation in 1D. 
 
@@ -82,7 +82,7 @@ Neumann boundary conditions will be used, these are described in equation \eqref
  \frac{\d u}{\d n} = 0|_{\text{on boundary}}
 \end{equation}
 
-Solving the BE scheme by hand for a very small mesh consisting of $4$ mesh points will reveal the structure of the BE scheme.
+\noindent Solving the BE scheme by hand for a very small mesh consisting of $4$ mesh points will reveal the structure of the BE scheme.
 \begin{align*}
  &u^{n+1}_0 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{0}+D_{1})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_0\\
  &u^{n+1}_1 = \frac{\Delta t}{2\Delta x^2}\left((D_{2}+D_{1})(u^{n+1}_{2}-u^{n+1}_{1})-(D_{1}+D_{0})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_1\\
@@ -90,7 +90,7 @@ Solving the BE scheme by hand for a very small mesh consisting of $4$ mesh point
  &u^{n+1}_3 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{2}+D_{3})(u^{n+1}_{3}-u^{n+1}_{2})\right) + u^n_3
 \end{align*}
 
-Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ results in a normal system of linear equations
+\noindent Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ results in a normal system of linear equations
 \begin{align*}
  &u^{n+1}_0\left(1+2a(D_0+D_1)\right)- 2au^{n+1}_{1}(D_1+D_0) =  u^n_0\\
  &u^{n+1}_1\left(1+a(D_2+2D_1+D_0)\right)-au^{n+1}_{2}(D_2+D_1)-au^{n+1}_{0}(D_1+D_0) = u^n_1\\
@@ -112,14 +112,14 @@ which is arranged as
   \mathbf{M}\mathbf{u}^n = \mathbf{u}^{n-1}
 \end{equation}
 
-If a linear system like the one in equation \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination \textcolor{red}{check this}. 
+\noindent If a linear system like the one in equation \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination \textcolor{red}{check this}. 
 However, for a sparse linear system a lot of the calculations in a Gaussian elimination will be done with zeros. 
-A more efficient way to solve the linear system in eq. \eqref{theory:BE:linear_system} is by exploiting the fact that it is tridiagonal. 
+A dramatically more efficient way to solve the linear system in \eqref{theory:BE:linear_system} is by exploiting the fact that it is tridiagonal. 
 In order to be more consistent with the algorithm, eq. \eqref{theory:BE:linear_system} will be rewritten as
 \begin{equation}
   \mathbf{M}\mathbf{u} = \mathbf{up}
 \end{equation}
-
+where $\mathbf{up}$ denotes the solution $\mathbf{u}$ at the previous time step. 
 Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algorithm listed below.
 
 \lstinputlisting{Figures/tridiag.cpp}
@@ -132,7 +132,7 @@ In two spatial dimensions the BE discretization gives the scheme shown in equati
  \underbrace{-\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{n+1}_{i,j+1}+u^{n+1}_{i,j-1}\right)
 \end{equation}
 
-Equation \eqref{general_scheme_BE2D} assembles to the linear system in equation \eqref{linear_system_BE2D} when solved on a $3\times3$ mesh.
+\noindent Equation \eqref{general_scheme_BE2D} assembles to the linear system in equation \eqref{linear_system_BE2D} when solved on a $3\times3$ mesh.
 \begin{align}\label{linear_system_BE2D}
   \left(\begin{array}{c c c : c c c : c c c}
         \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
@@ -147,7 +147,7 @@ Equation \eqref{general_scheme_BE2D} assembles to the linear system in equation 
        \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{align}
 
-The dashed lines confine a total of nine $3\times 3$ matrices which can be used to reformulate the $2n +1 = 7$ band diagonal system as a block tridiagonal system as shown below.
+\noindent The dashed lines confine a total of nine $3\times 3$ matrices which can be used to reformulate the $2n +1 = 7$ band diagonal system as a block tridiagonal system as shown below.
 \begin{align}\label{block_tridiagonal_dashed}
  \left(\begin{array}{c : c : c }
         B_0 & C_0 &0  \\ \hdashline
@@ -156,7 +156,7 @@ The dashed lines confine a total of nine $3\times 3$ matrices which can be used 
        \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{align}
 
-All entries in eq. \eqref{block_tridiagonal_dashed} are $3\times3$ matrices. 
+\noindent All entries in eq. \eqref{block_tridiagonal_dashed} are $3\times3$ matrices. 
 In the general case where the diffusion equation is discretized and solved on a mesh of size $n\times n$ the resulting block tridiagonal system will consist of $n^2$ matrix entries which all are $n\times n$ matrices.
 % In two spatial dimensions the BE discretization will result in a a $2n$ band diagonal matrix of size $n^2\times n^2$ with 5 nonzero bands. 
 % This band diagonal matrix can be rewritten as a block tridiagonal matrix with $n\times n$ matrices as entries. 
