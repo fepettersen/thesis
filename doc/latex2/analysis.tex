@@ -293,3 +293,99 @@ Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorpl
 \end{figure}
 
 \section{Verification of the RW solver}
+
+The aim of this section is to verify that the implemented RW model will solve the diffusion equation with on the correct time scale, and to verify that the error term from the RW solver is dependent on the conversion factor, $Hc$. 
+In order to carry out the tests a new initial condition that can easily be recreated by random walkers will be introduced.
+\begin{equation}
+ u(t=0,x) = H\left(x-\frac{1}{2}\right)
+\end{equation}
+\noindent $H(x)$ denotes the Heaviside step function defined by its properties
+\begin{equation}\label{Heaviside_def}
+ H(x-a) = \begin{cases}
+           1\;\;x\geq a\\
+           0\;\;x<a
+          \end{cases}
+\end{equation}
+\noindent The new initial condition gives a new exact solution which is found by separation of variables as 
+\begin{equation}
+ u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
+\end{equation}
+
+Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
+The convergence is not very good, but this is expected because of the fluctuations which causes the error to stabilize around a certain value rather than converge to zero.
+
+\begin{figure}[h]
+ \centering
+\begin{subfigure}[t]{0.49\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_01052014_1615_Redoing_RW_tests/results/errorplot.eps}
+ \caption{}
+ \label{ConvergenceTestRW:dt:errorplot}
+\end{subfigure}
+ \begin{subfigure}[t]{0.49\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_01052014_1615_Redoing_RW_tests/results/ConvergenceTest.eps}
+  \caption{}
+ \label{ConvergenceTestRW:dt:convergence}
+\end{subfigure}
+\caption[]{Error plot (a) and convergence test (b) for 1D RW solver using a Heaviside step function as initial condition. In these tests both the time step and the conversion factor are changed for each simulation, and the conversion factor follows the previously proposed limit $Hc\geq\frac{1}{\Delta t^2}$. For each $\Delta t$ the RW simulation does 250 steps with a step length calculated from \eqref{theory:step_length}. The expected convergence rate is $0.5$, and to some extent this is achieved here, note however that due to fluctuations in the solution getting a good error measure is difficult and beyond our control.}
+ \label{ConvergenceTestRW:dt}
+\end{figure}
+\begin{figure}[h]
+ \centering
+ \begin{subfigure}[t]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/errorplot.eps}
+ \end{subfigure}
+\begin{subfigure}[t]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/ConvergenceTest.eps}
+\end{subfigure}
+\caption[Test RW]{As a comparison to Figures \ref{ConvergenceTestRW:dt} this test has been done for the same 1D Heaviside step function as initial condition, but keeps the time step fixed at $\Delta t = 0.05$ and increases the conversion factor. The convergence rate (fig. b) is worse than for the time convergence test, and seems to reach a limit where increasing the number of walkers has little effect on the error.}
+\label{ConvergenceTestRW:Hc}
+\end{figure}
+\clearpage
+\section{Verification of the hybrid solver}
+
+This section aims to achieve first order convergence in time for the hybrid solver by introducing a sufficient number of walkers. 
+Effects of varying the number of mesh points affected by the RW solver will also be illustrated. \\
+
+The number of walkers needed to achieve first order convergence in time for the hybrid solver is governed by 
+\begin{equation}
+ Hc\geq\frac{1}{\Delta t^2}
+\end{equation}
+\noindent This demand makes use of the FE scheme difficult because of the stability criterion, and so all tests are done with the BE scheme. 
+Figure \ref{combined_BE1d} shows first order convergence for the hybrid model.
+
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_15042014_0608_convergence_tests_etc/results/errorplot.eps}
+\caption{}  
+ \label{combined_BE1d:errorplot}
+ \end{subfigure}
+ \begin{subfigure}[b]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_15042014_0608_convergence_tests_etc/results/ConvergenceTest.eps}
+  \caption{}
+   \label{combined_BE1d:convergence}
+ \end{subfigure}
+ \caption[Error test for BE combined with RW in 1D]{\ref{combined_BE1d:errorplot} shows the error plot for a test where $\Delta x$ was fixed at $\Delta x = \frac{1}{100}$ and $\Delta t$ was reduced from $0.05$ to $0.01$ and finally to $0.005$. 
+ The conversion rate, $Hc$ was updated for each simulation to have the value $Hc = \frac{1}{\Delta t^2}$, meaning the error from the walkers should be smaller than the error from the time derivative. 
+ Walkers are placed on 10\% of the mesh from $x=0.4$ to $x=0.5$. 
+ \ref{combined_BE1d:convergence} shows the convergence rate in time for the same test.}
+ \label{combined_BE1d}
+\end{figure}
+
+Decreasing or increasing the relative size of the microscopic model as serious effects on the error and is illustrated in figure \ref{testing_walk_area_size_BE}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_16042014_1139_convergence_tests_etc/results/errorplot.eps}
+ \caption{Having walkers on 5\% of the mesh points.}
+ \label{errorplot_BE1D_walk_5_percent}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+ \includegraphics[width=\textwidth]{../results/experiment_16042014_1202_tests_35percent_walkers/results/errorplot.eps}
+ \caption{Having walkers on 35\% of the mesh points.}
+ \label{errorplot_BE1D_walk_35_percent}
+\end{subfigure}
+\caption[Effects of increasing relative size of walk area]{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.05$ and $\Delta x = 0.01$ using the BE discretization.}
+\label{testing_walk_area_size_BE}
+\end{figure}
