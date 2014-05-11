@@ -1,13 +1,13 @@
 \section{The error estimate}
 
-Solving PDEs numerically will result in errors because derivatives are approximated by finite differences. 
+Solving PDEs numerically will result in errors because derivatives are approximated by finite differences and the PDE is required to be fulfilled only on the mesh points. 
 For the schemes used in this thesis the error, $\epsilon$ will follow equation \eqref{analysis:error}
 
 \begin{equation}\label{analysis:error}
  \epsilon = C_x\Delta x^2 + C_t\Delta t
 \end{equation}
 
-where the coefficients $C_x$ and $C_t$ are unknown. 
+\noindent where the coefficients $C_x$ and $C_t$ are unknown. 
 Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. 
 
 The error is measured by comparing the result from a numerical simulation to an exact solution, $u_e$ and taking the norm of the difference. 
@@ -15,10 +15,11 @@ Specifically $\epsilon$ is measured by the L2 norm which is defined in equation 
 % \label{analysis:def_epsilon}
 \begin{align}
  \epsilon(t^n) &= ||u(t^n)-u_e(t^n)||_2 \nonumber \\
- &= \sqrt{\Delta x\Delta y\sum\limits_{i=0}^n\sum\limits_{i=0}^n \left(u(t^n,x_i,y_j)-u_e(t^n,x_i,y_j)\right)^2}\label{analysis:def_epsilon}
+ &= \iint\sqrt{\left(u(t^n,x,y)-u_e(t^n,x,y)\right)^2}\,dx\,dy \nonumber \\
+ &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^n\sum\limits_{i=0}^n \left(u(t^n,x_i,y_j)-u_e(t^n,x_i,y_j)\right)^2}\label{analysis:def_epsilon}
  \end{align}
  
-$\epsilon$ is time dependent because it allows for investigation of the evolution of the error over the course of a simulation.
+\noindent $\epsilon$ is time dependent because it allows for investigation of the evolution of the error over the course of a simulation.
 Some of the error tests will require a single number as an error measure. 
 In these cases the norm of $\epsilon(t)$, defined in eq. \eqref{analysis:convergence_test_error} is used.
 \begin{equation}\label{analysis:convergence_test_error}
@@ -290,3 +291,5 @@ Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorpl
  This increased error originates in the many roundoff errors in the inverted matrix where a lot of terms $10^{-16}$ and smaller.}
  \label{numex:BE_errorplot}
 \end{figure}
+
+\section{Verification of the RW solver}

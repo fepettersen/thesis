@@ -61,12 +61,17 @@ $C$ is best illustrated in Figure \ref{theory:illustration_C}.
 
 To produce a random walk one must have random numbers. 
 The random numbers in this thesis are produced by a five seeded xor-shift algorithm copied from George Marsaglia \cite{marsaglia2003xorshift}. 
-This generator is chosen because of its very large period compared to the computational cost.
+This generator is chosen because of its very large period ($\sim10^{48}$) compared to the computational cost.
 
 \section{Backward Euler schemes in 2 or more spatial dimensions}
 
-The reader is assumed to know the basics of solving partial differential equations (PDEs\nomenclature{PDE}{partial differential equation}) by finite difference methods. 
-This section will concern the special case of how to solve PDEs by the implicit Backward Euler (BE\nomenclature{BE}{Backward Euler}) scheme, especially in more than one spatial dimension.
+The reader is assumed to know the basics of solving partial differential equations (PDEs\nomenclature{PDE}{Partial Differential Equation}) by finite difference methods, but for the sake of clarity the two schemes used in this thesis are written out. 
+\begin{equation}\label{theory_theta_rule}
+ \frac{u^{n+1}-u^n}{\Delta t} = \theta D\frac{\d^2 u^{n+1}}{\d x^2} + (1-\theta)D\frac{\d^2 u^{n}}{\d x^2}
+\end{equation}
+\noindent Having $\theta = 0$ gives the Forward Euler (FE\nomenclature{FE}{Forward Euler}) scheme, and $\theta = 1$ gives the  Backward Euler (BE\nomenclature{BE}{Backward Euler}) scheme. \\
+This section will concern a simple, but elegant way of efficiently solving the diffusion equation by the implicit BE scheme in more than one spatial dimension. 
+% This section will concern the special case of how to solve the diffusion equation by the implicit BE scheme, especially in more than one spatial dimension.
 First, let us look at the BE discretization of the diffusion equation in 1D. 
 
 \begin{align}\label{theory:BE_scheme_1D}
@@ -76,7 +81,7 @@ $u$ is here the unknown function which solves the diffusion equation.
 Note that 
 $$u^n_i = u(t_0+n\cdot\Delta t,x_0+i\cdot\Delta x)$$
 and not $u$ to the $n$'th power. \\
-Neumann boundary conditions will be used, these are described in equation \eqref{theory:Neumann_boundaries}.
+Neumann boundary conditions will be used, these are described in \eqref{theory:Neumann_boundaries}.
 
 \begin{equation}\label{theory:Neumann_boundaries}
  \frac{\d u}{\d n} = 0|_{\text{on boundary}}
@@ -107,15 +112,15 @@ which is arranged as
         0& 0& a_3 & b_3\\
        \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{align}
-
+\noindent The coefficient matrix in \eqref{BE} will be labeled $\mathbf M$ throughout the thesis.
 \begin{equation}\label{theory:BE:linear_system}
   \mathbf{M}\mathbf{u}^n = \mathbf{u}^{n-1}
 \end{equation}
 
-\noindent If a linear system like the one in equation \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination \textcolor{red}{check this}. 
+\noindent If a linear system like the one in \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination \textcolor{red}{check this}. 
 However, for a sparse linear system a lot of the calculations in a Gaussian elimination will be done with zeros. 
 A dramatically more efficient way to solve the linear system in \eqref{theory:BE:linear_system} is by exploiting the fact that it is tridiagonal. 
-In order to be more consistent with the algorithm, eq. \eqref{theory:BE:linear_system} will be rewritten as
+In order to be more consistent with the algorithm, \eqref{theory:BE:linear_system} will be rewritten as
 \begin{equation}
   \mathbf{M}\mathbf{u} = \mathbf{up}
 \end{equation}
@@ -132,7 +137,8 @@ In two spatial dimensions the BE discretization gives the scheme shown in equati
  \underbrace{-\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{n+1}_{i,j+1}+u^{n+1}_{i,j-1}\right)
 \end{equation}
 
-\noindent Equation \eqref{general_scheme_BE2D} assembles to the linear system in equation \eqref{linear_system_BE2D} when solved on a $3\times3$ mesh.
+\noindent If \eqref{general_scheme_BE2D} is solved by hand on a $3\times3$ mesh by the same steps as in 1D it gives the following linear system
+% \noindent Equation \eqref{general_scheme_BE2D} assembles to the linear system in equation \eqref{linear_system_BE2D} when solved on a $3\times3$ mesh.
 \begin{align}\label{linear_system_BE2D}
   \left(\begin{array}{c c c : c c c : c c c}
         \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
@@ -230,7 +236,7 @@ The remaining calculations include three matrix vector multiplications, all of w
 \subsection{The algorithm}
 After setting an initial condition and diffusion constant the diffusion problem is solved on both the microscopic and macroscopic meshes and combined into a common solution by the following steps.
 \begin{itemize}
- \item The result from last PDE time step, $\mathbf{up}$, is converted to a distribution of random walkers and sent to the RW solver
+ \item The result from previous PDE time step, $\mathbf{up}$, is converted to a distribution of random walkers and sent to the RW solver
  \item The RW solver does a predefined number of micro scale time steps which correspond to one PDE time step
  \item The result from the RW solver is converted back to a concentration and this replaces the PDE solution
  \item $\mathbf{up}$ is then used as input to calculate the next time step
@@ -244,7 +250,8 @@ This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp 
  C_{ij} = Hc\cdot u_{ij}
 \end{equation}
 
-As before $u_{ij}$ is the solution to the 2D diffusion equation evaluated at $x_0 +i\Delta x$ and $y_0 +j\Delta y$, and $C_{ij}$ is the number of random walkers located in the rectangle defined by $x_i\pm\frac{\Delta x}{2}$ and $y_j\pm\frac{\Delta y}{2}$. 
+\noindent As before $u_{ij}$ is the solution to the 2D diffusion equation evaluated at $x_0 +i\Delta x$ and $y_0 +j\Delta y$, and $C_{ij}$ is the number of random walkers located in the rectangle defined by $x_i\pm\frac{\Delta x}{2}$ and $y_j\pm\frac{\Delta y}{2}$. 
+Walkers are given a random position within this rectangle at the beginning of each PDE time step. 
 
 Equation \eqref{theory:Hc_definition} effectively states that one ''unit`` of the solution $u$ will directly correspond to $Hc$ random walkers.
 
