@@ -1,0 +1,16 @@
+The following chapter is included to show that the developed hybrid diffusion solver can be applied to real life problems with only minor modifications.
+
+\section{Physical scope}
+
+
+
+\section{Implementation}
+
+The developed computer code has been slightly modified in order to support modeling of dendrites and dendritic spines. 
+First of all special dendritic spine objects have been developed. 
+These are RW solvers with a funnel like geometry and some extra length parameters added. \\
+The second modification is to the class responsible for combining the PDE and RW solvers. 
+Since dendritic spines are placed on the boundary of a dendrite there is only surface overlap between the two length scales which eliminates the need for redistribution of walkers at each time step is eliminated.
+
+\section{Parameters}
+

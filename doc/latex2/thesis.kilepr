@@ -3,7 +3,7 @@ def_graphic_ext=eps
 img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
-kileversion=2.1.3
+kileversion=2.1.0
 lastDocument=theory.tex
 masterDocument=
 name=thesis
@@ -17,13 +17,14 @@ MakeIndex=
 QuickBuild=
 
 [document-settings,item:analysis.tex]
-Bookmarks=
+Bookmarks=341,353
 Encoding=UTF-8
 FoldedColumns=
 FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=normal
 Mode=LaTeX
+ReadWrite=true
 
 [document-settings,item:introduction.tex]
 Bookmarks=
@@ -33,6 +34,7 @@ FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=normal
 Mode=LaTeX
+ReadWrite=true
 
 [document-settings,item:theory.tex]
 Bookmarks=
@@ -42,6 +44,7 @@ FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=normal
 Mode=LaTeX
+ReadWrite=true
 
 [document-settings,item:thesis.tex]
 Bookmarks=
@@ -51,13 +54,14 @@ FoldedLines=
 Highlighting=LaTeX
 Indentation Mode=normal
 Mode=LaTeX
+ReadWrite=true
 
 [item:analysis.tex]
 archive=true
-column=42
+column=12
 encoding=UTF-8
 highlight=LaTeX
-line=165
+line=390
 mode=LaTeX
 open=true
 order=3
@@ -74,10 +78,10 @@ order=1
 
 [item:theory.tex]
 archive=true
-column=0
+column=30
 encoding=UTF-8
 highlight=LaTeX
-line=184
+line=269
 mode=LaTeX
 open=true
 order=0
@@ -94,19 +98,19 @@ order=-1
 
 [item:thesis.tex]
 archive=true
-column=15
+column=2
 encoding=UTF-8
 highlight=LaTeX
-line=44
+line=15
 mode=LaTeX
 open=true
 order=2
 
 [view-settings,view=0,item:analysis.tex]
-CursorColumn=42
-CursorLine=165
+CursorColumn=12
+CursorLine=390
 JumpList=
-ViMarks=
+ViMarks=a,341,0,b,353,0
 
 [view-settings,view=0,item:introduction.tex]
 CursorColumn=0
@@ -115,13 +119,13 @@ JumpList=
 ViMarks=
 
 [view-settings,view=0,item:theory.tex]
-CursorColumn=0
-CursorLine=184
+CursorColumn=30
+CursorLine=269
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:thesis.tex]
-CursorColumn=15
-CursorLine=44
+CursorColumn=2
+CursorLine=15
 JumpList=
 ViMarks=
