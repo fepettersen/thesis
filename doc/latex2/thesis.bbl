@@ -16,6 +16,110 @@
   {}
 \endgroup
 
+\entry{arellano2007ultrastructure}{article}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Arellano}{A.}%
+     {Jon~I}{J.~I.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Benavides-Piccione}{B.-P.}%
+     {Ruth}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {DeFelipe}{D.}%
+     {Javier}{J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Yuste}{Y.}%
+     {Rafael}{R.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Frontiers Research Foundation}%
+  }
+  \strng{namehash}{AJI+1}
+  \strng{fullhash}{AJIBPRDJYR1}
+  \field{sortinit}{A}
+  \field{number}{1}
+  \field{pages}{131}
+  \field{title}{{Ultrastructure of dendritic spines: correlation between
+  synaptic and spine morphologies}}
+  \field{volume}{1}
+  \field{journaltitle}{Frontiers in neuroscience}
+  \field{year}{2007}
+\endentry
+
+\entry{craske2005spines}{article}{}
+  \name{author}{4}{}{%
+    {{}%
+     {Craske}{C.}%
+     {Madeleine~L}{M.~L.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Fivaz}{F.}%
+     {Marc}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Batada}{B.}%
+     {Nizar~N}{N.~N.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Meyer}{M.}%
+     {Tobias}{T.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{CML+1}
+  \strng{fullhash}{CMLFMBNNMT1}
+  \field{sortinit}{C}
+  \field{title}{{Spines and neurite branches function as geometric attractors
+  that enhance protein kinase C action}}
+\endentry
+
+\entry{light1996protein}{article}{}
+  \name{author}{5}{}{%
+    {{}%
+     {Light}{L.}%
+     {Peter~E}{P.~E.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Sabir}{S.}%
+     {Aftab~A}{A.~A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Allen}{A.}%
+     {Bruce~G}{B.~G.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Walsh}{W.}%
+     {Michael~P}{M.~P.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {French}{F.}%
+     {Robert~J}{R.~J.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{LPE+1}
+  \strng{fullhash}{LPESAAABGWMPFRJ1}
+  \field{sortinit}{L}
+  \field{title}{{Protein Kinase C--Induced Changes in the Stoichiometry of ATP
+  Binding Activate Cardiac ATP-Sensitive K+ Channels A Possible Mechanistic
+  Link to Ischemic Preconditioning}}
+\endentry
+
 \entry{marsaglia2003xorshift}{article}{}
   \name{author}{1}{}{%
     {{}%

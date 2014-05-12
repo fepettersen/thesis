@@ -273,10 +273,22 @@ Rewriting equation \eqref{theory:einstein_relation} gives the final expression f
 
 \subsection{Boundary conditions for the random walk}
 
+Because the RW area must correspond to an area on the PDE mesh which has a finite, constant size the RW model must have boundary conditions imposed on it. 
+In order to make absolutely sure that no walkers disappear and by extension that the amount of concentration is conserved, perfectly reflecting boundaries are chosen for the RW model. 
+Reflecting boundaries correspond to zero flux Neumann boundaries
+\begin{equation}
+ \frac{\d C}{\d n} = 0
+\end{equation}
+Neumann boundaries might seem unphysical, but the redistribution of walkers at each PDE time step must also to some extent be considered as a boundary condition. \\
+In hindsight, a possibly better choice of boundary conditions for the RW model would have been perfect exchange of flux between the two solvers. 
+\begin{equation}
+ \frac{\d u}{\d n} = \frac{\d C}{\d n}
+\end{equation}
+Since time does not allow for this to be tested it will be left as a reference to possible future work.
 
 \section{Potential problems or pitfalls}\label{problems_and_pitfalls}
  
-This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.
+\emph{\textcolor{red}{This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.}}
 
 % \subsubsection{Different timescales}
 % The time scales are coupled through the step length of the random walkers which is shown in equation \eqref{steplength}. 
@@ -304,13 +316,64 @@ The workaround will at least keep the simulation from crashing, but has a fundam
  \includegraphics[width=\textwidth]{Figures/signmap_illustration_pt2.eps}
  \caption{}
 \end{subfigure}
-\caption[Workaround for negative concentrations, illustration]{An illustration of the proposed workaround for negative concentrations and an illustration of how well it works (b). The fundamental problem is that a diffusion process will even out discontinuities such as the one in (a). The result of this evening out is shown in (b) as an increase in concentration in the middle mesh point which should remain equal to zero.}
+\caption[Workaround for negative concentrations, illustration]{An illustration of the proposed workaround for negative concentrations and an illustration of how it performs (b). The fundamental problem is that a diffusion process will even out discontinuities such as the one in (a). The result of this evening out is shown in (b) as an increase in concentration in the middle mesh point which should remain equal to zero.}
 \label{theory:signmap_illustration}
  \end{figure}
 
 \subsubsection{Smooth solutions}
 
+ A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
+ When a stochastic process is introduced, rapid fluctuations from one time-step to the next might follow.
+ In this case a dilemma arises; on the one hand there is the smoothness of the solution to consider, on the other hand the stochastic term was introduced believing that it adds detail to the model. 
+ The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
+ A polynomial regression model was implemented in 1D, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
+ The idea behind this polynomial regression model is described in more detail in section \ref{other_possible_coupling_methods}. \\
+ In the end the order of integration was switched so that the PDE solver can reduce the worst of the fluctuations from the RW model. 
+ This ensures some smoothness and some fluctuations and is considered a working compromise. 
 
-\subsubsection{Number of time-steps on the random walk level}
+\subsubsection{Number of time steps on the random walk level}
 
-% \subsection{Other possible coupling methods}
+The reason for introducing a random walk model in the diffusion solver was to represent parts of the mesh at a higher resolution than the rest of the process. 
+This means that the RW solver must take $\tau$ time steps for each PDE time step. 
+$\tau$ could in principle be any integer, but should be chosen large enough so the central limit theorem is satisfied. 
+This usually means $\tau\geq50$. \\
+Alternatively $\tau$ can be calculated from the assumption that the error term wrt. time arising from the RW model is proportional to the square root of the time step. 
+This assumption comes from the fact that the step length is proportional to the square root of the time step.
+
+\begin{equation}
+ \epsilon \propto \sqrt{\tilde{\Delta t}}
+\end{equation}
+In order to make the error of the same size as the error from the PDE model we use 
+\begin{align*}
+ \tilde{\Delta t} &= \frac{\Delta t}{\tau} \\
+ \implies \epsilon &\propto \sqrt{\frac{\Delta t}{\tau}} \\
+ \mathcal{O}(\Delta t) &\geq \sqrt{\frac{\Delta t}{\tau}} \\
+ \implies \tau \geq \frac{1}{\Delta t}
+\end{align*}
+\noindent Note that the error associated with the number of walkers introduced is of much higher significance than the error from the time step.
+
+\section{Other possible coupling methods}\label{other_possible_coupling_methods}
+
+Running the solution from the PDE model through a RW model gives two solutions for a part of the mesh. 
+As it turns out it is sufficient to simply replace the PDE solution with the RW solution in this area, which is nice seeing as it is the simplest possible method. 
+There are however some other ways to do this which have been tested, and found inadequate or simply been disregarded. Three of these are mentioned below. 
+\begin{itemize}
+ \item Averaging the two solutions \\
+ This method is simple and reduces fluctuations by approximately one half (approximately because fluctuations will be present after the first time step). 
+ The reason an average was scraped is simply that results just as good were achieved by only replacing the solution.
+ \item Polynomial regression \\
+ \emph{\textcolor{red}{Explain what polynomial regression is??}}
+ In order to smoothen out the solution from the RW model a polynomial regression function was tested. 
+ The principle was to look at the solution from the RW model as a set of data points which have some dependency on their position on the PDE mesh. 
+ Figure \ref{theory:polyreg} shows how this method worked for a slightly exaggerated case. 
+ \begin{figure}[H]
+ \centering
+ \includegraphics[width=0.7\textwidth]{Figures/polyreg.png}
+ \caption{}
+ \label{theory:polyreg}
+ \end{figure}
+ This approach turns out to have two problems; first and foremost the amount of concentration is no longer conserved, secondly the endpoints are usually way off.
+ \item Cubic spline interpolation \\
+ \emph{\textcolor{red}{Explain what cubic spline is??}} 
+ Cubic spline interpolation has the same problem as polynomial regression when it comes to conserving energy.
+\end{itemize}
