@@ -29,20 +29,23 @@ In these cases the norm of $\epsilon(t)$, defined in eq. \eqref{analysis:converg
 \section{Verification techniques}
 
 This thesis will focus on three verification techniques which are described below. 
-The aim for all of these techniques is to make sure that the error term follows equation \eqref{analysis:error}. 
+The aim for all of these techniques is to make sure that the implementation is correct by comparing simulations results known to be correct. 
+% The aim for all of these techniques is to make sure that the error term follows equation \eqref{analysis:error}. 
 Since an incorrect implementation of the spatial derivative will cause the solution to be unstable which is easily noticed through visual inspection, the tests will focus on verifying the time derivative. 
 Isolating the contribution to $\epsilon(t)$ from the time derivative will be necessary and is ensured by setting $\Delta t \gg\Delta x^2$. 
-A time step of this size violates the stability criterion for the FE scheme, and so some of the tests are omitted for this scheme. \\
+A time step of this size violates the stability criterion for the FE scheme, and so some of the tests are slightly inaccurate for this scheme. \\
 
 The verification techniques are
 
 \begin{itemize}
  \item Manufactured solutions\\
- By choosing an adequate initial condition the exact solution to the diffusion equation can be found with relative ease. 
+ By modifying the source term almost any solution can be chosen, hence the name ``manufactured solutions''. 
+%  By choosing an adequate initial condition the exact solution to the diffusion equation can be found with relative ease. 
  The chosen solution is
  \begin{equation}\label{manufactured_solution}
   u(x,y,t) = e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1
  \end{equation}
+ which requires no source term. 
   The point of these tests is to verify that $\epsilon \sim \Delta t$ and the tests can be done for a time step which fulfills the stability criterion.
   \item Convergence tests \\
   In the general case the error term is proportional to the time step to some power $r$ when the error from the time derivative is dominant.
@@ -60,7 +63,8 @@ By comparing the error from two simulations with different time steps the expone
    \log\left(\frac{\epsilon_1}{\epsilon_2}\right) &\simeq r\log\left(\frac{\Delta t_1}{\Delta t_2}\right)\\
    r&\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}
 \end{align*}
-The FE and BE schemes have errors proportional to $\Delta t$ so the tests are expected to measure $r=1$.
+The FE and BE schemes have errors proportional to $\Delta t$ so the tests are expected to measure $r=1$. 
+For these tests it is better if the time step is larger than the stability criterion for the FE scheme.
   \item Exact numerical solutions \\
   The numerical schemes are actually reformulations of the PDE we are trying to solve as difference equations which have their own exact solutions. 
   These will be called the numerical exact solutions, and they are slightly different from the exact solutions to the PDE. 
@@ -94,7 +98,7 @@ By inserting the limit $t\to\infty$ in equation \eqref{manufactured_solution} we
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_29112013_1709/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_29112013_1709/results/deterministic_errorplot.eps}
   \caption{}
  \end{subfigure}
  \caption[]{}
@@ -107,11 +111,11 @@ By inserting the limit $t\to\infty$ in equation \eqref{manufactured_solution} we
 \centering
  \begin{subfigure}{0.49\textwidth}
   \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{}
+  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+  \includegraphics[width=\textwidth]{../results/experiment_18042014_1450_convergencetest_BE2D/results/errorplot.eps}
+  \caption{}
  \end{subfigure}
  \caption[]{}
  \label{analysis:errorplots:BE}
@@ -120,50 +124,50 @@ By inserting the limit $t\to\infty$ in equation \eqref{manufactured_solution} we
 \subsection{Verification by convergence tests}
 
 The convergence tests are done by isolating the error term from either the time derivative or the spatial derivative, and refining the relevant discretization parameter over several simulations. 
-Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order while figure \ref{analysis:spatial_convergence_test} verifies the error from the spatial derivative for the BE scheme.
+Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order while figure \ref{analysis:spatial_convergence_tests} verifies the error from the spatial derivative for the BE scheme.
 
 \begin{figure}[h]
-% Error plots for BE in 1D (a) and 2D (b)
+% Convergence tests for FE in 1D (a) and 2D (b)
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/ConvergenceTest.eps}
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+  \includegraphics[width=\textwidth]{../results/experiment_29112013_1709/results/ConvergenceTest.eps}
+  \caption{}
  \end{subfigure}
- \caption[]{}
+ \caption[Convergence tests in time FE scheme]{Convergence tests with respect to the time derivative for the FE scheme in 1D (a) and 2D (b). }
  \label{analysis:convergence_tests:FE}
 \end{figure}
 
 \begin{figure}[h]
-% Error plots for BE in 1D (a) and 2D (b)
+% Convergence tests for BE in 1D (a) and 2D (b)
 \centering
- \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{}
- \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
   \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
   \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
  \end{subfigure}
- \caption[]{}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_18042014_1450_convergencetest_BE2D/results/ConvergenceTest.eps}
+  \caption{}
+ \end{subfigure}
+ \caption[Convergence tests for BE scheme]{Convergence tests with respect to the time derivative for the BE scheme in 1D (a) and 2D (b).}
  \label{analysis:convergence_tests:BE}
 \end{figure}
 
-\begin{figure}[h]
-% Error plots for BE in 1D (a) and 2D (b)
+\begin{figure}[H]
+% Spatial error test for the BE scheme
 \centering
  \begin{subfigure}{0.49\textwidth}
   \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/ConvergenceTest.eps}
+  \caption{}
  \end{subfigure}
- \caption[]{}
+ \caption[Spatial error test for the BE scheme]{This figure shows the error from the spatial derivative (a) and the corresponding convergence test. For the smallest $\Delta x$ the spatial error is no longer completely dominant which explains the poorer convergence.}
  \label{analysis:spatial_convergence_tests}
 \end{figure}
 \subsection{Verification of FE scheme by exact numerical solution}

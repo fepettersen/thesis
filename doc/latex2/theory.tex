@@ -21,7 +21,7 @@ Assuming that no walkers disappear or are created the flux of walkers leaving $V
  \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS
 \end{equation}
 
-\noindent Through Greens theorem equation \eqref{theory:diffusion_integral_form} can be reformulated
+\noindent Through Greens theorem \eqref{theory:diffusion_integral_form} can be reformulated
 
 \begin{equation}\label{theory:integral_form}
  \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV
@@ -32,7 +32,7 @@ Assuming that no walkers disappear or are created the flux of walkers leaving $V
  \vec J = D\nabla C
 \end{equation}
 
-\noindent where $D$ is the diffusion constant. Since $V$ was chosen as an arbitrary volume equation \eqref{theory:integral_form} is independent of the integration and the integrals can be dropped. 
+\noindent where $D$ is the diffusion constant. Since $V$ was chosen as an arbitrary volume \eqref{theory:integral_form} is independent of the integration and the integrals can be dropped. 
 The diffusive flux $\mathbf{J}$ is also inserted to yield the diffusion equation
 
 \begin{equation}\label{theory:diffusion_equation}
@@ -95,14 +95,14 @@ Neumann boundary conditions will be used, these are described in \eqref{theory:N
  &u^{n+1}_3 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{2}+D_{3})(u^{n+1}_{3}-u^{n+1}_{2})\right) + u^n_3
 \end{align*}
 
-\noindent Rearranging this and setting $a = \frac{\Delta t}{2\Delta x^2}$ results in a normal system of linear equations
+\noindent Rearranging this and setting $\alpha = \frac{\Delta t}{2\Delta x^2}$ results in a normal system of linear equations
 \begin{align*}
- &u^{n+1}_0\left(1+2a(D_0+D_1)\right)- 2au^{n+1}_{1}(D_1+D_0) =  u^n_0\\
- &u^{n+1}_1\left(1+a(D_2+2D_1+D_0)\right)-au^{n+1}_{2}(D_2+D_1)-au^{n+1}_{0}(D_1+D_0) = u^n_1\\
- &u^{n+1}_2\left(1+a(D_3+2D_2+D_1)\right)-au^{n+1}_{3}(D_3+D_2)-au^{n+1}_{1}(D_2+D_1) = u^n_2\\
- &u^{n+1}_3\left(1+2a(D_3+D_2)\right)- 2au^{n+1}_{2}(D_3+D_2) =  u^n_3
+ &u^{n+1}_0\left(1+2\alpha(D_0+D_1)\right)- 2\alpha u^{n+1}_{1}(D_1+D_0) =  u^n_0\\
+ &u^{n+1}_1\left(1+\alpha(D_2+2D_1+D_0)\right)-\alpha u^{n+1}_{2}(D_2+D_1)-\alpha u^{n+1}_{0}(D_1+D_0) = u^n_1\\
+ &u^{n+1}_2\left(1+\alpha(D_3+2D_2+D_1)\right)-\alpha u^{n+1}_{3}(D_3+D_2)-\alpha u^{n+1}_{1}(D_2+D_1) = u^n_2\\
+ &u^{n+1}_3\left(1+2\alpha(D_3+D_2)\right)- 2\alpha u^{n+1}_{2}(D_3+D_2) =  u^n_3
 \end{align*}
-which is arranged as 
+which is arranged as a coefficient matrix multiplied by the unknown next time step
 
 \begin{align}\label{BE}
  \left(\begin{array}{c c c c}
@@ -114,7 +114,7 @@ which is arranged as
 \end{align}
 \noindent The coefficient matrix in \eqref{BE} will be labeled $\mathbf M$ throughout the thesis.
 \begin{equation}\label{theory:BE:linear_system}
-  \mathbf{M}\mathbf{u}^n = \mathbf{u}^{n-1}
+  \mathbf{M}\mathbf{u}^{n+1} = \mathbf{u}^{n}
 \end{equation}
 
 \noindent If a linear system like the one in \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination \textcolor{red}{check this}. 
@@ -124,12 +124,12 @@ In order to be more consistent with the algorithm, \eqref{theory:BE:linear_syste
 \begin{equation}
   \mathbf{M}\mathbf{u} = \mathbf{up}
 \end{equation}
-where $\mathbf{up}$ denotes the solution $\mathbf{u}$ at the previous time step. 
+where $\mathbf{up} = \mathbf{u}^{n}$ denotes the solution $\mathbf{u}$ at the previous time step. 
 Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algorithm listed below.
 
 \lstinputlisting{Figures/tridiag.cpp}
 
-In two spatial dimensions the BE discretization gives the scheme shown in equation \eqref{general_scheme_BE2D}
+In two spatial dimensions the BE discretization gives the scheme shown below
 
 \begin{equation}\label{general_scheme_BE2D}
  u^{n}_{i,j} = \underbrace{\frac{-D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{n+1}_{i+1,j}+u^{n+1}_{i-1,j}\right) +
@@ -193,7 +193,7 @@ In order to solve this block tridiagonal linear system the ''tridiag`` solver fr
 Luckily this generalization is trivial and all that is needed is to replace divisions by matrix inverses. 
 An updated \emph{pseudo coded} scheme is listed in \eqref{block_tridiag_alg}
 
-There is a forward substitution
+\noindent There is a forward substitution
 \begin{align}\label{block_tridiag_alg}
  H_0 &= -B_0^{-1}C_0\nonumber \\
  \mathbf{g}_0 &= B_0^{-1}\mathbf{up}_0 \nonumber\\
@@ -206,13 +206,13 @@ There is a forward substitution
   \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
  \end{align*}
  
- It is possible to solve the BE scheme in 3D by the block tridiagonal solver as well. 
+ \noindent It is possible to solve the BE scheme in 3D by the block tridiagonal solver as well. 
  The linear system will be $2n^2 +1$ band diagonal and must first be reduced to a block matrix which is $2n+1$ band diagonal like the one in eq. \eqref{linear_system_BE2D} before it is further reduced to a block tridiagonal form. 
  Matrix entries will be $n^2\times n^2$ matrices.
  
  \subsubsection{Efficiency of the block tridiagonal algorithm}
  
- In general the Forward Euler (FE\nomenclature{FE}{Forward Euler}) scheme will solve a discrete PDE in $d$ spatial dimensions with $n$ mesh points in each dimension using
+ In general the FE scheme will solve a discrete PDE in $d$ spatial dimensions with $n$ mesh points in each dimension using
  \begin{equation*}
   \mathcal O(n^d)
  \end{equation*}
@@ -226,9 +226,9 @@ Implicit schemes like BE result in linear systems which can be solved by multipl
 Inverting a dense matrix demands $\mathcal O(n^3)$ FLOPs for an $n\times n$ matrix. 
 By rewriting the previously mentioned $n^2\times n^2$ band diagonal matrix as a block tridiagonal matrix and using the modified block tridiagonal solver we have reduced the demanded number of FLOPs from $\mathcal{O}(n^6)$ to $n\cdot\mathcal{O}(n^3) = \mathcal{O}(n^4)$. 
 Though an improvement of 2 orders is very good, compared to the FE scheme this is still one order larger.
-there is still room for improvement, however. 
-As long as the mass matrix is unchanged, which it will be as long as the time step and diffusion constant are constant, the $n$ matrix inversions need only be done once. 
-In other words, the $H_i$ terms from eq. \eqref{block_tridiag_alg} can be stored. 
+There is still room for improvement, however. 
+As long as the coefficient matrix is unchanged, which it will be as long as the time step and diffusion constant are constant, the $n$ matrix inversions need only be done once. 
+In other words, the $H_i$ terms from \eqref{block_tridiag_alg} can be stored. 
 The remaining calculations include three matrix vector multiplications, all of which demand $n^2$ FLOPs, thus further reducing the computational cost to $\mathcal{O}(n^2)$ FLOPs which is the same as the FE scheme.
 
 \section{Combining micro and macro scale models}
@@ -238,13 +238,13 @@ After setting an initial condition and diffusion constant the diffusion problem 
 \begin{itemize}
  \item The result from previous PDE time step, $\mathbf{up}$, is converted to a distribution of random walkers and sent to the RW solver
  \item The RW solver does a predefined number of micro scale time steps which correspond to one PDE time step
- \item The result from the RW solver is converted back to a concentration and this replaces the PDE solution
+ \item The result from the RW solver is converted back to a concentration and this replaces the PDE solution, $\mathbf{up}$
  \item $\mathbf{up}$ is then used as input to calculate the next time step
 \end{itemize}
 
 \subsection{The conversion between length scales}
 As the previous section states the result from the last PDE time step is converted to a distribution of random walkers. 
-This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp and Karma \cite{plapp2000multiscale}) which is defined in equation \eqref{theory:Hc_definition}
+This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp and Karma \cite{plapp2000multiscale}) which is defined by
 
 \begin{equation}\label{theory:Hc_definition}
  C_{ij} = Hc\cdot u_{ij}
@@ -279,16 +279,17 @@ Reflecting boundaries correspond to zero flux Neumann boundaries
 \begin{equation}
  \frac{\d C}{\d n} = 0
 \end{equation}
-Neumann boundaries might seem unphysical, but the redistribution of walkers at each PDE time step must also to some extent be considered as a boundary condition. \\
+Neumann boundaries might seem unphysical, but the redistribution of walkers at each PDE time step must also to some extent be considered as a boundary condition in which fluxes are exchanged between the two models. \\
 In hindsight, a possibly better choice of boundary conditions for the RW model would have been perfect exchange of flux between the two solvers. 
 \begin{equation}
  \frac{\d u}{\d n} = \frac{\d C}{\d n}
 \end{equation}
-Since time does not allow for this to be tested it will be left as a reference to possible future work.
+Since time does not allow for this to be implemented and tested it will be left as a reference to possible future work.
 
 \section{Potential problems or pitfalls}\label{problems_and_pitfalls}
  
-\emph{\textcolor{red}{This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.}}
+ This section will list and discuss some of the problems which were encountered while working on the thesis and present the solutions or workarounds.
+% \emph{\textcolor{red}{This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.}}
 
 % \subsubsection{Different timescales}
 % The time scales are coupled through the step length of the random walkers which is shown in equation \eqref{steplength}. 
@@ -323,13 +324,12 @@ The workaround will at least keep the simulation from crashing, but has a fundam
 \subsubsection{Smooth solutions}
 
  A diffusion process is very effective when it comes to dampening fast fluctuations, and so any solution of the diffusion equation will be smooth. 
- When a stochastic process is introduced, rapid fluctuations from one time-step to the next might follow.
+ Random walks are stochastic and though a RW will describe a diffusion process it will fluctuate around the solution. 
  In this case a dilemma arises; on the one hand there is the smoothness of the solution to consider, on the other hand the stochastic term was introduced believing that it adds detail to the model. 
- The approach we tried to use to this was to do some curve-fitting using both of the solutions. 
- A polynomial regression model was implemented in 1D, but regardless of degree and what points were used, the result was a lot worse than just the average of the two solutions. 
- The idea behind this polynomial regression model is described in more detail in section \ref{other_possible_coupling_methods}. \\
- In the end the order of integration was switched so that the PDE solver can reduce the worst of the fluctuations from the RW model. 
- This ensures some smoothness and some fluctuations and is considered a working compromise. 
+This is partly the reason for solving the RW model before the PDE model. 
+The fluctuations will be reduced by the PDE solver and the solution, though still fluctuating, will be smoother. \\
+
+Section \ref{other_possible_coupling_methods} describes some other methods which were attempted in order to reduce the fluctuations from the RW model.
 
 \subsubsection{Number of time steps on the random walk level}
 
