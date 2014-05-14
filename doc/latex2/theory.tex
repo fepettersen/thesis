@@ -58,11 +58,16 @@ $C$ is best illustrated in Figure \ref{theory:illustration_C}.
 
 \subsection{An error estimate for a diffusion RW solver}
 
+In general a Monte Carlo method will fluctuate around the correct (steady state) solution. The fluctuations have an amplitude related to the number of samples, $N$ used by the relation
+\begin{equation}\label{theory:error_estimate_RW}
+ \epsilon \propto \frac{1}{\sqrt N}
+\end{equation}
 
+\noindent \eqref{theory:error_estimate_RW} will be used as an error estimate for the solution of diffusion processes by a random walk (RW\nomenclature{RW}{Random Walk}) model and is assumed to hold for all parts of the simulation, not only the steady state.
 
 \subsection{Random number generator}
 
-To produce a random walk (RW\nomenclature{RW}{Random Walk} one must have random numbers. 
+To produce a random walk one must have random numbers. 
 The random numbers in this thesis are produced by a five seeded xor-shift algorithm copied from George Marsaglia \cite{marsaglia2003xorshift}. 
 This generator is chosen because of its very large period ($\sim10^{48}$) compared to the computational cost.
 
@@ -205,8 +210,8 @@ An updated \emph{pseudo coded} scheme is listed in \eqref{block_tridiag_alg}
  \end{align}
  Followed by a backward substitution
  \begin{align*}
-  \mathbf{x}_{n-1} &= \mathbf{g}_{n-1}\nonumber\\
-  \mathbf{x}_i &= \mathbf{g}_i + H_i\mathbf{x}_{i+1} \nonumber
+  \mathbf{u}_{n-1} &= \mathbf{g}_{n-1}\nonumber\\
+  \mathbf{u}_i &= \mathbf{g}_i + H_i\mathbf{u}_{i+1} \nonumber
  \end{align*}
  
  \noindent It is possible to solve the BE scheme in 3D by the block tridiagonal solver as well. 
