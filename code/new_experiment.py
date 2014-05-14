@@ -139,7 +139,7 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
-		color = ['b-','r-','k-','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
+		color = ['b-','r-x','k-o','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
 			# print self.runcounter
@@ -446,8 +446,8 @@ if __name__ == '__main__':
 	x1 = 1.0
 	y1 = 1.0
 	m = 100
-	n = 100
-	T = 200		# no.of timesteps, [dt*T] = seconds
+	n = 1
+	T = 1000		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 1.0 		#um
@@ -469,9 +469,9 @@ if __name__ == '__main__':
 	Hc = [2000]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_Redoing_RW_tests_Hc'
+	info='_errorplot_BE1D'
 	run = Experiment(this_dir,DEBUG,save_files,info)
-	run.exact = F
+	run.exact = f
 
 	run.SetInitialCondition(run.exact(x,y,0))
 	# run.SetDiffusionTensor(D(x,y))
@@ -481,7 +481,7 @@ if __name__ == '__main__':
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
-	run.RunSimulation(Hc[0])
+	# run.RunSimulation(Hc[0])
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
 	# run.Compare('/results_FE_Hc*.txt',numerical_exact)				# FE version
@@ -496,46 +496,47 @@ if __name__ == '__main__':
 	# run.ConvergenceTest(Hc)
 	# leg = ['Hc = %g'%i for i in Hc]
 	# # os.system('python spine_statistics.py')
-	# run.PlotError(leg)
 
 	## --- Run for time-step --- ###
+	# dt = [0.05,0.02,0.01,0.005]
+
 	# for i in dt:
 	# 	print "dt = %g"%i
 	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,i)
 	# 	run.RunSimulation(Hc[0])
 	# run.ConvergenceTest(dt)
 	# leg = ['dt = %g'%i for i in dt]
+	# run.PlotError(leg)
 
 	## --- Run for h --- ###
 	dt = 0.05
-	h = [300,500,1000,5000,10000]
+	h = [0.1,0.05,0.02]
 	# dx = 0.025
 	# h = [0.1,0.05,0.02,0.025]
 	# h = [0.025]
-	# for i in h:
-	# 	# i = 1.0/j
-	# 	# timestep = i*i/5.0
-	# 	timestep = dt
-	# 	# dt.append(timestep)
-	# 	# m = (1/i)+1
-	# 	m = 21
-	# 	n = 1
-	# 	if n==1:
-	# 		x = np.linspace(0,1,m)
-	# 		y = np.zeros(m)
-	# 	elif n==m:
-	# 		x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
-	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-	# 	run.SetInitialCondition(run.exact(x,y,0))
-	# 	run.SetDiffusionTensor(D(x,y))
-	# 	hc = int(round(1.0/(timestep**2)))
-	# 	hc = i
-	# 	print m," , ", timestep, " , ", hc
-	# 	run.RunSimulation(1*hc)
-	# leg = ['Hc = %g'%i for i in h]
-	# run.ConvergenceTest(h)
+	for i in h:
+		# i = 1.0/j
+		timestep = i*i/5.0
+		# dt.append(timestep)
+		m = (1/i)+1
+		# m = 21
+		n = m
+		if n==1:
+			x = np.linspace(0,1,m)
+			y = np.zeros(m)
+		elif n==m:
+			x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
+		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+		run.SetInitialCondition(run.exact(x,y,0))
+		run.SetDiffusionTensor(D(x,y))
+		# hc = int(round(1.0/(timestep**2)))
+		hc = 100
+		print m," , ", timestep, " , ", hc
+		run.RunSimulation(1*hc)
+	leg = ['h = %g'%i for i in h]
+	run.ConvergenceTest(h)
 	# leg = ['dt = %g'%i for i in dt]
-	# run.PlotError(leg)
+	run.PlotError(leg)
 	# # print 'dx =',dx
 	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# # run.UpdateWebpageSpecial()

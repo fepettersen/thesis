@@ -1,5 +1,5 @@
 \section{Results of verification}
-This section will quickly summarize the results of chapter \ref{chapter:analysis}.
+This section will quickly summarize the results of chapter \ref{chapter:analysis} and \ref{chapter:application}.
 
 
 \subsection{The FE scheme}
@@ -13,9 +13,9 @@ The result of verifying the FE scheme is that it is deemed correctly implemented
 Most of the tests done on the BE scheme are close to perfect. 
 Only when testing the scheme versus the numerical exact solution are the results slightly off. 
 Though the numerical exact solution test is expected to give an error close to machine precision the results are five orders of magnitude larger than machine precision. 
-On the other hand, the error term is also eight orders of magnitude smaller than the time step and there are a lot of possible round off errors in the inverted coefficient matrix which might accumulate. \\
+On the other hand, the error term is also eight orders of magnitude smaller than the time step and there are a lot of possible round off errors in the inverted coefficient matrix which can explain the lack of accuracy. \\
 Effectively, testing the convergence rate also verifies the assembly of the coefficient matrix while testing against the numerical exact solution verifies that the block tridiagonal solver works properly.\\
-The result of verifying the BE scheme is that both the assembly of the coefficient matrix and the block tridiagonal solver are deemed correctly implemented. 
+The result of verifying the BE scheme is that both the assembly of the coefficient matrix (and by extension the discretization of the diffusion equation) and the block tridiagonal solver are deemed correctly implemented. 
 
 \subsection{The RW solver}
 Due to fluctuations in the solution it is hard to get a good convergence rate for the RW solver. 
@@ -25,7 +25,11 @@ The result of verifying the RW solver is that it is deemed correctly implemented
 
 \subsection{The hybrid diffusion solver}
 For this thesis it is considered very important that the hybrid diffusion solver can have first order convergence in time if the conversion rate is high enough. 
-As Figure \ref{combined_BE1d:convergence} shows this was achieved, and the hybrid solver is therefore considered adequately implemented for the time being.
+As Figure \ref{combined_BE1d:convergence} shows this was achieved, and the hybrid solver is therefore considered adequately implemented for the time being.\\
+
+Effects of varying the relative size of the RW area were also illustrated. 
+The result of increasing the portion of the PDE mesh affected by an RW model is clearly a larger error term overall, while decreasing the size of the RW area significantly improves the error term. 
+All of this is expected since more fluctuations are introduced.
 
 \section{Results for physical application}
 

@@ -34,6 +34,12 @@ Mathematically the largest difference is that the random walkers are left alone,
 There are also some differences in the coupling; at each PDE time step there is a probability for an enzyme to diffuse into a spine if the concentration at the beginning of the spine neck is large enough. This probability decreases with the number of enzymes which have already diffused into the spine. 
 The width of a spine neck is determined by the number of PDE mesh points it connects to, all other length parameters are determined randomly but required to fit with measurements from Arrelano et.al \cite{arellano2007ultrastructure}. 
 
+\subsection{Initial Condition}
+
+In the presence of glutamate the diffusion constant for PKC$\gamma$ has been measured to $0.33\frac{\mu m^2}{s}$, but this does not reproduce the diffusion times in dendrites which are illustrated by Craske et.al. 
+There are two possible fixes to this; \emph{\textcolor{red}{either I have read the paper wrong, and the diffusion constant is really $5.72$ in the dendrite, in which case everything is ok.}} 
+The other possibility is to modify the initial condition. The latter is not as far fetched as is sounds because there is considerable absorption of PKC$\gamma$ in the dendrite walls during the first few seconds after release from soma. 
+The modified initial condition can be viewed as the concentration distribution in the dendrite some 2 seconds after release from soma.
 \clearpage
 
 \section{Parameters}

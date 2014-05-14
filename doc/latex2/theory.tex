@@ -56,10 +56,13 @@ $C$ is best illustrated in Figure \ref{theory:illustration_C}.
  \label{theory:illustration_C}
 \end{figure}
 
+\subsection{An error estimate for a diffusion RW solver}
+
+
 
 \subsection{Random number generator}
 
-To produce a random walk one must have random numbers. 
+To produce a random walk (RW\nomenclature{RW}{Random Walk} one must have random numbers. 
 The random numbers in this thesis are produced by a five seeded xor-shift algorithm copied from George Marsaglia \cite{marsaglia2003xorshift}. 
 This generator is chosen because of its very large period ($\sim10^{48}$) compared to the computational cost.
 

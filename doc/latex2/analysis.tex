@@ -82,15 +82,24 @@ An important property of the discretization scheme is that the difference betwee
 \begin{equation*}
  \epsilon(t) \sim \mathcal{O}(\Delta t)
 \end{equation*}
+\noindent For the FE scheme a single discretization parameter will be introduced by having a constant relation between the spatial resolution and the time step 
+\begin{equation*}
+ \frac{\Delta t}{\Delta x^2} = k
+\end{equation*}
+$\epsilon(t)$ can now be rewritten by setting $\Delta t = h$
+\begin{align*}
+ \epsilon(t) &= C_t h + C_x\frac{h}{k} \\
+ &= (C_t +C_x/k)h = C_k h
+\end{align*}
 
 Figures \ref{analysis:errorplots:FE} and \ref{analysis:errorplots:BE} show that for both the FE and BE scheme in both 1D and 2D the error is of the expected magnitude. 
 Another interesting property of the error plots is that the error tends to zero after a large number of time steps. 
-By inserting the limit $t\to\infty$ in equation \eqref{manufactured_solution} we observe that the error is expected to tend to zero because the limit value of one can be exactly recreated by both schemes.
+By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe that the error is expected to tend to zero because the limit value of one can be exactly recreated by both schemes.
 \begin{align*}
  \lim_{t\to\infty} e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1 = 1
 \end{align*}
 
-\begin{figure}[h]
+\begin{figure}[H]
 % Error plots for FE in 1D (a) and 2D (b)
  \centering
  \begin{subfigure}{0.49\textwidth}
@@ -98,26 +107,26 @@ By inserting the limit $t\to\infty$ in equation \eqref{manufactured_solution} we
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_29112013_1709/results/deterministic_errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_14052014_0754_errorplot_FE2D/results/errorplot.eps}
   \caption{}
  \end{subfigure}
- \caption[]{}
+ \caption[Error plots FE]{Error plot for the FE scheme in 1D (a) and 2D (b). Note that there is now only one discretization parameter called $h$.}
  \label{analysis:errorplots:FE}
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[H]
 % Error plots for BE in 1D (a) and 2D (b)
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+  \includegraphics[width=\textwidth]{../results/experiment_14052014_0744_errorplot_BE1D/results/errorplot.eps}
+  \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
   \includegraphics[width=\textwidth]{../results/experiment_18042014_1450_convergencetest_BE2D/results/errorplot.eps}
   \caption{}
  \end{subfigure}
- \caption[]{}
+ \caption[Error plots BE]{Error plot for the BE scheme in 1D (a) and 2D (b). Notice that the error is of the same order as the time step.}
  \label{analysis:errorplots:BE}
 \end{figure}
 
@@ -145,8 +154,8 @@ Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:
 % Convergence tests for BE in 1D (a) and 2D (b)
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
-  \caption{\emph{\textcolor{red}{This is not the correct plot!}}}
+  \includegraphics[width=\textwidth]{../results/experiment_14052014_0744_errorplot_BE1D/results/ConvergenceTest.eps}
+  \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
   \includegraphics[width=\textwidth]{../results/experiment_18042014_1450_convergencetest_BE2D/results/ConvergenceTest.eps}
@@ -206,12 +215,13 @@ The spatial derivatives are found as
  &= \frac{4}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
  &\dots
 \end{align*}
-The pattern continues allowing the final numerical exact solution to be expressed in equation \eqref{numerical_solution}.
+The pattern continues allowing the final numerical exact solution to be expressed below.
 \begin{equation}\label{numerical_solution}
   u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x)
 \end{equation}
+By construction the Neumann boundary conditions are fulfilled since $\frac{\d \cos(\pi x)}{\d x} = -\pi\sin(\pi x)$ and $\sin(0) = \sin(\pi) = 0$. \\
 
-Although the FE scheme is expected to represent equation \eqref{numerical_solution} to machine precision ($\epsilon \approx 10^{-16}$) there are two problems with the solution which will have an effect on the error:
+Although the FE scheme is expected to reproduce \eqref{numerical_solution} to machine precision ($\epsilon \approx 10^{-16}$) there are two problems with the solution which will have an effect on the error:
 \begin{itemize}
  \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. Testing if $\Delta x^{2i}>0$ and returning zero if the test fails will fix the problem. The argumentation for ignoring the troublesome terms is given below.
  \item ${n\choose i}$ goes to infinity for large $n$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$.
@@ -239,7 +249,8 @@ $$ \frac{1}{\Delta x^{2i}} \to \infty$$
 
 The same problems as in the 1D case will apply to equation \eqref{exact_numerical_solution_2d} with the same solutions. 
 Figure \ref{numerical_exact_FE:2D} shows how the 2D simulation compares to the numerical exact solution. 
-As was the case in 1D the error is larger than machine precision, but much smaller than $\Delta t$ suggesting that the scheme is implemented correctly.
+As was the case in 1D the error is larger than machine precision, but much smaller than $\Delta t$.
+% suggesting that the scheme is implemented correctly.
 
 \begin{figure}[H]
  \centering
@@ -262,18 +273,20 @@ As was the case in 1D the error is larger than machine precision, but much small
 \subsection{Verification of BE scheme by exact numerical solution}
 
 The exact numerical solution to the BE scheme is found by solving the linear system which arises from the discretization. 
+Given the $n$'th time step, the next time step is found by
+
 \begin{align*}
  \mathbf M \mathbf u^{n+1} &= \mathbf{u}^n \\
  \mathbf{u}^{n+1} &= \mathbf{M}^{-1} \mathbf{u}^n \\
  &= \mathbf{M}^{-1}\left(\mathbf{M}^{-1} \mathbf{u}^{n-1}\right)
 \end{align*}
 
-Doing the separation to the end relates the $n$'th time step to the initial condition
+\noindent Doing the separation to the end relates the $n$'th time step to the initial condition
 \begin{equation}\label{BE_numex}
  \vec u^{n+1} = \left(\mathbf M^{-1}\right)^{n+1} \vec u^0
 \end{equation}
 
-Note that $\left(\mathbf M^{-1}\right)^{n+1}$ is the inverse of $\mathbf M$ to the $n+1$'th power.\\
+\noindent Where $\left(\mathbf M^{-1}\right)^{n+1}$ is the inverse of $\mathbf M$ to the $n+1$'th power.\\
 
 Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
 Doing calculations with such a matrix gives a lot of round off errors which will reduce the accuracy of the numerical exact. 
@@ -306,8 +319,9 @@ In order to carry out the tests a new initial condition that can easily be recre
 \noindent $H(x)$ denotes the Heaviside step function defined by its properties
 \begin{equation}\label{Heaviside_def}
  H(x-a) = \begin{cases}
-           1\;\;x\geq a\\
-           0\;\;x<a
+           1\;\;x > a\\
+           \frac{1}{2}\;\; x = a\\ 
+           0\;\;x < a
           \end{cases}
 \end{equation}
 \noindent The new initial condition gives a new exact solution which is found by separation of variables as 
@@ -315,8 +329,8 @@ In order to carry out the tests a new initial condition that can easily be recre
  u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
 \end{equation}
 
-Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
-The convergence is not very good, but this is expected because of the fluctuations which causes the error to stabilize around a certain value rather than converge to zero.
+\noindent Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
+The convergence is not very good, but this is expected because of the fluctuations which causes the error to fluctuate around a certain value rather than converge to zero.
 
 \begin{figure}[h]
  \centering

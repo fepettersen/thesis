@@ -92,17 +92,17 @@ void Combine::Solve(){
 		ConvertFromWalkers(Up,inifilenames[i],indeces[i]);
 	}
 	pde_solver->advance(U,Up,m,n);
-	// for(int k=0; k<m; k++){
-	// 	for(int l=0; l<n; l++){
-	// 		Up[k][l] = U[k][l];
-	// 	}
-	// }
-
 	for(int k=0; k<m; k++){
 		for(int l=0; l<n; l++){
-			U[k][l] = Up[k][l];
+			Up[k][l] = U[k][l];
 		}
 	}
+
+	// for(int k=0; k<m; k++){
+	// 	for(int l=0; l<n; l++){
+	// 		U[k][l] = Up[k][l];
+	// 	}
+	// }
 	// if (diffnorm<0.1*pde_solver->dt && pde_solver->dt <0.01)
 	// {
 	// 	int lkjh=0;
