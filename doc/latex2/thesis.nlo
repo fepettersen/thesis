@@ -1,6 +1,6 @@
 \nomenclatureentry{aPKC$\gamma$@[{PKC$\gamma$}]\begingroup Protein Kinase C$\gamma$\nomeqref {1.0}|nompageref}{6}
-\nomenclatureentry{aRW@[{RW}]\begingroup Random Walk\nomeqref {2.5}|nompageref}{9}
-\nomenclatureentry{aPDE@[{PDE}]\begingroup Partial Differential Equation\nomeqref {2.5}|nompageref}{10}
-\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.6}|nompageref}{10}
-\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.6}|nompageref}{10}
-\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations (per second)\nomeqref {2.15}|nompageref}{13}
+\nomenclatureentry{aRW@[{RW}]\begingroup Random Walk\nomeqref {2.7}|nompageref}{10}
+\nomenclatureentry{aPDE@[{PDE}]\begingroup Partial Differential Equation\nomeqref {2.7}|nompageref}{10}
+\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.8}|nompageref}{10}
+\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.8}|nompageref}{10}
+\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations (per second)\nomeqref {2.17}|nompageref}{14}

@@ -1,0 +1,53 @@
+\section{Discussion}
+
+\subsection{Other work on the subject}
+
+As the project was being finished, I came across an article by Flekkøy et.al.\cite{flekkoy2001coupling} describing the same problems that are addressed in this thesis. 
+In this article, the authors try to combine a simple diffusion solver with a simple random walk solver and end up concluding that this is possible. 
+This thesis has been done completely independently of said article, and takes a slightly different approach to the problem as well.
+
+\subsection{Application}
+
+The model gives fairly good results for the application on PKC$\gamma$ into spines which largely are in agreement with the results by Craske et.al. 
+However, the mean diffusion times found from simulations seem to consistently lie towards the lower limits of the experimental results. 
+One possible extension to the model which might fix this is to introduce an absorption probability in the spine head which is fairly large (say 80\% per second), or even increases with the amount of time spent in the spine head. 
+A setup like this should increase the average diffusion time by a few seconds. 
+It does not, however reflect the physical process to a better accuracy seeing as a concentration increase in a spine head will be measured quickly.
+
+\subsection{Alternatives to the implemented PDE solver}
+% \subsection{Higher order approximations to the time derivative}
+Although a first order approximation to the time derivative might seem primitive, the aim of this thesis was to prove the concept of combining two different models for the same problem. 
+For verification purposes, the demand for walkers is already very high, at
+\begin{equation*}
+ Hc \geq \frac{1}{\Delta t^2}
+\end{equation*}
+In order to carry out the same verification for a second order scheme, the demand for walkers will become much larger
+\begin{equation*}
+ Hc \geq \frac{1}{\Delta t^4}
+\end{equation*}
+
+For future use, however, the concept has already been proven, and a higher order scheme would be an interesting, yet simple extension.
+
+Perhaps the biggest weakness of the software, as it stands, is the limitation in mesh geometry. 
+% The mesh must be quadratic
+Implementing a mesh geometry which is not square in a finite difference method turns out to be very complicated, and requires transforming the PDE to a new set of coordinates. 
+Ultimately one must solve an entirely different equation. 
+Alternatively, a finite element method can be used. 
+Finite element software will already have support for new mesh geometries built in, making the suggested transformations unnecessary.
+
+\subsection{The lower scale model}
+
+A simple RW was chosen for the lower scale model because it fulfills the diffusion equation as will therefore be easy to work with. 
+The idea, however, was always to create a software in which the lower scale model can easily be substituted for a better one. 
+By letting the lower scale model work as a standalone unit which communicates with the rest of the software through a file containing the positions of all the walkers, this is ensured. 
+All that is needed to switch lower scale model is to put the new solver in the correct place with respect to the rest of the software, and make sure it can communicate in the described manner. 
+As a test, the DSMC code developed by Anders Hafreager was used as a lower scale model for one simulation. 
+Naturally, a few problems arise, but from a strictly programming point of view it worked. \\
+
+As mentioned in section \ref{theory:BC_RW}, perfect flux exchange between the higher and lower scale model might have been a better boundary condition for the RW model than zero flux boundary conditions. 
+I principle, changing boundary conditions on the RW solver is simple, seeing as it is completely separate from the rest of the software. 
+The reason the boundary conditions have not been changed is that it requires a complete workover of the coupling between the two models as well, which is a much larger job. 
+
+
+
+\section{Conclusion}
