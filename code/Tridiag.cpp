@@ -6,7 +6,7 @@ Tridiag::Tridiag(void){
 	
 }
 
-void Tridiag::precondition(mat A, int m, int n){
+void Tridiag::precondition(vector<mat> A, vector<mat> B,vector<mat> C, int m, int n){
 	/*Preconditioner for the efficient tridiag method.*/
 	D.clear();
 	H.clear();
@@ -16,36 +16,43 @@ void Tridiag::precondition(mat A, int m, int n){
 	mat c = zeros(n,n);
 	
 	int i = 0;
-	for(int j=0;j<n;j++){
-		for(int k=0;k<n;k++){
-			b(j,k) = A(i*n+j,i*n+k);
-			c(j,k) = A(i*n+j,(i+1)*n+k);
-		}
-	}
-
+	// for(int j=0;j<n;j++){
+	// 	for(int k=0;k<n;k++){
+	// 		b(j,k) = A(i*n+j,i*n+k);
+	// 		c(j,k) = A(i*n+j,(i+1)*n+k);
+	// 	}
+	// }
+	a = A[i];
+	b = B[i];
+	c = C[i];
 	D.push_back(inv(b));
 	H.push_back(-1*D[i]*c);
 	
 	for(i=1;i<m-1;i++){
-		for(int j=0;j<n;j++){
-			for(int k=0;k<n;k++){
-				a(j,k) = A(i*n+j,(i-1)*n+k);
-				b(j,k) = A(i*n+j,i*n+k);
-				c(j,k) = A(i*n+j,(i+1)*n+k);
-			}
-		}
+		a = A[i];
+		b = B[i];
+		c = C[i];
+		// for(int j=0;j<n;j++){
+		// 	for(int k=0;k<n;k++){
+		// 		a(j,k) = A(i*n+j,(i-1)*n+k);
+		// 		b(j,k) = A(i*n+j,i*n+k);
+		// 		c(j,k) = A(i*n+j,(i+1)*n+k);
+		// 	}
+		// }
 		aa.push_back(a);
 		D.push_back(inv(b+a*H[i-1]));
 		H.push_back(-1*D[i]*c);
 
 	}
 	i = m-1;
-	for(int j=0;j<n;j++){
-		for(int k=0;k<n;k++){
-			a(j,k) = A(i*n+j,(i-1)*n+k);
-			b(j,k) = A(i*n+j,i*n+k);
-		}
-	}
+	// for(int j=0;j<n;j++){
+	// 	for(int k=0;k<n;k++){
+	// 		a(j,k) = A(i*n+j,(i-1)*n+k);
+	// 		b(j,k) = A(i*n+j,i*n+k);
+	// 	}
+	// }
+	a = A[i];
+	b = B[i];
 	aa.push_back(a);
 	D.push_back(inv(b+a*H[i-1]));
 }

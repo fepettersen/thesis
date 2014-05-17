@@ -17,12 +17,17 @@ class Diffusion
 		arma::mat Lower;						/*used for the BE solver*/
 		double alpha,beta;						/*Saved in case dt is changed*/
 		Tridiag* linalg;
+
+		std::vector<arma::mat> subdiag;
+		std::vector<arma::mat> diag;
+		std::vector<arma::mat> superdiag;
+
 		void advance(double **U,double **Up, int, int);
 		void boundary(double **,double **, int, int);
 		double f(double x,double y, double t);
 		void BE2D(double **U, double **Up, int m, int n);
 		arma::mat Assemble(double, double, int, int);
-		arma::mat AssembleAnisotropic(double a, double b, int m, int n);
+		void AssembleAnisotropic(double a, double b, int m, int n);
 };
 
 #endif // DIFFUSION_H
