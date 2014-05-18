@@ -12,24 +12,29 @@ $V$ is contained by a surface $S$ and the relation is shown in Figure \ref{theor
  \label{theory:divergence_theorem}
 \end{figure}
 
-\noindent As the random walkers start to move some of them will leave the volume $V$ which results in a change in $C$. 
+A flux of walkers is a vector size describing the number of walkers passing a surface element $dS$ per unit time, per unit area. \\
+
+As the random walkers start to move, some of them will leave $V$, which results in a change in $C$. 
 The number of walkers leaving $V$ is described by the change in $C$ integrated over the entire volume.
 \begin{equation}
  \int_V \frac{\d C}{\d t}\,dV
 \end{equation}
-The number of walkers leaving $V$ can also be described by the number of walkers crossing the surface $S$ in the outward direction, $n$ by integrating the component of the flux of walkers, which is the number of walkers going in a \textcolor{red}{certain direction} per time per area, normal to the surface $S$ over the entire surface.
+As mentioned, the number of walkers leaving $V$ can also be described by the flux of walkers, $\mathbf{J}$, out of $S$. 
+Integrating the surface normal (illustrated in Figure \ref{theory:divergence_theorem}) of $\mathbf J$ over $S$ results in the number of walkers leaving $V$. 
+
 \begin{equation}
  \int_S\vec{J}\cdot \vec{n}\,dS
 \end{equation}
-Since no walkers are created or disappear, the two integrals must be equal.
+Since the number of walkers is conserved, the change in $C$ per time must be equal to the number of walkers leaving $V$ plus any walkers added to $V$
 \begin{equation}\label{theory:diffusion_integral_form}
- \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS
+ \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS + s
 \end{equation}
 
-\noindent Through Greens theorem \eqref{theory:diffusion_integral_form} can be reformulated
+\noindent where $s$ denotes a source term. 
+Through Greens theorem \eqref{theory:diffusion_integral_form} can be reformulated
 
 \begin{equation}\label{theory:integral_form}
- \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV
+ \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV +s
 \end{equation}
 
 \noindent The flux $\vec{J}$ can be expressed by Fick's first law as the diffusive flux 
@@ -41,7 +46,7 @@ Since no walkers are created or disappear, the two integrals must be equal.
 The diffusive flux $\mathbf{J}$ is also inserted to yield the diffusion equation
 
 \begin{equation}\label{theory:diffusion_equation}
- \frac{\d C}{\d t} = D\nabla^2 C
+ \frac{\d C}{\d t} = D\nabla^2 C +s
 \end{equation}
 
 \noindent Throughout this thesis $C$ will denote a spatial distribution of random walkers while $u$ will denote the solution to the diffusion equation. 
