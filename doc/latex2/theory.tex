@@ -247,9 +247,21 @@ In d spatial dimensions the matrices are $n^d\times n^d$, meaning that Gaussian 
 % Inverting a dense matrix demands $\mathcal O(n^3)$ FLOPs for an $n\times n$ matrix. 
 
 The block Tridiagonal solver requires inverting $n$ matrices of size $n^{d-1}\times n^{d-1}$ as well as some matrix-matrix multiplications. 
-All of these steps require $\mathcal O(n^{3d})$ FLOPs, but as long as the coefficient matrix is constant they need only be done once. 
+All of these steps require $\mathcal O(n^{3(d-1)})$ FLOPs, but as long as the coefficient matrix is constant they need only be done once. 
 In other words, the $H_i$ terms from \eqref{block_tridiag_alg} can be stored. 
 The remaining calculations include three matrix vector multiplications, all of which demand $n$ FLOPs because the matrices are diagonal, thus further reducing the computational cost to $\mathcal{O}(n^d)$ FLOPs which is the same as the FE scheme.
+The remaining calculations include three matrix vector multiplications, one of which demands $n$ FLOPs because the matrix is diagonal. 
+The other two matrices are dense, so (for now) the remaining two matix - vector multiplications require $n^2$ FLOPs. 
+In summary, the block tridiagonal solver requires $\mathcal{O}(n^{2n-1})$ FLOPs, which is an order more efficient than a general LU decomposition\emph{\textcolor{red}{, and in fact any other method I have been able to find}}. 
+In 2D the block tridiagonal solver is one order slower than the FE scheme, which means it is still very much usable for small meshes. \\
+
+Another point which should be mentioned is that the block tridiagonal solver is is extremely memory efficient compared to other linear system solvers. 
+Since the algorithm only loops through the non zero entries, there is no need to assemble the entire matrix. 
+For a 2D simulation on a $100\times 100$ mesh, the full assembled matrix will have $100^2\times100^2 = 10^8$ matrix entries, all of which are double precision floats. 
+The total size of the matrix in RAM will be $8\cdot10^8$ bytes, which is getting close to the available RAM of a normal computer at  $\sim 8\cdot10^9$ bytes. 
+In comparison, storing only the non zero entries requires three vectors of size $100$ which contain $100\times100$ matrices. A total of $24\cdot10^6$ bytes, or two orders of magnitude less. 
+Effectively, the memory impact is also reduced from $8\cdot n^{2d}$ bytes to $8\cdot n^{2d-1}$ bytes by switching to the block tridiagonal solver. 
+\emph{\textcolor{red}{There might still room for improvement since all the stored matrices are sparse.}}
 
 \section{Combining micro and macro scale models}
 

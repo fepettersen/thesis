@@ -428,10 +428,12 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return np.pi*x
-	return np.ones(np.shape(x))*0.5
+	return np.ones(np.shape(x))*5.45
 
 def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
-	return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
+	# return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
+	return A*np.exp(-(x-x0)**2/(2*sigma**2))
+
 	
 if __name__ == '__main__':
 	DEBUG = True
@@ -445,12 +447,12 @@ if __name__ == '__main__':
 	y0 = 0.0
 	x1 = 1.0
 	y1 = 1.0
-	m = 80
+	m = 1800
 	n = 1
-	T = 100		# no.of timesteps, [dt*T] = seconds
+	T = 6000		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
-	x_end = 1.0 		#um
+	x_end = 50.0 		#um
 
 	dx = (x_end-x_start)/(m-1.0)
 	dy = 1.0/(n-1) if n>1 else 0
@@ -466,12 +468,12 @@ if __name__ == '__main__':
 		x = np.linspace(x_start,x_end,m)
 		y = np.zeros(m)
 	# Hc = [1500]
-	Hc = [2000]#,2000,20000]
+	Hc = [20]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
 	info='_errorplot_BE1D'
 	run = Experiment(this_dir,DEBUG,save_files,info)
-	run.exact = f
+	run.exact = GaussianPulse
 
 	run.SetInitialCondition(run.exact(x,y,0))
 	# run.SetDiffusionTensor(D(x,y))
@@ -486,7 +488,7 @@ if __name__ == '__main__':
 	# u0 = run.exact(x,y,0)
 	# run.Compare('/results_FE_Hc*.txt',numerical_exact)				# FE version
 	# run.Compare('/Deterministic_n*.txt',numerical_exact,M,u0)				# BE version
-	run.PlotError('dt = %g'%dt[0])
+	# run.PlotError('dt = %g'%dt[0])
 	### --- Run for walkers --- ###
 
 	# for i in Hc:
@@ -540,7 +542,7 @@ if __name__ == '__main__':
 	# # print 'dx =',dx
 	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# # run.UpdateWebpageSpecial()
-	run.Visualize(viz_type=None)
+	# run.Visualize(viz_type=None)
 	# run.Visualize(viz_type='exact')
 
 	# run.Visualize(viz_type='difference',save_video=True)

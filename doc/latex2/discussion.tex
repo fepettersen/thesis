@@ -1,5 +1,13 @@
 \section{Discussion}
 
+A large portion of the work that has been put into this thesis has been on code implementation. 
+Because it is really demanding to read computer code, and it does not necessarily provide extra clarity, the code is not included in this text. 
+Should it be of interest, the complete computer code is published at github.com under the following link\\
+
+\noindent\url{https://github.com/fepettersen/thesis} \\
+
+
+
 \subsection{Other work on the subject}
 
 As the project was being finished, I came across an article by Flekkøy et.al.\cite{flekkoy2001coupling} describing the same problems that are addressed in this thesis. 
@@ -37,9 +45,9 @@ Finite element software will already have support for new mesh geometries built 
 
 \subsection{The lower scale model}
 
-A simple RW was chosen for the lower scale model because it fulfills the diffusion equation as will therefore be easy to work with. 
+A simple RW was chosen for the lower scale model because it fulfills the diffusion equation and is therefore easy to work with. 
 The idea, however, was always to create a software in which the lower scale model can easily be substituted for a better one. 
-By letting the lower scale model work as a standalone unit which communicates with the rest of the software through a file containing the positions of all the walkers, this is ensured. 
+By letting the lower scale model work as a standalone unit which communicates with the rest of the software through a file containing the positions of all the walkers (or particles), this is ensured. 
 All that is needed to switch lower scale model is to put the new solver in the correct place with respect to the rest of the software, and make sure it can communicate in the described manner. 
 As a test, the DSMC code developed by Anders Hafreager was used as a lower scale model for one simulation. 
 Naturally, a few problems arise, but from a strictly programming point of view it worked. \\
@@ -51,3 +59,15 @@ The reason the boundary conditions have not been changed is that it requires a c
 
 
 \section{Conclusion}
+
+In this thesis a hybrid diffusion solver in which parts of the process can be modeled by a particle dynamics description has been developed. 
+All parts of the solver have been verified to work properly, including the hybrid model. \\
+
+
+The developed software mainly relies on the implicit BE scheme to solve the diffusion equation, both in 1D and in 2D. 
+Like any implicit scheme, the BE scheme results in a system of linear equations of size $n^d\times n^d$ which must be solved at each time step. 
+In order to do so, a block tridiagonal solver has been implemented, with an efficiency of $\mathcal{O}(n^{2d-1})$. 
+To my knowledge, this is the most effective direct solver available, with alternatives like LU decomposition and Levinson recursion using $\mathcal{O}(n^{2d})$ FLOPs. 
+The limiting factor of the block tridiagonal solver is two matrix-vector multiplications which will use $\mathcal{O}(n^{2(d-1)})$ FLOPs. 
+If a faster matrix-vector multiplication scheme exists it will reduce the computational work to $\mathcal{O}(n^d)$. \\
+

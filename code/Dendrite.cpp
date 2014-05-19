@@ -84,11 +84,12 @@ void Dendrite::AddSpine(double drift){
 	int spine_position = left_spine_pos_limit+ right_spine_pos_limit*rng->uniform();
 	int spine_length_in_gridpoints = m + 1;
 	int max_spine_length_this_spine = min(max_spine_contact_point,m-spine_position);
+
 	while(spine_length_in_gridpoints >= max_spine_length_this_spine){
 		spine_length_in_gridpoints = min_spine_contact_point +rng->uniform()*max_spine_contact_point;
 	}
 	// spine_placements.push_back(spine_position);
-	Spine* tmp = new Spine(spine_position,spine_length_in_gridpoints + spine_position,aD[0][0],dt/RW_timesteps, dx);
+	Spine* tmp = new Spine(spine_position,spine_length_in_gridpoints + spine_position,0.33,dt/RW_timesteps, dx);
 	spines.push_back(tmp);
 	spines[num_spines]->SetDrift(drift);
 	num_spines ++;

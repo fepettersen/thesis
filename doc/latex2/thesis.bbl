@@ -116,6 +116,38 @@
   \field{year}{2001}
 \endentry
 
+\entry{hattne2005stochastic}{article}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Hattne}{H.}%
+     {Johan}{J.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Fange}{F.}%
+     {David}{D.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Elf}{E.}%
+     {Johan}{J.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Oxford Univ Press}%
+  }
+  \strng{namehash}{HJFDEJ1}
+  \strng{fullhash}{HJFDEJ1}
+  \field{sortinit}{H}
+  \field{number}{12}
+  \field{pages}{2923\bibrangedash 2924}
+  \field{title}{{Stochastic reaction-diffusion simulation with MesoRD}}
+  \field{volume}{21}
+  \field{journaltitle}{Bioinformatics}
+  \field{year}{2005}
+\endentry
+
 \entry{light1996protein}{article}{}
   \name{author}{5}{}{%
     {{}%
@@ -169,6 +201,34 @@
   \field{volume}{8}
   \field{journaltitle}{Journal of Statistical Software}
   \field{year}{2003}
+\endentry
+
+\entry{o1995molecular}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {O{\rq}Connell}{O.}%
+     {Sean~T}{S.~T.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Thompson}{T.}%
+     {Peter~A}{P.~A.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {APS}%
+  }
+  \strng{namehash}{OSTTPA1}
+  \strng{fullhash}{OSTTPA1}
+  \field{sortinit}{O}
+  \field{number}{6}
+  \field{pages}{R5792}
+  \field{title}{{Molecular dynamics--continuum hybrid computations: a tool for
+  studying complex fluid flows}}
+  \field{volume}{52}
+  \field{journaltitle}{Physical Review E}
+  \field{year}{1995}
 \endentry
 
 \entry{plapp2000multiscale}{article}{}

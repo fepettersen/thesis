@@ -6,7 +6,13 @@ Dendritic spines are the receiving end of a connection between two brain cells, 
 The increased concentration of PKC$\gamma$ in a dendritic spine is measured to around $5\frac{\text{nMol}}{\text{L}}$ which translates to $1-2$ PKC$\gamma$ enzymes in the spine. 
 Seeing as the diffusion equation is derived from a continuous concentration distribution, using it on the enzymes in the spine seems questionable. \\
 
-This thesis will look at hybrid diffusion processes where part of the process has very few particles and other parts have enough particles to be described by a continuous diffusion equation. 
-The part with few particles will have a higher resolution in both space and time, and will be modeled by a stochastic process. 
+This thesis will look at hybrid diffusion processes where part of the process has very few particles, and other parts have enough particles to be described by a continuous diffusion equation. 
+The sparsely populated parts of the process will be viewed as a separate system coupled to the diffusion process, but described by a different model. 
+In principle, any particle dynamics model could be used, but for the sake of verification a stochastic model has been implemented. 
 A large emphasis has been put on verification of all parts of the hybrid model. 
-Both individually and for the combined, hybrid solver to verify the average behavior of the system.
+Both individually and for the combined, hybrid solver to verify the average behavior of the system. \\
+
+Some hybrid models exist today, but these are mostly aimed either at specific problems, like dendritc solidification \cite{plapp2000multiscale}. 
+Other models which bears resemblance to the mentioned hybrid diffusion solver are reaction diffusion models \cite{hattne2005stochastic} which can be used to model chemical reactions, but do not usually include a higher scale model. 
+Hybrid fluid flow models also exist, coupling molecular dynamics with a larger scale navier stokes equation \cite{o1995molecular}, as well as dissipative fluid dynamics which is a purely mesoscale particle model, among other things used to model fluid flow around supersonic aircraft \cite{}. 
+
