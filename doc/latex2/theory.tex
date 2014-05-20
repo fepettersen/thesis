@@ -249,7 +249,6 @@ In d spatial dimensions the matrices are $n^d\times n^d$, meaning that Gaussian 
 The block Tridiagonal solver requires inverting $n$ matrices of size $n^{d-1}\times n^{d-1}$ as well as some matrix-matrix multiplications. 
 All of these steps require $\mathcal O(n^{3(d-1)})$ FLOPs, but as long as the coefficient matrix is constant they need only be done once. 
 In other words, the $H_i$ terms from \eqref{block_tridiag_alg} can be stored. 
-The remaining calculations include three matrix vector multiplications, all of which demand $n$ FLOPs because the matrices are diagonal, thus further reducing the computational cost to $\mathcal{O}(n^d)$ FLOPs which is the same as the FE scheme.
 The remaining calculations include three matrix vector multiplications, one of which demands $n$ FLOPs because the matrix is diagonal. 
 The other two matrices are dense, so (for now) the remaining two matix - vector multiplications require $n^2$ FLOPs. 
 In summary, the block tridiagonal solver requires $\mathcal{O}(n^{2n-1})$ FLOPs, which is an order more efficient than a general LU decomposition\emph{\textcolor{red}{, and in fact any other method I have been able to find}}. 

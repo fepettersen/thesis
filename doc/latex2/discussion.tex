@@ -2,17 +2,20 @@
 
 A large portion of the work that has been put into this thesis has been on code implementation. 
 Because it is really demanding to read computer code, and it does not necessarily provide extra clarity, the code is not included in this text. 
-Should it be of interest, the complete computer code is published at github.com under the following link\\
+Should it be of interest, the complete computer code is published at \url{github.com} under the following address \\
 
 \noindent\url{https://github.com/fepettersen/thesis} \\
 
+In summary, this project contains
+\begin{itemize}
+ \item Implementation of both explicit and implicit solvers for the (anisotropic) diffusion equation using finite difference methods in one and two spatial dimensions. The implicit solver can also handle three dimensions, but the discretization is incomplete.
+ \item Implementation of a direct solver for banded linear systems which rewrites the system as block tridiagonal. As far as I'm aware, this block tridiagonal solver is one order more efficient than all other direct solvers.
+ \item Implementation of a random walk model for (anisotropic) diffusion in one and two spatial dimensions, with the grounds for three dimensions laid.
+ \item Combination of the PDE and RW models into a hybrid diffusion model. 
+ \item Thorough testing and verification of all the implemented solvers.
+ \item An application of a slightly modified version of the hybrid diffusion model on diffusion of PKC$\gamma$ from thick apical dendrites into very narrow dendritic spines.
+\end{itemize}
 
-
-\subsection{Other work on the subject}
-
-As the project was being finished, I came across an article by Flekkøy et.al.\cite{flekkoy2001coupling} describing the same problems that are addressed in this thesis. 
-In this article, the authors try to combine a simple diffusion solver with a simple random walk solver and end up concluding that this is possible. 
-This thesis has been done completely independently of said article, and takes a slightly different approach to the problem as well.
 
 \subsection{Application}
 
@@ -22,30 +25,11 @@ One possible extension to the model which might fix this is to introduce an abso
 A setup like this should increase the average diffusion time by a few seconds. 
 It does not, however reflect the physical process to a better accuracy seeing as a concentration increase in a spine head will be measured quickly.
 
-\subsection{Alternatives to the implemented PDE solver}
-% \subsection{Higher order approximations to the time derivative}
-Although a first order approximation to the time derivative might seem primitive, the aim of this thesis was to prove the concept of combining two different models for the same problem. 
-For verification purposes, the demand for walkers is already very high, at
-\begin{equation*}
- Hc \geq \frac{1}{\Delta t^2}
-\end{equation*}
-In order to carry out the same verification for a second order scheme, the demand for walkers will become much larger
-\begin{equation*}
- Hc \geq \frac{1}{\Delta t^4}
-\end{equation*}
+\subsection{Possible extensions}
+As the project stands now it is mostly a proof of concept for hybrid diffusion solvers as well as a first attempt at a flexible framework for similar problems. 
+This means that there are quite a few possible extensions that can be done to the project, perhaps in conjunction with another masters thesis. \\
 
-For future use, however, the concept has already been proven, and a higher order scheme would be an interesting, yet simple extension.
-
-Perhaps the biggest weakness of the software, as it stands, is the limitation in mesh geometry. 
-% The mesh must be quadratic
-Implementing a mesh geometry which is not square in a finite difference method turns out to be very complicated, and requires transforming the PDE to a new set of coordinates. 
-Ultimately one must solve an entirely different equation. 
-Alternatively, a finite element method can be used. 
-Finite element software will already have support for new mesh geometries built in, making the suggested transformations unnecessary.
-
-\subsection{The lower scale model}
-
-A simple RW was chosen for the lower scale model because it fulfills the diffusion equation and is therefore easy to work with. 
+\noindent A simple RW was chosen for the lower scale model because it fulfills the diffusion equation and is therefore easy to work with. 
 The idea, however, was always to create a software in which the lower scale model can easily be substituted for a better one. 
 By letting the lower scale model work as a standalone unit which communicates with the rest of the software through a file containing the positions of all the walkers (or particles), this is ensured. 
 All that is needed to switch lower scale model is to put the new solver in the correct place with respect to the rest of the software, and make sure it can communicate in the described manner. 
@@ -53,12 +37,34 @@ As a test, the DSMC code developed by Anders Hafreager was used as a lower scale
 Naturally, a few problems arise, but from a strictly programming point of view it worked. \\
 
 As mentioned in section \ref{theory:BC_RW}, perfect flux exchange between the higher and lower scale model might have been a better boundary condition for the RW model than zero flux boundary conditions. 
-I principle, changing boundary conditions on the RW solver is simple, seeing as it is completely separate from the rest of the software. 
+In principle, changing boundary conditions on the RW solver is simple, seeing as it is completely separate from the rest of the software. 
 The reason the boundary conditions have not been changed is that it requires a complete workover of the coupling between the two models as well, which is a much larger job. 
 
+Perhaps the biggest weakness of the software, as it stands, is the limitation in mesh geometry. 
+Implementing a mesh geometry which is not square in a finite difference method turns out to be very complicated, and requires transforming the PDE to a new set of coordinates. 
+Ultimately one must solve an entirely different equation. 
+Alternatively, a finite element method can be used. 
+Finite element software will already have support for new mesh geometries built in, making the suggested transformations unnecessary. 
+Implementing a finite element PDE solver will also make it a lot easier to use a higher order approximation to the time derivative, hence getting a more accurate PDE solution. 
+
+There are, of course, a lot of physical problems which the developed software can be applied to. 
+One possibility is modeling for example sodium ions that diffuse through ion channels in the cell membrane of neurons into the extracellular space of the brain. 
+Ion channels are very narrow, often only allowing one ion through at a time, and they are (often) specific to one ion. 
+Two 1D PDEs can describe the intra-, and extra-cellular concentrations of ions, and a lower scale model can describe the ion channel. 
+This problem would also need to consider drift terms arising from Coulomb forces. \\
+
+In principle, any diffusion process a small portion of a large number of particles diffuse into narrow passages could be modeled by the developed hybrid diffusion solver.
+
+\subsection{Other work on the subject}
+
+As the project was being finished, I came across an article by Flekkøy et.al.\cite{flekkoy2001coupling} describing the same problems that are addressed in this thesis. 
+In this article, the authors try to combine a simple diffusion solver with a simple random walk solver and end up concluding that this is possible. 
+This thesis has been done completely independently of said article, and takes a slightly different approach to the problem as well. \\
+
+% \noindent In addition, the computer code is not available.
 
 
-\section{Conclusion}
+\section{Concluding remarks}
 
 In this thesis a hybrid diffusion solver in which parts of the process can be modeled by a particle dynamics description has been developed. 
 All parts of the solver have been verified to work properly, including the hybrid model. \\

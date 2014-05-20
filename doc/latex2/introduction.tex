@@ -1,18 +1,26 @@
-The diffusion equation governs a large number of physical processes on many different length scales. 
-Both heat diffusion through a wall and the Brownian motion of dust particles can be described by the diffusion equation. 
-In some diffusion processes a large number of particles will diffuse from a large volume into a small volume in such a way that only very few particles enter the smaller volume. 
-An example of this in the diffusion of the enzyme Protein Kinase C$\gamma$ (PKC$\gamma$\nomenclature{PKC$\gamma$}{Protein Kinase C$\gamma$}) from the body of a brain cell via a dendrite of large volume into dendritic spines. 
-Dendritic spines are the receiving end of a connection between two brain cells, and PKC$\gamma$ is associated with long term reinforcement of such a connection resulting in learning or associative memory storage. 
-The increased concentration of PKC$\gamma$ in a dendritic spine is measured to around $5\frac{\text{nMol}}{\text{L}}$ which translates to $1-2$ PKC$\gamma$ enzymes in the spine. 
-Seeing as the diffusion equation is derived from a continuous concentration distribution, using it on the enzymes in the spine seems questionable. \\
+Diffusion processes are extremely important in modern science, and have so many applications that it is hard to list them all. 
+Brownian motion of particles, momentum in liquids, and atomic diffusion of Helium through a balloon wall are just some examples of diffusion processes. \\
+\noindent Both in general transport processes, which among other things include fluid flow, and particularly in diffusion processes, there are cases in which parts of the process cannot be described by a continuum model, but the rest of the process can. 
+Examples of such processes are fluid flow in nanoporous media, diffusion in the extracellular space of the brain, and ...\\
 
-This thesis will look at hybrid diffusion processes where part of the process has very few particles, and other parts have enough particles to be described by a continuous diffusion equation. 
-The sparsely populated parts of the process will be viewed as a separate system coupled to the diffusion process, but described by a different model. 
+\noindent These types of processes can be called multi scale processes in that two (or more) models, which are usually used on different length scales, are needed to achieve a complete description of the problem. 
+Multi scale models are usually either solved by designing a meso scale, or intermediate scale model, or by a hybrid solver which seeks to combine the models that are used. 
+An example of a meso scale model is dissipative particle dynamics \cite{}. 
+Here, clusters of particles are modeled as individual particles that have different properties than the actual molecules or atoms that make up the substance. 
+The other alternative is to use a hybrid solver. 
+Some hybrid models exist today, but these are mostly aimed at specific problems, like dendritc solidification \cite{plapp2000multiscale}, or hybrid fluid flow models which combine molecular dynamics and Navier-Stokes solvers \cite{o1995molecular}. 
+Other hybrid solvers for diffusion processes have also been developed \cite{flekkoy2001coupling}, but they are closed in the sense that the computer code is not commonly available. \\
+
+\noindent The aim of this masters thesis is to develop a simple, yet flexible hybrid diffusion solver from the ground and up where all parts of the theory and implementation are fully understood and transparent. 
 In principle, any particle dynamics model could be used, but for the sake of verification a stochastic model has been implemented. 
-A large emphasis has been put on verification of all parts of the hybrid model. 
-Both individually and for the combined, hybrid solver to verify the average behavior of the system. \\
+This is no limitation, as the interface to the lower scale model is simple, and the lower scale model works as a standalone unit. \\
 
-Some hybrid models exist today, but these are mostly aimed either at specific problems, like dendritc solidification \cite{plapp2000multiscale}. 
-Other models which bears resemblance to the mentioned hybrid diffusion solver are reaction diffusion models \cite{hattne2005stochastic} which can be used to model chemical reactions, but do not usually include a higher scale model. 
-Hybrid fluid flow models also exist, coupling molecular dynamics with a larger scale navier stokes equation \cite{o1995molecular}, as well as dissipative fluid dynamics which is a purely mesoscale particle model, among other things used to model fluid flow around supersonic aircraft \cite{}. 
+\noindent A large emphasis has been put on verification of all parts of the hybrid model. 
+Both individually and for the combined, hybrid solver to verify the average behavior of the system.\\
 
+\noindent Put shortly, the thesis in your hands has the following structure: \\
+Chapter \ref{chapter:theory} contains a detailed look at the coupling between the two models, as well as a look at band diagonal linear systems. 
+Chapter \ref{chapter:analysis} defines the error estimate and shows a thorough analysis of all parts of the developed software in order to verify that it functions properly. 
+In chapter \ref{chapter:application} the developed software is modified to describe a physical application in which a hybrid diffusion solver is demanded. 
+The results of both the verification and the physical application are described and discussed in chapter \ref{chapter:results}, and finally, chapter \ref{chapter:discussion} discusses the thesis as a whole and looks at possible improvements and extensions that can be done. 
+The appendix is a general guide to debugging the methods that have been implemented during this project.
