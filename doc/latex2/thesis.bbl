@@ -116,38 +116,6 @@
   \field{year}{2001}
 \endentry
 
-\entry{hattne2005stochastic}{article}{}
-  \name{author}{3}{}{%
-    {{}%
-     {Hattne}{H.}%
-     {Johan}{J.}%
-     {}{}%
-     {}{}}%
-    {{}%
-     {Fange}{F.}%
-     {David}{D.}%
-     {}{}%
-     {}{}}%
-    {{}%
-     {Elf}{E.}%
-     {Johan}{J.}%
-     {}{}%
-     {}{}}%
-  }
-  \list{publisher}{1}{%
-    {Oxford Univ Press}%
-  }
-  \strng{namehash}{HJFDEJ1}
-  \strng{fullhash}{HJFDEJ1}
-  \field{sortinit}{H}
-  \field{number}{12}
-  \field{pages}{2923\bibrangedash 2924}
-  \field{title}{{Stochastic reaction-diffusion simulation with MesoRD}}
-  \field{volume}{21}
-  \field{journaltitle}{Bioinformatics}
-  \field{year}{2005}
-\endentry
-
 \entry{light1996protein}{article}{}
   \name{author}{5}{}{%
     {{}%
@@ -257,6 +225,34 @@
   \field{volume}{165}
   \field{journaltitle}{Journal of Computational Physics}
   \field{year}{2000}
+\endentry
+
+\entry{saito2002protein}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Saito}{S.}%
+     {Naoaki}{N.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Shirai}{S.}%
+     {Yasuhito}{Y.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Jpn Biochemical Soc}%
+  }
+  \strng{namehash}{SNSY1}
+  \strng{fullhash}{SNSY1}
+  \field{sortinit}{S}
+  \field{number}{5}
+  \field{pages}{683\bibrangedash 687}
+  \field{title}{{Protein kinase C$\gamma$ (PKC$\gamma$): function of neuron
+  specific isotype}}
+  \field{volume}{132}
+  \field{journaltitle}{Journal of biochemistry}
+  \field{year}{2002}
 \endentry
 
 \lossort

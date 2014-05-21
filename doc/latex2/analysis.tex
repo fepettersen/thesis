@@ -10,8 +10,8 @@ Solving PDEs numerically will result in errors because derivatives are approxima
 % \noindent where the coefficients $C_x$ and $C_t$ are unknown. 
 % Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. 
 
-The error is measured by comparing the result from a numerical simulation to an exact solution, $u_e$ and taking the norm of the difference. 
-Specifically $\epsilon$ is measured by the L2 norm which is defined in equation \eqref{analysis:def_epsilon}
+The error, $\epsilon$, is measured by comparing the result from a numerical simulation to an exact solution, $u_e$ and taking the norm of the difference. 
+Specifically $\epsilon$ is measured by the L2 norm which is defined in \eqref{analysis:def_epsilon}
 % \label{analysis:def_epsilon}
 \begin{align}
  \epsilon(t^n) &= ||u(t^n)-u_e(t^n)||_2 \nonumber \\
@@ -19,26 +19,28 @@ Specifically $\epsilon$ is measured by the L2 norm which is defined in equation 
  &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^n\sum\limits_{i=0}^n \left(u(t^n,x_i,y_j)-u_e(t^n,x_i,y_j)\right)^2}\label{analysis:def_epsilon}
  \end{align}
  
-\noindent $\epsilon$ is time dependent because it allows for investigation of the evolution of the error over the course of a simulation.
+\noindent A time dependent error estimate has been chosen because it allows for investigation of the evolution of the error over the course of a simulation.
 Some of the error tests will require a single number as an error measure. 
-In these cases the norm of $\epsilon(t)$, defined in eq. \eqref{analysis:convergence_test_error} is used.
+In these cases the norm of $\epsilon(t)$, shown below, is used.
 \begin{equation}\label{analysis:convergence_test_error}
  \epsilon = \sqrt{\Delta t\sum\limits_{n=0}^T\epsilon(t^n)^2}
 \end{equation}
 
 \section{Verification techniques}
-
+All parts of the hybrid diffusion solver are subject to testing. First, the PDE and RW solver will be tested individually, then the hybrid solver is tested. 
 This thesis will focus on three verification techniques which are described below. 
-The aim for all of these techniques is to make sure that the implementation is correct by comparing simulations results known to be correct. 
-Since an incorrect implementation of the spatial derivative will cause the solution to be unstable which is easily noticed through visual inspection, the tests will focus on verifying the time derivative. 
-Isolating the contribution to $\epsilon(t)$ from the time derivative will be necessary and is ensured by setting $\Delta t \gg\Delta x^2$. 
+The aim for all of these techniques is to make sure that the implementation is correct by comparing simulations to an exact solution. \\
+
+\noindent For the PDE solver, there are errors arising from both the spatial derivative and from the time derivative. 
+Since an incorrect implementation of the spatial derivative will cause the solution to be unstable, which is easily noticed through visual inspection, the tests will focus on verifying the time derivative. 
+In some cases, isolating the contribution to $\epsilon(t)$ from the time derivative will be necessary, and is ensured by setting $\Delta t \gg\Delta x^2$. 
 A time step of this size violates the stability criterion for the FE scheme, and so some of the tests are slightly inaccurate for this scheme. \\
 
-The verification techniques are
+The verification techniques that will be carried out are:
 
 \begin{itemize}
  \item Manufactured solutions\\
- By adjusting the source term, $s$, one can, in principle, choose any solution to the diffusion equation. 
+ By adjusting the source term, $s(x,t)$, one can, in principle, choose any solution to the diffusion equation. 
 Should we, for example, want the solution to be $u(x,t) = \frac{1}{x+1}$, all that is needed is to set 
 $$
 s(x,t) = \frac{2D}{(x+1)^3}
@@ -58,7 +60,7 @@ and the problem is solved (as long as the boundary conditions are correct).
 \end{equation}
 where the coefficients $C_x$ and $C_t$ are unknown. 
 Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. \\
-Where possible, convergence will be tested by having $\Delta t \gg \Delta x^2$, which implies $\Delta x\approx0$ and 
+Where possible, convergence will be tested by having $\Delta t \gg \Delta x^2$, which implies $C_x\Delta x^2\approx0$ and 
 $$
 \epsilon \propto \Delta t^r
 $$
@@ -79,7 +81,7 @@ By comparing the error from two simulations with different time steps, $r$, call
 \end{align*}
 
   \item Exact numerical solutions \\
-  The numerical schemes are actually reformulations of the PDE we are trying to solve as difference equations which have their own exact solutions. 
+  The numerical schemes are actually reformulations of the PDE as difference equations, which have their own exact solutions. 
   These will be called the numerical exact solutions, and they are slightly different from the exact solutions to the PDE. 
   The reason for finding the numerical exact solutions is that the scheme theoretically will represent this solution with no error. 
   In practice there will always be round off errors and other factors, but an error term close to machine precision is expected.
@@ -91,7 +93,7 @@ By comparing the error from two simulations with different time steps, $r$, call
 \subsection{Verification by manufactured solutions}
 
 Equation \eqref{manufactured_solution} solves the diffusion equation, so using $u(x,y,t=0)$ as the initial condition for a simulation will give us both the numerical solution and the exact solution. 
-An important property of the discretization scheme is that the difference between these solutions is of the same order as the time step.
+An important property of both the FE and BE discretization schemes is that the difference between these solutions is of the same order as the time step.
 \begin{equation*}
  \epsilon(t) \sim \mathcal{O}(\Delta t)
 \end{equation*}
@@ -243,7 +245,7 @@ Although the FE scheme is expected to reproduce \eqref{numerical_solution} to ma
 \end{itemize}
 
 As a side note, equation \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
-In the numerical exact solution the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^n$.
+In the numerical exact solution, the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^n$.
 This amplification factor can be found in equation \eqref{numerical_solution} as 
 \begin{equation}
 A^n = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i
@@ -306,7 +308,8 @@ Given the $n$'th time step, the next time step is found by
 Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
 Doing calculations with such a matrix gives a lot of round off errors which will reduce the accuracy of the numerical exact. 
 The error should theoretically be machine precision, but is expected to at least be much smaller than $\Delta t$. 
-Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}
+Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}. 
+Though computationally intensive, the numerical exact solution for the BE scheme has none of the limitations that were found for the FE scheme. 
 
 \begin{figure}[H]
  \centering
@@ -326,7 +329,7 @@ Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorpl
 
 \section{Verification of the RW solver}
 
-The aim of this section is to verify that the implemented RW model will solve the diffusion equation with on the correct time scale, and to verify that the error term from the RW solver is dependent on the conversion factor, $Hc$. 
+The aim of this section is to verify that the implemented RW model will solve the diffusion equation on the correct time scale, and to verify that the error term from the RW solver is dependent on the conversion factor, $Hc$. 
 In order to carry out the tests a new initial condition that can easily be recreated by random walkers will be introduced.
 \begin{equation}
  u(t=0,x) = H\left(x-\frac{1}{2}\right)
@@ -344,7 +347,7 @@ In order to carry out the tests a new initial condition that can easily be recre
  u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
 \end{equation}
 
-\noindent Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
+\noindent Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And Figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
 The convergence is not very good, but this is expected because of the fluctuations which causes the error to fluctuate around a certain value rather than converge to zero.
 
 \begin{figure}[h]
@@ -359,7 +362,7 @@ The convergence is not very good, but this is expected because of the fluctuatio
   \caption{}
  \label{ConvergenceTestRW:dt:convergence}
 \end{subfigure}
-\caption[]{Error plot (a) and convergence test (b) for 1D RW solver using a Heaviside step function as initial condition. In these tests both the time step and the conversion factor are changed for each simulation, and the conversion factor follows the previously proposed limit $Hc\geq\frac{1}{\Delta t^2}$. For each $\Delta t$ the RW simulation does 250 steps with a step length calculated from \eqref{theory:step_length}. The expected convergence rate is $0.5$, and to some extent this is achieved here, note however that due to fluctuations in the solution getting a good error measure is difficult and beyond our control.}
+\caption[]{Error plot (a) and convergence test (b) for 1D RW solver using a Heaviside step function as initial condition. In these tests both the time step and the conversion factor are changed for each simulation, and the conversion factor follows the previously proposed limit $Hc\geq\frac{1}{\Delta t^2}$. For each $\Delta t$ the RW simulation does 250 steps with a step length calculated from \eqref{theory:step_length}. The expected convergence rate is $0.5$, and to some extent this is achieved here. Note, however, that due to fluctuations in the solution, getting a good error measure is difficult and beyond our control.}
  \label{ConvergenceTestRW:dt}
 \end{figure}
 \begin{figure}[h]
@@ -370,7 +373,7 @@ The convergence is not very good, but this is expected because of the fluctuatio
 \begin{subfigure}[t]{0.48\textwidth}
  \includegraphics[width=\textwidth]{../results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/ConvergenceTest.eps}
 \end{subfigure}
-\caption[Test RW]{As a comparison to Figures \ref{ConvergenceTestRW:dt} this test has been done for the same 1D Heaviside step function as initial condition, but keeps the time step fixed at $\Delta t = 0.05$ and increases the conversion factor. The convergence rate (fig. b) is worse than for the time convergence test, and seems to reach a limit where increasing the number of walkers has little effect on the error.}
+\caption[Test RW]{As a comparison to Figure \ref{ConvergenceTestRW:dt}, this test has been done for the same 1D Heaviside step function as initial condition, but keeps the time step fixed at $\Delta t = 0.05$ and increases the conversion factor. The convergence rate (fig. b) is worse than for the time convergence test, and seems to reach a limit where increasing the number of walkers has little effect on the error.}
 \label{ConvergenceTestRW:Hc}
 \end{figure}
 \clearpage
@@ -380,10 +383,12 @@ This section aims to achieve first order convergence in time for the hybrid solv
 Effects of varying the number of mesh points affected by the RW solver will also be illustrated. \\
 
 The number of walkers needed to achieve first order convergence in time for the hybrid solver is governed by 
-\begin{equation}
+\begin{equation}\label{analysis:Hc_limitation}
  Hc\geq\frac{1}{\Delta t^2}
 \end{equation}
-\noindent This demand makes use of the FE scheme difficult because of the stability criterion, and so all tests are done with the BE scheme. 
+
+\noindent The stability criterion for the FE scheme limits the size of the time step, and by \eqref{analysis:Hc_limitation} vastly increases the conversion rate. 
+All tests will be done with the BE scheme in order to reduce the demand for walkers and get a reasonable performance. 
 Figure \ref{combined_BE1d} shows first order convergence for the hybrid model.
 
 \begin{figure}[H]
@@ -405,7 +410,7 @@ Figure \ref{combined_BE1d} shows first order convergence for the hybrid model.
  \label{combined_BE1d}
 \end{figure}
 
-Decreasing or increasing the relative size of the microscopic model as serious effects on the error and is illustrated in figure \ref{testing_walk_area_size_BE}
+Decreasing or increasing the relative size of the microscopic model has serious effects on the error. This is illustrated in Figure \ref{testing_walk_area_size_BE}
 
 \begin{figure}[H]
 \centering

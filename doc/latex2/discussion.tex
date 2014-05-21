@@ -74,6 +74,6 @@ The developed software mainly relies on the implicit BE scheme to solve the diff
 Like any implicit scheme, the BE scheme results in a system of linear equations of size $n^d\times n^d$ which must be solved at each time step. 
 In order to do so, a block tridiagonal solver has been implemented, with an efficiency of $\mathcal{O}(n^{2d-1})$. 
 To my knowledge, this is the most effective direct solver available, with alternatives like LU decomposition and Levinson recursion using $\mathcal{O}(n^{2d})$ FLOPs. 
-The limiting factor of the block tridiagonal solver is two matrix-vector multiplications which will use $\mathcal{O}(n^{2(d-1)})$ FLOPs. 
+The limiting factors of the block tridiagonal solver are two matrix-vector multiplications which will use $\mathcal{O}(n^{2(d-1)})$ FLOPs. 
 If a faster matrix-vector multiplication scheme exists it will reduce the computational work to $\mathcal{O}(n^d)$. \\
 

@@ -27,14 +27,14 @@ Integrating the surface normal (illustrated in Figure \ref{theory:divergence_the
 \end{equation}
 Since the number of walkers is conserved, the change in $C$ per time must be equal to the number of walkers leaving $V$ plus any walkers added to $V$
 \begin{equation}\label{theory:diffusion_integral_form}
- \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS + s
+ \int_V \frac{\d C}{\d t}\,dV = \int_S\vec{J}\cdot \vec{n}\,dS + s(x,t)
 \end{equation}
 
-\noindent where $s$ denotes a source term. 
+\noindent where $s(x,t)$ denotes a source term. 
 Through Greens theorem \eqref{theory:diffusion_integral_form} can be reformulated
 
 \begin{equation}\label{theory:integral_form}
- \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV +s
+ \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV +s(x,t)
 \end{equation}
 
 \noindent The flux $\vec{J}$ can be expressed by Fick's first law as the diffusive flux 
@@ -46,7 +46,7 @@ Through Greens theorem \eqref{theory:diffusion_integral_form} can be reformulate
 The diffusive flux $\mathbf{J}$ is also inserted to yield the diffusion equation
 
 \begin{equation}\label{theory:diffusion_equation}
- \frac{\d C}{\d t} = D\nabla^2 C +s
+ \frac{\d C}{\d t} = D\nabla^2 C +s(x,t)
 \end{equation}
 
 \noindent Throughout this thesis $C$ will denote a spatial distribution of random walkers while $u$ will denote the solution to the diffusion equation. 

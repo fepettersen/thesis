@@ -1,0 +1,5 @@
+\nomenclatureentry{aRW@[{RW}]\begingroup Random Walk\nomeqref {2.7}|nompageref}{12}
+\nomenclatureentry{aPDE@[{PDE}]\begingroup Partial Differential Equation\nomeqref {2.7}|nompageref}{12}
+\nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.8}|nompageref}{12}
+\nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.8}|nompageref}{12}
+\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations (per second)\nomeqref {2.17}|nompageref}{16}
