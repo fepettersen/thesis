@@ -139,7 +139,7 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
-		color = ['b-','r-x','k-o','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
+		color = ['b-','r--','k:','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
 			# print self.runcounter
@@ -154,7 +154,7 @@ class Experiment:
 		mpl.legend(loc=0)
 		mpl.xlabel('timestep no.')
 		mpl.ylabel('errornorm (l2)')
-		mpl.title('Error plot; dt = %g'%self.dt)
+		# mpl.title('Error plot; dt = %g'%self.dt)
 		if save:
 			mpl.savefig(self.result_path+'/errorplot.png')
 			mpl.savefig(self.result_path+'/errorplot.eps')
@@ -297,23 +297,24 @@ class Experiment:
 
 
 
-	def ConvergenceTest(self,Hc,save=True):
+	def ConvergenceTest(self,h,save=True):
+		# h is the discretization parameter which the convergence is beeing tested for
 		E = []
 		if self.runcounter != len(self.error):
-			for i in xrange(len(Hc)):
-				E.append(np.sqrt(Hc[i]*np.sum(self.error[i+1]**2)))
+			for i in xrange(len(h)):
+				E.append(np.sqrt(h[i]*np.sum(self.error[i+1]**2)))
 		else:
-			for i in xrange(len(Hc)):
-				E.append(np.sqrt(Hc[i]*np.sum(self.error[i]**2)))
-				# E.append(np.sqrt(Hc[i]*np.max(self.error[i])**2'))
+			for i in xrange(len(h)):
+				E.append(np.sqrt(h[i]*np.sum(self.error[i]**2)))
+				# E.append(np.sqrt(h[i]*np.max(self.error[i])**2'))
 		r = [0]*(len(E)-1)
 		for j in xrange(len(E)-1):
-			r[j] = np.log(E[j+1]/E[j])/np.log(float(Hc[j+1])/float(Hc[j]))
+			r[j] = np.log(E[j+1]/E[j])/np.log(float(h[j+1])/float(h[j]))
 		print r
 		print E
-		mpl.ylim(0.0,1.1)
-		mpl.plot((Hc[:-1]),r,'b-x')
-		mpl.xlabel('dt')
+		# mpl.ylim(0.0,1.1)
+		mpl.plot((h[:-1]),r,'b-x')
+		mpl.xlabel('dx')
 		mpl.ylabel('r')
 		mpl.title('Convergence rate')
 		if save:
@@ -428,7 +429,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return np.pi*x
-	return np.ones(np.shape(x))*5.45
+	return np.ones(np.shape(x))
 
 def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	# return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
@@ -449,7 +450,7 @@ if __name__ == '__main__':
 	y1 = 1.0
 	m = 1800
 	n = 1
-	T = 6000		# no.of timesteps, [dt*T] = seconds
+	T = 8000		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 50.0 		#um
@@ -471,9 +472,9 @@ if __name__ == '__main__':
 	Hc = [20]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_errorplot_BE1D'
+	info='_FE1D_new_plots'
 	run = Experiment(this_dir,DEBUG,save_files,info)
-	run.exact = GaussianPulse
+	run.exact = f
 
 	run.SetInitialCondition(run.exact(x,y,0))
 	# run.SetDiffusionTensor(D(x,y))
@@ -483,7 +484,7 @@ if __name__ == '__main__':
 	run.compile()
 	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
-	run.RunSimulation(Hc[0])
+	# run.RunSimulation(Hc[0])
 	# M = np.loadtxt("BE_matrix_inverse.txt")
 	# u0 = run.exact(x,y,0)
 	# run.Compare('/results_FE_Hc*.txt',numerical_exact)				# FE version
@@ -511,34 +512,34 @@ if __name__ == '__main__':
 	# run.PlotError(leg)
 
 	## --- Run for h --- ###
-	# dt = 0.05
-	# h = [0.1,0.05,0.02]
-	# # dx = 0.025
-	# # h = [0.1,0.05,0.02,0.025]
-	# # h = [0.025]
-	# for i in h:
-	# 	# i = 1.0/j
-	# 	timestep = i*i/5.0
-	# 	# dt.append(timestep)
-	# 	m = (1/i)+1
-	# 	# m = 21
-	# 	n = m
-	# 	if n==1:
-	# 		x = np.linspace(0,1,m)
-	# 		y = np.zeros(m)
-	# 	elif n==m:
-	# 		x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
-	# 	run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
-	# 	run.SetInitialCondition(run.exact(x,y,0))
-	# 	run.SetDiffusionTensor(D(x,y))
-	# 	# hc = int(round(1.0/(timestep**2)))
-	# 	hc = 100
-	# 	print m," , ", timestep, " , ", hc
-	# 	run.RunSimulation(1*hc)
-	# leg = ['h = %g'%i for i in h]
-	# run.ConvergenceTest(h)
-	# # leg = ['dt = %g'%i for i in dt]
-	# run.PlotError(leg)
+	dt =[]
+	h = [0.1,0.05,0.02]
+	# dx = 0.025
+	# h = [0.1,0.05,0.02,0.025]
+	# h = [0.025]
+	for i in h:
+		# i = 1.0/j
+		timestep = i*i/4.0
+		dt.append(i*i)
+		m = (1/i)+1
+		# m = 21
+		n = 1
+		if n==1:
+			x = np.linspace(0,1,m)
+			y = np.zeros(m)
+		elif n==m:
+			x,y = np.meshgrid(np.linspace(0,1,m),np.linspace(0,1,m))
+		run.SetupRun(x0,x1,y0,y1,m,n,T,timestep)
+		run.SetInitialCondition(run.exact(x,y,0))
+		run.SetDiffusionTensor(D(x,y))
+		# hc = int(round(1.0/(timestep**2)))
+		hc = 100
+		print m," , ", timestep, " , ", hc
+		run.RunSimulation(1*hc)
+	leg = ['h = %g'%i for i in dt]
+	# run.ConvergenceTest(dt)
+	# leg = ['dt = %g'%i for i in dt]
+	run.PlotError(leg)
 	# # print 'dx =',dx
 	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# # run.UpdateWebpageSpecial()

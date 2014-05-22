@@ -60,25 +60,17 @@ and the problem is solved (as long as the boundary conditions are correct).
 \end{equation}
 where the coefficients $C_x$ and $C_t$ are unknown. 
 Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. \\
-Where possible, convergence will be tested by having $\Delta t \gg \Delta x^2$, which implies $C_x\Delta x^2\approx0$ and 
+Where possible, convergence will be tested by isolating one of the error terms. For example, setting $\Delta t \gg \Delta x^2$, implies $C_x\Delta x^2\approx0$ and 
 $$
 \epsilon \propto \Delta t^r
 $$
 where $r=1$. 
-However, for the FE scheme $\Delta t \gg \Delta x^2$ will violate the stability criterion, and a single discretization parameter, $h$, must be introduced by ensuring  
-\begin{equation*}
- \frac{\Delta t}{\Delta x^2} = k
-\end{equation*}
-$\epsilon(t)$ can now be rewritten by setting $\Delta t = h$
-\begin{align*}
- \epsilon(t) &= C_t h + C_x\frac{h}{k} \\
- &= (C_t +C_x/k)h = C_k h^r
-\end{align*}
-As $\Delta t$ or $h$ tends to zero, $r$ is expected to converge to one, and that is the purpose of these tests. 
+As $\Delta t$ tends to zero, $r$ is expected to converge to one, and that is the purpose of these tests. 
 By comparing the error from two simulations with different time steps, $r$, called the convergence rate, can be measured from 
  \begin{align*}
    r&\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}
 \end{align*}
+Notice that a single number must be used to describe the error, as shown in \eqref{analysis:convergence_test_error}.
 
   \item Exact numerical solutions \\
   The numerical schemes are actually reformulations of the PDE as difference equations, which have their own exact solutions. 
@@ -118,12 +110,14 @@ By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe 
 % Error plots for FE in 1D (a) and 2D (b)
  \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1327_FE1D_new_plots/results/errorplot.eps}
   \caption{}
+  % experiment_22052014_1305_spatial_convergencetest_BE1D
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14052014_0754_errorplot_FE2D/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1323_FE2D_new_plots/results/errorplot.eps}
   \caption{}
+% experiment_22052014_1309_spatial_convergencetest_BE1D
  \end{subfigure}
  \caption[Error plots FE]{Error plot for the FE scheme in 1D (a) and 2D (b). Note that there is now only one discretization parameter called $h$.}
  \label{analysis:errorplots:FE}
@@ -138,17 +132,30 @@ By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe 
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_18042014_1450_convergencetest_BE2D/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1317_BE2D_new_plots/results/errorplot.eps}
   \caption{}
  \end{subfigure}
- \caption[Error plots BE]{Error plot for the BE scheme in 1D (a) and 2D (b). Notice that the error is of the same order as the time step.}
+ \caption[Error plots BE]{Error plot for the BE scheme in 1D (a) and 2D (b). Notice that the error is roughly of the same order as the time step. Figures \ref{analysis:errorplots:FE}b and (b) show the same simulation using FE and BE schemes in 2D. The error is slightly larger in the BE discretization by a factor of 4.}
  \label{analysis:errorplots:BE}
 \end{figure}
 
 \subsection{Verification by convergence tests}
 
 The convergence tests are done by isolating the error term from either the time derivative or the spatial derivative, and refining the relevant discretization parameter over several simulations. 
-Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order while figure \ref{analysis:spatial_convergence_tests} verifies the error from the spatial derivative for the BE scheme.
+However, for the FE scheme it is impossible to isolate the error from the time derivative without violating the stability criterion. 
+To cope with this problem a single discretization parameter, $h$, is introduced by ensuring  
+\begin{equation*}
+ \frac{\Delta t}{\Delta x^2} = k
+\end{equation*}
+where $k$ is a constant. 
+$\epsilon(t)$ can now be rewritten by setting $\Delta t = h$
+\begin{align*}
+ \epsilon(t) &= C_t h + C_x\frac{h}{k} \\
+ &= (C_t +C_x/k)h = C_k h^r
+\end{align*}
+$r$ is expected to converge to one. 
+Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order. 
+In Figure \ref{analysis:spatial_convergence_tests} the error from the spatial derivative has been isolated, and tested for both schemes. 
 
 \begin{figure}[h]
 % Convergence tests for FE in 1D (a) and 2D (b)
@@ -181,17 +188,26 @@ Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:
 \end{figure}
 
 \begin{figure}[H]
-% Spatial error test for the BE scheme
+% Spatial error tests 
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1254_spatial_convergencetest_BE1D/results/errorplot.eps}
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14042014_1303_convergence_tests_etc/results/ConvergenceTest.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1254_spatial_convergencetest_BE1D/results/ConvergenceTest.eps}
   \caption{}
  \end{subfigure}
- \caption[Spatial error test for the BE scheme]{This figure shows the error from the spatial derivative (a) and the corresponding convergence test. For the smallest $\Delta x$ the spatial error is no longer completely dominant which explains the poorer convergence.}
+ 
+  \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_0810_spatial_convergencetest_FE2D/results/errorplot.eps}
+  \caption{}
+ \end{subfigure}
+ \begin{subfigure}{0.49\textwidth}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_0810_spatial_convergencetest_FE2D/results/ConvergenceTest.eps}
+  \caption{}
+ \end{subfigure}
+ \caption[Spatial error tests]{These plots show the error and convergence from the spatial derivative using BE (a \& b) and FE (c \& d) discretization schemes. The expected convergence rate for both discretizations is $r = 2$, which is recreated to a decent accuracy. Testing has been done using 1D simulations for the BE scheme, and 2D simulations for the FE scheme. This should not make any difference for the results.}
  \label{analysis:spatial_convergence_tests}
 \end{figure}
 
