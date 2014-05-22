@@ -99,7 +99,7 @@ An important property of both the FE and BE discretization schemes is that the d
 %  &= (C_t +C_x/k)h = C_k h
 % \end{align*}
 
-Figures \ref{analysis:errorplots:FE} and \ref{analysis:errorplots:BE} show that for both the FE and BE scheme in both 1D and 2D the error is of the expected magnitude. 
+Figures \ref{analysis:errorplots:FE} and \ref{analysis:errorplots:BE} show that for both the FE and BE scheme in both 1D and 2D the error is of the expected magnitude, which is roughly $\Delta t$. 
 Another interesting property of the error plots is that the error tends to zero after a large number of time steps. 
 By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe that the error is expected to tend to zero because the limit value of one can be exactly recreated by both schemes.
 \begin{align*}
@@ -119,7 +119,7 @@ By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe 
   \caption{}
 % experiment_22052014_1309_spatial_convergencetest_BE1D
  \end{subfigure}
- \caption[Error plots FE]{Error plot for the FE scheme in 1D (a) and 2D (b). Note that there is now only one discretization parameter called $h$.}
+ \caption[Error plots FE]{Error plot for the FE scheme in 1D (a) and 2D (b). Note that there is now only one discretization parameter, called $h$, which is related to the time step by $h = k\Delta t$, where $k$ is a constant.}
  \label{analysis:errorplots:FE}
 \end{figure}
 
@@ -215,11 +215,12 @@ In Figure \ref{analysis:spatial_convergence_tests} the error from the spatial de
 \subsection{Verification of FE scheme by exact numerical solution}\label{exact_numerical_solution}
 
 Discretization of the diffusion equation by the FE scheme yields the following numerical scheme in 1D
-\begin{equation}
+\begin{equation}\label{analysis:simplified_FE_scheme}
  u^{n+1} = D\Delta t u^n_{xx} + u^n
 \end{equation}
 where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$. 
-To illustrate how the equation is solved by the computer, the first four iterations are written out
+\eqref{analysis:simplified_FE_scheme} is a difference equation, which is most easily solved by writing out the first four iterations
+% To illustrate how the equation is solved by the computer, the first four iterations are written out
 \begin{align*}
  u^1 &= D\Delta t\, u_{xx}^0 + u^0 \\
  u^2 &= D\Delta t\, u_{xx}^1 + u^1 \\
@@ -232,15 +233,15 @@ To illustrate how the equation is solved by the computer, the first four iterati
  &= \left(D\Delta t\right)^4 u_{8x}^0 + 4\left(D\Delta t\right)^3 u_{6x}^0+ 6\left(D\Delta t\right)^2 u_{4x}^0 + 4D\Delta t u_{2x}^0 + u^0 
 \end{align*}
 
-\noindent From the iterations above a pattern emerges for iteration $n+1$\\
+\noindent From the iterations above a pattern can be recognized for iteration $n+1$\\
 \begin{equation}
  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^iu^0_{2ix}
 \end{equation}
-Where $u^0$ is the initial condition
+where $u^0$ is the initial condition
 \begin{equation}
  u^0 = \cos(\pi x)
 \end{equation}
-The spatial derivatives are found as
+The spatial derivatives are found by inserting the initial condition into the centered difference approximation to the second derivative 
 \begin{align*}
  u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
  &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
@@ -260,29 +261,30 @@ Although the FE scheme is expected to reproduce \eqref{numerical_solution} to ma
  \item ${n\choose i}$ goes to infinity for large $n$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$.
 \end{itemize}
 
-As a side note, equation \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
+As a side note, \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
 In the numerical exact solution, the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^n$.
 This amplification factor can be found in equation \eqref{numerical_solution} as 
 \begin{equation}
 A^n = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i
 \end{equation}
-Inserting a time step larger than the stability criterion ($\Delta t \leq \frac{\Delta x^2}{2D}$) will make the amplification factor $A$ larger than one which in turn will make the solution blow up. \\
-The stability criterion also illustrates why the terms where 
+Inserting a time step larger than $\frac{\Delta x^2}{2D}$ will make the amplification factor, $A$, larger than one, which in turn makes the solution blow up. \\
+
+\noindent The stability criterion also illustrates why the terms where 
 $$ \frac{1}{\Delta x^{2i}} \to \infty$$
  can be dropped. 
- By the stability criterion, the time step will cancel out $\Delta x^2$, and the result will be a number smaller than 1 raised to a rather large power, $i$, resulting in a number comparable to zero.\\
+ By the stability criterion, the time step will cancel out $\Delta x^2$, and the result will be a number smaller than 1 raised to a rather large power, resulting in a number comparable to zero.\\
  
  The results from comparing a 1D simulation to the numerical exact is shown in Figure \ref{numerical_exact_FE:1D}. 
- As expected the error is larger than machine precision by at most two orders of magnitude because of accumulating error terms from the dropped terms in eq. \eqref{numerical_solution}.
+ As expected the error is larger than machine precision by at most two orders of magnitude because of accumulating error terms from the dropped terms in \eqref{numerical_solution}.\\
  
- Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme. 
+\noindent Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme. 
  \begin{equation}\label{exact_numerical_solution_2d}
  u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
 \end{equation}
 
-The same problems as in the 1D case will apply to equation \eqref{exact_numerical_solution_2d} with the same solutions. 
+The same problems as in the 1D case will apply to \eqref{exact_numerical_solution_2d} with the same solutions. 
 Figure \ref{numerical_exact_FE:2D} shows how the 2D simulation compares to the numerical exact solution. 
-As was the case in 1D the error is larger than machine precision, but much smaller than $\Delta t$.
+As was the case in 1D, the error is larger than machine precision, but much smaller than $\Delta t$.
 % suggesting that the scheme is implemented correctly.
 
 \begin{figure}[H]
@@ -305,7 +307,7 @@ As was the case in 1D the error is larger than machine precision, but much small
 
 \subsection{Verification of BE scheme by exact numerical solution}
 
-The exact numerical solution to the BE scheme is found by solving the linear system which arises from the discretization. 
+The exact numerical solution to the BE scheme is found by solving the linear system which arises from the discretization (see Section \ref{theory:section:BE2D}). 
 Given the $n$'th time step, the next time step is found by
 
 \begin{align*}
@@ -316,14 +318,14 @@ Given the $n$'th time step, the next time step is found by
 
 \noindent Doing the separation to the end relates the $n$'th time step to the initial condition
 \begin{equation}\label{BE_numex}
- \vec u^{n+1} = \left(\mathbf M^{-1}\right)^{n+1} \vec u^0
+ \vec u^{n} = \left(\mathbf M^{-1}\right)^{n} \vec u^0
 \end{equation}
 
-\noindent Where $\left(\mathbf M^{-1}\right)^{n+1}$ is the inverse of $\mathbf M$ to the $n+1$'th power.\\
+\noindent Where $\left(\mathbf M^{-1}\right)^{n}$ is the inverse of $\mathbf M$ to the $n$'th power.\\
 
-Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
+\noindent Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
 Doing calculations with such a matrix gives a lot of round off errors which will reduce the accuracy of the numerical exact. 
-The error should theoretically be machine precision, but is expected to at least be much smaller than $\Delta t$. 
+The error should theoretically be machine precision, but is expected, to at least, be much smaller than $\Delta t$. 
 Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}. 
 Though computationally intensive, the numerical exact solution for the BE scheme has none of the limitations that were found for the FE scheme. 
 
@@ -346,11 +348,11 @@ Though computationally intensive, the numerical exact solution for the BE scheme
 \section{Verification of the RW solver}
 
 The aim of this section is to verify that the implemented RW model will solve the diffusion equation on the correct time scale, and to verify that the error term from the RW solver is dependent on the conversion factor, $Hc$. 
-In order to carry out the tests a new initial condition that can easily be recreated by random walkers will be introduced.
+In order to carry out the tests, a new initial condition that can easily be recreated by random walkers will be introduced.
 \begin{equation}
  u(t=0,x) = H\left(x-\frac{1}{2}\right)
 \end{equation}
-\noindent Where $H(x)$ denotes the Heaviside step function which is defined by its properties
+\noindent Where $H(x)$ denotes the Heaviside step function, which is defined by its properties
 \begin{equation}\label{Heaviside_def}
  H(x-a) = \begin{cases}
            1\;\;x > a\\
@@ -358,13 +360,14 @@ In order to carry out the tests a new initial condition that can easily be recre
            0\;\;x < a
           \end{cases}
 \end{equation}
-\noindent The new initial condition gives a new exact solution which is found by separation of variables as 
+\noindent The new initial condition gives a new exact solution which is found by separation of variables and Fourier series as 
 \begin{equation}
  u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
 \end{equation}
 
 \noindent Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And Figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
-The convergence is not very good, but this is expected because of the fluctuations which causes the error to fluctuate around a certain value rather than converge to zero.
+The convergence is not very good, but this is expected. 
+Stochastic effects causes the error to fluctuate around a certain value rather than converge to zero, making it very hard to get a good error measure.
 
 \begin{figure}[h]
  \centering
