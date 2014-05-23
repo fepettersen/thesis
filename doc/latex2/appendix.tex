@@ -1,61 +1,120 @@
 \section{Debugging}\label{debugging}
 
 In any project which involves programming one is bound to do some debugging. This project is no exception. 
-Debugging can be extremely frustrating because no-one sees all the hours that go into finding the bugs, only the ones that do not (when the bug is not fixed). 
-This section will deal with some general techniques for debugging finite difference solvers and random-walk implementations and some special words on how to debug the software developed to combine the two solvers.
+Debugging can be extremely frustrating because no one sees all the hours that go into finding the bugs, only the ones that do not (when the bug is not fixed). 
+This appendix is an introductory guide to debugging finite difference (FD) solvers and random walk implementations. It starts out with some general tips on how to handle error messages, and moves on to deal with FD and RW implementations. 
+Finally, some words on how to debug the developed software are included.
 
 \subsection{Compiler/syntax errors}
+If you are programming in a compiled language like Fortran or C/C++ it is very easy to forget or misspell some syntax. 
+Usually, the compiler will tell you what is wrong. 
+Should it not do so, there are compiler options which provides extra information about syntactically correct but questionable looking code (-Wall). 
+Some times one error results in several error messages. 
+Start with the messages that are understandable, and recompile before checking out the other messages. \\
 
-If you are programming in a compiled language like fortran or C/C++ you will forget some syntax, or misspell it, use a compiler-flag that outputs as much info as possible to terminal (-Wall for the gnu compiler), and start with the errors you understand. If you are building a larger project which requires linking, remember that packages must be linked in the correct order. For example; the armadillo linear algebra library is backened by LAPACK and BLAS. Both these libraries must be linked as well and they must be linked in the following order:
+\noindent If you are building a larger project which requires linking, remember that packages must be linked in the correct order. 
+For example; the Armadillo linear algebra library is backened by LAPACK and BLAS. 
+In addition to linking the Armadillo library, both LAPACK and BLAS must be linked, and they must be linked in the correct order: 
 \begin{lstlisting}
- g++ *.cpp -o myprog -O2 -larmadillo -llapack -lblas
+ g++ myprog.cpp -o myprog -O2 -larmadillo -llapack -lblas
 \end{lstlisting}
 Anything else will give very cryptic compiler errors. \\
-If you are using an interpreted language like python or MatLab the interpreter usually gives extensive information about the errors you have done, read them thoroughly!
+
+Interpreted languages, like Python or MatLab, mostly include debuggers which provide extensive information about any errors in the code, read them thoroughly.
 
 \subsection{Segmentation faults}
-In an interpreted language you will be told exactly where and what is wrong, in compiled languages you will not unless you are using extensions that give you some more information like armadillo. Segmentation faults are often quite simple to find, and most compilers have some sort of debugger which can help you find them. 
-The gnu-compiler has an environment called gdb in which you can run your program which will catch seg.-faults and tell you where they are. If you are using some advanced editor like qt creator you can also easily place breakpoints in your code where you can get information about the various variables, instances, attributes etc. of your code at the exact time of the break. You can also step through the code. thoroughly
-Some times though the thing that works best is to print things at various places. I like having the possibility that every function in my code can print its name when it is called. There are even some python modules which tells you where it was called from. This will make it very easy to find out when the code went wrong, and what function is the problem.
+Segmentation fault is a very common abort message to get from C++. It means that the program has tried to access a part of the computer memory (RAM) which it is not allowed to access by the operating system. 
+Interpreted languages will abort with a more informative error message, saying something about where the error was encountered. 
+In a compiled language, ``Segmentation fault'' is all you get, which basically means that there is something wrong somewhere in your code. 
+As an illustration, the terminal output below shows the output from a python- and C++- program for the same error:
+\begin{lstlisting}
+fredrik@Klokketiklokk:~/uio$ python segfault.py 
+Traceback (most recent call last):
+  File "segfault.py", line 3, in <module>
+    b = sys.argv[1]
+IndexError: list index out of range
+
+fredrik@Klokketiklokk:~/uio$ ./segfault 
+Segmentation fault (core dumped)
+\end{lstlisting}
+
+The gnu-compiler has an environment called gdb in which you can run your program. 
+``gdb'' will catch segmentation faults and provide some information about where they were encountered. 
+Furthermore, advanced editors like ``qt creator'' have built in debuggers and the ability to place breakpoints in the code, making it possible to step through code line by line. \\
+Some times though the thing that works best is to print messages or key values at various places, signaling that a code block is finished. 
+For example, making each function print its name when it is called will quickly identify problems. 
 
 \subsection{Finite difference methods}
-First and foremost: Have a correct discretization. There are (probably) webpages which can discretize your equation(s) for you, but it is almost always useful to do this by hand. 
-It will help you in your further debugging. \\
+First and foremost: Do the discretization by hand. 
+It will give valuable insight, which makes implementation and debugging a lot simpler. \\
+
 There is one very important rule in programming in general: ``First make it work, then make right, then make it fast''. 
-For implementing FDMs this means that you should start coding as soon as you have a clear image of what to be implemented, and what dependencies are needed. You will need a well defined initial condition (preferably one where you have the exact solution of the equation) and boundary conditions before you start coding. 
-Personally, I like starting with the simplest Dirichlet boundary conditions $u|_{\d \Omega} = 0$ and make them work before I go any further. 
-You should note, however, that implicit schemes will be greatly influenced by the choice of boundary conditions.\\
-Visualization is invaluable during debugging, seeing as a plot will let you see when and where the error occurs. \emph{Show some example}
-Most likely you will now have something wrong with your solution (if not, cudos). This is where you look over your discretization again to make sure that it is correct, and then look over your implementation to check that it actually does what you think it does. 
-At this point I would like to introduce rubber-duck debugging which was invented by the C-developer Dennis Ritchie. 
-The story goes that he would keep a rubber duck at his desk and whenever he was stuck, would describe the code in detail (what each statement did and was supposed to do) to the rubber duck. Asking questions often reveals a lot of information. 
-Personally I like my rubber duck to challenge me, so I prefer to involve a friend, but the concept is the same.\\
-When your code seems to reproduce the intended results it is time to start the verification. This is where we make an error estimate and do some numerical analysis (you should of course have checked for the numerical stability of your chosen scheme when you discretized it). 
-Making sure your implementation is correct is a lot harder than it sounds, but there are a few points that should be fulfilled:
+When solving PDEs numerically this principle is extra important. 
+A numerical discretization scheme will (to my knowledge) either result in a main loop or a linear system which solves the equation. 
+Regardless of the overall structure of the final program, this main block will be located somewhere, meaning that it should be implemented first. 
+It can be made more efficient once it works. \\
+
+Visualization is an invaluable tool while implementing a numerical PDE solver. 
+Even though the code runs through all the steps without crashing, it does not have to be correct. 
+This is illustrated in Figure \ref{appendix:visual_debugging}.
+\begin{figure}[H]
+ \centering
+ \begin{subfigure}[t]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{Figures/incorrect_implementation.eps}
+  \caption{Incorrect implementation}
+ \end{subfigure}
+ \begin{subfigure}[t]{0.48\textwidth}
+  \includegraphics[width=\textwidth]{Figures/correct_implementation.eps}
+  \caption{Correct implementation}
+ \end{subfigure}
+ \caption[Visual debugging]{Illustration of an implementation which does not crash the program, but is still clearly incorrect (a). (b) shows the correctly implemented version of the same time step.}
+ \label{appendix:visual_debugging}
+\end{figure}
+
+ 
+\noindent At this point I would like to introduce rubber-duck debugging which is said to be invented by Dennis Ritchie, the developer of the C programming language. 
+The story goes that he would keep a rubber duck at his desk and whenever he was stuck, would describe the code in detail (what each statement did and was supposed to do) to the rubber duck. 
+Asking questions, and saying thing out loud forces you to think about things in a slightly different manner. \\
+
+\noindent When the code seems to reproduce the intended results it is time to start the verification. 
+This is where we make an error estimate and do some numerical analysis (the numerical stability of the scheme should, of course, be investigated prior to implementation). 
+Making sure an implementation is correct is a lot harder than it sounds, but there are a few points that should be fulfilled:
+
 \begin{itemize}
  \item Manufactured solution\\
- Find some function which fulfills the equation you are working with. Remember that you have a source term which can be whatever you want it to be at this point, meaning that you can more or less decide what solution you want to your equation. 
+ As was described earlier, the source term of the equation can be used to force almost any solution upon the equation. 
+ 
  \item Stationary solution\\
- This boils down to energy-conservation. If the initial condition is a constant, there should be no time-dependencies (assuming your boundary conditions match; an initial condition $u=1$ with Dirichlet boundaries $u|_{\d \Omega}=0$ will not work), and the solution will be constant.
+ This is a special type of manufactured solution. Using the source term, and initial condition, the solution can be forced to be constant. 
+ If a scheme reproduces a stationary solution it conserves energy, which is very desirable.
  \item Exact numerical solution\\
- For a fitting initial condition (and discretization) you will be able to find an exact solution to the discretized equation you are implementing. An example of this is found in chapter \ref{exact_numerical_solution}. Your scheme should reproduce this solution to more or less machine precision. Note that you might run into round-off errors and overflow here in some cases (again, see chapter \ref{exact_numerical_solution}).\\
+ Depending on the discretization, it should be possible to find an exact solution to the discretized version of the PDE. 
+ An example of this is found in chapter \ref{exact_numerical_solution}. 
+ The scheme is expected to reproduce this solution to machine precision, but there are often several factors which limits the accuracy. 
+ At the very least, the error should be significantly smaller than the largest error term. \\
  \item Convergence test\\
- The discretization that is implemented will have some error term dependent on a discretization parameter (usually $\Delta t$, $\Delta x$ or some parameter $h$ used to determine the other discretization parameters) to some power. This power will determine the convergence rate of the numerical scheme, and you should verify that your implementation has the expected convergence. A convergence test is another way of saying that reducing the discretization parameter should reduce the error by the expected ammount. For a first order scheme the error should be halved by halving the time-step where as a second order scheme will get a reduction of $\frac{1}{4}$ for the same havlving of the discretization parameter. 
+ These tests are often hard to get right. 
+ The principle is to verify that using a smaller discretization parameter results in a smaller error, and that the error is reduced by the expected amount. 
 \end{itemize}
 
-There are probably more ways to make sure that a finite difference scheme is working properly, but the ones listed will usually give a good implication.
+\noindent There are probably more ways to make sure that a finite difference scheme is working properly, but the ones listed will usually give a good implication.
 
 \subsection{Random walk and Monte Carlo methods}
 
-The main difference between debugging a MC based solver and a deterministic solver is the fact that you often do not have a clear idea of what the results of the intermediate steps should be. 
-What you might know (or should know during development), however is the result of the complete MC integration, and some statistical properties of your random numbers. 
-Using uniformly distributed random numbers will give you a certain mean and standard deviation, and a Gaussian distribution will give you another. 
-You should check that the random number generator (RNG) you chose actually reproduces these properties to a reasonable precision. 
-If you are working with random walkers it also helps to look at the behavior of a small number of walkers, to check that they behave more or less as you expect. 
-One thing to look out for is the fact that a random walker in both one and two spatial dimensions will fill all space given enough steps. 
-Of course enough steps is infinitely many, but if you also implement reflecting boundaries and use some 4-5 walkers you will see a tendency after approximately $10^4$ steps. \\
-As we have discussed earlier the fluctuations in a MC-model are usually of a magnitude $\frac{1}{\sqrt N}$ this is also smart to verify. \\
-Finally, you should absolutely have the possibility to set the random seed and check that two runs with the same random seed produces the exact same result and makes sure you are using a RNG with a large enough period. The xor-shift algorithm by Geroge Marsagla \cite{} has a period of around $10^{48}$ which usually is more than adequate.
+While solving a PDE numerically, the intermediate calculations can be checked and verified. 
+Since Monte Carlo methods are based on random numbers, the results of intermediate calculations will be random, making them impossible to verify completely. 
+Instead, some statistical properties of the random numbers can be verified. 
+For example, using uniformly distributed random numbers will give a certain mean and standard deviation, while a Gaussian distribution will give another.
+The random number generator should be tested in order to verify that these properties are reproduced to a reasonable accuracy. \\
+
+Random walkers have some additional properties which can be tested. 
+Both a one dimensional and a two dimensional random walk will fill all available space, given infinitely many time steps. 
+Letting 4-5 walkers jump around for around $10^4$ time steps, and plotting their paths should give an indication of how well this property is reproduced. 
+
+Finally, it is very useful to specify a random seed. This will ensure that the random number generator produces the same sequence of numbers each simulation, which often makes testing easier. 
+% 
+% As we have discussed earlier the fluctuations in a MC-model are usually of a magnitude $\frac{1}{\sqrt N}$ this is also smart to verify. \\
+% Finally, you should absolutely have the possibility to set the random seed and check that two runs with the same random seed produces the exact same result and makes sure you are using a RNG with a large enough period. The xor-shift algorithm by Geroge Marsagla \cite{} has a period of around $10^{48}$ which usually is more than adequate.
 
 \subsection{The developed software}
 
