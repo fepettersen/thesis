@@ -7,25 +7,32 @@
 Although not all of the results from verification of the FE scheme are perfect, the results from testing the exact numerical solution are very good. 
 The numerical exact solution test is a verification of the implementation of the FE scheme. 
 A successful test indicates that the scheme is correct and will solve the diffusion equation to the expected accuracy. 
-When the convergence tests for the FE scheme could be better it is most likely due to other effects like not being able to make the error from the spatial derivative sufficiently dominant. 
-The result of verifying the FE scheme is that it is deemed correctly implemented within the limits of the applied tests.
+Both the error plots from section \ref{analysis:section_manufactured_solution} and the spatial convergence test are very close to perfect, further suggesting a correct implementation. 
+When the general convergence tests for the FE scheme could be better (figures \ref{analysis:convergence_tests:FE}), it is most likely due to other effects. \\
+Considering that two out of three tests are close to perfect, the FE scheme is deemed correctly implemented within the limits of the applied tests.
 
 \subsection{The BE scheme and the block tridiagonal solver}
-Most of the tests done on the BE scheme are close to perfect. 
-Only when testing the scheme versus the numerical exact solution are the results slightly off. 
+Two of the tests done on the BE scheme are slightly off target. 
+These are the spatial convergence test and the numerical exact solution. \\
 Though the numerical exact solution test is expected to give an error close to machine precision the results are five orders of magnitude larger than machine precision. 
 On the other hand, the error term is also eight orders of magnitude smaller than the time step and there are a lot of possible round off errors in the inverted coefficient matrix which can explain the lack of accuracy. \\
-Effectively, testing the convergence rate also verifies the assembly of the coefficient matrix while testing against the numerical exact solution verifies that the block tridiagonal solver works properly.\\
-The result of verifying the BE scheme is that both the assembly of the coefficient matrix (and by extension the discretization of the diffusion equation) and the block tridiagonal solver are deemed correctly implemented. 
+The spatial convergence test demands that the error associated with the spatial derivative is much larger than the error from the time derivative. 
+As the spatial resolution is increased, the spatial error becomes less dominant because the time step is held constant. 
+Because the spatial convergence is still clearly larger than one, and starts out at two (which is the value it should converge to), this is considered to be adequate. \\
+
+\noindent Effectively, the manufactured solution test, and convergence tests verifies the assembly of the coefficient matrix, since an incorrect assembly would produce a larger error term. 
+The numerical exact solution test verifies the implementation and accuracy of the block tridiagonal solver, since an incorrectly implemented solver would give results comparable to the numerical exact solution. \\
+
+\noindent In summary, the tests done on the BE scheme verifies that it, and the block tridiagonal solver, is implemented correctly.
 
 \subsection{The RW solver}
 Due to fluctuations in the solution it is hard to get a good convergence rate for the RW solver. 
-However it is measured to be close to $0.5$ both with respect to the time step and wit respect to the number of walkers introduced. 
+However it is measured to be close to $0.5$ both with respect to the time step and with respect to the number of walkers introduced. 
 % Seeing as there is no exact numerical solution for a random walk, only statistical properties 
 The result of verifying the RW solver is that it is deemed correctly implemented within the limits of the applied tests.
 
 \subsection{The hybrid diffusion solver}
-For this thesis it is considered very important that the hybrid diffusion solver can have first order convergence in time if the conversion rate is high enough. 
+For this thesis it is considered very important that the hybrid diffusion solver can have first order convergence in time given a high enough conversion rate. 
 As Figure \ref{combined_BE1d:convergence} shows this was achieved, and the hybrid solver is therefore considered adequately implemented for the time being.\\
 
 Effects of varying the relative size of the RW area were also illustrated. 
@@ -43,7 +50,7 @@ This figure shows a clear trend for longer diffusion times as the neck length of
 Figure \ref{results:boxplot_relative_diffusiontime_long_neck} further support this claim and implies the average diffusion time for PKC$\gamma$ into long necked spines to be of accordance to the results from Craske et.al.
 Seeing as there are no additional complexities added to the random walk model we can assume that the spine neck does in fact function as a diffusion barrier.
 
-\begin{figure}[H]
+\begin{figure}[h]
  \centering
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{Figures/spine_stats_fulltime_nl.eps}
@@ -59,7 +66,7 @@ Seeing as there are no additional complexities added to the random walk model we
 \label{results:spine_diffusion_stats}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[h]
  \centering
  \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
  \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Crase et.al. and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}

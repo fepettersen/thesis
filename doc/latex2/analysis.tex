@@ -82,7 +82,7 @@ Notice that a single number must be used to describe the error, as shown in \eqr
 \section{Testing the PDE solver}
 
 
-\subsection{Verification by manufactured solutions}
+\subsection{Verification by manufactured solutions}\label{analysis:section_manufactured_solution}
 
 Equation \eqref{manufactured_solution} solves the diffusion equation, so using $u(x,y,t=0)$ as the initial condition for a simulation will give us both the numerical solution and the exact solution. 
 An important property of both the FE and BE discretization schemes is that the difference between these solutions is of the same order as the time step.
@@ -362,11 +362,11 @@ In order to carry out the tests, a new initial condition that can easily be recr
 \end{equation}
 \noindent The new initial condition gives a new exact solution which is found by separation of variables and Fourier series as 
 \begin{equation}
- u(x,t) = \frac{1}{2} + \sum\limits_{n=1}^\infty \frac{2\sin(\frac{n\pi}{2})}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
+ u(x,t) = \frac{1}{2} + 2\sum\limits_{n= \text{odd}}^\infty \frac{(-1)^{\frac{n-1}{2}}}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
 \end{equation}
 
 \noindent Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And Figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
-The convergence is not very good, but this is expected. 
+The convergence rate is not very good, but this is expected. 
 Stochastic effects causes the error to fluctuate around a certain value rather than converge to zero, making it very hard to get a good error measure.
 
 \begin{figure}[h]
@@ -396,9 +396,16 @@ Stochastic effects causes the error to fluctuate around a certain value rather t
 \label{ConvergenceTestRW:Hc}
 \end{figure}
 \clearpage
+
 \section{Verification of the hybrid solver}
 
-This section aims to achieve first order convergence in time for the hybrid solver by introducing a sufficient number of walkers. 
+The hybrid diffusion solver is a combination of the PDE and RW solvers, which means that the error term for the hybrid model is described by 
+\begin{equation}
+ \epsilon(t) = C_t \Delta t + C_x \Delta x^2 + \frac{C_{RW}}{\sqrt{Hc}}
+\end{equation}
+where $C_{RW}$ is an unknown stochastic quantity.\\
+
+\noindent This section aims to achieve first order convergence in time for the hybrid solver by introducing a sufficient number of walkers. 
 Effects of varying the number of mesh points affected by the RW solver will also be illustrated. \\
 
 The number of walkers needed to achieve first order convergence in time for the hybrid solver is governed by 
@@ -407,7 +414,7 @@ The number of walkers needed to achieve first order convergence in time for the 
 \end{equation}
 
 \noindent The stability criterion for the FE scheme limits the size of the time step, and by \eqref{analysis:Hc_limitation} vastly increases the conversion rate. 
-All tests will be done with the BE scheme in order to reduce the demand for walkers and get a reasonable performance. 
+All tests will be done with the BE scheme in order to reduce the demand for walkers and get a reasonable performance. \\
 Figure \ref{combined_BE1d} shows first order convergence for the hybrid model.
 
 \begin{figure}[H]

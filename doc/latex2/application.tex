@@ -10,8 +10,10 @@ The following chapter is included to show that the developed hybrid diffusion so
 \end{figure}
 
 Figure \ref{application:pyramidal_neuron} shows a pyramidal neuron with an apical dendrite, and an inset with dendritic spines. 
-Spines are (often) the receiving end of a chemical synapse, which is a junction between two neurons. 
-This application will look at the diffusion of PKC$\gamma$ in the apical dendrite and into dendritic spines. 
+Pyramidal neurons take their name from the triangular shape of the Soma, and an apical dendrite is a dendrite springing from the apex of the Soma. 
+Spines are (often) the receiving end of a chemical synapse, which is a junction between two neurons. \\
+
+\noindent This application will look at the diffusion of PKC$\gamma$ in the apical dendrite and into dendritic spines. 
 PKC$\gamma$ is a protein found in neurons which is associated with memory storage and associative learning \cite{saito2002protein}. 
 Upon activation it will diffuse out of the Soma, through a dendrite, and into a dendritic spine to reinforce or reduce the absorption of neurotransmitters. 
 The results will be compared to results by Craske et.al \cite{craske2005spines}, who in 2005 studied a similar problem in rodent pyramidal neurons harvested from the hippocampus.
@@ -35,7 +37,7 @@ There is a difference between the approach of the developed hybrid solver and th
   \includegraphics[width=\textwidth]{Figures/hybrid_model_principle.eps}
   \caption{}
  \end{subfigure}
- \caption[Difference between hybrid diffusion solver and dendrite - spine diffusion model]{The geometric difference between the original hybrid diffusion solver (b) and the problem of PKC$\gamma$ diffusing into dendritic spines (a). }
+ \caption[Difference between hybrid diffusion solver and dendrite - spine diffusion model]{The geometric difference between the original hybrid diffusion solver (b) and the numerical setup to model PKC$\gamma$ diffusing into dendritic spines (a). Spines are attached by a few mesh points on the PDE mesh, which also determines the neck width of the spine.}
  \label{application:geometry_difference}
 \end{figure}
 
@@ -63,17 +65,17 @@ The new problem requires the introduction of some additional parameters as well 
 \hline
 \textbf{Parameter} & \textbf{Explanation} &\textbf{Expression/ typical value}& \textbf{Origin} \\
 \hline
-$\Delta t$ & time-step & $\Delta x^2$ & stability criterion FE scheme \\
+$\Delta t$ & time step & $\Delta x^2$ & Stability criterion FE scheme \\
 \hline
-$\Delta x$ & spatial resolution & $\frac{1}{2}$min(spine neck diameter) & estimated \\
+$\Delta x$ & spatial resolution & $\frac{1}{2}$min(spine neck width) & Estimated; in order for a spine to be 2D, it must connect to at least two PDE mesh points. \\
 \hline
-$Hc$ & conversion factor & 5-24 & estimated by calculations of concentration levels taken from \cite{light1996protein} and spine/dendrite volume ratios. See later for discussion. \\
+$Hc$ & Conversion factor & 5-24 & Estimated by calculations of concentration levels taken from \cite{light1996protein} and spine/dendrite volume ratios. See later for discussion. \\
 \hline
-$u(t=0)$ & initial condition value & 5$\frac{\text{nMol}}{\text{L}}$ & estimated from values found in \cite{light1996protein}\\
+$u(t=0)$ & Initial condition value & 5$\frac{\text{nMol}}{\text{L}}$ & Estimated from values found in \cite{light1996protein}\\
 \hline
-$p_{ds}$ & probability to diffuse into a spine & $0.1\cdot\Delta x\cdot\Delta t$& estimated. An important ability of this parameter should be that wide necked spines have larger probability and that a certain flux is maintained (on average), meaning that the flux should be independent of $\Delta t$ \\
+$p_{ds}$ & Probability to diffuse into a spine & $0.1\cdot\Delta x\cdot\Delta t$& Estimated. An important ability of this parameter should be that wide necked spines have larger probability and that a certain flux is maintained (on average), meaning that the flux should be independent of $\Delta t$ \\
 \hline
-$p_{ab}$ & probability for PKC$\gamma$ to be absorbed, and removed from simulation, per time-step taken in spine head & 100\% & estimated\\
+$p_{ab}$ & Probability for PKC$\gamma$ to be absorbed, and removed from simulation, per time-step taken in spine head & 100\% & Estimated\\
 \hline
 \end{tabular}
 \caption[Important parameters]{Parameters which play an important role in the simulation of PKC$\gamma$ diffusion into dendritic spines with explanations, expressions/typical values and an indication as to where the value/expression has its origin.}

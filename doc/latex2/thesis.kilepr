@@ -4,7 +4,7 @@ img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
 kileversion=2.1.3
-lastDocument=application.tex
+lastDocument=analysis.tex
 masterDocument=
 name=thesis
 pkg_extIsRegExp=false
@@ -17,7 +17,7 @@ MakeIndex=
 QuickBuild=
 
 [document-settings,item:analysis.tex]
-Bookmarks=375,363
+Bookmarks=378,365
 Encoding=UTF-8
 FoldedColumns=
 FoldedLines=
@@ -98,10 +98,10 @@ ReadWrite=true
 
 [item:analysis.tex]
 archive=true
-column=126
+column=149
 encoding=UTF-8
 highlight=LaTeX
-line=412
+line=369
 mode=LaTeX
 open=true
 order=4
@@ -158,10 +158,10 @@ order=5
 
 [item:theory.tex]
 archive=true
-column=40
+column=71
 encoding=UTF-8
 highlight=LaTeX
-line=48
+line=83
 mode=LaTeX
 open=true
 order=2
@@ -187,10 +187,10 @@ open=true
 order=1
 
 [view-settings,view=0,item:analysis.tex]
-CursorColumn=126
-CursorLine=412
+CursorColumn=149
+CursorLine=369
 JumpList=
-ViMarks=a,363,0,b,375,0
+ViMarks=a,378,0,b,365,0
 
 [view-settings,view=0,item:appendix.tex]
 CursorColumn=281
@@ -223,8 +223,8 @@ JumpList=
 ViMarks=
 
 [view-settings,view=0,item:theory.tex]
-CursorColumn=40
-CursorLine=48
+CursorColumn=71
+CursorLine=83
 JumpList=
 ViMarks=
 
