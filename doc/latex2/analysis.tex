@@ -41,10 +41,10 @@ The verification techniques that will be carried out are:
 \begin{itemize}
  \item Manufactured solutions\\
  By adjusting the source term, $s(x,t)$, one can, in principle, choose any solution to the diffusion equation. 
-Should we, for example, want the solution to be $u(x,t) = \frac{1}{x+1}$, all that is needed is to set 
-$$
+Should we, for example, want the solution to be $u(x,t) = \frac{1}{x+1}$, all that is needed is to set the source term equal to $-D\frac{\d^2 u}{\d x^2}$
+\begin{equation*}
 s(x,t) = \frac{2D}{(x+1)^3}
-$$
+\end{equation*}
 and the problem is solved (as long as the boundary conditions are correct).
  For the verifiation that follows, the chosen solution is
  \begin{equation}\label{manufactured_solution}
@@ -54,9 +54,9 @@ and the problem is solved (as long as the boundary conditions are correct).
   The point of these tests is to verify that $\epsilon \sim \Delta t$ and the tests can be done for a time step which fulfills the stability criterion.
   \item Convergence tests \\
 %   In the general case the error term is proportional to the time step to some power $r$ when the error from the time derivative is dominant.
-  In the general case the error term is described by 
+ For the schemes used in this thesis the error term is described by
 \begin{equation}\label{analysis:error}
- \epsilon = C_x\Delta x^2 + C_t\Delta t
+ \epsilon = C_x\Delta x^2 + C_t\Delta t^1
 \end{equation}
 where the coefficients $C_x$ and $C_t$ are unknown. 
 Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. \\
@@ -66,7 +66,7 @@ $$
 $$
 where $r=1$. 
 As $\Delta t$ tends to zero, $r$ is expected to converge to one, and that is the purpose of these tests. 
-By comparing the error from two simulations with different time steps, $r$, called the convergence rate, can be measured from 
+By comparing the error from two simulations with different time steps, the convergence rate, $r$, can be measured from 
  \begin{align*}
    r&\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}
 \end{align*}

@@ -102,3 +102,25 @@
 	year = "2001"
 }
 
+@article{hattne2005stochastic,
+	author = "Hattne, Johan and Fange, David and Elf, Johan",
+	journal = "Bioinformatics",
+	number = "12",
+	pages = "2923--2924",
+	publisher = "Oxford Univ Press",
+	title = "{Stochastic reaction-diffusion simulation with MesoRD}",
+	volume = "21",
+	year = "2005"
+}
+
+@article{o1995molecular,
+	author = "O{\rq}Connell, Sean T and Thompson, Peter A",
+	journal = "Physical Review E",
+	number = "6",
+	pages = "R5792",
+	publisher = "APS",
+	title = "{Molecular dynamics--continuum hybrid computations: a tool for studying complex fluid flows}",
+	volume = "52",
+	year = "1995"
+}
+

@@ -1,13 +1,14 @@
 Diffusion processes are extremely important in modern science, and have so many applications that it is hard to list them all. 
-Brownian motion of particles, momentum in liquids, and atomic diffusion of Helium through a balloon wall are just some examples of diffusion processes. \\
-\noindent Both in general transport processes, which among other things include fluid flow, and particularly in diffusion processes, there are cases in which parts of the process cannot be described by a continuum model, but the rest of the process can. 
-Examples of such processes are fluid flow in nanoporous media, diffusion in the extracellular space of the brain, and ...\\
+Brownian motion of particles, momentum in liquids, and atomic diffusion are just some examples of processes described by the diffusion equation. \\
+\noindent Both in general transport processes, and particularly in diffusion processes, there are cases in which parts of the process cannot be described by a continuum model, but the rest of the process can. 
+Examples of such processes are fluid flow in nanoporous media and diffusion in the extracellular space of the brain. There are also many applications in materials design.
 
-\noindent These types of processes can be called multi scale processes in that two (or more) models, which are usually used on different length scales, are needed to achieve a complete description of the problem. 
-Multi scale models are usually either solved by designing a meso scale, or intermediate scale model, or by a hybrid solver which seeks to combine the models that are used. 
-An example of a meso scale model is dissipative particle dynamics \cite{}. 
-Here, clusters of particles are modeled as individual particles that have different properties than the actual molecules or atoms that make up the substance. 
-The other alternative is to use a hybrid solver. 
+\noindent These types of processes can be called multi scale processes in the sense that more than one model is required to describe the entire system. Usually these are on different length scales. 
+There are at least three ways to handle multi scale problems. 
+The first alternative is to ignore the problem, and assume that the chosen model can accurately solve the problem. For diffusion processes, this approach often works a lot better than it should. 
+A more realistic approach is to create an intermediate scale and model. In the limit between continuum and particle dynamics this is often called a \emph{meso scale} model. 
+An example of a meso scale model is dissipative particle dynamics \cite{warren1998dissipative}, where clusters of particles are modeled as individual particles. The particle clusters have different properties than the individual atoms or molecules which make up the substance. 
+A final alternative is a \emph{hybrid} model.
 Some hybrid models exist today, but these are mostly aimed at specific problems, like dendritc solidification \cite{plapp2000multiscale}, or hybrid fluid flow models which combine molecular dynamics and Navier-Stokes solvers \cite{o1995molecular}. 
 Other hybrid solvers for diffusion processes have also been developed \cite{flekkoy2001coupling}, but they are closed in the sense that the computer code is not commonly available. \\
 
@@ -18,9 +19,17 @@ This is no limitation, as the interface to the lower scale model is simple, and 
 \noindent A large emphasis has been put on verification of all parts of the hybrid model. 
 Both individually and for the combined, hybrid solver to verify the average behavior of the system.\\
 
-\noindent Put shortly, the thesis in your hands has the following structure: \\
-Chapter \ref{chapter:theory} contains a detailed look at the coupling between the two models, as well as a look at band diagonal linear systems. 
-Chapter \ref{chapter:analysis} defines the error estimate and shows a thorough analysis of all parts of the developed software in order to verify that it functions properly. 
-In chapter \ref{chapter:application} the developed software is modified to describe a physical application in which a hybrid diffusion solver is demanded. 
-The results of both the verification and the physical application are described and discussed in chapter \ref{chapter:results}, and finally, chapter \ref{chapter:discussion} discusses the thesis as a whole and looks at possible improvements and extensions that can be done. 
-The appendix is a general guide to debugging the methods that have been implemented during this project.
+\section{Outline}
+\noindent The thesis in your hands has the following structure: \\
+
+\noindent \emph{Chapter \ref{chapter:theory}} contains a detailed look at the coupling between the two models, as well as a look at band diagonal linear systems. \\
+
+\noindent \emph{Chapter \ref{chapter:analysis}} defines the error estimate and shows a thorough analysis of all parts of the developed software in order to verify that it functions properly. \\
+
+\noindent In \emph{chapter \ref{chapter:application}} the developed software is modified to describe a physical application in which a hybrid diffusion solver is demanded. \\
+
+\noindent \emph{Chapter \ref{chapter:results}} presents and discusses the results from the verification of the computer code and the physical application. \\
+
+\noindent Finally, \emph{chapter \ref{chapter:discussion}} discusses the thesis as a whole and looks at possible improvements and extensions that can be done. \\
+
+\noindent The \emph{appendix} is a general guide to debugging the methods that have been implemented during this project.

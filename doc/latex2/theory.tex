@@ -3,7 +3,15 @@
 A random walker is a point object which after a certain amount of time jumps a fixed step length either right or left with equal probability for jumping either way. 
 In $d$ spatial dimensions the axis on which the jump happens is chosen at random before the direction of the jump is decided. \\
 Say $N$ random walkers are placed at the same position within a volume, $V$ of arbitrary shape, to make a spatial distribution of walkers, $C = N\delta(x)$. 
-$V$ is contained by a surface $S$ and the relation is shown in Figure \ref{theory:divergence_theorem}. 
+Where $\delta(x)$ is the Dirac Delta function, defined by its properties
+\begin{equation}
+ \delta(x-a) = \begin{cases}
+              0;\;\;\; x\neq a\\
+              \infty;\;\; x=a
+             \end{cases}
+\end{equation}
+
+\noindent $V$ is contained by a surface $S$ and the relation is shown in Figure \ref{theory:divergence_theorem}. 
 
 \begin{figure}[H]
 \centering
@@ -12,17 +20,16 @@ $V$ is contained by a surface $S$ and the relation is shown in Figure \ref{theor
  \label{theory:divergence_theorem}
 \end{figure}
 
-A flux of walkers is a vector size describing the number of walkers passing a surface element $dS$ per unit time, per unit area. \\
+\noindent A flux of walkers is a vector size describing the number of walkers passing a surface element $dS$ per unit time, per unit area. \\
 
-As the random walkers start to move, some of them will leave $V$, which results in a change in $C$. 
+\noindent As the random walkers start to move, some of them will leave $V$, which results in a change in $C$. 
 The number of walkers leaving $V$ is described by the change in $C$ integrated over the entire volume.
 \begin{equation}
  \int_V \frac{\d C}{\d t}\,dV
 \end{equation}
-As mentioned, the number of walkers leaving $V$ can also be described by the flux of walkers, $\mathbf{J}$, out of $S$. 
-Integrating the surface normal (illustrated in Figure \ref{theory:divergence_theorem}) of $\mathbf J$ over $S$ results in the number of walkers leaving $V$. 
+The number of walkers leaving $V$ can must be equal to the number of walkers crossing $S$ per unit time and area. Integrating the outward normal component of the flux of walkers, $\mathbf{J}$ over the entire surface results in the number of walkers leaving $V$.
 
-\begin{equation}
+\begin{equation}\label{theory:flux_integral}
  \int_S\vec{J}\cdot \vec{n}\,dS
 \end{equation}
 Since the number of walkers is conserved, the change in $C$ per time must be equal to the number of walkers leaving $V$ plus any walkers added to $V$
@@ -31,7 +38,7 @@ Since the number of walkers is conserved, the change in $C$ per time must be equ
 \end{equation}
 
 \noindent where $s(x,t)$ denotes a source term. 
-Through Greens theorem \eqref{theory:diffusion_integral_form} can be reformulated
+Through Greens theorem \eqref{theory:flux_integral} can be reformulated 
 
 \begin{equation}\label{theory:integral_form}
  \int_V \frac{\d C}{\d t}\,dV = \int_V\nabla\cdot\vec{J}\,dV +s(x,t)
@@ -49,7 +56,7 @@ The diffusive flux $\mathbf{J}$ is also inserted to yield the diffusion equation
  \frac{\d C}{\d t} = D\nabla^2 C +s(x,t)
 \end{equation}
 
-\noindent Throughout this thesis $C$ will denote a spatial distribution of random walkers while $u$ will denote the solution to the diffusion equation. 
+\noindent Throughout this thesis $C$ will denote a spatial distribution of random walkers while $u$ will denote the solution to the diffusion equation, which is a concentration distribution. 
 The difference between $u$ and $C$ is best illustrated in Figure \ref{theory:illustration_C}.
 
 \begin{figure}[H]
@@ -81,24 +88,24 @@ To produce a random walk one must have random numbers.
 The random numbers in this thesis are produced by a five seeded xor-shift algorithm copied from George Marsaglia \cite{marsaglia2003xorshift}. 
 This generator is chosen because of its very large period ($\sim10^{48}$) compared to the computational cost.
 
-\section{Backward Euler schemes in 2 or more spatial dimensions}\label{theory:section:BE2D}
+\section{Backward Euler schemes in two or more spatial dimensions}\label{theory:section:BE2D}
 
-The reader is assumed to know the basics of solving partial differential equations (PDEs\nomenclature{PDE}{Partial Differential Equation}) by finite difference methods, but for the sake of clarity the two schemes used in this thesis are written out. 
+The reader is assumed to know the basics of solving partial differential equations (PDEs\nomenclature{PDE}{Partial Differential Equation}) by finite difference methods. For the sake of clarity the two schemes used to solve the diffusion equation \eqref{theory:diffusion_equation} in this thesis are written out. 
 \begin{equation}\label{theory_theta_rule}
- \frac{u^{n+1}-u^n}{\Delta t} = \theta D\frac{\d^2 u^{n+1}}{\d x^2} + (1-\theta)D\frac{\d^2 u^{n}}{\d x^2}
+ \frac{u^{k+1}-u^k}{\Delta t} = \theta D\frac{\d^2 u^{k+1}}{\d x^2} + (1-\theta)D\frac{\d^2 u^{k}}{\d x^2}
 \end{equation}
 \noindent Having $\theta = 0$ gives the Forward Euler (FE\nomenclature{FE}{Forward Euler}) scheme, and $\theta = 1$ gives the  Backward Euler (BE\nomenclature{BE}{Backward Euler}) scheme. \\
-This section will concern a simple, but elegant way of efficiently solving the diffusion equation by the implicit BE scheme in more than one spatial dimension. 
+This section will concern a simple, but elegant way of efficiently solving the diffusion equation by the implicit BE scheme in more than one spatial dimension. The reason for using the BE scheme is that we want to use a large time step and still have a large spatial resolution. 
 % This section will concern the special case of how to solve the diffusion equation by the implicit BE scheme, especially in more than one spatial dimension.
 First, let us look at the BE discretization of the diffusion equation in 1D. 
 
 \begin{align}\label{theory:BE_scheme_1D}
- u^{n+1}_i = \frac{\Delta t}{2\Delta x^2}\left((D_{i+1}+D_{i})(u^{n+1}_{i+1}-u^{n+1}_{i})-(D_{i}+D_{i-1})(u^{n+1}_{i}-u^{n+1}_{i-1})\right) + u^n_i
+ u^{k+1}_i = \frac{\Delta t}{2\Delta x^2}\left((D_{i+1}+D_{i})(u^{k+1}_{i+1}-u^{k+1}_{i})-(D_{i}+D_{i-1})(u^{k+1}_{i}-u^{k+1}_{i-1})\right) + u^k_i
 \end{align}
 $u$ is here the unknown function which solves the diffusion equation. 
 Note that 
-$$u^n_i = u(t_0+n\cdot\Delta t,x_0+i\cdot\Delta x)$$
-and not $u$ to the $n$'th power. \\
+$$u^k_i = u(t_0+k\cdot\Delta t,x_0+i\cdot\Delta x)$$
+and not $u$ to the $k$'th power. \\
 Neumann boundary conditions will be used, these are described in \eqref{theory:Neumann_boundaries}.
 
 \begin{equation}\label{theory:Neumann_boundaries}
@@ -107,18 +114,18 @@ Neumann boundary conditions will be used, these are described in \eqref{theory:N
 
 \noindent Solving the BE scheme by hand for a very small mesh consisting of $4$ mesh points will reveal the structure of the BE scheme.
 \begin{align*}
- &u^{n+1}_0 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{0}+D_{1})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_0\\
- &u^{n+1}_1 = \frac{\Delta t}{2\Delta x^2}\left((D_{2}+D_{1})(u^{n+1}_{2}-u^{n+1}_{1})-(D_{1}+D_{0})(u^{n+1}_{1}-u^{n+1}_{0})\right) + u^n_1\\
- &u^{n+1}_2 = \frac{\Delta t}{2\Delta x^2}\left((D_{3}+D_{2})(u^{n+1}_{3}-u^{n+1}_{2})-(D_{2}+D_{1})(u^{n+1}_{2}-u^{n+1}_{1})\right) + u^n_2 \\
- &u^{n+1}_3 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{2}+D_{3})(u^{n+1}_{3}-u^{n+1}_{2})\right) + u^n_3
+ &u^{k+1}_0 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{0}+D_{1})(u^{k+1}_{1}-u^{k+1}_{0})\right) + u^k_0\\
+ &u^{k+1}_1 = \frac{\Delta t}{2\Delta x^2}\left((D_{2}+D_{1})(u^{k+1}_{2}-u^{k+1}_{1})-(D_{1}+D_{0})(u^{k+1}_{1}-u^{k+1}_{0})\right) + u^k_1\\
+ &u^{k+1}_2 = \frac{\Delta t}{2\Delta x^2}\left((D_{3}+D_{2})(u^{k+1}_{3}-u^{k+1}_{2})-(D_{2}+D_{1})(u^{k+1}_{2}-u^{k+1}_{1})\right) + u^k_2 \\
+ &u^{k+1}_3 =  \frac{\Delta t}{2\Delta x^2}\left(2(D_{2}+D_{3})(u^{k+1}_{3}-u^{k+1}_{2})\right) + u^k_3
 \end{align*}
 
 \noindent Rearranging this and setting $\alpha = \frac{\Delta t}{2\Delta x^2}$ results in a normal system of linear equations
 \begin{align*}
- &u^{n+1}_0\left(1+2\alpha(D_0+D_1)\right)- 2\alpha u^{n+1}_{1}(D_1+D_0) =  u^n_0\\
- &u^{n+1}_1\left(1+\alpha(D_2+2D_1+D_0)\right)-\alpha u^{n+1}_{2}(D_2+D_1)-\alpha u^{n+1}_{0}(D_1+D_0) = u^n_1\\
- &u^{n+1}_2\left(1+\alpha(D_3+2D_2+D_1)\right)-\alpha u^{n+1}_{3}(D_3+D_2)-\alpha u^{n+1}_{1}(D_2+D_1) = u^n_2\\
- &u^{n+1}_3\left(1+2\alpha(D_3+D_2)\right)- 2\alpha u^{n+1}_{2}(D_3+D_2) =  u^n_3
+ &u^{k+1}_0\left(1+2\alpha(D_0+D_1)\right)- 2\alpha u^{k+1}_{1}(D_1+D_0) =  u^k_0\\
+ &u^{k+1}_1\left(1+\alpha(D_2+2D_1+D_0)\right)-\alpha u^{k+1}_{2}(D_2+D_1)-\alpha u^{k+1}_{0}(D_1+D_0) = u^k_1\\
+ &u^{k+1}_2\left(1+\alpha(D_3+2D_2+D_1)\right)-\alpha u^{k+1}_{3}(D_3+D_2)-\alpha u^{k+1}_{1}(D_2+D_1) = u^k_2\\
+ &u^{k+1}_3\left(1+2\alpha(D_3+D_2)\right)- 2\alpha u^{k+1}_{2}(D_3+D_2) =  u^k_3
 \end{align*}
 which is arranged as a coefficient matrix multiplied by the unknown next time step
 
@@ -128,21 +135,21 @@ which is arranged as a coefficient matrix multiplied by the unknown next time st
         a_1 & b_1 & c_1 &0 \\
         0& a_2 & b_2& c_2\\
         0& 0& a_3 & b_3\\
-       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
+       \end{array}\right)\mathbf{u}^{k+1} = \mathbf{u}^{k}
 \end{align}
 \noindent The coefficient matrix in \eqref{BE} will be labeled $\mathbf M$ throughout the thesis.
 \begin{equation}\label{theory:BE:linear_system}
-  \mathbf{M}\mathbf{u}^{n+1} = \mathbf{u}^{n}
+  \mathbf{M}\mathbf{u}^{k+1} = \mathbf{u}^{k}
 \end{equation}
 
-\noindent If a linear system like the one in \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination \textcolor{red}{check this}. 
+\noindent If a linear system like the one in \eqref{theory:BE:linear_system} has a solution it can always be found by Gaussian elimination. 
 However, for a sparse linear system a lot of the calculations in a Gaussian elimination will be done with zeros. 
 A dramatically more efficient way to solve the linear system in \eqref{theory:BE:linear_system} is by exploiting the fact that it is tridiagonal. 
 In order to be more consistent with the algorithm, \eqref{theory:BE:linear_system} will be rewritten as
 \begin{equation}
-  \mathbf{M}\mathbf{u} = \mathbf{up}
+  \mathbf{M}\mathbf{u} = \mathbf{u}_p
 \end{equation}
-where $\mathbf{up} = \mathbf{u}^{n}$ denotes the solution $\mathbf{u}$ at the previous time step. 
+where $\mathbf{u}_p = \mathbf{u}^{k}$ denotes the solution $\mathbf{u}$ at the previous time step. 
 Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algorithm listed below.
 
 \lstinputlisting{Figures/tridiag.cpp}
@@ -150,9 +157,9 @@ Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algor
 In two spatial dimensions the BE discretization gives the scheme shown below
 
 \begin{equation}\label{general_scheme_BE2D}
- u^{n}_{i,j} = \underbrace{\frac{-D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{n+1}_{i+1,j}+u^{n+1}_{i-1,j}\right) +
- \underbrace{\left(1+\frac{2D\Delta t}{\Delta x^2} +\frac{2D\Delta t}{\Delta y^2}\right)}_{\gamma}u^{n+1}_{i,j} 
- \underbrace{-\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{n+1}_{i,j+1}+u^{n+1}_{i,j-1}\right)
+ u^{k}_{i,j} = -\underbrace{\frac{D\Delta t}{\Delta x^2}}_{\alpha}\left(u^{k+1}_{i+1,j}+u^{k+1}_{i-1,j}\right) +
+ \underbrace{\left(1+\frac{2D\Delta t}{\Delta x^2} +\frac{2D\Delta t}{\Delta y^2}\right)}_{\gamma}u^{k+1}_{i,j} 
+ -\underbrace{\frac{2D\Delta t}{\Delta y^2}}_{\beta}\left(u^{k+1}_{i,j+1}+u^{k+1}_{i,j-1}\right)
 \end{equation}
 
 \noindent If \eqref{general_scheme_BE2D} is solved by hand on a $3\times3$ mesh by the same steps as in 1D it gives the following linear system
@@ -168,7 +175,7 @@ In two spatial dimensions the BE discretization gives the scheme shown below
         0& 0 &0 &-2\alpha &0&0 & \gamma & -2\beta&0\\
         0& 0 &0 &0 &-2\alpha&0&-\beta & \gamma &-\beta\\
          0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
-       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
+       \end{array}\right)\mathbf{u} = \mathbf{u}_p
 \end{align}
 
 \noindent The dashed lines confine a total of nine $3\times 3$ matrices which can be used to reformulate the $2n +1 = 7$ band diagonal system as a block tridiagonal system as shown below.
@@ -177,7 +184,7 @@ In two spatial dimensions the BE discretization gives the scheme shown below
         B_0 & C_0 &0  \\ \hdashline
         A_1 & B_1 & C_1 \\ \hdashline
         0& A_2 & B_2
-       \end{array}\right)\mathbf{u}^{n+1} = \mathbf{u}^{n}
+       \end{array}\right)\mathbf{u} = \mathbf{u}_p
 \end{align}
 
 \noindent All entries in eq. \eqref{block_tridiagonal_dashed} are $3\times3$ matrices. 
@@ -214,9 +221,9 @@ An updated \emph{pseudo coded} scheme is listed in \eqref{block_tridiag_alg}
 \noindent There is a forward substitution
 \begin{align}\label{block_tridiag_alg}
  H_0 &= -B_0^{-1}C_0\nonumber \\
- \mathbf{g}_0 &= B_0^{-1}\mathbf{up}_0 \nonumber\\
+ \mathbf{g}_0 &= B_0^{-1}\mathbf{u}_{p0} \nonumber\\
  H_i &= -\left(B_i+A_iH_{i-1}\right)^{-1}C_i \nonumber \\
- \mathbf{g}_i &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{up}_i-A_i\mathbf{g}_{i-1}\right)
+ \mathbf{g}_i &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{u}_{pi}-A_i\mathbf{g}_{i-1}\right)
  \end{align}
  Followed by a backward substitution
  \begin{align*}
@@ -251,14 +258,14 @@ All of these steps require $\mathcal O(n^{3(d-1)})$ FLOPs, but as long as the co
 In other words, the $H_i$ terms from \eqref{block_tridiag_alg} can be stored. 
 The remaining calculations include three matrix vector multiplications, one of which demands $n$ FLOPs because the matrix is diagonal. 
 The other two matrices are dense, so (for now) the remaining two matix - vector multiplications require $n^2$ FLOPs. 
-In summary, the block tridiagonal solver requires $\mathcal{O}(n^{2n-1})$ FLOPs, which is an order more efficient than a general LU decomposition\emph{\textcolor{red}{, and in fact any other method I have been able to find}}. 
+In summary, the block tridiagonal solver requires $\mathcal{O}(n^{2n-1})$ FLOPs, which is an order more efficient than a general LU decomposition, and in fact any other direct solver the author knows of. 
 In 2D the block tridiagonal solver is one order slower than the FE scheme, which means it is still very much usable for small meshes. \\
 
 Another point which should be mentioned is that the block tridiagonal solver is is extremely memory efficient compared to other linear system solvers. 
 Since the algorithm only loops through the non zero entries, there is no need to assemble the entire matrix. 
 For a 2D simulation on a $100\times 100$ mesh, the full assembled matrix will have $100^2\times100^2 = 10^8$ matrix entries, all of which are double precision floats. 
 The total size of the matrix in RAM will be $8\cdot10^8$ bytes, which is getting close to the available RAM of a normal computer at  $\sim 8\cdot10^9$ bytes. 
-In comparison, storing only the non zero entries requires three vectors of size $100$ which contain $100\times100$ matrices. A total of $24\cdot10^6$ bytes, or two orders of magnitude less. 
+In comparison, storing only the non zero entries requires three vectors of size $100$ which contain $100\times100$ matrices. A total of $24\cdot10^6$ bytes, or a factor $100$ less. 
 Effectively, the memory impact is also reduced from $8\cdot n^{2d}$ bytes to $8\cdot n^{2d-1}$ bytes by switching to the block tridiagonal solver. 
 \emph{\textcolor{red}{There might still room for improvement since all the stored matrices are sparse.}}
 
@@ -267,13 +274,13 @@ Effectively, the memory impact is also reduced from $8\cdot n^{2d}$ bytes to $8\
 \subsection{The algorithm}
 After setting an initial condition and diffusion constant the diffusion problem is solved on both the microscopic and macroscopic meshes and combined into a common solution by the following steps.
 \begin{itemize}
- \item The result from previous PDE time step, $\mathbf{up}$, is converted to a distribution of random walkers and sent to the RW solver
+ \item The result from previous PDE time step, $\mathbf{u}_p$, is converted to a distribution of random walkers and sent to the RW solver
  \item The RW solver does a predefined number of micro scale time steps which correspond to one PDE time step
- \item The result from the RW solver is converted back to a concentration and this replaces the PDE solution, $\mathbf{up}$
- \item $\mathbf{up}$ is then used as input to calculate the next time step
+ \item The result from the RW solver is converted back to a concentration and this replaces the PDE solution, $\mathbf{u}_p$
+ \item $\mathbf{u}_p$ is then used as input to calculate the next time step
 \end{itemize}
 
-\subsection{The conversion between length scales}
+\subsection{Conversion between length scales}
 As the previous section states the result from the last PDE time step is converted to a distribution of random walkers. 
 This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp and Karma \cite{plapp2000multiscale}) which is a single, real integer defined by
 
@@ -282,14 +289,20 @@ This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp 
 \end{equation}
 
 \noindent As before $u_{ij}$ is the solution to the 2D diffusion equation evaluated at $x_0 +i\Delta x$ and $y_0 +j\Delta y$, and $C_{ij}$ is the number of random walkers located in the rectangle defined by $x_i\pm\frac{\Delta x}{2}$ and $y_j\pm\frac{\Delta y}{2}$. 
-Walkers are given a random position within this rectangle at the beginning of each PDE time step. 
+Walkers are given a random position within this rectangle at the beginning of each PDE time step.
 
-Equation \eqref{theory:Hc_definition} effectively states that one ''unit`` of the solution $u$ will directly correspond to $Hc$ random walkers. Depending on the application, $Hc \approx 20-50$.
+The reason to not simply use the positions from last time step is that the amount of concentration in the RW area could change from one time step to the next. This will result in a different distribution of walkers which must be calculated at each time step. This is illustrated in Figure \ref{theory:concentration_update}.
+\begin{figure}[h]
+ \centering
+ 
+\end{figure}
+
+Equation \eqref{theory:Hc_definition} effectively states that one ''unit`` of the solution $u$ will directly correspond to $Hc$ random walkers. Depending on the application and the units of the PDE solution, $Hc \approx 20-50$.
 
 \subsection{Coupling the models through step length}
 
 To ensure that the $\tau$ time steps performed by the RW solver sums up to one time step for the PDE solver a limitation must be imposed on the RW solver. 
-This limitation can only be imposed on the step length of the random walkers, so the task at hand is to relate the step length to the PDE time step and $\tau$. \\
+This limitation can only be imposed on the step length of the random walkers, so the task at hand is to relate the step length to the PDE time step, $\Delta t$, and $\tau$. \\
 Through an Einstein relation the variance in position is coupled to the diffusion constant.
 \begin{equation}\label{theory:einstein_relation}
  \langle\tilde{\Delta x}^2\rangle = 2Dd\tilde{\Delta t}
@@ -317,7 +330,7 @@ In hindsight, a possibly better choice of boundary conditions for the RW model w
 \end{equation}
 Since time does not allow for this to be implemented and tested it will be left as a reference to possible future work.
 
-\section{Potential problems or pitfalls}\label{problems_and_pitfalls}
+\section{Potential problems}\label{problems_and_pitfalls}
  
  This section will list and discuss some of the problems which were encountered while working on the thesis and present the solutions or workarounds.
 % \emph{\textcolor{red}{This section will identify and discuss a few obvious difficulties which might arise in this project. As far as possible solutions or workarounds will be presented, but some problems might not be solvable.}}
@@ -367,7 +380,7 @@ The reason for introducing a random walk model in the diffusion solver was to in
 This means that the RW solver must take $\tau$ time steps for each PDE time step. 
 $\tau$ could in principle be any integer, but should be chosen large enough so the central limit theorem is satisfied. 
 This usually means $\tau\geq50$. \\
-Alternatively $\tau$ can be calculated from the assumption that the error term wrt. time arising from the RW model is proportional to the square root of the time step. 
+Alternatively $\tau$ can be calculated from the assumption that the error term with respect to time arising from the RW model is proportional to the square root of the time step. 
 This assumption comes from the fact that the step length is proportional to the square root of the time step.
 
 \begin{equation}
@@ -387,8 +400,8 @@ In order to make the error of the same size as the error from the PDE model we u
 Running the solution from the PDE model through a RW model gives two solutions for a part of the mesh. 
 As it turns out it is sufficient to simply replace the PDE solution with the RW solution in this area, which is nice seeing as it is the simplest possible method. 
 There are however some other ways to do this which have been tested, and found inadequate or simply been disregarded. Three of these are mentioned below. 
-\begin{itemize}
- \item Averaging the two solutions \\
+
+\subsubsection{Averaging the two solutions}
  Doing the arithmetic mean of the two solutions will reduce the magnitude of the fluctuations, as shown in Figure \ref{theory:average}. 
  This method is simple and reduces fluctuations by approximately one half (approximately because fluctuations will be present after the first time step). 
  \begin{figure}[h]
@@ -399,8 +412,9 @@ There are however some other ways to do this which have been tested, and found i
  \end{figure}
 
  The reason an average was scraped is simply that results just as good were achieved by only replacing the solution.
- \item Polynomial regression \\
-%  \emph{\textcolor{red}{Explain what polynomial regression is??}}
+ 
+\subsubsection{Polynomial regression}
+
  In order to smoothen out the solution from the RW model a polynomial regression function was tested. 
  The principle was to look at the solution from the RW model as a set of data points which have some dependency on their position on the PDE mesh. 
  Figure \ref{theory:polyreg} shows how this method worked for a slightly exaggerated case. 
@@ -412,7 +426,8 @@ There are however some other ways to do this which have been tested, and found i
  \label{theory:polyreg}
  \end{figure}
  This approach turns out to have two problems; first and foremost the amount of concentration is no longer conserved, secondly the endpoints are usually way off.
- \item Cubic spline interpolation \\
-%  \emph{\textcolor{red}{Explain what cubic spline is??}} 
- Cubic spline interpolation has the same problem as polynomial regression when it comes to conserving energy.
-\end{itemize}
+ 
+ \subsubsection{Cubic spline interpolation}
+ Doing an interpolation will force the combined solution to be equal to the RW solution at some mesh points. In practice this means choosing which points are correct, and which are not. The author has not found any reasonable way to do this. 
+ 
+ In addition, Cubic spline interpolation has the same problem as polynomial regression when it comes to conserving energy.

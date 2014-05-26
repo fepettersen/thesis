@@ -255,6 +255,28 @@
   \field{year}{2002}
 \endentry
 
+\entry{warren1998dissipative}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Warren}{W.}%
+     {Patrick~B}{P.~B.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Elsevier}%
+  }
+  \strng{namehash}{WPB1}
+  \strng{fullhash}{WPB1}
+  \field{sortinit}{W}
+  \field{number}{6}
+  \field{pages}{620\bibrangedash 624}
+  \field{title}{{Dissipative particle dynamics}}
+  \field{volume}{3}
+  \field{journaltitle}{Current opinion in colloid \& interface science}
+  \field{year}{1998}
+\endentry
+
 \lossort
 \endlossort
 
