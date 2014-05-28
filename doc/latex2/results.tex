@@ -14,20 +14,20 @@ Considering that two out of three tests are close to perfect, the FE scheme is d
 \subsection{The BE scheme and the block tridiagonal solver}
 Two of the tests done on the BE scheme are slightly off target. 
 These are the spatial convergence test and the numerical exact solution. \\
-Though the numerical exact solution test is expected to give an error close to machine precision the results are five orders of magnitude larger than machine precision. 
-On the other hand, the error term is also eight orders of magnitude smaller than the time step and there are a lot of possible round off errors in the inverted coefficient matrix which can explain the lack of accuracy. \\
+Though the numerical exact solution test is expected to give an error close to machine precision, the results are five orders of magnitude larger than machine precision. 
+On the other hand, the error term is also eight orders of magnitude smaller than the time step and there are a lot of possible round-off errors in the inverted coefficient matrix which can explain the lack of accuracy. \\
 The spatial convergence test demands that the error associated with the spatial derivative is much larger than the error from the time derivative. 
 As the spatial resolution is increased, the spatial error becomes less dominant because the time step is held constant. 
 Because the spatial convergence is still clearly larger than one, and starts out at two (which is the value it should converge to), this is considered to be adequate. \\
 
-\noindent Effectively, the manufactured solution test, and convergence tests verifies the assembly of the coefficient matrix, since an incorrect assembly would produce a larger error term. 
+\noindent Effectively, the manufactured solution test and convergence tests verify the assembly of the coefficient matrix, since an incorrect assembly would produce a larger error term. 
 The numerical exact solution test verifies the implementation and accuracy of the block tridiagonal solver, since an incorrectly implemented solver would give results comparable to the numerical exact solution. \\
 
-\noindent In summary, the tests done on the BE scheme verifies that it, and the block tridiagonal solver, is implemented correctly.
+\noindent In summary, the tests done on the BE scheme verifies that it, and the block tridiagonal solver, are implemented correctly.
 
 \subsection{The RW solver}
 Due to fluctuations in the solution it is hard to get a good convergence rate for the RW solver. 
-However it is measured to be close to $0.5$ both with respect to the time step and with respect to the number of walkers introduced. 
+However, it is measured to be close to $0.5$ both with respect to the time step and with respect to the number of walkers introduced. 
 % Seeing as there is no exact numerical solution for a random walk, only statistical properties 
 The result of verifying the RW solver is that it is deemed correctly implemented within the limits of the applied tests.
 
@@ -47,8 +47,8 @@ In their measurements they found a delay of around $5-10$ seconds from elevated 
 Using parameter values which resemble the values found in actual (rodent) neurons and neurites in the developed software, the observed delay-times have been recreated. 
 Figure \ref{results:spine_diffusion_stats} shows plots of the observed diffusion times into spines. 
 This figure shows a clear trend for longer diffusion times as the neck length of the spine increases. 
-Figure \ref{results:boxplot_relative_diffusiontime_long_neck} further support this claim and implies the average diffusion time for PKC$\gamma$ into long necked spines to be of accordance to the results from Craske et.al.
-Seeing as there are no additional complexities added to the random walk model we can assume that the spine neck does in fact function as a diffusion barrier.
+Figure \ref{results:boxplot_relative_diffusiontime_long_neck} further supports this claim and implies the average diffusion time for PKC$\gamma$ into long necked spines to be in accordance with the results from Craske et.al.
+Seeing as there are no additional complexities added to the RW model we can assume that the spine neck does in fact function as a diffusion barrier.
 
 \begin{figure}[h]
  \centering
@@ -69,11 +69,11 @@ Seeing as there are no additional complexities added to the random walk model we
 \begin{figure}[h]
  \centering
  \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
- \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Crase et.al. and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
+ \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Craske et.al. and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
  \label{results:boxplot_relative_diffusiontime_long_neck}
 \end{figure}
 
 Through the simulations it became apparent that there must be some sort of limiting factor which limits the number of PKC$\gamma$ particles that are let into the spine. 
-In real life this is achieved by a concentration gradient which tends to zero (or negative values) meaning that no particles will diffuse into the spine after it is ``filled'' up. 
+In real life this is achieved by a concentration gradient which tends to zero (or negative values), meaning that no particles will diffuse into the spine after it is ``filled'' up. 
 A random walker will not feel this concentration gradient unless it is explicitly told so. 
-The alternative solution then, is to reduce the probability for particles to diffuse into a spine for each particle that get caught in the spine head by a factor $\frac{1}{10}$. 
+The alternative solution then, is to reduce the probability for particles to diffuse into a spine for each particle that gets caught in the spine head by a factor $\frac{1}{10}$. 

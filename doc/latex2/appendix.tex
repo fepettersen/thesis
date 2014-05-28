@@ -2,13 +2,13 @@
 
 In any project which involves programming one is bound to do some debugging. This project is no exception. 
 Debugging can be extremely frustrating because no one sees all the hours that go into finding the bugs, only the ones that do not (when the bug is not fixed). 
-This appendix is an introductory guide to debugging finite difference (FD) solvers and random walk implementations. It starts out with some general tips on how to handle error messages, and moves on to deal with FD and RW implementations. 
+This appendix is an introductory guide to debugging finite difference (FD) solvers and RW implementations. It starts out with some general tips on how to handle error messages, and moves on to deal with FD and RW implementations. 
 Finally, some words on how to debug the developed software are included.
 
 \subsection{Compiler/syntax errors}
 If you are programming in a compiled language like Fortran or C/C++ it is very easy to forget or misspell some syntax. 
 Usually, the compiler will tell you what is wrong. 
-Should it not do so, there are compiler options which provides extra information about syntactically correct but questionable looking code (-Wall). 
+Should it not do so, there are compiler options which provide extra information about syntactically correct but questionable looking code (-Wall). 
 Some times one error results in several error messages. 
 Start with the messages that are understandable, and recompile before checking out the other messages. \\
 
@@ -40,8 +40,8 @@ Segmentation fault (core dumped)
 
 The gnu-compiler has an environment called gdb in which you can run your program. 
 ``gdb'' will catch segmentation faults and provide some information about where they were encountered. 
-Furthermore, advanced editors like ``qt creator'' have built in debuggers and the ability to place breakpoints in the code, making it possible to step through code line by line. \\
-Some times though the thing that works best is to print messages or key values at various places, signaling that a code block is finished. 
+Furthermore, advanced editors like ``qt creator'' have built-in debuggers and the ability to place breakpoints in the code, making it possible to step through code line by line. \\
+Some times though, the thing that works best is to print messages or key values at various places, signaling that a code block is finished. 
 For example, making each function print its name when it is called will quickly identify problems. 
 
 \subsection{Finite difference methods}
@@ -90,25 +90,25 @@ Making sure an implementation is correct is a lot harder than it sounds, but the
  \item Exact numerical solution\\
  Depending on the discretization, it should be possible to find an exact solution to the discretized version of the PDE. 
  An example of this is found in chapter \ref{exact_numerical_solution}. 
- The scheme is expected to reproduce this solution to machine precision, but there are often several factors which limits the accuracy. 
+ The scheme is expected to reproduce this solution to machine precision, but there are often several factors which limit the accuracy. 
  At the very least, the error should be significantly smaller than the largest error term. \\
  \item Convergence test\\
- These tests are often hard to get right. 
+ These tests are often difficult to get right. 
  The principle is to verify that using a smaller discretization parameter results in a smaller error, and that the error is reduced by the expected amount. 
 \end{itemize}
 
 \noindent There are probably more ways to make sure that a finite difference scheme is working properly, but the ones listed will usually give a good implication.
 
-\subsection{Random walk and Monte Carlo methods}
+\subsection{Random Walk and Monte Carlo methods}
 
 While solving a PDE numerically, the intermediate calculations can be checked and verified. 
-Since Monte Carlo methods are based on random numbers, the results of intermediate calculations will be random, making them impossible to verify completely. 
+Since Monte Carlo methods are based on random numbers, the results of intermediate calculations will be random, making it impossible to verify them completely. 
 Instead, some statistical properties of the random numbers can be verified. 
 For example, using uniformly distributed random numbers will give a certain mean and standard deviation, while a Gaussian distribution will give another.
 The random number generator should be tested in order to verify that these properties are reproduced to a reasonable accuracy. \\
 
 \noindent Random walkers have some additional properties which can be tested. 
-Both a one dimensional and a two dimensional random walk will fill all available space, given infinitely many time steps. 
+Both a one-dimensional and a two-dimensional random walk will fill all available space, given infinitely many time steps. 
 Letting 4-5 walkers jump around for around $10^4$ time steps, and plotting their paths should give an indication of how well this property is reproduced. \\
 
 \noindent Finally, it is very useful to specify a random seed. This will ensure that the random number generator produces the same sequence of numbers each simulation, which often makes testing easier. 
@@ -127,11 +127,11 @@ While implementing the hybrid solver, there were four main points which either m
  \item Unit testing\\
  This is a way to test a single unit of code, often a single function, and verify that it does exactly what it should do. \\
  \item Version control\\
- During implementation and testing, a lot of changes will be made to the code. It is surprisingly hard to remember all the changes, which often means that functioning code will be lost. 
+ During implementation and testing, a lot of changes will be made to the code. It is surprisingly difficult to remember all the changes, which often means that functioning code will be lost. 
  Using version control software eliminates this problem. Version control software allows a developer to save snapshots of code with a comment, as well as some more advanced options. This allows for tracking of progress, committing working code before changes are made, and much more. Should some changes be made to a working piece of code, it can be reverted to the last working version.\\
  \item Make independent modules\\
  This applies to most code development. If the code is divided into independent modules, it is not only easier to test the code, it will also be much easier to reuse the code. \\
- As an example, the block tridiagonal solver has been implemented as a separate module, which since then has been used by Thorbjørn Sæland in his masters thesis.\\
+ As an example, the block tridiagonal solver has been implemented as a separate module, which since then has been used by Torbjørn Sæland in his masters thesis.\\
  \item Do not be nostalgic\\
  Because you are now using version control, there is no need to just comment out sections of code in case it is needed later. 
  This makes the rest of the code less messy, and reduces the risk of forgetting to remove something.

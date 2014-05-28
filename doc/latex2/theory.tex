@@ -27,7 +27,7 @@ The number of walkers leaving $V$ is described by the change in $C$ integrated o
 \begin{equation}
  \int_V \frac{\d C}{\d t}\,dV
 \end{equation}
-The number of walkers leaving $V$ can must be equal to the number of walkers crossing $S$ per unit time and area. Integrating the outward normal component of the flux of walkers, $\mathbf{J}$ over the entire surface results in the number of walkers leaving $V$.
+The number of walkers leaving $V$ must be equal to the number of walkers crossing $S$ per unit time and area. Integrating the outward normal component of the flux of walkers, $\mathbf{J}$ over the entire surface results in the number of walkers leaving $V$.
 
 \begin{equation}\label{theory:flux_integral}
  \int_S\vec{J}\cdot \vec{n}\,dS
@@ -257,11 +257,11 @@ The block Tridiagonal solver requires inverting $n$ matrices of size $n^{d-1}\ti
 All of these steps require $\mathcal O(n^{3(d-1)})$ FLOPs, but as long as the coefficient matrix is constant they need only be done once. 
 In other words, the $H_i$ terms from \eqref{block_tridiag_alg} can be stored. 
 The remaining calculations include three matrix vector multiplications, one of which demands $n$ FLOPs because the matrix is diagonal. 
-The other two matrices are dense, so (for now) the remaining two matix - vector multiplications require $n^2$ FLOPs. 
+The other two matrices are dense, so (for now) the remaining two matrix - vector multiplications require $n^2$ FLOPs. 
 In summary, the block tridiagonal solver requires $\mathcal{O}(n^{2n-1})$ FLOPs, which is an order more efficient than a general LU decomposition, and in fact any other direct solver the author knows of. 
 In 2D the block tridiagonal solver is one order slower than the FE scheme, which means it is still very much usable for small meshes. \\
 
-Another point which should be mentioned is that the block tridiagonal solver is is extremely memory efficient compared to other linear system solvers. 
+Another point which should be mentioned is that the block tridiagonal solver is extremely memory efficient compared to other linear system solvers. 
 Since the algorithm only loops through the non zero entries, there is no need to assemble the entire matrix. 
 For a 2D simulation on a $100\times 100$ mesh, the full assembled matrix will have $100^2\times100^2 = 10^8$ matrix entries, all of which are double precision floats. 
 The total size of the matrix in RAM will be $8\cdot10^8$ bytes, which is getting close to the available RAM of a normal computer at  $\sim 8\cdot10^9$ bytes. 
@@ -281,7 +281,7 @@ After setting an initial condition and diffusion constant the diffusion problem 
 \end{itemize}
 
 \subsection{Conversion between length scales}
-As the previous section states the result from the last PDE time step is converted to a distribution of random walkers. 
+As the previous section states, the result from the last PDE time step is converted to a distribution of random walkers. 
 This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp and Karma \cite{plapp2000multiscale}) which is a single, real integer defined by
 
 \begin{equation}\label{theory:Hc_definition}
@@ -294,7 +294,9 @@ Walkers are given a random position within this rectangle at the beginning of ea
 The reason to not simply use the positions from last time step is that the amount of concentration in the RW area could change from one time step to the next. This will result in a different distribution of walkers which must be calculated at each time step. This is illustrated in Figure \ref{theory:concentration_update}.
 \begin{figure}[h]
  \centering
- 
+%  \includegraphics[scale=0.6]{Figures/concentration_update.eps}
+ \caption{}
+ \label{theory:concentration_update}
 \end{figure}
 
 Equation \eqref{theory:Hc_definition} effectively states that one ''unit`` of the solution $u$ will directly correspond to $Hc$ random walkers. Depending on the application and the units of the PDE solution, $Hc \approx 20-50$.
@@ -346,7 +348,7 @@ Since time does not allow for this to be implemented and tested it will be left 
 
  
 \subsubsection{Negative concentration of walkers}
-Physically a negative concentration does not make sense, but if an initial condition which takes negative values is imposed on the system the software will try to allocate a negative number of walkers. 
+Physically a negative concentration does not make sense, but if an initial condition which takes negative values is imposed on the system, the software will try to allocate a negative number of walkers. 
 Trying to handle this is more of an oddity than anything else, but a workaround has been found. 
 If the absolute value of the negative concentration is taken as input to the RW solver and the sign at each mesh point is stored while the RW solver advances the system, the resulting solution can be multiplied by the stored sign to give back a negative concentration. 
 The workaround will at least keep the simulation from crashing, but has a fundamental problem. 
@@ -402,7 +404,7 @@ In order to make the error of the same size as the error from the PDE model we u
 
 Running the solution from the PDE model through a RW model gives two solutions for a part of the mesh. 
 As it turns out it is sufficient to simply replace the PDE solution with the RW solution in this area, which is nice seeing as it is the simplest possible method. 
-There are however some other ways to do this which have been tested, and found inadequate or simply been disregarded. Three of these are mentioned below. 
+There are, however, some other ways to do this which have been tested, and found inadequate or simply been disregarded. Three of these are mentioned below. 
 
 \subsubsection{Averaging the two solutions}
  Doing the arithmetic mean of the two solutions will reduce the magnitude of the fluctuations, as shown in Figure \ref{theory:average}. 
@@ -414,7 +416,7 @@ There are however some other ways to do this which have been tested, and found i
   \label{theory:average}
  \end{figure}
 
- The reason an average was scraped is simply that results just as good were achieved by only replacing the solution.
+ The reason an average was scraped is simply that equally satisfactory results were achieved by only replacing the solution.
  
 \subsubsection{Polynomial regression}
 

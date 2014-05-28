@@ -5,7 +5,7 @@ The following chapter is included to show that the developed hybrid diffusion so
 \begin{figure}[H]
  \centering
  \includegraphics[width=0.7\textwidth]{Figures/Cochlear_nucleus_multipolar_cell.jpg}
- \caption[Pyramidal neuron]{A pyramidal neuron with an apical dendrite (staring by the arrow). The inset shows an amplification of the apical dendrite and illustrates the size of dendritic spines (small outgrowths). The arrow points to the cell body, called the Soma. Note that this image does not show how neurons are located within the brain. Image from \url{www.neurolex.org}.}
+ \caption[Pyramidal neuron]{A pyramidal neuron with an apical dendrite (starting by the arrow). The inset shows an amplification of the apical dendrite and illustrates the size of dendritic spines (small outgrowths). The arrow points to the cell body, called the Soma. Note that this image does not show how neurons are located within the brain. Image from \url{www.neurolex.org}.}
  \label{application:pyramidal_neuron}
 \end{figure}
 
@@ -13,7 +13,7 @@ Figure \ref{application:pyramidal_neuron} shows a pyramidal neuron with an apica
 Pyramidal neurons take their name from the triangular shape of the Soma, and an apical dendrite is a dendrite springing from the apex of the Soma. 
 Spines are (often) the receiving end of a chemical synapse, which is a junction between two neurons that allows for communication between the two cells. \\
 
-\noindent This application will look at diffusion of PKC$\gamma$ in an apical dendrite and into dendritic spines. 
+\noindent This application will look at diffusion of PKC$\gamma$ in a segment of an apical dendrite and into dendritic spines. 
 PKC$\gamma$ is a protein found in neurons which is associated with memory storage and associative learning \cite{saito2002protein}. 
 Upon activation it will diffuse out of the Soma, through a dendrite, and into a dendritic spine to reinforce or reduce the absorption of neurotransmitters. 
 The results will be compared to results by Craske et.al \cite{craske2005spines}, who in 2005 studied a similar problem in rodent pyramidal neurons harvested from the hippocampus.
@@ -24,9 +24,9 @@ Effectively we will investigate the diffusion time for random walkers through sp
 
 There is a difference between the approach of the developed hybrid solver and the dendrite - spine system with respect to geometry which is best summarized in Figure \ref{application:geometry_difference}.\\
 
-\noindent The dendrite is approximated as a cylinder with radius $\sim10\mu$m and length $\sim50\mu$m. Furthermore, little of interest is assumed to happen in the radial direction. All things considered, diffusion in the dendrite will be modeled as a 1D process. \\
+\noindent The dendrite segment is approximated as a cylinder with diameter $\sim10\mu$m and length $\sim50\mu$m. Furthermore, little of interest is assumed to happen in the radial direction. All things considered, diffusion in the dendrite will be modeled as a 1D process. \\
 
-\noindent Spines have a wide variety of geometries, with various properties. For this application, however, only the neck length and width of a spine is of interest. The spines will therefore be modeled as two dimensional objects with rectangular necks and trapezoidal heads. 
+\noindent Spines have a wide variety of geometries, with various properties \cite{arellano2007ultrastructure}. For this application, however, only the neck length and width of a spine is of interest. The spines will therefore be modeled as two dimensional objects with rectangular necks and trapezoidal heads. 
 \begin{figure}[H]
  \centering
  \begin{subfigure}{0.48\textwidth}
@@ -43,12 +43,12 @@ There is a difference between the approach of the developed hybrid solver and th
 
 The hybrid diffusion solver has been slightly modified in order to recreate the new geometry. 
 Mathematically the largest difference is that the random walkers are left alone, meaning that the diffusion equation is not solved in the spines. 
-There are also some differences in the coupling; at each PDE time step there is a probability for an protein to diffuse into a spine if the concentration at the beginning of the spine neck is large enough. This probability decreases with the number of proteins which have already diffused into the spine. 
-The width of a spine neck is determined by the number of PDE mesh points it connects to, which is chosen at random. 
-All other length parameters are also determined randomly, but required to fit with measurements from Arellano et.al \cite{arellano2007ultrastructure}. 
+There are also some differences in the coupling; at each PDE time step there is a probability for a protein to diffuse into a spine if the concentration at the beginning of the spine neck is large enough. This probability decreases with the number of proteins which have already diffused into the spine. 
+The width of a spine neck is determined by the number of PDE mesh points it connects to, which, for this purpose, is chosen at random. 
+All other length parameters are determined randomly, but required to fit with measurements from Arellano et.al \cite{arellano2007ultrastructure}. 
 
 \section{Parameters and details}
-Within the first three seconds after PKC$\gamma$ is released from Soma, a portion of the released amount will bind to the Dendrite wall. 
+Within the first three seconds after PKC$\gamma$ is released from Soma, a portion of the released amount will bind to the dendrite wall. 
 This process is not governed by the diffusion equation, and seems to increase the speed with which PKC$\gamma$ diffuses into the spine \cite{craske2005spines}. 
 For this application, these dynamics are not of interest. In order to still have a realistic model, the initial condition has been altered: 
 
@@ -72,3 +72,24 @@ The model should have a few properties in order to be a realistic representation
 In order for a spine to be two dimensional, it must cover at least two points of the PDE mesh. This limits the minimal spatial resolution to the minimal neck diameter of a spine, which is $0.22\mu$m \cite{arellano2007ultrastructure}.
 
 Real particles will ``feel'' a concentration gradient, but random walkers do not. As spine heads are filled with proteins, new proteins must therefore be hindered from entering a spine if it is full. 
+
+\section{Using other particle dynamics}
+
+The aim of this project has always been to create a flexible framework where especially the particle dynamics can be substituted. 
+A test was therefore executed where Direct Simulation Monte Carlo (DSMC) code developed by Anders Hafreager for his masters thesis, was used in stead of the RW model. 
+DSMC is a particle dynamics approach where the velocities of individual particles are modeled, but particle some interactions are modeled by a stochastic process. 
+Typically, particle collisions are modeled by a Monte Carlo method, but boundary conditions are not.\\
+
+\noindent A problem arises with respect to the coupling described in this thesis: 
+In the DSMC model, there is no fixed step length for each particle. It is possible to measure a diffusion coefficient which, to some degree, can be controlled by adjusting the temperature of the system, but this has not been done. 
+
+As a result, this must be viewed as an experiment in which the aim is for the two softwares to communicate as intended. 
+In this sense, the experiment was successful, as is illustrated in Figure 
+% \ref{}.
+
+% \begin{figure}[H]
+% \centering
+% % \includegraphics[width=0.5\textwidth]{}
+%  \caption[]{}
+%  \label{}
+% \end{figure}

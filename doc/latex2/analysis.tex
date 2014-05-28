@@ -135,7 +135,7 @@ By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe 
   \includegraphics[width=\textwidth]{../results/experiment_22052014_1317_BE2D_new_plots/results/errorplot_pretty.eps}
   \caption{}
  \end{subfigure}
- \caption[Error plots BE]{Error plot for the BE scheme in 1D (a) and 2D (b). Notice that the error is roughly of the same order as the time step. Figures \ref{analysis:errorplots:FE}b and (b) show the same simulation using FE and BE schemes in 2D. The error is slightly larger in the BE discretization by a factor of 4.}
+ \caption[Error plots BE]{Error plot for the BE scheme in 1D (a) and 2D (b). Notice that the error is roughly of the same order as the time step. Figures \ref{analysis:errorplots:FE}b and \ref{analysis:errorplots:BE}b show the same simulation using FE and BE schemes in 2D. The error is slightly larger in the BE discretization by a factor of 4.}
  \label{analysis:errorplots:BE}
 \end{figure}
 
@@ -328,8 +328,8 @@ Given the $k$'th time step, the next time step is found by
 \noindent Where $\left(\mathbf M^{-1}\right)^{k}$ is the inverse of $\mathbf M$ to the $k$'th power.\\
 
 \noindent Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
-Doing calculations with such a matrix results in a lot of round off errors which will reduce the accuracy of the numerical exact. 
-The error should theoretically be machine precision, but is expected, to at least, be much smaller than $\Delta t$. 
+Doing calculations with such a matrix results in a lot of round-off errors which will reduce the accuracy of the numerical exact. 
+The error should theoretically be machine precision, but is expected to at least, be much smaller than $\Delta t$. 
 Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}. 
 Though computationally intensive, the numerical exact solution for the BE scheme has none of the limitations that were found for the FE scheme. 
 
@@ -343,9 +343,9 @@ Though computationally intensive, the numerical exact solution for the BE scheme
  \includegraphics[width=\textwidth]{../results/experiment_30042014_0914_BE2D_numex/results/numerical_exact.eps}
  \caption{}
 \end{subfigure}
- \caption[Numerical exact errorplots for BE scheme]{Plots showing the error for the BE scheme in 1D (a) and 2D (b) compared to the numerical exact solution. 
+ \caption[Numerical exact error plots for BE scheme]{Plots showing the error for the BE scheme in 1D (a) and 2D (b) compared to the numerical exact solution. 
  The error is not machine precision, but significantly smaller than $\Delta t$ which for these simulations is $\Delta t=0.01$. 
- This increased error originates in the many roundoff errors in the inverted matrix where a lot of terms $10^{-16}$ and smaller.}
+ This increased error originates in the many round-off errors in the inverted matrix where a lot of terms are of the order $10^{-16}$ and smaller.}
  \label{numex:BE_errorplot}
 \end{figure}
 
@@ -372,7 +372,7 @@ In order to carry out the tests, a new initial condition that can easily be recr
 
 \noindent Figure \ref{ConvergenceTestRW:Hc} verifies that the error term improves by adding more walkers. And Figure \ref{ConvergenceTestRW:dt} shows that the RW model will fulfill the chosen time step on the PDE level. 
 The convergence rate is not very good, but this is expected. 
-Stochastic effects causes the error to fluctuate around a certain value rather than converge to zero, making it very hard to get a good error measure.
+Stochastic effects causes the error to fluctuate around a certain value rather than converge to zero, making it very difficult to get a good error measure.
 
 \begin{figure}[h]
  \centering

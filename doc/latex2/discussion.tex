@@ -10,7 +10,7 @@ In summary, this project contains
 \begin{itemize}
  \item Implementation of both explicit and implicit solvers for the (anisotropic) diffusion equation using finite difference methods in one and two spatial dimensions. The implicit solver can also handle three dimensions, but this requires writing code that assembles the coefficient matrix.
  \item Implementation of a direct solver for banded linear systems which rewrites the system as block tridiagonal. To my knowledge, this block tridiagonal solver is one order more efficient than any other direct solver.
- \item Implementation of a random walk model for (anisotropic) diffusion in one and two spatial dimensions, with the grounds for three dimensions laid.
+ \item Implementation of a RW model for (anisotropic) diffusion in one and two spatial dimensions, with the grounds for three dimensions laid.
  \item Combination of the PDE and RW models into a hybrid diffusion model. 
  \item Thorough testing and verification of all the implemented solvers.
  \item An application of a slightly modified version of the hybrid diffusion model on diffusion of PKC$\gamma$ from thick apical dendrites into very narrow dendritic spines.
@@ -22,7 +22,7 @@ The model gives fairly good results for the application on PKC$\gamma$ into spin
 However, the mean diffusion times found from simulations seem to consistently lie towards the lower limits of the experimental results. 
 One possible extension to the model which might fix this is to introduce an absorption probability in the spine head which is fairly large (say 80\% per second), or even increases with the amount of time spent in the spine head. 
 A setup like this should increase the average diffusion time by a few seconds. 
-It does not, however reflect the physical process to a better accuracy seeing as a concentration increase in a spine head will be measured quickly.
+It does not, however, reflect the physical process to a better accuracy seeing as a concentration increase in a spine head will be measured quickly.
 
 \subsection{Possible extensions}
 As the project stands now it is mostly a proof of concept for hybrid diffusion solvers as well as a first attempt at a flexible framework for similar problems. 
@@ -33,15 +33,15 @@ The idea, however, was always to create a software in which the lower scale mode
 By letting the lower scale model work as a standalone unit which communicates with the rest of the software through a file containing the positions of all the walkers (or particles), this is ensured. 
 All that is needed to switch lower scale model is to put the new solver in the correct place with respect to the rest of the software, and make sure it can communicate in the described manner. 
 As a test, the DSMC code developed by Anders Hafreager was used as a lower scale model for one simulation. 
-Naturally, a few problems arise, but from a strictly programming point of view it worked. \\
+Naturally, a few problems arose, but from a strictly programming point of view it worked. \\
 
 \noindent As mentioned in section \ref{theory:BC_RW}, perfect flux exchange between the higher and lower scale model might have been a better boundary condition for the RW model than zero flux boundary conditions. 
 In principle, changing boundary conditions on the RW solver is simple, seeing as it is completely separate from the rest of the software. 
-The reason the boundary conditions have not been changed is that it requires a complete workover of the coupling between the two models as well, which is a much larger job. \\
+The reason the boundary conditions have not been changed is that it requires a complete workover of the coupling between the two models as well, which is a too large job to complete at this point. \\
 
 \noindent Perhaps the biggest weakness of the software, as it stands, is the limitation in mesh geometry. 
 Implementing a mesh geometry which is not square in a finite difference method turns out to be very complicated, and requires transforming the PDE to a new set of coordinates. 
-Ultimately one must solve an entirely different equation. 
+Ultimately, one must solve an entirely different equation. 
 Alternatively, a finite element method can be used. 
 Finite element software will already have support for new mesh geometries built in, making the suggested transformations unnecessary. 
 Implementing a finite element PDE solver will also make it a lot easier to use a higher order approximation to the time derivative, hence getting a more accurate PDE solution. 
@@ -52,7 +52,7 @@ Ion channels are very narrow, often only allowing one ion through at a time, and
 Two 1D PDEs can describe the intra-, and extra-cellular concentrations of ions, and a lower scale model can describe the ion channel. 
 This problem would also need to consider drift terms arising from Coulomb forces and using a modified particle model which can describe the dynamics inside an ion channel. \\
 
-In principle, any diffusion process a small portion of a large number of particles diffuse into narrow passages could be modeled by the developed hybrid diffusion solver.
+In principle, any diffusion process where a small portion of a large number of particles diffuse into narrow passages could be modeled by the developed hybrid diffusion solver.
 
 \subsection{Other work on the subject}
 
