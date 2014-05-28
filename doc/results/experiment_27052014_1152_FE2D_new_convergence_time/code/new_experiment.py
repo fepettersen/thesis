@@ -329,7 +329,7 @@ class Experiment:
 		mpl.rc('font', family='serif')
 		
 		mpl.plot((h[:-1]),r,'b-x')
-		mpl.xlabel('$\Delta x$',fontsize=16)
+		mpl.xlabel('$\Delta t$',fontsize=16)
 		mpl.ylabel('r',fontsize=16)
 		# mpl.title('Convergence rate')
 		if save:
@@ -452,7 +452,7 @@ def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 
 	
 if __name__ == '__main__':
-	DEBUG = True
+	DEBUG = False
 	save_files = True
 	mode = 'test'
 
@@ -465,7 +465,7 @@ if __name__ == '__main__':
 	y1 = 1.0
 	m = 1800
 	n = 1
-	T = 8000		# no.of timesteps, [dt*T] = seconds
+	T = 4000		# no.of timesteps, [dt*T] = seconds
 
 	x_start = 0
 	x_end = 50.0 		#um
@@ -487,7 +487,7 @@ if __name__ == '__main__':
 	Hc = [20]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_BE2D_new_convergence_space	'
+	info='_FE2D_new_convergence_time'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
@@ -534,7 +534,7 @@ if __name__ == '__main__':
 	# h = [0.025]
 	for i in h:
 		# i = 1.0/j
-		timestep = 8e-5
+		timestep = i*i/4.0
 		dt.append(timestep)
 		m = (1/i)+1
 		# m = 21
@@ -552,8 +552,8 @@ if __name__ == '__main__':
 		print m," , ", timestep, " , ", hc
 		run.RunSimulation(1*hc)
 	leg = ['$\Delta t$ = %g'%i for i in dt]
-	# run.ConvergenceTest(h)
 	run.ConvergenceTest(h)
+	run.ConvergenceTest(dt)
 	# leg = ['dt = %g'%i for i in dt]
 	run.PlotError(leg)
 	# # print 'dx =',dx

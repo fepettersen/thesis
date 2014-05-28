@@ -116,42 +116,6 @@
   \field{year}{2001}
 \endentry
 
-\entry{light1996protein}{article}{}
-  \name{author}{5}{}{%
-    {{}%
-     {Light}{L.}%
-     {Peter~E}{P.~E.}%
-     {}{}%
-     {}{}}%
-    {{}%
-     {Sabir}{S.}%
-     {Aftab~A}{A.~A.}%
-     {}{}%
-     {}{}}%
-    {{}%
-     {Allen}{A.}%
-     {Bruce~G}{B.~G.}%
-     {}{}%
-     {}{}}%
-    {{}%
-     {Walsh}{W.}%
-     {Michael~P}{M.~P.}%
-     {}{}%
-     {}{}}%
-    {{}%
-     {French}{F.}%
-     {Robert~J}{R.~J.}%
-     {}{}%
-     {}{}}%
-  }
-  \strng{namehash}{LPE+1}
-  \strng{fullhash}{LPESAAABGWMPFRJ1}
-  \field{sortinit}{L}
-  \field{title}{{Protein Kinase C--Induced Changes in the Stoichiometry of ATP
-  Binding Activate Cardiac ATP-Sensitive K+ Channels A Possible Mechanistic
-  Link to Ischemic Preconditioning}}
-\endentry
-
 \entry{marsaglia2003xorshift}{article}{}
   \name{author}{1}{}{%
     {{}%

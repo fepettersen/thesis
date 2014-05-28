@@ -113,14 +113,10 @@ class Experiment:
 
 	def CalculateError(self,filename):
 		if self.n <= 1:
-			d=1
 			X = np.linspace(0,1,self.m)
 			Y = np.zeros(self.m)
-			dx = X[1]-X[0]
 		else:
-			d=2
 			X,Y = np.meshgrid(np.linspace(0,1,self.m),np.linspace(0,1,self.n))
-			dx = X[1,1]-X[0,0]
 		exact = True if self.exact(X,Y,0)!=None else False
 		if exact:
 			tmp = np.zeros(self.T)
@@ -128,8 +124,7 @@ class Experiment:
 			for step in sorted(glob.glob(filename)):
 				# print step
 				infile = np.loadtxt(step)
-				# tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
-				tmp[j] = np.sqrt(dx**d*np.sum((self.exact(X,Y,(j+1)*self.dt)-infile)**2))
+				tmp[j] = np.linalg.norm(self.exact(X,Y,(j+1)*self.dt)-infile)
 				j+=1
 			self.error.append(tmp.copy())
 
@@ -144,11 +139,8 @@ class Experiment:
 
 	def PlotError(self,legend,save=True):
 		# mpl.hold('on')
-		size = 16
-		mpl.rc('text', usetex=True)
-		mpl.rc('font', family='serif')
-		mpl.rc('xtick', labelsize=13) 
-		mpl.rc('ytick', labelsize=13) 
+		mpl.rc('usetex',True)
+		size = 14
 		color = ['b-','r--','k:','c-','g-','m-','b-x','r-x','k-x','c-x','g-x','m-o','b-o','r-o','k-o','c-o','g-o','m-o']
 		if self.runcounter!=len(self.error):
 			# print self.error,'\n \n'
@@ -156,13 +148,13 @@ class Experiment:
 			mpl.plot(self.error[0],color[0],label='Deterministic')
 			for i in range(self.runcounter):
 				# mpl.plot(np.log(self.error[i]/self.dt))
-				mpl.plot(self.error[i+1],color[i+1],label=legend[i])
+				mpl.plot(self.error[i+1],color[i+1],label=legend[i],fontsize=size)
 		else:
 			for i in range(self.runcounter):
 				# mpl.plot(np.log(self.error[i]/self.dt))
-				mpl.plot(self.error[i],color[i],label=legend[i])
+				mpl.plot(self.error[i],color[i],label=legend[i],fontsize=size)
 		mpl.legend(loc=0)
-		mpl.xlabel('timestep no.',fontsize=13)
+		mpl.xlabel('timestep no.',fontsize=size)
 		mpl.ylabel('$\epsilon(t)$',fontsize=size)
 		# mpl.title('Error plot; dt = %g'%self.dt)
 		if save:
@@ -323,15 +315,10 @@ class Experiment:
 		print r
 		print E
 		# mpl.ylim(0.0,1.1)
-		mpl.rc('xtick', labelsize=15) 
-		mpl.rc('ytick', labelsize=15) 
-		mpl.rc('text', usetex=True)
-		mpl.rc('font', family='serif')
-		
 		mpl.plot((h[:-1]),r,'b-x')
-		mpl.xlabel('$\Delta x$',fontsize=16)
-		mpl.ylabel('r',fontsize=16)
-		# mpl.title('Convergence rate')
+		mpl.xlabel('dx')
+		mpl.ylabel('r')
+		mpl.title('Convergence rate')
 		if save:
 			mpl.savefig(self.result_path+'/ConvergenceTest.eps')
 			mpl.savefig(self.result_path+'/ConvergenceTest.png')
@@ -444,7 +431,7 @@ def numerical_exact(n,x,y,dx,dy,dt,D=1):
 
 def D(x,y,t=0):
 	# return np.pi*x
-	return np.ones(np.shape(x))*0.5
+	return np.ones(np.shape(x))
 
 def GaussianPulse(x,y,t=0,x0=0,sigma=1.0,A=2.5,Hc=15):
 	# return A*np.exp(-(x-x0)**2/(2*sigma**2)) + 1.0/((x+1.5)*Hc) +0.3*np.random.rand(len(x))
@@ -487,7 +474,7 @@ if __name__ == '__main__':
 	Hc = [20]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_BE2D_new_convergence_space	'
+	info='_FE1D_new_plots'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
@@ -497,7 +484,7 @@ if __name__ == '__main__':
 	run.SetDiffusionTensor(D(x,y))
 
 	run.compile()
-	# run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
+	run.SetupRun(x0,x1,y0,y1,m,n,T,dt[0])
 	# run.VerifyDeterministicError()
 	# run.RunSimulation(Hc[0])
 	# M = np.loadtxt("BE_matrix_inverse.txt")
@@ -534,11 +521,11 @@ if __name__ == '__main__':
 	# h = [0.025]
 	for i in h:
 		# i = 1.0/j
-		timestep = 8e-5
-		dt.append(timestep)
+		timestep = i*i/4.0
+		dt.append(i*i)
 		m = (1/i)+1
 		# m = 21
-		n = m
+		n = 1
 		if n==1:
 			x = np.linspace(0,1,m)
 			y = np.zeros(m)
@@ -551,9 +538,8 @@ if __name__ == '__main__':
 		hc = 100
 		print m," , ", timestep, " , ", hc
 		run.RunSimulation(1*hc)
-	leg = ['$\Delta t$ = %g'%i for i in dt]
-	# run.ConvergenceTest(h)
-	run.ConvergenceTest(h)
+	leg = ['h = %g'%i for i in dt]
+	# run.ConvergenceTest(dt)
 	# leg = ['dt = %g'%i for i in dt]
 	run.PlotError(leg)
 	# # print 'dx =',dx

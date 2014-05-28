@@ -11,22 +11,22 @@ The following chapter is included to show that the developed hybrid diffusion so
 
 Figure \ref{application:pyramidal_neuron} shows a pyramidal neuron with an apical dendrite, and an inset with dendritic spines. 
 Pyramidal neurons take their name from the triangular shape of the Soma, and an apical dendrite is a dendrite springing from the apex of the Soma. 
-Spines are (often) the receiving end of a chemical synapse, which is a junction between two neurons. \\
+Spines are (often) the receiving end of a chemical synapse, which is a junction between two neurons that allows for communication between the two cells. \\
 
-\noindent This application will look at the diffusion of PKC$\gamma$ in the apical dendrite and into dendritic spines. 
+\noindent This application will look at diffusion of PKC$\gamma$ in an apical dendrite and into dendritic spines. 
 PKC$\gamma$ is a protein found in neurons which is associated with memory storage and associative learning \cite{saito2002protein}. 
 Upon activation it will diffuse out of the Soma, through a dendrite, and into a dendritic spine to reinforce or reduce the absorption of neurotransmitters. 
 The results will be compared to results by Craske et.al \cite{craske2005spines}, who in 2005 studied a similar problem in rodent pyramidal neurons harvested from the hippocampus.
 
-Effectively we will investigate the diffusion time for random walkers through spine necks which are very narrow ($\leq0.5\mu$m). 
+Effectively we will investigate the diffusion time for random walkers through spine necks which are very narrow ($\leq0.5\mu$m). Spine necks are thought to act as diffusion barriers which hinder, but do not stop diffusion \cite{craske2005spines}.
 
 \section{Implementation}
 
-There is a difference between the approach of the developed hybrid solver and the dendrite - spine system with respect to geometry which is best summarized in figure \ref{application:geometry_difference}.\\
+There is a difference between the approach of the developed hybrid solver and the dendrite - spine system with respect to geometry which is best summarized in Figure \ref{application:geometry_difference}.\\
 
 \noindent The dendrite is approximated as a cylinder with radius $\sim10\mu$m and length $\sim50\mu$m. Furthermore, little of interest is assumed to happen in the radial direction. All things considered, diffusion in the dendrite will be modeled as a 1D process. \\
 
-\noindent Spines have a wide variety of geometries, with various properties. For this application, however, only the neck length and width of a spine is of interest. The spines will therefore be modeled as two dimensional objects with a funnel shape. 
+\noindent Spines have a wide variety of geometries, with various properties. For this application, however, only the neck length and width of a spine is of interest. The spines will therefore be modeled as two dimensional objects with rectangular necks and trapezoidal heads. 
 \begin{figure}[H]
  \centering
  \begin{subfigure}{0.48\textwidth}
@@ -43,41 +43,32 @@ There is a difference between the approach of the developed hybrid solver and th
 
 The hybrid diffusion solver has been slightly modified in order to recreate the new geometry. 
 Mathematically the largest difference is that the random walkers are left alone, meaning that the diffusion equation is not solved in the spines. 
-There are also some differences in the coupling; at each PDE time step there is a probability for an enzyme to diffuse into a spine if the concentration at the beginning of the spine neck is large enough. This probability decreases with the number of enzymes which have already diffused into the spine. 
+There are also some differences in the coupling; at each PDE time step there is a probability for an protein to diffuse into a spine if the concentration at the beginning of the spine neck is large enough. This probability decreases with the number of proteins which have already diffused into the spine. 
 The width of a spine neck is determined by the number of PDE mesh points it connects to, which is chosen at random. 
-All other length parameters are also determined randomly, but required to fit with measurements from Arrelano et.al \cite{arellano2007ultrastructure}. 
+All other length parameters are also determined randomly, but required to fit with measurements from Arellano et.al \cite{arellano2007ultrastructure}. 
 
-\subsection{Initial Condition}
+\section{Parameters and details}
+Within the first three seconds after PKC$\gamma$ is released from Soma, a portion of the released amount will bind to the Dendrite wall. 
+This process is not governed by the diffusion equation, and seems to increase the speed with which PKC$\gamma$ diffuses into the spine \cite{craske2005spines}. 
+For this application, these dynamics are not of interest. In order to still have a realistic model, the initial condition has been altered: 
 
-In the presence of glutamate the diffusion constant for PKC$\gamma$ has been measured to $0.33\frac{\mu m^2}{s}$, but this does not reproduce the diffusion times in dendrites which are illustrated by Craske et.al. 
-There are two possible fixes to this; \emph{\textcolor{red}{either I have read the paper wrong, and the diffusion constant is really $5.72$ in the dendrite, in which case everything is ok.}} 
-The other possibility is to modify the initial condition. The latter is not as far fetched as is sounds because there is considerable absorption of PKC$\gamma$ in the dendrite walls during the first few seconds after release from soma. 
-The modified initial condition can be viewed as the concentration distribution in the dendrite some 2 seconds after release from soma.
-\clearpage
+Assuming that the actual release of PKC$\gamma$ from Soma can be modeled as a delta pulse, the solution will be a Gaussian function. 
+The modified initial condition places a small amount of PKC$\gamma$ over the entire dendrite, and adds some random fluctuations. This is illustrated in Figure \ref{initial}. 
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.6\textwidth]{Figures/initial_condition_application.png}
+ \caption{Initial condition used in the application}
+ \label{initial}
+\end{figure}
 
-\section{Parameters}
+\noindent The result of using this new initial condition is simply that approximately $3$ seconds can be added to all the measured times. \\
 
-The new problem requires the introduction of some additional parameters as well as a reformulation of limiting factors for some known parameters, all of which are described in the following table.
- 
- \begin{table}[H]
-\centering
-\begin{tabular}{|p{0.13\textwidth}|p{0.21\textwidth}|p{0.18\textwidth}|p{0.37\textwidth}|}
-\hline
-\textbf{Parameter} & \textbf{Explanation} &\textbf{Expression/ typical value}& \textbf{Origin} \\
-\hline
-$\Delta t$ & time step & $\Delta x^2$ & Stability criterion FE scheme \\
-\hline
-$\Delta x$ & spatial resolution & $\frac{1}{2}$min(spine neck width) & Estimated; in order for a spine to be 2D, it must connect to at least two PDE mesh points. \\
-\hline
-$Hc$ & Conversion factor & 5-24 & Estimated by calculations of concentration levels taken from \cite{light1996protein} and spine/dendrite volume ratios. See later for discussion. \\
-\hline
-$u(t=0)$ & Initial condition value & 5$\frac{\text{nMol}}{\text{L}}$ & Estimated from values found in \cite{light1996protein}\\
-\hline
-$p_{ds}$ & Probability to diffuse into a spine & $0.1\cdot\Delta x\cdot\Delta t$& Estimated. An important ability of this parameter should be that wide necked spines have larger probability and that a certain flux is maintained (on average), meaning that the flux should be independent of $\Delta t$ \\
-\hline
-$p_{ab}$ & Probability for PKC$\gamma$ to be absorbed, and removed from simulation, per time-step taken in spine head & 100\% & Estimated\\
-\hline
-\end{tabular}
-\caption[Important parameters]{Parameters which play an important role in the simulation of PKC$\gamma$ diffusion into dendritic spines with explanations, expressions/typical values and an indication as to where the value/expression has its origin.}
-\label{table:parameters}
-\end{table}
+As Figure \ref{initial} shows, the concentration of PKC$\gamma$ has units $\frac{\text{nMol}}{\text{L}}$. 
+Craske et.al. measured increases in concentration of around $5\frac{\text{nMol}}{\text{L}}$ in spine heads, which corresponds to $1-2$ proteins once the volume of a spine is taken into account. 
+In fact, by calculating the volume of the dendrite segment we are simulating, the conversion factor has been estimated at $Hc = 5-25$. 
+
+The model should have a few properties in order to be a realistic representation. First of all, if a large number of proteins are located at the junction to a spine, it is more likely that a protein diffuses into the spine. This is ensured by making the probability for a protein to diffuse into a spine to be dependent on the amount of PKC$\gamma$ present at the beginning of the spine neck. 
+
+In order for a spine to be two dimensional, it must cover at least two points of the PDE mesh. This limits the minimal spatial resolution to the minimal neck diameter of a spine, which is $0.22\mu$m \cite{arellano2007ultrastructure}.
+
+Real particles will ``feel'' a concentration gradient, but random walkers do not. As spine heads are filled with proteins, new proteins must therefore be hindered from entering a spine if it is full. 

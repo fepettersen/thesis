@@ -4,7 +4,7 @@ img_extIsRegExp=false
 img_extensions=.eps .jpg .jpeg .png .pdf .ps .fig .gif
 kileprversion=2
 kileversion=2.1.3
-lastDocument=introduction.tex
+lastDocument=discussion.tex
 masterDocument=
 name=thesis
 pkg_extIsRegExp=false
@@ -17,7 +17,7 @@ MakeIndex=
 QuickBuild=
 
 [document-settings,item:analysis.tex]
-Bookmarks=378,365
+Bookmarks=
 Encoding=UTF-8
 FoldedColumns=
 FoldedLines=
@@ -98,10 +98,10 @@ ReadWrite=true
 
 [item:analysis.tex]
 archive=true
-column=97
+column=59
 encoding=UTF-8
 highlight=LaTeX
-line=68
+line=358
 mode=LaTeX
 open=true
 order=4
@@ -118,20 +118,20 @@ order=6
 
 [item:application.tex]
 archive=true
-column=13
+column=90
 encoding=UTF-8
 highlight=LaTeX
-line=79
+line=7
 mode=LaTeX
 open=true
 order=0
 
 [item:discussion.tex]
 archive=true
-column=56
+column=0
 encoding=UTF-8
 highlight=LaTeX
-line=76
+line=17
 mode=LaTeX
 open=true
 order=7
@@ -148,20 +148,20 @@ order=3
 
 [item:results.tex]
 archive=true
-column=16
+column=76
 encoding=UTF-8
 highlight=LaTeX
-line=68
+line=10
 mode=LaTeX
 open=true
 order=5
 
 [item:theory.tex]
 archive=true
-column=14
+column=477
 encoding=UTF-8
 highlight=LaTeX
-line=432
+line=353
 mode=LaTeX
 open=true
 order=2
@@ -178,19 +178,19 @@ order=-1
 
 [item:thesis.tex]
 archive=true
-column=2
+column=49
 encoding=UTF-8
 highlight=LaTeX
-line=77
+line=44
 mode=LaTeX
 open=true
 order=1
 
 [view-settings,view=0,item:analysis.tex]
-CursorColumn=97
-CursorLine=68
+CursorColumn=59
+CursorLine=358
 JumpList=
-ViMarks=a,378,0,b,365,0
+ViMarks=a,408,0,b,408,0
 
 [view-settings,view=0,item:appendix.tex]
 CursorColumn=283
@@ -199,14 +199,14 @@ JumpList=
 ViMarks=
 
 [view-settings,view=0,item:application.tex]
-CursorColumn=13
-CursorLine=79
+CursorColumn=90
+CursorLine=7
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:discussion.tex]
-CursorColumn=56
-CursorLine=76
+CursorColumn=0
+CursorLine=17
 JumpList=
 ViMarks=
 
@@ -217,19 +217,19 @@ JumpList=
 ViMarks=
 
 [view-settings,view=0,item:results.tex]
-CursorColumn=16
-CursorLine=68
+CursorColumn=76
+CursorLine=10
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:theory.tex]
-CursorColumn=14
-CursorLine=432
+CursorColumn=477
+CursorLine=353
 JumpList=
 ViMarks=
 
 [view-settings,view=0,item:thesis.tex]
-CursorColumn=2
-CursorLine=77
+CursorColumn=49
+CursorLine=44
 JumpList=
 ViMarks=

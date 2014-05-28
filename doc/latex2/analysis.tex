@@ -110,16 +110,16 @@ By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe 
 % Error plots for FE in 1D (a) and 2D (b)
  \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_22052014_1327_FE1D_new_plots/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1327_FE1D_new_plots/results/errorplot_pretty.eps}
   \caption{}
   % experiment_22052014_1305_spatial_convergencetest_BE1D
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_22052014_1323_FE2D_new_plots/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1323_FE2D_new_plots/results/errorplot_pretty.eps}
   \caption{}
 % experiment_22052014_1309_spatial_convergencetest_BE1D
  \end{subfigure}
- \caption[Error plots FE]{Error plot for the FE scheme in 1D (a) and 2D (b). Note that there is now only one discretization parameter, called $h$, which is related to the time step by $h = k\Delta t$, where $k$ is a constant.}
+ \caption[Error plots FE]{Error plot for the FE scheme in 1D (a) and 2D (b). All simulations have been run using $\Delta t = \frac{\Delta x^2}{5}$ which fulfills the stability criterion in 1D and 2D.}
  \label{analysis:errorplots:FE}
 \end{figure}
 
@@ -128,11 +128,11 @@ By inserting the limit $t\to\infty$ in \eqref{manufactured_solution} we observe 
 % Error plots for BE in 1D (a) and 2D (b)
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_14052014_0744_errorplot_BE1D/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_14052014_0744_errorplot_BE1D/results/errorplot_pretty.eps}
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_22052014_1317_BE2D_new_plots/results/errorplot.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_22052014_1317_BE2D_new_plots/results/errorplot_pretty.eps}
   \caption{}
  \end{subfigure}
  \caption[Error plots BE]{Error plot for the BE scheme in 1D (a) and 2D (b). Notice that the error is roughly of the same order as the time step. Figures \ref{analysis:errorplots:FE}b and (b) show the same simulation using FE and BE schemes in 2D. The error is slightly larger in the BE discretization by a factor of 4.}
@@ -148,27 +148,31 @@ To cope with this problem a single discretization parameter, $h$, is introduced 
  \frac{\Delta t}{\Delta x^2} = k
 \end{equation*}
 where $k$ is a constant. 
-$\epsilon(t)$ can now be rewritten by setting $\Delta t = h$
+The error term from \eqref{analysis:error} can now be rewritten by setting $\Delta t = h$;
 \begin{align*}
  \epsilon(t) &= C_t h + C_x\frac{h}{k} \\
- &= (C_t +C_x/k)h = C_k h^r
+ &= (C_t +C_x/k)h \\
+ &= C_k h^r
 \end{align*}
-$r$ is expected to converge to one. 
-Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order. 
+where $r$ is still expected to converge to one.  \\
+
+\noindent Figures \ref{analysis:convergence_tests:FE} and \ref{analysis:convergence_tests:BE} verify that the error associated with the time derivative is of the expected order. 
+
 In Figure \ref{analysis:spatial_convergence_tests} the error from the spatial derivative has been isolated, and tested for both schemes. 
+The error term associated with the spatial derivative is of second order, as seen in \eqref{analysis:error}. A second order error term is expected to have second order convergence.
 
 \begin{figure}[h]
 % Convergence tests for FE in 1D (a) and 2D (b)
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/ConvergenceTest.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/ConvergenceTest_pretty.eps}
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_29112013_1709/results/ConvergenceTest.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_27052014_1152_FE2D_new_convergence_time/results/ConvergenceTest.eps}
   \caption{}
  \end{subfigure}
- \caption[Convergence tests in time FE scheme]{Convergence tests with respect to the time derivative for the FE scheme in 1D (a) and 2D (b). }
+ \caption[Convergence tests in time FE scheme]{Convergence tests with respect to the single discretization parameter, $h$, for the FE scheme in 1D (a) and 2D (b). }
  \label{analysis:convergence_tests:FE}
 \end{figure}
 
@@ -219,12 +223,12 @@ Discretization of the diffusion equation by the FE scheme yields the following n
  u^{n+1} = D\Delta t u^n_{xx} + u^n
 \end{equation}
 where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$. 
-\eqref{analysis:simplified_FE_scheme} is a difference equation, which is most easily solved by writing out the first four iterations
+\eqref{analysis:simplified_FE_scheme} is a difference equation, which is most easily solved by writing out the first four iterations and finding a pattern
 % To illustrate how the equation is solved by the computer, the first four iterations are written out
 \begin{align*}
  u^1 &= D\Delta t\, u_{xx}^0 + u^0 \\
  u^2 &= D\Delta t\, u_{xx}^1 + u^1 \\
- &= D\Delta t\left[D\Delta t u_{4x}^0 + u_{2x}^0\right] + u^0\\
+ &= D\Delta t\left[D\Delta t u_{4x}^0 + u_{2x}^0\right] + D\Delta t\, u_{xx}^0 +u^0\\
  &= \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0 \\
  u^3 &= D\Delta t\, u_{xx}^2 + u^2 \\
  &= D\Delta t\left[\left(D\Delta t\right)^2 u_{6x}^0 + 2D\Delta t u_{4x}^0+ u_{2x}^0\right] + \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0\\
@@ -246,7 +250,7 @@ The spatial derivatives are found by inserting the initial condition into the ce
  u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
  &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
  u^0_{4x} &= [u^0_{xx}]_{xx} \frac{1}{\Delta x^2}\left[\frac{u^0_{xx}}{\cos(\pi x)}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
- &= \frac{4}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
+ &= \frac{4}{\Delta x^4}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
  &\dots
 \end{align*}
 The pattern continues allowing the final numerical exact solution to be expressed below.
@@ -300,7 +304,7 @@ As was the case in 1D, the error is larger than machine precision, but much smal
   \label{numerical_exact_FE:2D}
  \end{subfigure}
  \caption[Numerical exact error plots FE]{Numerical solution from the FE scheme in 1D (a) and 2D (b) versus the exact numerical solution of the FE scheme.
- Some of the terms in the numerical exact solutions are ignored to prevent overflow and this is responsible for the increasing error which is slightly larger than machine precision.}
+ Some of the terms in the numerical exact solutions are ignored to prevent overflow and these are responsible for the increasing error which is slightly larger than machine precision.}
  \label{numerical_exact_FE}
 \end{figure}
 
@@ -308,23 +312,23 @@ As was the case in 1D, the error is larger than machine precision, but much smal
 \subsection{Verification of BE scheme by exact numerical solution}
 
 The exact numerical solution to the BE scheme is found by solving the linear system which arises from the discretization (see Section \ref{theory:section:BE2D}). 
-Given the $n$'th time step, the next time step is found by
+Given the $k$'th time step, the next time step is found by
 
 \begin{align*}
- \mathbf M \mathbf u^{n+1} &= \mathbf{u}^n \\
- \mathbf{u}^{n+1} &= \mathbf{M}^{-1} \mathbf{u}^n \\
- &= \mathbf{M}^{-1}\left(\mathbf{M}^{-1} \mathbf{u}^{n-1}\right)
+ \mathbf M \mathbf u^{k+1} &= \mathbf{u}^n \\
+ \mathbf{u}^{k+1} &= \mathbf{M}^{-1} \mathbf{u}^k \\
+ &= \mathbf{M}^{-1}\left(\mathbf{M}^{-1} \mathbf{u}^{k-1}\right)
 \end{align*}
 
 \noindent Doing the separation to the end relates the $n$'th time step to the initial condition
 \begin{equation}\label{BE_numex}
- \vec u^{n} = \left(\mathbf M^{-1}\right)^{n} \vec u^0
+ \vec u^{k} = \left(\mathbf M^{-1}\right)^{k} \vec u^0
 \end{equation}
 
-\noindent Where $\left(\mathbf M^{-1}\right)^{n}$ is the inverse of $\mathbf M$ to the $n$'th power.\\
+\noindent Where $\left(\mathbf M^{-1}\right)^{k}$ is the inverse of $\mathbf M$ to the $k$'th power.\\
 
 \noindent Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
-Doing calculations with such a matrix gives a lot of round off errors which will reduce the accuracy of the numerical exact. 
+Doing calculations with such a matrix results in a lot of round off errors which will reduce the accuracy of the numerical exact. 
 The error should theoretically be machine precision, but is expected, to at least, be much smaller than $\Delta t$. 
 Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}. 
 Though computationally intensive, the numerical exact solution for the BE scheme has none of the limitations that were found for the FE scheme. 
@@ -360,6 +364,7 @@ In order to carry out the tests, a new initial condition that can easily be recr
            0\;\;x < a
           \end{cases}
 \end{equation}
+
 \noindent The new initial condition gives a new exact solution which is found by separation of variables and Fourier series as 
 \begin{equation}
  u(x,t) = \frac{1}{2} + 2\sum\limits_{n= \text{odd}}^\infty \frac{(-1)^{\frac{n-1}{2}}}{n\pi}e^{-(n\pi)^2t}\cos(n\pi x)
@@ -384,6 +389,12 @@ Stochastic effects causes the error to fluctuate around a certain value rather t
 \caption[]{Error plot (a) and convergence test (b) for 1D RW solver using a Heaviside step function as initial condition. In these tests both the time step and the conversion factor are changed for each simulation, and the conversion factor follows the previously proposed limit $Hc\geq\frac{1}{\Delta t^2}$. For each $\Delta t$ the RW simulation does 250 steps with a step length calculated from \eqref{theory:step_length}. The expected convergence rate is $0.5$, and to some extent this is achieved here. Note, however, that due to fluctuations in the solution, getting a good error measure is difficult and beyond our control.}
  \label{ConvergenceTestRW:dt}
 \end{figure}
+% \begin{figure}[h]
+%  \centering
+%  \includegraphics[scale=0.4]{Figures/unit_step.eps}
+%  \caption{Heaviside step function}
+%  \label{heaviside}
+% \end{figure}
 \begin{figure}[h]
  \centering
  \begin{subfigure}[t]{0.48\textwidth}
@@ -398,23 +409,32 @@ Stochastic effects causes the error to fluctuate around a certain value rather t
 \clearpage
 
 \section{Verification of the hybrid solver}
-
-The hybrid diffusion solver is a combination of the PDE and RW solvers, which means that the error term for the hybrid model is described by 
-\begin{equation}
- \epsilon(t) = C_t \Delta t + C_x \Delta x^2 + \frac{C_{RW}}{\sqrt{Hc}}
-\end{equation}
-where $C_{RW}$ is an unknown stochastic quantity.\\
-
 \noindent This section aims to achieve first order convergence in time for the hybrid solver by introducing a sufficient number of walkers. 
 Effects of varying the number of mesh points affected by the RW solver will also be illustrated. \\
 
-The number of walkers needed to achieve first order convergence in time for the hybrid solver is governed by 
+The hybrid diffusion solver is a combination of the PDE and RW solvers, which means that the error term for the hybrid model is described by 
+\begin{equation}\label{analysis:hybrid_errorterm}
+ \epsilon(t) = C_t \Delta t + C_x \Delta x^2 + \frac{C_{RW}}{\sqrt{Hc}}
+\end{equation}
+where $C_{RW}$ is an unknown stochastic coefficient.\\
+
+\noindent From \eqref{analysis:hybrid_errorterm} it is clear that the error term from the RW solver is dominant, as it is of order $r=0.5$. 
+In order to achieve first order convergence, a limitation must be placed on the conversion rate. 
+Assuming that the spatial error term is negligible: 
+
+\begin{align}
+ \epsilon(t) &= C_t \Delta t + \underbrace{C_x \Delta x^2}_{\approx 0} + \frac{C_{RW}}{\sqrt{Hc}}\\
+ \mathcal O(\Delta t) &\approx C_t \Delta t + \frac{C_{RW}}{\sqrt{Hc}} \\
+ &\implies  \frac{1}{\sqrt{Hc}} \leq \Delta t
+\end{align}
+Which finally gives the restriction on the conversion rate
 \begin{equation}\label{analysis:Hc_limitation}
  Hc\geq\frac{1}{\Delta t^2}
 \end{equation}
 
-\noindent The stability criterion for the FE scheme limits the size of the time step, and by \eqref{analysis:Hc_limitation} vastly increases the conversion rate. 
-All tests will be done with the BE scheme in order to reduce the demand for walkers and get a reasonable performance. \\
+\noindent By \eqref{analysis:Hc_limitation} the time step should be as large as possible in order to limit the number of walkers and achieve a reasonable computational performance. 
+The FE scheme has a strict limitation on the time step from the stability criterion, making the BE scheme desirable. 
+For this reason all tests will be done with the BE scheme. \\
 Figure \ref{combined_BE1d} shows first order convergence for the hybrid model.
 
 \begin{figure}[H]
@@ -442,12 +462,12 @@ Decreasing or increasing the relative size of the microscopic model has serious 
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{../results/experiment_16042014_1139_convergence_tests_etc/results/errorplot.eps}
- \caption{Having walkers on 5\% of the mesh points.}
+ \caption{Walkers on 5\% of the mesh points.}
  \label{errorplot_BE1D_walk_5_percent}
 \end{subfigure}
 \begin{subfigure}[b]{0.48\textwidth}
  \includegraphics[width=\textwidth]{../results/experiment_16042014_1202_tests_35percent_walkers/results/errorplot.eps}
- \caption{Having walkers on 35\% of the mesh points.}
+ \caption{Walkers on 35\% of the mesh points.}
  \label{errorplot_BE1D_walk_35_percent}
 \end{subfigure}
 \caption[Effects of increasing relative size of walk area]{The effect of increasing the size of the walk area for a fixed $\Delta t = 0.05$ and $\Delta x = 0.01$ using the BE discretization.}

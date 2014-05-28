@@ -267,7 +267,7 @@ For a 2D simulation on a $100\times 100$ mesh, the full assembled matrix will ha
 The total size of the matrix in RAM will be $8\cdot10^8$ bytes, which is getting close to the available RAM of a normal computer at  $\sim 8\cdot10^9$ bytes. 
 In comparison, storing only the non zero entries requires three vectors of size $100$ which contain $100\times100$ matrices. A total of $24\cdot10^6$ bytes, or a factor $100$ less. 
 Effectively, the memory impact is also reduced from $8\cdot n^{2d}$ bytes to $8\cdot n^{2d-1}$ bytes by switching to the block tridiagonal solver. 
-\emph{\textcolor{red}{There might still room for improvement since all the stored matrices are sparse.}}
+
 
 \section{Combining micro and macro scale models}
 
@@ -349,7 +349,10 @@ Since time does not allow for this to be implemented and tested it will be left 
 Physically a negative concentration does not make sense, but if an initial condition which takes negative values is imposed on the system the software will try to allocate a negative number of walkers. 
 Trying to handle this is more of an oddity than anything else, but a workaround has been found. 
 If the absolute value of the negative concentration is taken as input to the RW solver and the sign at each mesh point is stored while the RW solver advances the system, the resulting solution can be multiplied by the stored sign to give back a negative concentration. 
-The workaround will at least keep the simulation from crashing, but has a fundamental problem which is illustrated in Figure \ref{theory:signmap_illustration}.
+The workaround will at least keep the simulation from crashing, but has a fundamental problem. 
+
+Figure \ref{theory:signmap_illustration}a shows how a negative concentration is converted to a positive concentration by taking the absolute value. This results in an abrupt change where the original function, $u(x,t)$, crossed the x-axis. Seeing as a diffusion process very efficiently evens out abrupt changes, the point where $u(x,t)$ crossed the x-axis will get an increased value. As Figure \ref{theory:signmap_illustration}b shows, this point should remain equal to zero.
+
   
 \begin{figure}[H]
 \centering
