@@ -1,10 +1,10 @@
-Diffusion processes are extremely important in modern science, and have so many applications that it is hard to list them all. 
+Diffusion processes are extremely important in modern science, and have so many applications that it is challenging to list them all. 
 Brownian motion of particles, momentum in liquids, and atomic diffusion are just some examples of processes described by the diffusion equation. \\
 \noindent Both in general transport processes, and particularly in diffusion processes, there are cases in which parts of the process cannot be described by a continuum model, but the rest of the process can. 
-Examples of such processes are fluid flow in nanoporous media and diffusion in the extracellular space of the brain. There are also many applications in materials design.
+Examples of such processes are fluid flow in nanoporous media and diffusion in the extracellular space of the brain. There are also many examples in materials design.
 
 \noindent These types of processes can be called multi scale processes in the sense that more than one model is required to describe the entire system. Usually these are on different length scales. 
-There are at least three ways to handle multi scale problems. 
+There are three obvious ways to handle multi scale problems. 
 The first alternative is to ignore the problem, and assume that the chosen model can accurately solve the problem. For diffusion processes, this approach often works a lot better than it should. 
 A more realistic approach is to create an intermediate scale and model. In the limit between continuum and particle dynamics this is often called a \emph{meso scale} model. 
 An example of a meso scale model is dissipative particle dynamics \cite{warren1998dissipative}, where clusters of particles are modeled as individual particles. The particle clusters have different properties than the individual atoms or molecules which make up the substance. 
@@ -22,7 +22,7 @@ Both individually and for the combined, hybrid solver to verify the average beha
 \section{Outline}
 \noindent The thesis in your hands has the following structure: \\
 
-\noindent \emph{Chapter \ref{chapter:theory}} contains a detailed look at the coupling between the two models, as well as a look at band diagonal linear systems. \\
+\noindent \emph{Chapter \ref{chapter:theory}} contains a detailed review of the coupling between the two models, as well as a look at band diagonal linear systems. \\
 
 \noindent \emph{Chapter \ref{chapter:analysis}} defines the error estimate and shows a thorough analysis of all parts of the developed software in order to verify that it functions properly. \\
 

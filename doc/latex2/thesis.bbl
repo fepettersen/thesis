@@ -16,6 +16,30 @@
   {}
 \endgroup
 
+\entry{abramowitz2012handbook}{book}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Abramowitz}{A.}%
+     {Milton}{M.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Stegun}{S.}%
+     {Irene~A}{I.~A.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Courier Dover Publications}%
+  }
+  \strng{namehash}{AMSIA1}
+  \strng{fullhash}{AMSIA1}
+  \field{sortinit}{A}
+  \field{title}{{Handbook of mathematical functions: with formulas, graphs, and
+  mathematical tables}}
+  \field{year}{2012}
+\endentry
+
 \entry{arellano2007ultrastructure}{article}{}
   \name{author}{4}{}{%
     {{}%
@@ -52,6 +76,25 @@
   \field{volume}{1}
   \field{journaltitle}{Frontiers in neuroscience}
   \field{year}{2007}
+\endentry
+
+\entry{boas2006mathematical}{book}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Boas}{B.}%
+     {Mary~L}{M.~L.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {John Wiley \& Sons., Inc}%
+  }
+  \strng{namehash}{BML1}
+  \strng{fullhash}{BML1}
+  \field{sortinit}{B}
+  \field{chapter}{8}
+  \field{title}{{Mathematical Methods in the Physical Sciences}}
+  \field{year}{2006}
 \endentry
 
 \entry{craske2005spines}{article}{}

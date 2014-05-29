@@ -1,14 +1,14 @@
 \noindent This chapter will summarize and discuss the results from chapters \ref{chapter:analysis} and \ref{chapter:application}.
 
 \section{Results of verification}
-
+The plots that are discussed in this section can be found in chapter \ref{chapter:analysis}.
 
 \subsection{The FE scheme}
 Although not all of the results from verification of the FE scheme are perfect, the results from testing the exact numerical solution are very good. 
 The numerical exact solution test is a verification of the implementation of the FE scheme. 
 A successful test indicates that the scheme is correct and will solve the diffusion equation to the expected accuracy. 
 Both the error plots from section \ref{analysis:section_manufactured_solution} and the spatial convergence test are very close to perfect, further suggesting a correct implementation. 
-When the general convergence tests for the FE scheme could be better (Figure \ref{analysis:convergence_tests:FE}), it is most likely due to other effects. \\
+While the general convergence tests for the FE scheme could be better (Figure \ref{analysis:convergence_tests:FE}), it is most likely due to other effects. \\
 Considering that two out of three tests are close to perfect, the FE scheme is deemed correctly implemented within the limits of the applied tests.
 
 \subsection{The BE scheme and the block tridiagonal solver}
@@ -37,11 +37,11 @@ As Figure \ref{combined_BE1d:convergence} shows this was achieved, and the hybri
 
 Effects of varying the relative size of the RW area were also illustrated. 
 The result of increasing the portion of the PDE mesh affected by an RW model is clearly a larger error term overall, while decreasing the size of the RW area significantly improves the error term. 
-All of this is expected since more fluctuations are introduced.
+All of this is expected since more fluctuations are introduced by the RW solver.
 
 \section{Results for physical application}
 
-Craske et.al. suggest that the neck of spines act as diffusion barriers which slow down, but don't completely stop the diffusion of PKC$\gamma$ into spines. 
+Craske et.al. \cite{craske2005spines} suggest that the neck of spines act as diffusion barriers which slow down, but don't completely stop the diffusion of PKC$\gamma$ into spines. 
 The function of this barrier is a bit unclear, but the presence of it is undisputed. 
 In their measurements they found a delay of around $5-10$ seconds from elevated concentration levels in the dendrite until a similarly elevated concentration level occurred in spines with necks longer than $0.5\mu$m. 
 Using parameter values which resemble the values found in actual (rodent) neurons and neurites in the developed software, the observed delay-times have been recreated. 
@@ -69,7 +69,7 @@ Seeing as there are no additional complexities added to the RW model we can assu
 \begin{figure}[h]
  \centering
  \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
- \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Craske et.al. and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
+ \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Craske et.al. \cite{craske2005spines} and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
  \label{results:boxplot_relative_diffusiontime_long_neck}
 \end{figure}
 

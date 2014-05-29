@@ -75,7 +75,7 @@
 	journal = "Journal of Statistical Software",
 	number = "14",
 	pages = "1--6",
-	title = "{Xorshift rngs}",
+	title = "{Xorshift RNGs}",
 	volume = "8",
 	year = "2003"
 }
@@ -133,5 +133,16 @@
 	title = "{Protein kinase C$\gamma$ (PKC$\gamma$): function of neuron specific isotype}",
 	volume = "132",
 	year = "2002"
+}
+
+@article{warren1998dissipative,
+	author = "Warren, Patrick B",
+	journal = "Current opinion in colloid \& interface science",
+	number = "6",
+	pages = "620--624",
+	publisher = "Elsevier",
+	title = "{Dissipative particle dynamics}",
+	volume = "3",
+	year = "1998"
 }
 

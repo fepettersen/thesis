@@ -16,9 +16,9 @@ Spines are (often) the receiving end of a chemical synapse, which is a junction 
 \noindent This application will look at diffusion of PKC$\gamma$ in a segment of an apical dendrite and into dendritic spines. 
 PKC$\gamma$ is a protein found in neurons which is associated with memory storage and associative learning \cite{saito2002protein}. 
 Upon activation it will diffuse out of the Soma, through a dendrite, and into a dendritic spine to reinforce or reduce the absorption of neurotransmitters. 
-The results will be compared to results by Craske et.al \cite{craske2005spines}, who in 2005 studied a similar problem in rodent pyramidal neurons harvested from the hippocampus.
 
 Effectively we will investigate the diffusion time for random walkers through spine necks which are very narrow ($\leq0.5\mu$m). Spine necks are thought to act as diffusion barriers which hinder, but do not stop diffusion \cite{craske2005spines}.
+The results will be compared to results by Craske et.al \cite{craske2005spines}, who in 2005 studied a similar problem in rodent pyramidal neurons harvested from the hippocampus.
 
 \section{Implementation}
 
@@ -64,7 +64,7 @@ The modified initial condition places a small amount of PKC$\gamma$ over the ent
 \noindent The result of using this new initial condition is simply that approximately $3$ seconds can be added to all the measured times. \\
 
 As Figure \ref{initial} shows, the concentration of PKC$\gamma$ has units $\frac{\text{nMol}}{\text{L}}$. 
-Craske et.al. measured increases in concentration of around $5\frac{\text{nMol}}{\text{L}}$ in spine heads, which corresponds to $1-2$ proteins once the volume of a spine is taken into account. 
+Craske et.al. \cite{craske2005spines} measured increases in concentration of around $5\frac{\text{nMol}}{\text{L}}$ in spine heads, which corresponds to $1-2$ proteins once the volume of a spine is taken into account. 
 In fact, by calculating the volume of the dendrite segment we are simulating, the conversion factor has been estimated at $Hc = 5-25$. 
 
 The model should have a few properties in order to be a realistic representation. First of all, if a large number of proteins are located at the junction to a spine, it is more likely that a protein diffuses into the spine. This is ensured by making the probability for a protein to diffuse into a spine to be dependent on the amount of PKC$\gamma$ present at the beginning of the spine neck. 

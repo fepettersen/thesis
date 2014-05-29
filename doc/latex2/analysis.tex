@@ -11,19 +11,19 @@ Solving PDEs numerically will result in errors because derivatives are approxima
 % Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. 
 
 The error, $\epsilon$, is measured by comparing the result from a numerical simulation to an exact solution, $u_e$ and taking the norm of the difference. 
-Specifically $\epsilon$ is measured by the L2 norm which is defined in \eqref{analysis:def_epsilon}
+Specifically $\epsilon$ is measured by the L2 norm which is defined in \eqref{analysis:def_epsilon}:
 % \label{analysis:def_epsilon}
 \begin{align}
- \epsilon(t^n) &= ||u(t^n)-u_e(t^n)||_2 \nonumber \\
- &= \iint\sqrt{\left(u(t^n,x,y)-u_e(t^n,x,y)\right)^2}\,dx\,dy \nonumber \\
- &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^n\sum\limits_{i=0}^n \left(u(t^n,x_i,y_j)-u_e(t^n,x_i,y_j)\right)^2}\label{analysis:def_epsilon}
+ \epsilon(t^k) &= ||u(t^k)-u_e(t^k)||_2 \nonumber \\
+ &= \iint\sqrt{\left(u(t^k,x,y)-u_e(t^k,x,y)\right)^2}\,dx\,dy \nonumber \\
+ &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^k\sum\limits_{i=0}^k \left(u(t^k,x_i,y_j)-u_e(t^k,x_i,y_j)\right)^2}.\label{analysis:def_epsilon}
  \end{align}
  
 \noindent A time dependent error estimate has been chosen because it allows for investigation of the evolution of the error over the course of a simulation.
 Some of the error tests will require a single number as an error measure. 
-In these cases the norm of $\epsilon(t)$, shown below, is used.
+In these cases the norm of $\epsilon(t)$, shown below, is used:
 \begin{equation}\label{analysis:convergence_test_error}
- \epsilon = \sqrt{\Delta t\sum\limits_{n=0}^T\epsilon(t^n)^2}
+ \epsilon = \sqrt{\Delta t\sum\limits_{k=0}^T\epsilon(t^k)^2}.
 \end{equation}
 
 \section{Verification techniques}
@@ -41,14 +41,14 @@ The verification techniques that will be carried out are:
 \begin{itemize}
  \item Manufactured solutions\\
  By adjusting the source term, $s(x,t)$, one can, in principle, choose any solution to the diffusion equation. 
-Should we, for example, want the solution to be $u(x,t) = \frac{1}{x+1}$, all that is needed is to set the source term equal to $-D\frac{\d^2 u}{\d x^2}$
+Should we, for example, want the solution to be $u(x,t) = \frac{1}{x+1}$, all that is needed is to set the source term equal to $-D\frac{\d^2 u}{\d x^2}$;
 \begin{equation*}
-s(x,t) = \frac{2D}{(x+1)^3}
+s(x,t) = \frac{2D}{(x+1)^3},
 \end{equation*}
 and the problem is solved (as long as the boundary conditions are correct).
  For the verifiation that follows, the chosen solution is
  \begin{equation}\label{manufactured_solution}
-  u(x,y,t) = e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1
+  u(x,y,t) = e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1,
  \end{equation}
  which requires no source term and fulfills the zero flux boundary conditions naturally. 
   The point of these tests is to verify that $\epsilon \sim \Delta t$ and the tests can be done for a time step which fulfills the stability criterion.
@@ -56,19 +56,19 @@ and the problem is solved (as long as the boundary conditions are correct).
 %   In the general case the error term is proportional to the time step to some power $r$ when the error from the time derivative is dominant.
  For the schemes used in this thesis the error term is described by
 \begin{equation}\label{analysis:error}
- \epsilon = C_x\Delta x^2 + C_t\Delta t^1
+ \epsilon = C_x\Delta x^2 + C_t\Delta t^1,
 \end{equation}
 where the coefficients $C_x$ and $C_t$ are unknown. 
 Notice that there is one term arising from the time derivative and one from the spatial derivative and that they are of different order. \\
 Where possible, convergence will be tested by isolating one of the error terms. For example, setting $\Delta t \gg \Delta x^2$, implies $C_x\Delta x^2\approx0$ and 
 $$
-\epsilon \propto \Delta t^r
+\epsilon \propto \Delta t^r,
 $$
 where $r=1$. 
 As $\Delta t$ tends to zero, $r$ is expected to converge to one, and that is the purpose of these tests. 
 By comparing the error from two simulations with different time steps, the convergence rate, $r$, can be measured from 
  \begin{align*}
-   r&\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}
+   r&\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}.
 \end{align*}
 Notice that a single number must be used to describe the error, as shown in \eqref{analysis:convergence_test_error}.
 
@@ -145,14 +145,14 @@ The convergence tests are done by isolating the error term from either the time 
 However, for the FE scheme it is impossible to isolate the error from the time derivative without violating the stability criterion. 
 To cope with this problem a single discretization parameter, $h$, is introduced by ensuring  
 \begin{equation*}
- \frac{\Delta t}{\Delta x^2} = k
+ \frac{\Delta t}{\Delta x^2} = k,
 \end{equation*}
 where $k$ is a constant. 
 The error term from \eqref{analysis:error} can now be rewritten by setting $\Delta t = h$;
 \begin{align*}
  \epsilon(t) &= C_t h + C_x\frac{h}{k} \\
  &= (C_t +C_x/k)h \\
- &= C_k h^r
+ &= C_k h^r,
 \end{align*}
 where $r$ is still expected to converge to one.  \\
 
@@ -218,9 +218,9 @@ The error term associated with the spatial derivative is of second order, as see
 
 \subsection{Verification of FE scheme by exact numerical solution}\label{exact_numerical_solution}
 
-Discretization of the diffusion equation by the FE scheme yields the following numerical scheme in 1D
+Discretization of the diffusion equation by the FE scheme yields the following numerical scheme in 1D:
 \begin{equation}\label{analysis:simplified_FE_scheme}
- u^{n+1} = D\Delta t u^n_{xx} + u^n
+ u^{k+1} = D\Delta t u^k_{xx} + u^k,
 \end{equation}
 where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$. 
 \eqref{analysis:simplified_FE_scheme} is a difference equation, which is most easily solved by writing out the first four iterations and finding a pattern
@@ -237,9 +237,9 @@ where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$.
  &= \left(D\Delta t\right)^4 u_{8x}^0 + 4\left(D\Delta t\right)^3 u_{6x}^0+ 6\left(D\Delta t\right)^2 u_{4x}^0 + 4D\Delta t u_{2x}^0 + u^0 
 \end{align*}
 
-\noindent From the iterations above a pattern can be recognized for iteration $n+1$\\
+\noindent From the iterations above a pattern can be recognized for iteration $k+1$:\\
 \begin{equation}
- u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^iu^0_{2ix}
+ u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^iu^0_{2ix}
 \end{equation}
 where $u^0$ is the initial condition
 \begin{equation}
@@ -255,21 +255,21 @@ The spatial derivatives are found by inserting the initial condition into the ce
 \end{align*}
 The pattern continues allowing the final numerical exact solution to be expressed below.
 \begin{equation}\label{numerical_solution}
-  u^{n+1} = \sum\limits_{i=0}^n {n\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x)
+  u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x)
 \end{equation}
 By construction the Neumann boundary conditions are fulfilled since $\frac{\d \cos(\pi x)}{\d x} = -\pi\sin(\pi x)$ and $\sin(0) = \sin(\pi) = 0$. \\
 
 Although the FE scheme is expected to reproduce \eqref{numerical_solution} to machine precision ($\epsilon \approx 10^{-16}$) there are two problems with the solution which will have an effect on the error:
 \begin{itemize}
  \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. Testing if $\Delta x^{2i}>0$ and returning zero if the test fails will fix the problem. The argumentation for ignoring the troublesome terms is given below.
- \item ${n\choose i}$ goes to infinity for large $n$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $n!>10^{308}$ for $n>170$.
+ \item ${k\choose i}$ goes to infinity for large $k$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $k!>10^{308}$ for $k>170$.
 \end{itemize}
 
 As a side note, \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
-In the numerical exact solution, the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^n$.
+In the numerical exact solution, the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^k$.
 This amplification factor can be found in equation \eqref{numerical_solution} as 
 \begin{equation}
-A^n = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i
+A^k = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i
 \end{equation}
 Inserting a time step larger than $\frac{\Delta x^2}{2D}$ will make the amplification factor, $A$, larger than one, which in turn makes the solution blow up. \\
 
@@ -283,7 +283,7 @@ $$ \frac{1}{\Delta x^{2i}} \to \infty$$
  
 \noindent Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme. 
  \begin{equation}\label{exact_numerical_solution_2d}
- u^{n+1} = \sum\limits^n_{i=0}{n\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
+ u^{k+1} = \sum\limits^k_{i=0}{k\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
 \end{equation}
 
 The same problems as in the 1D case will apply to \eqref{exact_numerical_solution_2d} with the same solutions. 
@@ -303,7 +303,7 @@ As was the case in 1D, the error is larger than machine precision, but much smal
   \caption{}
   \label{numerical_exact_FE:2D}
  \end{subfigure}
- \caption[Numerical exact error plots FE]{Numerical solution from the FE scheme in 1D (a) and 2D (b) versus the exact numerical solution of the FE scheme.
+ \caption[Numerical exact error plots FE]{Error plots for the FE scheme in 1D (a) and 2D (b) when comparing with the numerical exact solution.
  Some of the terms in the numerical exact solutions are ignored to prevent overflow and these are responsible for the increasing error which is slightly larger than machine precision.}
  \label{numerical_exact_FE}
 \end{figure}
@@ -322,13 +322,13 @@ Given the $k$'th time step, the next time step is found by
 
 \noindent Doing the separation to the end relates the $n$'th time step to the initial condition
 \begin{equation}\label{BE_numex}
- \vec u^{k} = \left(\mathbf M^{-1}\right)^{k} \vec u^0
+ \vec u^{k} = \left(\mathbf M^{-1}\right)^{k} \vec u^0,
 \end{equation}
 
-\noindent Where $\left(\mathbf M^{-1}\right)^{k}$ is the inverse of $\mathbf M$ to the $k$'th power.\\
+\noindent where $\left(\mathbf M^{-1}\right)^{k}$ is the inverse of $\mathbf M$ to the $k$'th power.\\
 
 \noindent Taking the inverse of $\mathbf M$ will result in a dense matrix where a lot of the entries are close to zero (e.g. $10^{-20}$). 
-Doing calculations with such a matrix results in a lot of round-off errors which will reduce the accuracy of the numerical exact. 
+Doing calculations with such a matrix results in a lot of round-off errors which will reduce the accuracy of the numerical exact solution. 
 The error should theoretically be machine precision, but is expected to at least, be much smaller than $\Delta t$. 
 Errors from both 1D and 2D simulations are shown in Figure \ref{numex:BE_errorplot}. 
 Though computationally intensive, the numerical exact solution for the BE scheme has none of the limitations that were found for the FE scheme. 
@@ -356,7 +356,7 @@ In order to carry out the tests, a new initial condition that can easily be recr
 \begin{equation}
  u(t=0,x) = H\left(x-\frac{1}{2}\right)
 \end{equation}
-\noindent Where $H(x)$ denotes the Heaviside step function, which is defined by its properties
+\noindent Where $H(x)$ denotes the Heaviside step function \cite{abramowitz2012handbook}, which is defined by its properties
 \begin{equation}\label{Heaviside_def}
  H(x-a) = \begin{cases}
            1\;\;x > a\\
@@ -414,7 +414,7 @@ Effects of varying the number of mesh points affected by the RW solver will also
 
 The hybrid diffusion solver is a combination of the PDE and RW solvers, which means that the error term for the hybrid model is described by 
 \begin{equation}\label{analysis:hybrid_errorterm}
- \epsilon(t) = C_t \Delta t + C_x \Delta x^2 + \frac{C_{RW}}{\sqrt{Hc}}
+ \epsilon(t) = C_t \Delta t + C_x \Delta x^2 + \frac{C_{RW}}{\sqrt{Hc}},
 \end{equation}
 where $C_{RW}$ is an unknown stochastic coefficient.\\
 
@@ -425,11 +425,11 @@ Assuming that the spatial error term is negligible:
 \begin{align}
  \epsilon(t) &= C_t \Delta t + \underbrace{C_x \Delta x^2}_{\approx 0} + \frac{C_{RW}}{\sqrt{Hc}}\\
  \mathcal O(\Delta t) &\approx C_t \Delta t + \frac{C_{RW}}{\sqrt{Hc}} \\
- &\implies  \frac{1}{\sqrt{Hc}} \leq \Delta t
+ &\implies  \frac{1}{\sqrt{Hc}} \leq \Delta t.
 \end{align}
 Which finally gives the restriction on the conversion rate
 \begin{equation}\label{analysis:Hc_limitation}
- Hc\geq\frac{1}{\Delta t^2}
+ Hc\geq\frac{1}{\Delta t^2}.
 \end{equation}
 
 \noindent By \eqref{analysis:Hc_limitation} the time step should be as large as possible in order to limit the number of walkers and achieve a reasonable computational performance. 
