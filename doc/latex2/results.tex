@@ -49,6 +49,12 @@ Figure \ref{results:spine_diffusion_stats} shows plots of the observed diffusion
 This figure shows a clear trend for longer diffusion times as the neck length of the spine increases. 
 Figure \ref{results:boxplot_relative_diffusiontime_long_neck} further supports this claim and implies the average diffusion time for PKC$\gamma$ into long necked spines to be in accordance with the results from Craske et.al.
 Seeing as there are no additional complexities added to the RW model we can assume that the spine neck does in fact function as a diffusion barrier.
+\begin{figure}[h]
+ \centering
+ \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
+ \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Craske et.al. \cite{craske2005spines} and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
+ \label{results:boxplot_relative_diffusiontime_long_neck}
+\end{figure}
 
 \begin{figure}[h]
  \centering
@@ -62,18 +68,25 @@ Seeing as there are no additional complexities added to the RW model we can assu
  \caption{Relative diffusion times.}
  \label{results:spine_diffusion_stats:reltime}
 \end{subfigure}
-\caption[Diffusion times with least squares fit]{Absolute (a) and relative (b) diffusion times into spines. The lines represent a least squares fit of the results. This least squares fit should have been done after removing outliers and should have an expression written out somewhere.}
+\caption[Diffusion times with least squares fit]{Absolute (a) and relative (b) diffusion times into spines with outliers removed from the data. Outliers are the observations illustrated by crosses in Figure \ref{results:boxplot_relative_diffusiontime_long_neck}. The lines represent a least squares fit of the results. For (a) the least squares fit is $y\approx 0.0346x +0.4424$, where $y$ is the diffusion time and $x$ is the neck length of the spine. For (b) the least squares fit is $y\approx 0.0249x+ 0.4189$. }
 \label{results:spine_diffusion_stats}
 \end{figure}
 
-\begin{figure}[h]
- \centering
- \includegraphics[scale=0.5]{Figures/spine_stats_boxplot_reltime_longneck.eps}
- \caption[Diffusion time for long necked spines]{Boxplot of the relative diffusion times (time between elevated concentration in dendrite and elevated concentration in spine head) into spines with necks longer than $0.5\mu$m. Similar studies were done by Craske et.al. \cite{craske2005spines} and found diffusion time (unclear whether relative or not) to be somewhere around 5-10 seconds.}
- \label{results:boxplot_relative_diffusiontime_long_neck}
-\end{figure}
 
 Through the simulations it became apparent that there must be some sort of limiting factor which limits the number of PKC$\gamma$ particles that are let into the spine. 
 In real life this is achieved by a concentration gradient which tends to zero (or negative values), meaning that no particles will diffuse into the spine after it is ``filled'' up. 
 A random walker will not feel this concentration gradient unless it is explicitly told so. 
 The alternative solution then, is to reduce the probability for particles to diffuse into a spine for each particle that gets caught in the spine head by a factor $\frac{1}{10}$. 
+
+\section{Using other particle dynamics}
+
+The aim of this project has always been to create a flexible framework where especially the particle dynamics can be substituted. 
+A test was therefore executed where Direct Simulation Monte Carlo (\nomenclature{DSMC}{Direct Simulation Monte Carlo}DSMC) code developed by Anders Hafreager for his masters thesis \cite{hafreager2014flow}, was used in stead of the RW model. 
+DSMC is a particle dynamics approach where the velocities of individual particles are modeled, but particle some interactions are modeled by a stochastic process. 
+Typically, particle collisions are modeled by a Monte Carlo method, but boundary conditions are not.\\
+
+\noindent A problem arises with respect to the coupling described in this thesis: 
+In the DSMC model, there is no fixed step length for each particle. It is possible to measure a diffusion coefficient which, to some extent, can be controlled by adjusting the temperature of the system, but this has not been done. 
+
+As a result, this must be viewed as an experiment in which the aim is for the two softwares to communicate as intended. 
+In this sense, the experiment was successful.

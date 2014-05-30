@@ -322,7 +322,7 @@ class Experiment:
 			r[j] = np.log(E[j+1]/E[j])/np.log(float(h[j+1])/float(h[j]))
 		print r
 		print E
-		# mpl.ylim(0.0,1.1)
+		mpl.ylim(0.0,1.1)
 		mpl.rc('xtick', labelsize=15) 
 		mpl.rc('ytick', labelsize=15) 
 		mpl.rc('text', usetex=True)
@@ -487,7 +487,7 @@ if __name__ == '__main__':
 	Hc = [20]#,2000,20000]
 	# Hc = [5600, 10000, 50000]
 	info='_Testrun_for_PKCg_diffusion'
-	info='_BE2D_new_convergence_space	'
+	info='_BE2D_new_convergence_space'
 	run = Experiment(this_dir,DEBUG,save_files,info)
 	run.exact = f
 
@@ -534,7 +534,7 @@ if __name__ == '__main__':
 	# h = [0.025]
 	for i in h:
 		# i = 1.0/j
-		timestep = 8e-5
+		timestep = i**2/5.0
 		dt.append(timestep)
 		m = (1/i)+1
 		# m = 21
@@ -553,9 +553,9 @@ if __name__ == '__main__':
 		run.RunSimulation(1*hc)
 	leg = ['$\Delta t$ = %g'%i for i in dt]
 	# run.ConvergenceTest(h)
-	run.ConvergenceTest(h)
+	run.ConvergenceTest(dt)
 	# leg = ['dt = %g'%i for i in dt]
-	run.PlotError(leg)
+	# run.PlotError(leg)
 	# # print 'dx =',dx
 	# # run.SaveError(header="max(abs(error)) for manufactured solution u(x,t) = exp(-t*pi**2*cos(pi*x) in 1D. Hc = %g"%Hc[0])
 	# # run.UpdateWebpageSpecial()

@@ -1,7 +1,8 @@
 \section{Debugging}\label{debugging}
 
 In any project which involves programming one is bound to do some debugging. This project is no exception. 
-Debugging can be extremely frustrating because no one sees all the hours that go into finding the bugs, only the ones that do not (when the bug is not fixed). 
+Debugging can be extremely frustrating because no one sees all the hours that go into finding the bugs. 
+Should a bug not be found, however, it will be noticed immediately. 
 This appendix is an introductory guide to debugging finite difference (FD) solvers and RW implementations. It starts out with some general tips on how to handle error messages, and moves on to deal with FD and RW implementations. 
 Finally, some words on how to debug the developed software are included.
 
@@ -26,15 +27,15 @@ Interpreted languages, like Python or MatLab, mostly include debuggers which pro
 Segmentation fault is a very common abort message to get from C++. It means that the program has tried to access a part of the computer memory (RAM) which it is not allowed to access by the operating system. 
 Interpreted languages will abort with a more informative error message, saying something about where the error was encountered. 
 In a compiled language, ``Segmentation fault'' is all you get, which basically means that there is something wrong somewhere in your code. 
-As an illustration, the terminal output below shows the output from a python- and C++- program for the same error:
+As an illustration, the terminal output below shows the output from a python- and C++- program (both named ``segfault'') for the same error:
 \begin{lstlisting}
-fredrik@Klokketiklokk:~/uio$ python segfault.py 
+fredrik@Workstation:~/uio$ python segfault.py 
 Traceback (most recent call last):
   File "segfault.py", line 3, in <module>
     b = sys.argv[1]
 IndexError: list index out of range
 
-fredrik@Klokketiklokk:~/uio$ ./segfault 
+fredrik@Workstation:~/uio$ ./segfault 
 Segmentation fault (core dumped)
 \end{lstlisting}
 
@@ -46,13 +47,17 @@ For example, making each function print its name when it is called will quickly 
 
 \subsection{Finite difference methods}
 First and foremost: Do the discretization by hand. 
-It will give valuable insight, which makes implementation and debugging a lot simpler. \\
+It will give valuable insight, which makes implementation and debugging a lot simpler. 
+Secondly, the numerical stability of the scheme should be investigated prior to implementation. 
+This ensures that a conditionally stable scheme does not fail tests because of a to large discretization parameter. \\
 
 \noindent There is one very important rule in programming in general: ``First make it work, then make right, then make it fast''. 
 When solving PDEs numerically this principle is extra important. 
 A numerical discretization scheme will (to my knowledge) either result in a main loop or a linear system which solves the equation. 
-Regardless of the overall structure of the final program, this main block will be located somewhere, meaning that it should be implemented first. 
-It can be made more efficient once it works. \\
+Regardless of the overall structure of the final program, this main block will be located unchanged somewhere within the final structure. 
+This part should therefore be implemented and tested first. 
+Structural changes and efficiency issues can be addressed at a later point. \\
+
 
 \noindent Visualization is an invaluable tool while implementing a numerical PDE solver. 
 Even though the code runs through all the steps without crashing, it does not have to be correct. 
@@ -77,7 +82,7 @@ The story goes that he would keep a rubber duck at his desk and whenever he was 
 Asking questions, and saying thing out loud forces you to think about things in a slightly different manner. \\
 
 \noindent When the code seems to reproduce the intended results it is time to start the verification. 
-This is where we make an error estimate and do some numerical analysis (the numerical stability of the scheme should, of course, be investigated prior to implementation). 
+This is where we make an error estimate and do some numerical analysis. 
 Making sure an implementation is correct is a lot harder than it sounds, but there are a few points that should be fulfilled:
 
 \begin{itemize}
@@ -93,7 +98,7 @@ Making sure an implementation is correct is a lot harder than it sounds, but the
  The scheme is expected to reproduce this solution to machine precision, but there are often several factors which limit the accuracy. 
  At the very least, the error should be significantly smaller than the largest error term. \\
  \item Convergence test\\
- These tests are often difficult to get right. 
+ It is often difficult to make convergence tests work properly, but they are arguably the most powerful tests and therefore important to implement. 
  The principle is to verify that using a smaller discretization parameter results in a smaller error, and that the error is reduced by the expected amount. 
 \end{itemize}
 
@@ -133,7 +138,7 @@ While implementing the hybrid solver, there were four main points which either m
  This applies to most code development. If the code is divided into independent modules, it is not only easier to test the code, it will also be much easier to reuse the code. \\
  As an example, the block tridiagonal solver has been implemented as a separate module, which since then has been used by Torbjørn Sæland in his masters thesis.\\
  \item Do not be nostalgic\\
- Because you are now using version control, there is no need to just comment out sections of code in case it is needed later. 
+ Because you are now using version control, there is no need to comment out sections of code in case it is needed later. 
  This makes the rest of the code less messy, and reduces the risk of forgetting to remove something.
 \end{itemize}
 

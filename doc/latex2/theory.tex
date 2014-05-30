@@ -1,5 +1,10 @@
-\section{Random walks}
+This chapter will concern the theory needed to implement a hybrid diffusion solver using Random Walks as a lower scale model. 
+Random Walk is a Monte Carlo (MC\nomenclature{MC}{Monte Carlo}) method, which is a large group of algorithms that use random sampling to achieve numerical results. 
 
+
+
+\section{Random Walks}
+% Random Walks is a type of Monte Carlo method
 A random walker is a point object which after a certain amount of time jumps a fixed step length either right or left with equal probability for jumping either way. 
 In $d$ spatial dimensions the axis on which the jump happens is chosen at random before the direction of the jump is decided. \\
 Say $N$ random walkers are placed at the same position within a volume, $V$ of arbitrary shape, to make a spatial distribution of walkers, $C = N\delta(x)$. 
@@ -16,7 +21,7 @@ Here, $\delta(x)$ is the Dirac Delta function \cite{boas2006mathematical}, defin
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.6]{Figures/divergence_theorem.png}
- \caption[]{}
+ \caption{A general volume contained by a surface.}
  \label{theory:divergence_theorem}
 \end{figure}
 
@@ -133,15 +138,16 @@ Neumann boundary conditions will be used, these are described in \eqref{theory:N
  &u^{k+1}_3\left(1+2\alpha(D_3+D_2)\right)- 2\alpha u^{k+1}_{2}(D_3+D_2) =  u^k_3
 \end{align*}
 which is arranged as a coefficient matrix multiplied by the unknown next time step
-
+{\scriptsize
 \begin{align}\label{BE}
  \left(\begin{array}{c c c c}
-        b_0 & c_0 &0 &0 \\
-        a_1 & b_1 & c_1 &0 \\
-        0& a_2 & b_2& c_2\\
-        0& 0& a_3 & b_3\\
+        1+2a(D_0+D_1) & -2a(D_1+D_0) &0 &0 \\
+        -a(D_1+D_0) &1+a(D_2+2D_1+D_0) & -a(D_2+D_1) &0 \\
+        0& -a(D_2+D_1) & 1+a(D_3+2D_2+D_1)& -a(D_3+D_2)\\
+        0& 0& - 2a(D_3+D_2)&1+2a(D_3+D_2) \\
        \end{array}\right)\mathbf{u}^{k+1} = \mathbf{u}^{k}
 \end{align}
+}
 \noindent Denote the coefficient matrix in \eqref{BE} by $\mathbf M$
 \begin{equation}\label{theory:BE:linear_system}
   \mathbf{M}\mathbf{u}^{k+1} = \mathbf{u}^{k}.
@@ -155,12 +161,13 @@ In order to be more consistent with the algorithm to be used, \eqref{theory:BE:l
   \mathbf{M}\mathbf{u} = \mathbf{u}_p,
 \end{equation}
 where $\mathbf{u}_p = \mathbf{u}^{k}$ denotes the solution at the previous time step, and $\mathbf{u} =\mathbf{u}^{k+1}$ denotes the solution at the current time step. 
-Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algorithm listed below.
+Tridiagonal systems can be solved extremely efficiently by the ``tridiag`` algorithm listed below. 
 
 {
 \lstinputlisting[label=theory:tridiag,caption=The tridiag algoritm,language=c++]{Figures/tridiag.cpp}
  }
 
+\noindent Algorithm \ref{theory:tridiag} uses three vectors $a$, $b$ and $c$ to describe the coefficient matrix, $\mathbf{M}$. Vector $b$ contains the diagonal elements, $a$ contains the sub-diagonal elements, and $c$ contains the elements above the diagonal. \\
 
 In two spatial dimensions the BE discretization gives the scheme shown below,
 
@@ -299,11 +306,12 @@ This is done by specifying a conversion rate denoted $Hc$ (as was done by Plapp 
 \noindent As before $u_{ij}$ is the solution to the 2D diffusion equation evaluated at $x_0 +i\Delta x$ and $y_0 +j\Delta y$, and $C_{ij}$ is the number of random walkers located in the rectangle defined by $x_i\pm\frac{\Delta x}{2}$ and $y_j\pm\frac{\Delta y}{2}$. 
 Walkers are given a random position within this rectangle at the beginning of each PDE time step.
 
-The reason to not simply use the positions from last time step is that the concentration in the RW area could change from one time step to the next. This will result in a different distribution of walkers which must be calculated at each time step. This is illustrated in Figure \ref{theory:concentration_update}.
+The reason to not simply use the positions from last time step is that the concentration in the RW area could change from one time step to the next. 
+This will result in a different distribution of walkers which must be calculated at each time step. This is illustrated in Figure \ref{theory:concentration_update}.
 \begin{figure}[h]
  \centering
-%  \includegraphics[scale=0.6]{Figures/concentration_update.eps}
- \caption{}
+ \includegraphics[scale=0.6]{Figures/integral_illustration.eps}
+ \caption[Reason for RW update each time step]{This figure shows an exaggerated case of how the concentration in an area changes over the course of a simulation. The distribution of walkers is directly proportional to the integral of $u(x,t)$, illustrated by a colored area. There is clearly a larger concentration in the area after $1000$ time steps than at the beginning of the simulation, meaning that the number of walkers should be recalculated at each time step. This figure was made using the FE scheme with $\Delta x = \frac{1}{300}$, $D = 1$ and $\Delta t \approx 5.56\cdot 10^{-6}$.}
  \label{theory:concentration_update}
 \end{figure}
 

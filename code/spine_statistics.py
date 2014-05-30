@@ -70,7 +70,7 @@ class Parser:
 				statfile.write(string+'\n')
 		
 
-balle = Parser('spine_info.txt')
-balle.read()
-balle.update_statisticsfile()
-print balle.information
+data = Parser('spine_info.txt')
+data.read()
+data.update_statisticsfile()
+print data.information

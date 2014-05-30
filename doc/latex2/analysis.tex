@@ -165,11 +165,11 @@ The error term associated with the spatial derivative is of second order, as see
 % Convergence tests for FE in 1D (a) and 2D (b)
 \centering
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/ConvergenceTest_pretty.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_18042014_1014_convergencetest_FE1D/results/ConvergenceTest.eps}
   \caption{}
  \end{subfigure}
  \begin{subfigure}{0.49\textwidth}
-  \includegraphics[width=\textwidth]{../results/experiment_27052014_1152_FE2D_new_convergence_time/results/ConvergenceTest.eps}
+  \includegraphics[width=\textwidth]{../results/experiment_27052014_1152_FE2D_new_convergence_time/results/ConvergenceTest_pretty.eps}
   \caption{}
  \end{subfigure}
  \caption[Convergence tests in time FE scheme]{Convergence tests with respect to the single discretization parameter, $h$, for the FE scheme in 1D (a) and 2D (b). }
@@ -239,13 +239,13 @@ where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$.
 
 \noindent From the iterations above a pattern can be recognized for iteration $k+1$:\\
 \begin{equation}
- u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^iu^0_{2ix}
+ u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^iu^0_{2ix},
 \end{equation}
-where $u^0$ is the initial condition
+where $u^0$ is the initial condition;
 \begin{equation}
- u^0 = \cos(\pi x)
+ u^0 = \cos(\pi x).
 \end{equation}
-The spatial derivatives are found by inserting the initial condition into the centered difference approximation to the second derivative 
+The spatial derivatives are found by inserting the initial condition into the centered difference approximation to the second derivative :
 \begin{align*}
  u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
  &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
@@ -253,9 +253,9 @@ The spatial derivatives are found by inserting the initial condition into the ce
  &= \frac{4}{\Delta x^4}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
  &\dots
 \end{align*}
-The pattern continues allowing the final numerical exact solution to be expressed below.
+The pattern continues allowing the final numerical exact solution to be expressed below:
 \begin{equation}\label{numerical_solution}
-  u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x)
+  u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x).
 \end{equation}
 By construction the Neumann boundary conditions are fulfilled since $\frac{\d \cos(\pi x)}{\d x} = -\pi\sin(\pi x)$ and $\sin(0) = \sin(\pi) = 0$. \\
 
@@ -269,7 +269,7 @@ As a side note, \eqref{numerical_solution} illustrates how the stability criteri
 In the numerical exact solution, the exponential which is found in the exact solution to the PDE (eq. \ref{manufactured_solution}) is replaced by an amplification factor $A^k$.
 This amplification factor can be found in equation \eqref{numerical_solution} as 
 \begin{equation}
-A^k = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i
+A^k = \left(\frac{2D\Delta t}{\Delta x^2}\right)^i.
 \end{equation}
 Inserting a time step larger than $\frac{\Delta x^2}{2D}$ will make the amplification factor, $A$, larger than one, which in turn makes the solution blow up. \\
 
@@ -281,9 +281,9 @@ $$ \frac{1}{\Delta x^{2i}} \to \infty$$
  The results from comparing a 1D simulation to the numerical exact is shown in Figure \ref{numerical_exact_FE:1D}. 
  As expected the error is larger than machine precision by at most two orders of magnitude because of accumulating error terms from the dropped terms in \eqref{numerical_solution}.\\
  
-\noindent Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme. 
+\noindent Using the same method as in the 1D case, a numerical exact solution can be found to the 2D FE scheme; 
  \begin{equation}\label{exact_numerical_solution_2d}
- u^{k+1} = \sum\limits^k_{i=0}{k\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right]
+ u^{k+1} = \sum\limits^k_{i=0}{k\choose i}\left(D\Delta t\right)^i\left[2^{i-1}\cos(\pi x)\cos(\pi y)\left(\frac{(\cos(\pi\Delta x))^i}{\Delta x^{2i}} +\frac{(\cos(\pi\Delta y))^i}{\Delta y^{2i}}\right)\right].
 \end{equation}
 
 The same problems as in the 1D case will apply to \eqref{exact_numerical_solution_2d} with the same solutions. 

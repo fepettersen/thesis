@@ -71,25 +71,5 @@ The model should have a few properties in order to be a realistic representation
 
 In order for a spine to be two dimensional, it must cover at least two points of the PDE mesh. This limits the minimal spatial resolution to the minimal neck diameter of a spine, which is $0.22\mu$m \cite{arellano2007ultrastructure}.
 
-Real particles will ``feel'' a concentration gradient, but random walkers do not. As spine heads are filled with proteins, new proteins must therefore be hindered from entering a spine if it is full. 
+Real particles will ``feel'' a concentration gradient, but random walkers do not. As spine heads are filled with proteins, new proteins must therefore be hindered from entering a spine if it is full. This is achieved by reducing the probability for a particle to diffuse into a specific spine each time a particle is absorbed in the head of that spine.
 
-\section{Using other particle dynamics}
-
-The aim of this project has always been to create a flexible framework where especially the particle dynamics can be substituted. 
-A test was therefore executed where Direct Simulation Monte Carlo (DSMC) code developed by Anders Hafreager for his masters thesis, was used in stead of the RW model. 
-DSMC is a particle dynamics approach where the velocities of individual particles are modeled, but particle some interactions are modeled by a stochastic process. 
-Typically, particle collisions are modeled by a Monte Carlo method, but boundary conditions are not.\\
-
-\noindent A problem arises with respect to the coupling described in this thesis: 
-In the DSMC model, there is no fixed step length for each particle. It is possible to measure a diffusion coefficient which, to some degree, can be controlled by adjusting the temperature of the system, but this has not been done. 
-
-As a result, this must be viewed as an experiment in which the aim is for the two softwares to communicate as intended. 
-In this sense, the experiment was successful, as is illustrated in Figure 
-% \ref{}.
-
-% \begin{figure}[H]
-% \centering
-% % \includegraphics[width=0.5\textwidth]{}
-%  \caption[]{}
-%  \label{}
-% \end{figure}

@@ -127,6 +127,34 @@
   that enhance protein kinase C action}}
 \endentry
 
+\entry{farnell2005monte}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Farnell}{F.}%
+     {L}{L}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Gibson}{G.}%
+     {WG}{W.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Elsevier}%
+  }
+  \strng{namehash}{FLGW1}
+  \strng{fullhash}{FLGW1}
+  \field{sortinit}{F}
+  \field{number}{1}
+  \field{pages}{253\bibrangedash 265}
+  \field{title}{{Monte Carlo simulation of diffusion in a spatially
+  nonhomogeneous medium: A biased random walk on an asymmetrical lattice}}
+  \field{volume}{208}
+  \field{journaltitle}{Journal of Computational Physics}
+  \field{year}{2005}
+\endentry
+
 \entry{flekkoy2001coupling}{article}{}
   \name{author}{3}{}{%
     {{}%
@@ -157,6 +185,25 @@
   \field{volume}{64}
   \field{journaltitle}{Physical Review E}
   \field{year}{2001}
+\endentry
+
+\entry{hafreager2014flow}{thesis}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Hafreager}{H.}%
+     {Anders}{A.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{HA1}
+  \strng{fullhash}{HA1}
+  \field{sortinit}{H}
+  \field{title}{{Flow of dilute gasses in complex nanoporous media}}
+  \list{institution}{1}{%
+    {University of Oslo}%
+  }
+  \field{type}{mathesis}
+  \field{year}{2014}
 \endentry
 
 \entry{marsaglia2003xorshift}{article}{}

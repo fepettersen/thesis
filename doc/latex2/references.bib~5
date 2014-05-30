@@ -124,3 +124,25 @@
 	year = "1995"
 }
 
+@article{saito2002protein,
+	author = "Saito, Naoaki and Shirai, Yasuhito",
+	journal = "Journal of biochemistry",
+	number = "5",
+	pages = "683--687",
+	publisher = "Jpn Biochemical Soc",
+	title = "{Protein kinase C$\gamma$ (PKC$\gamma$): function of neuron specific isotype}",
+	volume = "132",
+	year = "2002"
+}
+
+@article{warren1998dissipative,
+	author = "Warren, Patrick B",
+	journal = "Current opinion in colloid \& interface science",
+	number = "6",
+	pages = "620--624",
+	publisher = "Elsevier",
+	title = "{Dissipative particle dynamics}",
+	volume = "3",
+	year = "1998"
+}
+
