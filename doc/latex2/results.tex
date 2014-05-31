@@ -89,4 +89,13 @@ Typically, particle collisions are modeled by a Monte Carlo method, but boundary
 In the DSMC model, there is no fixed step length for each particle. It is possible to measure a diffusion coefficient which, to some extent, can be controlled by adjusting the temperature of the system, but this has not been done. 
 
 As a result, this must be viewed as an experiment in which the aim is for the two softwares to communicate as intended. 
-In this sense, the experiment was successful.
+In this sense, the experiment was successful. 
+Figure \ref{results:anders} shows one time step of a simulation where the DSMC model was used as particle dynamics model. 
+As is apparent from the figure, the coupling is not very good. 
+
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=0.7\textwidth]{Figures/anders_stuff.eps}
+ \caption[Hybrid solver with DSMC particle model]{This figure shows the hybrid diffusion solver with a DSMC particle model. The coupling between the two modes is not very good, but the communication between them works.}
+ \label{results:anders}
+\end{figure}

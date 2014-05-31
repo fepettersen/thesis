@@ -75,7 +75,7 @@
 	journal = "Journal of Statistical Software",
 	number = "14",
 	pages = "1--6",
-	title = "{Xorshift rngs}",
+	title = "{Xorshift RNGs}",
 	volume = "8",
 	year = "2003"
 }
@@ -144,5 +144,13 @@
 	title = "{Dissipative particle dynamics}",
 	volume = "3",
 	year = "1998"
+}
+
+@book{boas2006mathematical,
+	author = "Boas, Mary L",
+	chapter = "8",
+	publisher = "John Wiley \& Sons., Inc",
+	title = "{Mathematical Methods in the Physical Sciences}",
+	year = "2006"
 }
 

@@ -3,5 +3,5 @@
 \nomenclatureentry{aPDE@[{PDE}]\begingroup Partial Differential Equation\nomeqref {2.8}|nompageref}{12}
 \nomenclatureentry{aFE@[{FE}]\begingroup Forward Euler\nomeqref {2.9}|nompageref}{13}
 \nomenclatureentry{aBE@[{BE}]\begingroup Backward Euler\nomeqref {2.10}|nompageref}{13}
-\nomenclatureentry{aFLOPs@[{FLOPs}]\begingroup Floating Point Operations (per second)\nomeqref {2.19}|nompageref}{16}
+\nomenclatureentry{aFLOP@[{FLOP}]\begingroup Floating point Operation\nomeqref {2.19}|nompageref}{16}
 \nomenclatureentry{aDSMC@[{DSMC}]\begingroup Direct Simulation Monte Carlo\nomeqref {5.0}|nompageref}{51}

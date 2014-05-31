@@ -80,8 +80,8 @@ void Combine::Solve(){
 		ConvertToWalkers(Up,inifilenames[i],indeces[i]);
 		// sprintf(diffT,"stochastic/DiffusionTensor_%d.txt",i+1);
 		// sprintf(cmd,"mpirun -np %d stochastic/%s %d %d %d %g",num_procs,prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt);
-		// sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
-		sprintf(cmd,"python balle2.py");
+		sprintf(cmd,"./stochastic/%s %d %d %d %g %s %s",prgm.c_str(),parameters[i][0],parameters[i][1],walk_steps,pde_solver->dt,inifilenames[i].c_str(),diffT);
+		// sprintf(cmd,"python balle2.py");
 		int failure = system(cmd);
 		if(failure){
 			cout<<endl;
@@ -160,8 +160,8 @@ void Combine::AddWalkArea(double *x, double *y){
 		SaveDiffusionTensor(temp,M,N,walk_areas);
 	}
 	char tmp[100];
-	// sprintf(tmp,"stochastic/inifile_%d.bin",walk_areas);
-	sprintf(tmp,"state.xyz");
+	sprintf(tmp,"stochastic/inifile_%d.bin",walk_areas);
+	// sprintf(tmp,"state.xyz");
 	string name = tmp;
 	inifilenames.push_back(name);
 	int* parameter_tmp = new int[2];
@@ -218,8 +218,8 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	int** Conc = new int*[M];
 	int nwalkers = 0;
 	double test = 0;
-	ofstream inifile (filename.c_str());
-	// ofstream inifile (filename.c_str(), ios::out | ios::binary);
+	// ofstream inifile (filename.c_str());
+	ofstream inifile (filename.c_str(), ios::out | ios::binary);
 
 	
 	vec x = linspace(0,1,M);
@@ -238,21 +238,21 @@ void Combine::ConvertToWalkers(double **u, string filename, int **index){
 	for(int i=0; i<M; i++){
 		for(int j=0; j<N; j++){
 			for(int l=0; l<Conc[i][j]; l++){
-				// thingy = x[i]+0.99*DX*(0.5-rng->uniform());
-				thingy = (DX/2.0+1.0/128.0)+ 0.984375/(1+DX+1.0/64)*(x[i]+0.99*DX*(0.5-rng->uniform()));
+				thingy = x[i]+0.99*DX*(0.5-rng->uniform());
+				// thingy = (DX/2.0+1.0/128.0)+ 0.984375/(1+DX+1.0/64)*(x[i]+0.99*DX*(0.5-rng->uniform()));
 				// if(thingy>=0.984375){
 				// 	cout<<"balle! "<<thingy<<endl;
 				// }
 				inifile<<"Ar "<<thingy<<" ";
 				if(d==2){
-					// thingy = y[j]+0.99*DY*(0.5-rng->uniform());
-					// inifile<<thingy<<" "<<0;
-					thingy = (DY/2.0+1.0/128.0)+ 0.984375/(1+DY+1.0/64)*(y[j]+0.99*DY*(0.5-rng->uniform()));
-					inifile<<thingy<<" "<<0.008;
+					thingy = y[j]+0.99*DY*(0.5-rng->uniform());
+					inifile<<thingy<<" "<<0;
+					// thingy = (DY/2.0+1.0/128.0)+ 0.984375/(1+DY+1.0/64)*(y[j]+0.99*DY*(0.5-rng->uniform()));
+					// inifile<<thingy<<" "<<0.008;
 				}
 				else{
-					inifile<<0.008<<" "<<0.008;
-					// inifile<<0<<" "<<0;
+					// inifile<<0.008<<" "<<0.008;
+					inifile<<0<<" "<<0;
 				}
 				inifile<<endl;
 			}
@@ -300,6 +300,7 @@ void Combine::ConvertFromWalkers(double **u, string filename, int **index){
 		iss >> sub;
 		for (j = 0; j < 3; j++){
 			iss >> sub;
+			// pos[j] = factor*atof(sub.c_str()) -(DX/2.0);
 			pos[j] = atof(sub.c_str());
 		}
 		indx[0] = int(round(pos[0]/DX));

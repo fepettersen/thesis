@@ -15,8 +15,8 @@ Specifically $\epsilon$ is measured by the L2 norm which is defined in \eqref{an
 % \label{analysis:def_epsilon}
 \begin{align}
  \epsilon(t^k) &= ||u(t^k)-u_e(t^k)||_2 \nonumber \\
- &= \iint\sqrt{\left(u(t^k,x,y)-u_e(t^k,x,y)\right)^2}\,dx\,dy \nonumber \\
- &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^k\sum\limits_{i=0}^k \left(u(t^k,x_i,y_j)-u_e(t^k,x_i,y_j)\right)^2}.\label{analysis:def_epsilon}
+ &= \iint\sqrt{\left(u(t^k,x,y)-u_e(t^k,x,y)\right)^2}\,dx\,dy \label{analysis:def_epsilon} \\
+ &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^k\sum\limits_{i=0}^k \left(u(t^k,x_i,y_j)-u_e(t^k,x_i,y_j)\right)^2}.\nonumber
  \end{align}
  
 \noindent A time dependent error estimate has been chosen because it allows for investigation of the evolution of the error over the course of a simulation.
@@ -220,17 +220,17 @@ The error term associated with the spatial derivative is of second order, as see
 
 Discretization of the diffusion equation by the FE scheme yields the following numerical scheme in 1D:
 \begin{equation}\label{analysis:simplified_FE_scheme}
- u^{k+1} = D\Delta t u^k_{xx} + u^k,
+ u^{k+1} = D\Delta t u^k_{2x} + u^k,
 \end{equation}
-where $u_{xx}$ denotes the double derivative of $u$ with respect to $x$. 
-\eqref{analysis:simplified_FE_scheme} is a difference equation, which is most easily solved by writing out the first four iterations and finding a pattern
+where $u_{2x}$ denotes the double derivative of $u$ with respect to $x$. 
+Equation \eqref{analysis:simplified_FE_scheme} is a difference equation, which is most easily solved by writing out the first four iterations and finding a pattern
 % To illustrate how the equation is solved by the computer, the first four iterations are written out
 \begin{align*}
- u^1 &= D\Delta t\, u_{xx}^0 + u^0 \\
- u^2 &= D\Delta t\, u_{xx}^1 + u^1 \\
- &= D\Delta t\left[D\Delta t u_{4x}^0 + u_{2x}^0\right] + D\Delta t\, u_{xx}^0 +u^0\\
+ u^1 &= D\Delta t\, u_{2x}^0 + u^0 \\
+ u^2 &= D\Delta t\, u_{2x}^1 + u^1 \\
+ &= D\Delta t\left[D\Delta t u_{4x}^0 + u_{2x}^0\right] + D\Delta t\, u_{2x}^0 +u^0\\
  &= \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0 \\
- u^3 &= D\Delta t\, u_{xx}^2 + u^2 \\
+ u^3 &= D\Delta t\, u_{2x}^2 + u^2 \\
  &= D\Delta t\left[\left(D\Delta t\right)^2 u_{6x}^0 + 2D\Delta t u_{4x}^0+ u_{2x}^0\right] + \left(D\Delta t\right)^2 u_{4x}^0 + 2D\Delta t u_{2x}^0+ u^0\\
  &= \left(D\Delta t\right)^3 u_{6x}^0 + 3\left(D\Delta t\right)^2 u_{4x}^0+ 3D\Delta tu_{2x}^0 + u^0 \\
  u^4 &= D\Delta t \,u_{xx}^3 + u^3 = \dots \\
@@ -247,9 +247,9 @@ where $u^0$ is the initial condition;
 \end{equation}
 The spatial derivatives are found by inserting the initial condition into the centered difference approximation to the second derivative :
 \begin{align*}
- u^0_{xx} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
+ u^0_{2x} &= \frac{1}{\Delta x^2}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right) \\
  &= \frac{2}{\Delta x^2}\left(\cos(\pi\Delta x)-1\right)\cos(\pi x)\\
- u^0_{4x} &= [u^0_{xx}]_{xx} \frac{1}{\Delta x^2}\left[\frac{u^0_{xx}}{\cos(\pi x)}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
+ u^0_{4x} &= [u^0_{2x}]_{2x} \frac{1}{\Delta x^2}\left[\frac{u^0_{2x}}{\cos(\pi x)}\left(\cos(\pi(x+\Delta x)) -2\cos(\pi x) +\cos(\pi(x-\Delta x))\right)\right]\\
  &= \frac{4}{\Delta x^4}\left(\cos(\pi\Delta x)-1\right)^2\cos(\pi x)\\
  &\dots
 \end{align*}
@@ -262,7 +262,7 @@ By construction the Neumann boundary conditions are fulfilled since $\frac{\d \c
 Although the FE scheme is expected to reproduce \eqref{numerical_solution} to machine precision ($\epsilon \approx 10^{-16}$) there are two problems with the solution which will have an effect on the error:
 \begin{itemize}
  \item $\Delta x^{2i}$ will quickly tend to zero, and the computer will interpret it as zero. This will cause division by zero, which again results in ``Not a number'' (nan) and ruins the simulation. Testing if $\Delta x^{2i}>0$ and returning zero if the test fails will fix the problem. The argumentation for ignoring the troublesome terms is given below.
- \item ${k\choose i}$ goes to infinity for large $k$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $k!>10^{308}$ for $k>170$.
+ \item ${k\choose i}$ goes towards infinity for large $k$ and $i$. The computer can only represent numbers up to $\sim10^{308}$, which limits the number of steps to $170$ since $k!>10^{308}$ for $k>170$.
 \end{itemize}
 
 As a side note, \eqref{numerical_solution} illustrates how the stability criterion for the FE scheme comes into place. 
@@ -401,7 +401,7 @@ Stochastic effects causes the error to fluctuate around a certain value rather t
   \includegraphics[width=\textwidth]{../results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/errorplot.eps}
  \end{subfigure}
 \begin{subfigure}[t]{0.48\textwidth}
- \includegraphics[width=\textwidth]{../results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/ConvergenceTest.eps}
+ \includegraphics[width=\textwidth]{../results/experiment_02052014_0747_Redoing_RW_tests_Hc/results/ConvergenceTest_pretty.pdf}
 \end{subfigure}
 \caption[Test RW]{As a comparison to Figure \ref{ConvergenceTestRW:dt}, this test has been done for the same 1D Heaviside step function as initial condition, but keeps the time step fixed at $\Delta t = 0.05$ and increases the conversion factor. The convergence rate (fig. b) is worse than for the time convergence test, and seems to reach a limit where increasing the number of walkers has little effect on the error.}
 \label{ConvergenceTestRW:Hc}
@@ -456,7 +456,9 @@ Figure \ref{combined_BE1d} shows first order convergence for the hybrid model.
  \label{combined_BE1d}
 \end{figure}
 
-Decreasing or increasing the relative size of the microscopic model has serious effects on the error. This is illustrated in Figure \ref{testing_walk_area_size_BE}
+Decreasing or increasing the relative size of the microscopic model has serious effects on the error. Figure \ref{errorplot_BE1D_walk_5_percent} shows that the error term is comparable to the error from a simulation without walkers when only 5\% of the mesh points are affected by walkers. 
+As a comparison, Figure \ref{errorplot_BE1D_walk_35_percent} shows that the error will not be comparable to a simulation without walkers, even for a large conversion rate, when as much as 35\% of the mesh points are affected by walkers.
+
 
 \begin{figure}[H]
 \centering

@@ -146,3 +146,18 @@
 	year = "1998"
 }
 
+@book{boas2006mathematical,
+	author = "Boas, Mary L",
+	chapter = "8",
+	publisher = "John Wiley \& Sons., Inc",
+	title = "{Mathematical Methods in the Physical Sciences}",
+	year = "2006"
+}
+
+@book{abramowitz2012handbook,
+	author = "Abramowitz, Milton and Stegun, Irene A",
+	publisher = "Courier Dover Publications",
+	title = "{Handbook of mathematical functions: with formulas, graphs, and mathematical tables}",
+	year = "2012"
+}
+

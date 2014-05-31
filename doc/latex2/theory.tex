@@ -1,5 +1,5 @@
 This chapter will concern the theory needed to implement a hybrid diffusion solver using Random Walks as a lower scale model. 
-Random Walk is a Monte Carlo (MC\nomenclature{MC}{Monte Carlo}) method, which is a large group of algorithms that use random sampling to achieve numerical results. 
+Random Walk is a Monte Carlo (MC\nomenclature{MC}{Monte Carlo}) method, which is a large group of algorithms that use random sampling to produce numerical results. 
 
 
 
@@ -74,7 +74,7 @@ The difference between $u$ and $C$ is best illustrated in Figure \ref{theory:ill
   \includegraphics[width=\textwidth]{Figures/illustration_C_pt2.eps}
   \caption{}
  \end{subfigure}
- \caption[Illustration of $C(x)$]{Illustration of the difference between $u(x,t)$ in (a) which is the solution to the diffusion equation and $C(x,t)$ in (b) which is the number of random walkers within an area of $\pm\frac{\Delta x}{2}$ around each mesh point.}
+ \caption[Illustration of $C(x)$]{Illustration of the difference between $u(x,t)$ (in (a)) which is the solution to the diffusion equation, and $C(x,t)$ (in (b)) which is the number of random walkers within an area of $\pm\frac{\Delta x}{2}$ around each mesh point.}
  \label{theory:illustration_C}
 \end{figure}
 
@@ -256,7 +256,7 @@ An updated \emph{pseudo coded} scheme is listed in \eqref{block_tridiag_alg}
  \begin{equation*}
   \mathcal O(n^d)
  \end{equation*}
-floating point operations (FLOPs\nomenclature{FLOPs}{Floating Point Operations (per second)}). 
+floating point operations (FLOP\nomenclature{FLOP}{Floating point Operation}). 
 This is the maximum efficiency possible for a PDE in $d$ dimensions (without using some form of symmetry argument) and will be the benchmark for the BE scheme as well.\\
 
 Implicit schemes like BE result in linear systems which, as mentioned, can always be solved by Gaussian elimination by some $\mathcal O(n^3)$ FLOPs for a $n\times n$ matrix. 
@@ -308,7 +308,7 @@ Walkers are given a random position within this rectangle at the beginning of ea
 
 The reason to not simply use the positions from last time step is that the concentration in the RW area could change from one time step to the next. 
 This will result in a different distribution of walkers which must be calculated at each time step. This is illustrated in Figure \ref{theory:concentration_update}.
-\begin{figure}[h]
+\begin{figure}[H]
  \centering
  \includegraphics[scale=0.6]{Figures/integral_illustration.eps}
  \caption[Reason for RW update each time step]{This figure shows an exaggerated case of how the concentration in an area changes over the course of a simulation. The distribution of walkers is directly proportional to the integral of $u(x,t)$, illustrated by a colored area. There is clearly a larger concentration in the area after $1000$ time steps than at the beginning of the simulation, meaning that the number of walkers should be recalculated at each time step. This figure was made using the FE scheme with $\Delta x = \frac{1}{300}$, $D = 1$ and $\Delta t \approx 5.56\cdot 10^{-6}$.}

@@ -187,6 +187,34 @@
   \field{year}{2001}
 \endentry
 
+\entry{graham2011principles}{book}{}
+  \name{author}{3}{}{%
+    {{}%
+     {Graham}{G.}%
+     {Bruce}{B.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Gillies}{G.}%
+     {Andrew}{A.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {Willshaw}{W.}%
+     {David}{D.}%
+     {}{}%
+     {}{}}%
+  }
+  \list{publisher}{1}{%
+    {Cambridge}%
+  }
+  \strng{namehash}{GBGAWD1}
+  \strng{fullhash}{GBGAWD1}
+  \field{sortinit}{G}
+  \field{title}{{Principles of computational modelling in neuroscience}}
+  \field{year}{2011}
+\endentry
+
 \entry{hafreager2014flow}{thesis}{}
   \name{author}{1}{}{%
     {{}%
