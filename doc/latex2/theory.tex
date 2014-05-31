@@ -1,5 +1,5 @@
-This chapter will concern the theory needed to implement a hybrid diffusion solver using Random Walks as a lower scale model. 
-Random Walk is a Monte Carlo (MC\nomenclature{MC}{Monte Carlo}) method, which is a large group of algorithms that use random sampling to produce numerical results. 
+This chapter will concern the theory needed to implement a hybrid diffusion solver that combines a diffusion equation and Random Walk solver as a lower scale model. 
+A Random Walk is a Monte Carlo (MC\nomenclature{MC}{Monte Carlo}) method, which is a large group of algorithms that use random sampling to produce numerical results. 
 
 
 
@@ -101,9 +101,9 @@ The reader is assumed to know the basics of solving partial differential equatio
 \end{equation}
 \noindent Setting $\theta = 0$ gives the Forward Euler (FE\nomenclature{FE}{Forward Euler}) scheme which is explicit and conditionally stable with stability criterion 
 \begin{equation}\label{theory:stability_FE}
- \Delta t \leq \frac{\Delta x^2}{2d\max\{D\}}.
+ \Delta t \leq \frac{\Delta x^2}{2dD_{max}},
 \end{equation}
-
+where $d$ is the spatial dimension and $D_{max}$ denotes the maximum value of the diffusion coefficient.
 Setting $\theta = 1$ gives the  Backward Euler (BE\nomenclature{BE}{Backward Euler}) scheme which is unconditionally stable. \\
 This section will present a simple, but elegant way of efficiently solving the diffusion equation by the implicit BE scheme in more than one spatial dimension. The reason for using the BE scheme is that we want to use a large time step and still have a large spatial resolution. 
 % This section will concern the special case of how to solve the diffusion equation by the implicit BE scheme, especially in more than one spatial dimension.

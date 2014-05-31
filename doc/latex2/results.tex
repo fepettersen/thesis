@@ -4,12 +4,12 @@
 The plots that are discussed in this section can be found in chapter \ref{chapter:analysis}.
 
 \subsection{The FE scheme}
-Although not all of the results from verification of the FE scheme are perfect, the results from testing the exact numerical solution are very good. 
+In general, the results from testing the FE implementation are very good. Especially the results from testing the exact numerical solution are informative. 
 The numerical exact solution test is a verification of the implementation of the FE scheme. 
 A successful test indicates that the scheme is correct and will solve the diffusion equation to the expected accuracy. 
-Both the error plots from section \ref{analysis:section_manufactured_solution} and the spatial convergence test are very close to perfect, further suggesting a correct implementation. 
-While the general convergence tests for the FE scheme could be better (Figure \ref{analysis:convergence_tests:FE}), it is most likely due to other effects. \\
-Considering that two out of three tests are close to perfect, the FE scheme is deemed correctly implemented within the limits of the applied tests.
+Both the error plots from section \ref{analysis:section_manufactured_solution} and the spatial convergence test are very close to perfect, further suggesting a correct implementation. \\
+% While the general convergence tests for the FE scheme could be better (Figure \ref{analysis:convergence_tests:FE}), it is most likely due to other effects. \\
+Considering all of the three tests are close to perfect, the FE scheme is deemed correctly implemented within the limits of the applied tests.
 
 \subsection{The BE scheme and the block tridiagonal solver}
 Two of the tests done on the BE scheme are slightly off target. 
@@ -82,7 +82,7 @@ The alternative solution then, is to reduce the probability for particles to dif
 
 The aim of this project has always been to create a flexible framework where especially the particle dynamics can be substituted. 
 A test was therefore executed where Direct Simulation Monte Carlo (\nomenclature{DSMC}{Direct Simulation Monte Carlo}DSMC) code developed by Anders Hafreager for his masters thesis \cite{hafreager2014flow}, was used in stead of the RW model. 
-DSMC is a particle dynamics approach where the velocities of individual particles are modeled, but particle some interactions are modeled by a stochastic process. 
+DSMC is a particle dynamics approach where the velocities of individual particles are modeled, but some particle interactions are modeled by a stochastic process. 
 Typically, particle collisions are modeled by a Monte Carlo method, but boundary conditions are not.\\
 
 \noindent A problem arises with respect to the coupling described in this thesis: 
