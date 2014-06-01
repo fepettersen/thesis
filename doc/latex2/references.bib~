@@ -171,3 +171,13 @@
 	year = "2014"
 }
 
+@article{varah1972solution,
+	author = "Varah, James M",
+	journal = "Mathematics of Computation",
+	number = "120",
+	pages = "859-868",
+	title = "{On the solution of block-tridiagonal systems arising from certain finite-difference equations}",
+	volume = "26",
+	year = "1972"
+}
+

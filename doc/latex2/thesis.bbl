@@ -123,8 +123,13 @@
   \strng{namehash}{CML+1}
   \strng{fullhash}{CMLFMBNNMT1}
   \field{sortinit}{C}
+  \field{number}{170}
+  \field{pages}{1147\bibrangedash 1158}
   \field{title}{{Spines and neurite branches function as geometric attractors
   that enhance protein kinase C action}}
+  \field{volume}{7}
+  \field{journaltitle}{The Journal of cell biology}
+  \field{year}{2005}
 \endentry
 
 \entry{farnell2005monte}{article}{}
@@ -281,12 +286,6 @@
   \field{year}{1995}
 \endentry
 
-\entry{varah1972solution}{article}{}
-  \field{sortinit}{O}
-  \field{title}{{On the solution of block-tridiagonal systems arising from
-  certain finite-difference equations}}
-\endentry
-
 \entry{plapp2000multiscale}{article}{}
   \name{author}{2}{}{%
     {{}%
@@ -341,6 +340,26 @@
   \field{volume}{132}
   \field{journaltitle}{Journal of biochemistry}
   \field{year}{2002}
+\endentry
+
+\entry{varah1972solution}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Varah}{V.}%
+     {James~M}{J.~M.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{VJM1}
+  \strng{fullhash}{VJM1}
+  \field{sortinit}{V}
+  \field{number}{120}
+  \field{pages}{859\bibrangedash 868}
+  \field{title}{{On the solution of block-tridiagonal systems arising from
+  certain finite-difference equations}}
+  \field{volume}{26}
+  \field{journaltitle}{Mathematics of Computation}
+  \field{year}{1972}
 \endentry
 
 \entry{warren1998dissipative}{article}{}
