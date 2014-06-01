@@ -230,7 +230,7 @@ In the general case where the diffusion equation is discretized and solved on a 
 One should note that the $n\times n$ matrix $\mathbf u$ which solves the 2D diffusion equation has be rewritten as a vector $\mathbf{u}$ of size $n^2$. \\ 
 
 In order to solve this block tridiagonal linear system Algorithm \ref{theory:tridiag} must be generalized to support matrices as entries in $\mathbf M$. 
-Luckily this generalization is trivial and all that is needed is to replace divisions by matrix inverses. 
+Luckily this generalization is trivial and all that is needed is to replace divisions by matrix inverses \cite{varah1972solution}. 
 An updated \emph{pseudo coded} scheme is listed in \eqref{block_tridiag_alg}
 
 \noindent There is a forward substitution

@@ -154,3 +154,10 @@
 	year = "2006"
 }
 
+@book{abramowitz2012handbook,
+	author = "Abramowitz, Milton and Stegun, Irene A",
+	publisher = "Courier Dover Publications",
+	title = "{Handbook of mathematical functions: with formulas, graphs, and mathematical tables}",
+	year = "2012"
+}
+

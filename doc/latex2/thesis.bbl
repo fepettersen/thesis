@@ -281,6 +281,12 @@
   \field{year}{1995}
 \endentry
 
+\entry{varah1972solution}{article}{}
+  \field{sortinit}{O}
+  \field{title}{{On the solution of block-tridiagonal systems arising from
+  certain finite-difference equations}}
+\endentry
+
 \entry{plapp2000multiscale}{article}{}
   \name{author}{2}{}{%
     {{}%
