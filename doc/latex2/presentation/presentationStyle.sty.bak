@@ -1,0 +1,315 @@
+\ProvidesPackage{presentationStyle}
+
+%\usepackage{a4}
+%\usepackage[latin1]{inputenc}  % Bruk latin-1 tegnsett
+\usepackage[dvips]{epsfig}     % For å inkludere PostScript
+\usepackage{subfiles}
+
+%\usepackage[norsk]{babel}  % For norwegian text
+\usepackage{makeidx,amsmath,esint,amsfonts,amsthm,color,multicol,mathtools,subcaption}
+\usepackage[utf8]{inputenc}
+\usepackage[labelfont=bf]{caption}
+\usepackage{listings}
+%\usepackage[svgnames]{xcolor}
+%\usepackage{fullpage}  % For wider margins
+\usepackage{parskip}   % Skip a line for new paragraph
+\usepackage{fancyref}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{graphicx,epstopdf}
+\usepackage{enumerate}
+\usepackage{nomencl}
+\usepackage{booktabs}
+\usepackage{nicefrac}
+\usepackage{array}
+%\usepackage[numbers]{natbib}
+\usepackage{pythonhighlight}
+%\usepackage{microtype}
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+
+\usetheme{Warsaw}
+\usepackage{multicol}
+
+\makeatletter
+\def\insertsectionnavigation#1{%
+  \hbox to #1{\vbox{{\usebeamerfont{section in head/foot}%
+     \usebeamercolor[fg]{section in head/foot}%
+     \def\slideentry##1##2##3##4##5##6{}%
+     \def\sectionentry##1##2##3##4##5{%
+       \ifnum##5=\c@part%
+       \def\insertsectionhead{##2\hskip1em}%
+       \def\insertsectionheadnumber{##1}%
+       \def\insertpartheadnumber{##5}%
+         \hyperlink{Navigation##3}{%
+             \ifnum\c@section=##1%
+               {\usebeamertemplate{section in head/foot}}%
+             \else%
+               {\usebeamertemplate{section in head/foot shaded}}%
+             \fi%
+         }\par
+       \fi}%
+       \parbox[c][0cm][c]{.5\paperwidth}{%
+       \begin{multicols}{2}
+       \dohead
+       \end{multicols}}\space}
+     }%
+  \hfil}%
+}
+
+\def\insertsubsectionnavigation#1{%
+  \hbox to #1{%
+    \vbox{{%
+      \usebeamerfont{subsection in head/foot}\usebeamercolor[fg]{subsection in head/foot}%
+      \vskip0.5625ex%
+      \beamer@currentsubsection=0%
+      \def\sectionentry##1##2##3##4##5{}%
+      \def\slideentry##1##2##3##4##5##6{\ifnum##6=\c@part\ifnum##1=\c@section%
+        \ifnum##2>\beamer@currentsubsection%
+        \beamer@currentsubsection=##2%
+        \def\insertsubsectionhead{##5}%
+        \def\insertsectionheadnumber{##1}%
+        \def\insertsubsectionheadnumber{##2}%
+        \def\insertpartheadnumber{##6}%
+        \beamer@link(##4){%
+              \ifnum\c@subsection=##2%
+                {\usebeamertemplate{subsection in head/foot}}%
+              \else%
+                {\usebeamertemplate{subsection in head/foot shaded}}%
+              \fi\hfill}\par
+        \fi\fi\fi}%
+       \hspace*{0.5em}\parbox[c][0cm][c]{\dimexpr.5\paperwidth-1em\relax}{%
+       \begin{multicols}{2}
+       \dohead\vskip0.5625ex\end{multicols}
+       }\space
+   }\hfil
+}}}
+
+\setbeamertemplate{headline}
+{%
+  \leavevmode\@tempdimb=2.4375ex%
+  \ifnum\beamer@subsectionmax<\beamer@sectionmax%
+    \multiply\@tempdimb by\beamer@sectionmax%
+  \else%
+    \multiply\@tempdimb by\beamer@subsectionmax%
+  \fi%
+  \ifdim\@tempdimb>0pt%
+    \advance\@tempdimb by 1.125ex%
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=0.5\@tempdimb,dp=2ex]{section in head/foot}%
+      \vbox to0.5\@tempdimb{\vfill\insertsectionnavigation{.5\paperwidth}\vfill}%
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.5\paperwidth,ht=0.5\@tempdimb,dp=2ex]{subsection in head/foot}%
+      \vbox to0.5\@tempdimb{\vfill\insertsubsectionnavigation{.5\paperwidth}\vfill}%
+    \end{beamercolorbox}%
+  \fi%
+}
+\makeatother
+
+\setbeamertemplate{footline}[frame number]
+
+%\newcommand{\changefont}{%
+%    \fontsize{9}{11}\selectfont
+%}
+%\fancyhf{}
+%\fancyhead[LE,RO]{\changefont \slshape \rightmark} %section
+%\fancyhead[RE,LO]{\changefont \slshape \leftmark} %chapter
+%\fancyfoot[C]{\changefont \thepage} %footer
+%%\usepackage{svg}
+
+%\fancyhf{}
+%\fancyhead[LE]{\slshape \rightmark} %section
+%\fancyhead[RE]{\thepage}
+%\fancyhead[RO]{\slshape \leftmark} % chapter
+%\fancyhead[LO]{\thepage}
+
+\DeclareCaptionFont{black}{ \color{black} }
+\DeclareCaptionFormat{listing}{
+  \colorbox[cmyk]{0.43, 0.35, 0.35,0.01 }{
+    \parbox{\textwidth}{\hspace{15pt}#1#2#3}
+  }
+}
+\renewcommand{\lstlistingname}{Code}
+\captionsetup[lstlisting]{labelfont=black, textfont=black, singlelinecheck=false, margin=0pt, font={bf,footnotesize} }
+
+\setcounter{tocdepth}{1}
+
+
+\graphicspath{/home/nina/Dropbox/bitbucket/master_thesis/img/}
+
+%\usepackage{minted} % packages needed for verbatim environments
+%\usepackage{subcaption}
+
+% Hyperlinks in PDF:
+%\usepackage[%
+%    colorlinks=true,
+%    linkcolor=black,
+%    %linkcolor=blue,
+%    citecolor=black,
+%    filecolor=black,
+%    %filecolor=blue,
+%    urlcolor=black,
+%    pdfmenubar=true,
+%    pdftoolbar=true,
+%    urlcolor=black,
+%    %urlcolor=blue,
+%    bookmarksdepth=3   % Uncomment (and tweak) for PDF bookmarks with more levels than the TOC
+%            ]{hyperref}
+%\hyperbaseurl{}   % hyperlinks are relative to this root
+
+\newcolumntype{~}{>{\global\let\currentrowstyle\relax}}
+\newcolumntype{^}{>{\currentrowstyle}}
+\newcommand{\rowstyle}[1]{\gdef\currentrowstyle{#1}%
+  #1\ignorespaces
+}
+
+\definecolor{light-gray}{gray}{0.95}
+
+% Tricks for having figures close to where they are defined:
+% 1. define less restrictive rules for where to put figures
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.7}
+% 2. ensure all figures are flushed before next section
+\usepackage[section]{placeins}
+% 3. enable begin{figure}[H] (often leads to ugly pagebreaks)
+%\usepackage{float}\restylefloat{figure}
+\renewcommand{\div}{\nabla \cdot}
+\newcommand{\grad}[1]{\nabla #1}
+\newcommand{\real}{\mathbb{R}}
+\newcommand{\intO}[1]{\int\limits_{\Omega} #1 \,\,d\Omega}
+\newcommand{\intx}[1]{\int\limits_{\Omega} #1 \,\,dx}
+\newcommand{\intS}[1]{\int\limits^t_0 #1 \,\, ds}
+\newcommand{\intI}[1]{\int\limits^{t_i}_0 #1 \,\, ds}
+\newcommand{\intD}[1]{\int\limits_{\Gamma_D} #1 \,\,d\Gamma}
+\newcommand{\intB}[1]{\int\limits_{\Gamma_{1,2}} #1 \,\,d\Gamma}
+\newcommand{\intN}[1]{\int\limits_{\Gamma_N} #1 \,\,d\Gamma}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\intzo}{\int\limits^1_0}
+\newcommand{\intzi}{\int\limits^\infty_0}
+\newcommand{\Om}{\Omega}
+\newcommand{\dO}{\partial\Omega}
+\newcommand{\foralls}{\forall\,}
+\newcommand{\unit}[1]{\mathrm{#1}}
+%\newcommand{\eps}{\epsilon}
+%\newcommand{\xb}{\mathbf{x}}
+%\newcommand{\fb}{\mathbf{f}}
+%\newcommand{\gb}{\mathbf{g}}
+%\newcommand{\nb}{\mathbf{n}}
+%\newcommand{\ub}{\mathbf{u}}
+%\newcommand{\ab}{\mathbf{a}}
+%\newcommand{\vb}{\mathbf{v}}
+%\newcommand{\bb}{\mathbf{b}}
+%\newcommand{\Ab}{\mathbf{A}}
+%\newcommand{\etheta}{\mathbf{e_\theta}}
+%\newcommand{\error}{\mathbf{e}_h}
+\newcommand{\xb}{x}
+\newcommand{\fb}{f}
+\newcommand{\gb}{g}
+\newcommand{\nb}{n}
+\newcommand{\ub}{u}
+\newcommand{\ab}{a}
+\newcommand{\vb}{v}
+\newcommand{\bb}{b}
+\newcommand{\Ab}{A}
+\newcommand{\etheta}{e_\theta}
+\newcommand{\error}{e_h}
+\newcommand{\order}{\mathcal{O}}
+\newcommand{\fxt}{\fb(\xb, t)}
+\newcommand{\gxt}{\gb(\xb, t)}
+\newcommand{\uxt}{\ub(\xb, t)}
+%\newcommand{\define}[2]{\textbf{Definition: #1}\quote{\emph{#2}}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\ba}{\begin{align}}
+\newcommand{\ea}{\end{align}}
+\newcommand{\body}{$\mathcal{G}$ }
+\newcommand{\boundary}{\partial\Omega}
+\newcommand{\neumann}{\Gamma_{N}}
+\newcommand{\dirichlet}{\Gamma_{D}}
+\newcommand{\sij}{\sigma_{ij}}
+\newcommand{\eij}{\epsilon_{ij}}
+\newcommand{\complex}{\mathcal{C}}
+\newcommand{\normal}{\hat{n}}
+\newcommand{\surfaceint}[2]{\int\limits_{#1}^{#2}}
+\newcommand{\lineint}[2]{\oint\limits_{#1}^{#2}}
+\newcommand{\intervalt}{\mathcal{J}}
+\newcommand{\Lagr}[1]{\mathcal{L}\{#1\}}
+\newcommand{\lebesgue}{\mathcal{L}}
+\newcommand{\testspace}{\mathcal{V}}
+\newcommand{\thesispath}{/home/nina/Dropbox/bitbucket/master_thesis/thesis}
+\newcommand{\imagepath}{/home/nina/Dropbox/bitbucket/master_thesis/img}
+\newcommand{\sourcepath}{/home/nina/Dropbox/bitbucket/master_thesis/simplified_case/src}
+\newcommand{\notetoself}[1]{\note{#1}}
+\newcommand{\inner}[2]{#1 \cdot #2}
+\newcommand{\tr}{\text{tr}}
+\newcommand{\mysum}[2]{\sum\limits_{#1}^{#2}}
+\newcommand{\dt}{\Delta t }
+\newcommand{\oG}{\overline{G}}
+\newcommand{\oa}{\overline{\alpha}}
+\newcommand{\okap}{\overline{\kappa}}
+\newcommand{\omu}{\overline{\mu}}
+\newcommand{\oeta}{\overline{\eta}}
+\newcommand{\summary}{\textit{Short summary of the article}}
+\newcommand{\results}{\textit{Results / values obtained}}
+\newcommand{\application}{\textit{Applications of the results to the current problem}}
+\newcommand{\tens}[1]{\times 10^{#1}}
+\graphicspath{\imagepath}
+\newcommand{\exponential}[1]{\, e^{#1}}
+
+\newcommand{\emptypage}{\newpage \mbox{}}
+
+%\newtheorem{theorem}{Theorem}[chapter]
+%\newtheorem{mydef}[theorem]{Definition}[chapter]
+\let\eps\epsilon
+%\renewcommand{\epsilon}{{\boldsymbol\varepsilon}}
+\renewcommand{\epsilon}{{\varepsilon}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}[section] % reset theorem numbering for each chapter
+
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition} % definition numbers are dependent on theorem numbers
+\newtheorem{exmp}[thm]{Example} % same for example numbers
+
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}[section]
+
+\renewcommand{\nomname}{List of abbreviations}
+\makenomenclature
+
+\let\sigmaTemp\sigma
+%\renewcommand{\sigma}{{\boldsymbol\sigmaTemp}}
+%\renewcommand{\sigma}{\sigmaTemp}
+
+\graphicspath{/home/nina/Dropbox/bitbucket/master_thesis/img/}
+
+
+\lstset{ %
+  backgroundcolor=\color{light-gray},  % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                % sets automatic line breaking
+  captionpos=b,                   % sets the caption-position to bottom
+  commentstyle=\color{PineGreen},   % comment style
+  deletekeywords={...},           % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},         % if you want to add LaTeX within your code
+  %extendedchar=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                   % adds a frame around the code
+  keywordstyle=\color{Blue},      % keyword style
+  language=Python,                % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                   % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  numberstyle=\tiny\color{Gray},  % the style that is used for the line-numbers
+  rulecolor=\color{Black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,               % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,         % underline spaces within strings only
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{Mahogany},      % string literal style
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  title=\lstname                  % show the filename of files included with \lstinputlisting; also try caption instead of title
+}

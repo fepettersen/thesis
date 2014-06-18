@@ -1,0 +1,639 @@
+\documentclass[12pt,a4paper, xcolor={usenames,dvipsnames,svgnames,table}]{beamer}
+\usepackage{presentationStyle}
+\usepackage{arydshln,leftidx,mathtools}
+
+\renewcommand{\d}{\partial}
+%\setbeameroption{show only notes}
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}
+%    \frametitle{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+\setbeamertemplate{section in toc}[ball unnumbered]
+\title % (optional, only for long titles)
+{Multiscale modeling of diffusion processes in dendrites and dendritic spines}
+%\subtitle{Evidence from India}
+\author % (optional, for multiple authors)
+{Fredrik Eksaa Pettersen\inst{1}}
+\institute[UiO] % (optional)
+{
+  \inst{1}%
+  Faculty of Mathematics and Natural Sciences\\
+  University of Oslo
+}
+\date% (optional)
+{June $26^{\text{th}}$, 2014}
+\subject{Master thesis presentation}
+\begin{document}
+
+% ------- TITLE -------- %
+\frame[plain]{\titlepage}
+\notetoself{Welcome. Today, I will be presenting my masters thesis, \textbf{Multiscale modeling of diffusion processes in dendrites and dendritic spines.}}
+
+
+% ------ OUTLINE --------%
+\begin{frame}{Outline}
+\tableofcontents
+%\frametitle{Testing}
+%\begin{itemize}
+%\pause \item Medical background
+%\pause \item The simulation scenario
+%\pause \item Mathematical models
+%\pause \item Discretization
+%\pause \item Implementation
+%\pause \item Results
+%	\begin{itemize}
+%	\item Verification of implementation
+%	\item Simulation results
+%	\end{itemize}
+%\pause \item Conclusions
+%\end{itemize}
+\end{frame}
+\notetoself{Here is an overview of the presentation. I will begin by giving a motivation for developing a multi scale solver before I move on to describe some of the theory that is necessary. Next, I will describe some very useful test that the code must pass in order to verify that it is implemented correctly, and describe an application that illustrates how the software can be modified to describe physical problems. Finally, the results of the verification and application will be discussed and some concluding remarks will be given.}
+
+
+% ----- INTRODUCTION ----- %
+\section{Motivation}
+\note{I will start of by motivating the need for a hybrid diffusion solver.}
+%\addcontentsline{toc}{section}{ -- Medical background}
+
+\subsection{Physical models on different length scales}
+\begin{frame}[shrink]
+\frametitle{Physical models on different length scales}
+\begin{columns}
+ \column{0.5\textwidth}
+\begin{itemize}
+\item<2-> Systems on different length scales are characterized by different effects.
+\item<3-> Quantum Mechanics is the ``typical'' example in physics, but there are many more.
+\item<4-> Problems might arise between these length scales
+\end{itemize}
+ \column{0.5\textwidth}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{Figures/lengthscales.jpg}
+  \caption{Illustration of physical models on different length scales, from  Markus J. Buehler, MIT}
+ \end{figure}
+\end{columns}
+\end{frame}
+\notetoself{}
+
+
+\begin{frame}[shrink]
+\frametitle{Physical models on different length scales}
+\framesubtitle{Existing meso scale models}
+Some meso scale models exist already, but mostly these are aimed at specific problems and/or closed source.
+\begin{itemize}
+ \item Dissipative Particle Dynamics
+ \item Dendritc solidification modeling by 
+ \item Hybrid fluid flow models by 
+\end{itemize}
+\end{frame}
+\note{The symptoms of the Chiari I malformation are very diverse, making the condition difficult to diagnose without the use of magnetic resonance imaging. The Chiari I malformation is also related to other conditions, most notably syringomyelia.}
+
+\subsection{Aim of this project}
+\begin{frame}
+\frametitle{Aim of this project}
+\begin{itemize}
+\item<2-> Develop and implement a hybrid diffusion solver using Random Walk as a lower scale model.
+\item<3-> Make sure all parts of the theory are transparent.
+\item<4-> Test and verify implementation thoroughly.
+\item<5-> Apply developed software to physical problem in order to verify functionality.
+\end{itemize}
+\end{frame}
+\note{Syringomyelia is a condition in which fluid-filled cavities, also known as sytinxes, develop in the spinal cord tissue. Syrinxes may cause irreversible nerve damage; however, the reason why syrinxes form is yet to be determined. Estimated It is estimated that approximately $70\%$ of syringomyelia is related to hindbrain malformations such as the Chiari I malformation, and approximately $30-50\%$ of Chiari patients develop syrinxes. This thesis investigated the response of the spinal cord under pressure caused by CSF flow, to see if a mathematical model for the spinal cord could further understanding of syrinx formation.}
+
+%\subsection{CSF flow}
+%\begin{frame}
+%\frametitle{CSF flow}
+%Cerebrospinal fluid (CSF) flows in the subarachnoid space (SAS) in the brain and spinal column.
+%\begin{itemize}
+%\item<1-> Studies show that Chiari I results in abnormal CSF flow.
+%\begin{itemize}
+%\item<2-> Velocity
+%\item<2-> Pressure
+%\end{itemize}
+%\item<2-> Believed to be a possible cause for symptoms and syringomyelia.
+%\end{itemize}
+%\end{frame}
+
+
+\section{Theory}
+%\addcontentsline{toc}{section}{ -- Simulation scenario}
+\notetoself{We now continue to the simulation scenario. To understand what exactly is to be simulated, the spinal cord is studied.}
+
+
+%\subsection{Spinal cord}
+%\begin{frame}
+%\frametitle{The spinal cord}
+%\begin{multicols}{2}
+%\begin{itemize}
+%\item<2-> Part of the central nervous system.
+%\item<3-> Encased in the spinal column.
+%\item<4-> CSF flows past the spinal cord.
+%\item<5-> Cylindrical in shape.
+%\item<6-> Made up of grey and white matter.
+%\end{itemize}
+%\vspace{2cm}
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.55\textwidth]{\imagepath/vertebra-cross-section.jpg}
+%\end{figure}
+%\end{multicols}
+%\end{frame}
+%\notetoself{The spinal cord, together with the brain, makes up the central nervous system. It is located within the spinal column, and protected by three layers of membranes known as the pia mater, arachnoid and dura mater. Between the pia and arachnoid is the subarachnoid space (SAS), in which CSF flows. It is from this flow that pressure is applied on the spinal cord. The spinal cord is cylindrical in shape, and is made up of a core of grey matter, covered by white matter.}
+
+
+% ----- SIMULATION SCENARIO ----- %
+\begin{frame}{Random Walks}
+\begin{multicols}{2}
+\begin{itemize}
+\item<2-> Widely used in many applications.
+\item<3-> Can be shown to fulfill the diffusion equation.
+\item<4-> Used as lower scale model for this purpose
+\end{itemize}
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Figures/randomwalk.eps}
+\end{figure}
+\end{multicols}
+\end{frame}
+\notetoself{In the simulations, an anatomically accurate geometry is used to represent the spinal cord. This geometry is based on the spinal cord of a sheep, and is approximately 3.4 cm in length. }
+
+
+\begin{frame}{Finite difference methods}
+\framesubtitle{- For partial differential equations}
+\begin{columns}
+ \column{0.5\textwidth}
+\begin{itemize}
+\item<2-> Approximate derivatives by finite differences using the definition of the derivative and omitting the limit:
+\begin{align*} 
+ \frac{du}{dt} &=\lim_{\Delta t\to0} \frac{u(t) -u(t+\Delta t)}{\Delta t} \\
+ &\approx \frac{u(t) -u(t+\Delta t)}{\Delta t}
+\end{align*}
+\item<3-> Repeat for all derivatives in the PDE.
+\item<4-> Solve equation on discrete mesh points.
+\end{itemize}
+
+\column{0.5\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Figures/FDM_stencils.eps}
+\end{figure}
+\end{columns}
+\end{frame}
+\note{To simulate the pressure from CSF flow, measured pressure values from a Chiari patient was used. The pressure was modelled as a travelling wave on the form seen here, where $z$ is the longitudinal coordinate and $c$ is the wave speed, measured to be $2$m/s.}
+
+\begin{frame}{Finite difference methods}
+% \framesubtitle{}
+
+\begin{itemize}
+\item<2->The two discretizations used are summarized in the theta-rule description 
+\begin{equation}
+ \frac{u^{k+1}-u^k}{\Delta t} = \theta D\frac{\d^2 u^{k+1}}{\d x^2} + (1-\theta)D\frac{\d^2 u^{k}}{\d x^2}.
+\end{equation}
+\item<3->In order to accommodate a larger time step, the Backward Euler discretization ($\theta =1$) must be implemented:
+{\footnotesize
+\begin{align*}
+ u^{k+1}_i = \frac{D\Delta t}{\Delta x^2}\left((u^{k+1}_{i+1}-u^{k+1}_{i})-(u^{k+1}_{i}-u^{k+1}_{i-1})\right) + u^k_i.
+\end{align*}
+}
+\item<4-> By insertion the BE scheme results in a tridiagonal linear system in 1D.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Tridiagonal linear systems}
+ Tridiagonal linear systems are efficiently solved by a specialized Gaussian elimination algorithm.
+ {\footnotesize
+ \lstinputlisting[label=theory:tridiag,caption=The tridiag algoritm,language=c++]{../Figures/tridiag2.cpp}
+ }
+\end{frame}
+
+
+\begin{frame}{Finite difference methods}
+\framesubtitle{Backward Euler in 2D}
+
+\begin{itemize}
+\item<2-> In 2D the solution to the discrete diffusion equation is a matrix.
+\item<3-> Rewriting the matrix as a vector results in a banded linear system:
+{\footnotesize
+\begin{align*}\label{linear_system_BE2D}
+  \left(\begin{array}{c c c : c c c : c c c}
+        \gamma & -2\beta &0 &-2\alpha &0 &0 &0 &0 &0\\
+        -\beta & \gamma & -\beta &0 &-2\alpha &0 &0 &0 &0\\
+        0&-2\beta & \gamma & 0 & 0 & -2\alpha &0&0&0\\ \hdashline
+        -\alpha& 0&0 & \gamma & -2\beta & 0 & -\alpha &0&0\\
+        0& -\alpha&0&-\beta & \gamma & -\beta & 0 & -\alpha &0\\
+        0& 0& -\alpha&0&-2\beta & \gamma & 0 & 0 &-\alpha\\ \hdashline
+        0& 0 &0 &-2\alpha &0&0 & \gamma & -2\beta&0\\
+        0& 0 &0 &0 &-2\alpha&0&-\beta & \gamma &-\beta\\
+         0&0 &0 &0&0 &-2\alpha&0&-2\beta & \gamma
+       \end{array}\right)\mathbf{u} = \mathbf{u}_p
+\end{align*}
+}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Tridiagonal linear systems}
+ \framesubtitle{Block tridiagonal solver}
+The tridiag algorithm can be rewritten to solve block tridiagonal systems by replacing divisions with matrix inverses:
+\begin{align*}
+ H_0 &= -B_0^{-1}C_0\nonumber \\
+ \mathbf{g}_0 &= B_0^{-1}\mathbf{u}_{p0} \nonumber\\
+ H_i &= -\left(B_i+A_iH_{i-1}\right)^{-1}C_i \nonumber \\
+ \mathbf{g}_i &= \left(B_i+A_iH_{i-1}\right)^{-1}\left(\mathbf{u}_{pi}-A_i\mathbf{g}_{i-1}\right)\\
+ \text{}\\
+  \mathbf{u}_{n-1} &= \mathbf{g}_{n-1}\nonumber\\
+  \mathbf{u}_i &= \mathbf{g}_i + H_i\mathbf{u}_{i+1} \nonumber
+ \end{align*}
+\end{frame}
+
+\begin{frame}{Tridiagonal linear systems}
+ \framesubtitle{Performance of Block tridiagonal solver}
+ \begin{itemize}
+  \item <1-> The 1D tridiagonal solver requires $\mathcal{O}(n)$ operations, comparable to the Forward Euler scheme.
+  \item <2-> The Block tridiagonal solver requires inversion of $2n$ matrices, but only once.
+  \item <3-> In total $\mathcal{O}(n^{2d-1})$ operations are required for a general system, one order less than e.g. LU decomposition.
+  \item <4-> Memory impact can also be reduced to $8\cdot n^{2d-1}$ bytes, as opposed to $8\cdot n^{2d}$ bytes.
+ \end{itemize}
+\end{frame}
+
+\section{Details of the coupling}
+\notetoself{In order to simulate the response of the spinal cord under applied pressure, mathematical models for the spinal cord are needed. The spinal cord is considered a solid. Because the spinal cord has been shown to display viscoelastic properties, a viscoelastic model is used. In addition, a purely elastic model is used for comparison.}
+%\addcontentsline{toc}{section}{ -- Mathematical models}
+% ----- MATHEMATICAL MODELS ----- %
+
+\subsection{The algorithm}
+\begin{frame}[shrink]{The algorithm}
+After the initial setup, the algorithm is as follows:
+\begin{itemize}
+ \item<2-> The result from previous PDE time step, $\mathbf{u}_p$, is converted to a distribution of random walkers and sent to the RW solver.
+ \item<3-> The RW solver does a predefined number of micro scale time steps which correspond to one PDE time step.
+ \item<4-> The result from the RW solver is converted back to a concentration and this replaces the PDE solution, $\mathbf{u}_p$.
+ \item<5-> $\mathbf{u}_p$ is then used as input to calculate the next time step.
+\end{itemize}
+
+\end{frame}
+\notetoself{\small The governing equations from the theory of elasticity are given here. Gamma D denotes the Dirichlet boundary and Gamma N denotes the Neumann boundary. The Neumann boundary condition simulated the applied pressure, where p is the travelling wave from the previous slide. The Dirichlet boundary condition is used to place constraints on the solution, and in this particular case the Dirichlet boundary was chosen to be the top and bottom boundaries, where the geometry would be connected to more spinal cord above and below. There are no obvious choices for what this condition should be. $u=0$ is a possibility, although that would not allow the spinal cord to compress in the radial direction at the boundaries. }
+\note{Another possibility is $u_z=0$. Dirichlet boundary conditions will be discussed in more detail later, and for now we leave $u=u_D$.}
+
+\begin{frame}
+\frametitle{Conversion between length scales}
+\begin{columns}
+ \column{0.5\textwidth}
+\begin{itemize}
+\item<2-> A single, real integer converts the concentration in one mesh point to a number of random walkers.
+\item<3-> \begin{equation*}
+            C_{ij} = Hc\cdot u_{ij}
+          \end{equation*}
+\item<4-> The conversion must be done at each time step because the concentration over an area of the mesh might change.
+\end{itemize}
+ \column{0.5\textwidth}
+ \begin{figure}[H]
+  \centering
+\includegraphics[width=\textwidth]{../Figures/integral_illustration.eps}
+  \end{figure}
+
+\end{columns}
+\end{frame}
+
+\subsection{Coupling the models through the step length}
+\begin{frame}
+\frametitle{Coupling the models through the step length}
+\begin{itemize}
+ \item<1-> The RW solver needs a constraint in order to make sure it models diffusion on the same time scale as the PDE model.
+ \item<2-> From an Einstein relation we find
+ \begin{equation*}
+  \langle\tilde{\Delta x}^2\rangle = 2Dd\tilde{\Delta t}
+ \end{equation*}
+ \item <4-> Rewriting this results in the desired restriction which is placed on the step length:
+ \begin{equation*}
+ l = \sqrt{2dD\frac{\Delta t}{\tau}}
+\end{equation*}
+\end{itemize}
+
+\end{frame}
+\notetoself{In order to describe the specific behavior of a material, a constitutive relationship is required. In particular, we want a stress-strain relationship. Sigma, as appears in the governing equations, is the stress tensor, while the strain tensor is defined as shown. The constitutive relationships we are looking for is then the stress expressed in terms of the strain.  For simplicity, only linear constitutive relationships have been considered, for isotropic materials.}
+
+\subsection{Boundary Conditions}
+\begin{frame}
+\frametitle{Boundary conditions on the random walk}
+\begin{itemize}
+ \item<1-> Perfectly reflecting boundaries, equivalent to zero flux
+ \begin{equation*}
+   \frac{\d C}{\d n} = 0
+ \end{equation*}
+ \item<2-> Updating concentration at each time step must also be considered a boundary condition.
+ \item<3-> Other boundary conditions might have been better, say perfect flux exchange:
+ \begin{equation*}
+   \frac{\d u}{\d n} = \frac{\d C}{\d n}
+ \end{equation*}
+ \item<4-> Requires some work on the PDE boundary conditions etc.
+\end{itemize}
+
+\end{frame}
+\notetoself{}
+
+
+
+\section{Verification}
+\notetoself{With the mathematical models in place, they may be discretized in order to be implemented on a computer.}
+% ------ DISCRETIZATION ------ %
+\subsection{Error estimate}
+\begin{frame}{Computation of the error}
+\begin{itemize}
+ \item<1-> Solving PDEs by FDMs results in errors which can tell a lot about the implementation.
+ \item<2-> From the residuals, we know how the error should behave.
+ \item<3-> For a given exact solution, $u_e$, the error is defined by:
+ \begin{align*}
+  \epsilon(t^k) &= ||u(t^k)-u_e(t^k)||_2 \\
+   &\approx \sqrt{\Delta x\Delta y\sum\limits_{i=0}^k\sum\limits_{i=0}^k \left(u(t^k,x_i,y_j)-u_e(t^k,x_i,y_j)\right)^2}.
+ \end{align*}
+
+\end{itemize}
+\end{frame}
+\notetoself{}
+
+
+\subsection{Verification techniques}
+
+\begin{frame}[shrink]
+\frametitle{Verification techniques}
+\framesubtitle{Method of manufactured solutions}
+\begin{itemize}
+ \item<1-> Make a solution by adapting the source term.
+ \item<2-> For example:
+ \begin{align*}
+  u(x,t) = \frac{1}{x+1}\\
+  \implies s(x,t) = \frac{2D}{(x+1)^3}
+ \end{align*}
+ \item<3-> Many useful variations of this method.
+ \item<4-> Tests are done using 
+  \begin{equation*}
+  u(x,y,t) = e^{-\pi^2t}\cos(\pi x)\cos(\pi y) +1,
+ \end{equation*}
+ which fulfills boundary conditions and has $s(x,t) = 0$.
+\end{itemize}
+\end{frame}
+\notetoself{}
+
+
+\begin{frame}[shrink]
+\frametitle{Verification techniques}
+\framesubtitle{Convergence tests}
+\begin{itemize}
+ \item<1-> Error term is on the form
+ \begin{equation*}
+ \epsilon = C_x\Delta x^2 + C_t\Delta t^1,
+\end{equation*}
+for the schemes that are implemented.
+\item<2-> Measuring the exponents gives the convergence of the scheme.
+\item<3-> Do several simulations and calculate
+\begin{equation*}
+ r\simeq \frac{\log\left(\epsilon_1/\epsilon_2\right)}{\log\left(\Delta t_1/\Delta t_2\right)}.
+\end{equation*}
+\item<4-> Often difficult tests.
+\end{itemize}
+\end{frame}
+\notetoself{}
+
+\begin{frame}[shrink]
+\frametitle{Verification techniques}
+\framesubtitle{Numerical exact solutions}
+\begin{itemize}
+ \item <1-> Discretization is a reformulation of a PDE as a difference equation. 
+ \item <2-> New exact solution can be found - theoretically zero error!
+ \item <3-> Forward Euler solution (1D):
+ \begin{equation*}
+  u^{k+1} = \sum\limits_{i=0}^k {k\choose i}\left(D\Delta t\right)^i\frac{2^i}{\Delta x^{2i}}\left(\cos(\pi\Delta x)-1\right)^i\cos(\pi x).
+ \end{equation*}
+ \item <3-> Backward Euler solution:
+ \begin{equation*}
+   \vec u^{k} = \left(\mathbf M^{-1}\right)^{k} \vec u^0.
+ \end{equation*}
+\end{itemize}
+\end{frame}
+
+
+
+\section{Application}
+\notetoself{Now that the boundary conditions are dealt with, the problem may be implemented.}
+% ------ IMPLEMENTATION ------ %
+\begin{frame}[shrink]{The problem}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{itemize}
+ \item <2-> Pyramidal neuron
+ \item <3-> Protein Kinase C$\gamma$
+ \item <4-> Dendritic spines
+\end{itemize}
+
+\column{0.5\textwidth}
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{../Figures/Cochlear_nucleus_multipolar_cell.jpg}
+\end{figure}
+
+\end{columns}
+
+\end{frame}
+\notetoself{}
+
+
+\begin{frame}[shrink]{Computational model}
+
+\begin{columns}
+\column{0.5\textwidth}
+Default setup
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{../Figures/hybrid_model_principle.eps}
+\end{figure}
+\column{0.5\textwidth}
+Modified setup
+\begin{figure}[H]
+ \centering
+ \includegraphics[width=\textwidth]{../Figures/dendrite_spine_model.eps}
+\end{figure}
+\end{columns}
+\end{frame}
+\notetoself{}
+
+
+\begin{frame}[shrink]{Parameters and other details}
+blablabla
+
+\end{frame}
+\notetoself{}
+
+\section{Results}
+\notetoself{This brings us to the simulations. Results from the simulations will now be reviewed.}
+% ------ RESULTS ------ %
+\subsection{Results of verification}
+\begin{frame}[shrink]{What we are looking for}
+\begin{itemize}
+ \item Successful tests of PDE solvers.
+ \item Successful tests of RW solver.
+ \item Successful test of hybrid solver given sufficient number of walkers.
+\end{itemize}
+
+\end{frame}
+\notetoself{}
+
+
+% \begin{frame}[shrink]
+% \frametitle{PDE solvers}
+% Include one Convergence test, and numerical exact solution plot for each scheme!
+% \begin{columns}
+%  \column{0.5\textwidt}
+%  BE\\
+%  \begin{figure}[H]
+%  \centering
+%  \begin{subfigure}
+%   \includegraphics[]{}
+%  \end{subfigure}
+% 
+%  \begin{subfigure}
+%   \includegraphics[]{}
+%  \end{subfigure}
+%  \end{figure}
+% 
+%   \column{0.5\textwidt}
+%  FE\\
+%  \begin{figure}[H]
+%  \centering
+%  \begin{subfigure}
+%   \includegraphics[]{}
+%  \end{subfigure}
+% 
+%  \begin{subfigure}
+%   \includegraphics[]{}
+%  \end{subfigure}
+%  \end{figure}
+% \end{columns}
+% 
+% \end{frame}
+% \notetoself{}
+
+
+\begin{frame}
+\frametitle{RW solver}
+
+\end{frame}
+\notetoself{}
+
+
+\begin{frame}[shrink]
+\frametitle{Hybrid solver}
+
+\end{frame}
+\notetoself{}
+
+\subsection{Application}
+\begin{frame}
+\frametitle{Results from application}
+\end{frame}
+\notetoself{}
+
+
+
+\section{Concluding remarks}
+\notetoself{The simulation results and verification tests allow some conclusions to be made. Some suggestions for further work are also provided.}
+% ------ CONCLUSIONS ------ %
+\begin{frame}{Conclusions}
+\begin{itemize}
+\item<2-> Difficult to establish parameter values.
+\item<3-> Scaling parameter values affects displacement magnitudes.
+\item<4-> Changing $\eta$ -- effect on magnitude and behaviour.
+\item<5-> Compressibility important. 
+\item<6-> Small but clear viscoelastic effect:
+	\begin{itemize}
+	\item<7-> Lag, approx $10$ms.
+	\item<8-> Varying peak displacement over several cycles, $\approx 10^{-7}-10^{-8}$m.
+	\end{itemize}
+\end{itemize}
+\end{frame} 
+\notetoself{In this thesis, mathematical models for simulating the linear viscoelastic and linear elastic response of the spinal cord have been developed, discretized using the finite element method, and implemented. An efficient scheme for the viscoelasticity problem was developed, resulting in comparable computational speeds for both the linear viscoelasticity problem and the linear elasticity problem. Parameter values were chosen from the literature. However, due to the lack of standardized parameter values, determining appropriate values was challenging, and resulted in differences in displacement magnitudes of approximately 2 orders of magnitude when using parameter values selected from the literature.}
+\notetoself{Scaling the parameter values up/down resulted in displacement magnitudes decreasing/increasing, but had no effect on the displacement pattern or the behaviour of selected points in the geometry.
+
+The effect of compressibility was shown to be important. There was a small, but clear effect of using a viscoelastic model as compared to a purely elastic model. This effect was displayed through a lag in the viscoelastic model of approximately 10ms, and the varying peak displacement displayed by the viscoelastic model when a simulation was run over four cycles.}
+
+\begin{frame}{Conclusions}
+\begin{itemize}
+\item Viscoelastic behaviour similar to linear elastic behaviour.
+%	\begin{itemize}
+%	\item<2-> Lag does not seem to be significant.
+%	\item<3-> Variation in peak displacements over time appears to decrease over time, not 		increase.
+%	\end{itemize}
+\item<2-> Linear viscoelastic model has little or no effect in context of syringomyelia.
+\item<3-> Elastic/viscoelastic models assume solid spinal cord.
+\item<4-> Poroelastic model -- fluid flow within spinal cord.
+\end{itemize}
+\end{frame}
+\notetoself{Apart from this, the viscoelastic behaviour appears to be very similar to the elastic behaviour. The lag displayed by the viscoelastic models is very small, and does not seem significant. Also, the peak displacements results over time displayed by the viscoelastic model over several cycles suggested that the variation decreased for each cycle, and we do not expect any variation in the peak displacement after four cycles. Because of this, together with the uncertainty in the parameter values, it appears that the linear viscoelasticity model has little or no effect in the context of syringomyelia. }
+\note{A limitation of using purely elastic/viscoelastic models is that they model the spinal cord as a solid. This means that any fluid flow within the spinal cord itself is assumed negligible. However, seeing as syrinxes contain fluid, and seeing as the viscoelastic effect turned out to be very small, it may be more interesting to use models that also take into account the fluid flow within the spinal cord for further research into the development of syrinxes, for example a poroelastic model.}
+
+\subsection{Further work}
+\begin{frame}
+\frametitle{Further work}
+\begin{itemize}
+\item<2-> Develop standard procedures for obtaining parameter data.
+	\begin{itemize}
+	\item<2-> Standardized parameter values.
+	\end{itemize}
+\item<3-> Obtain patient-specific spinal cord geometry, parameter data and pressure data.
+\item<4-> Test effect of non-linear model.
+\item<5-> Couple with CFD simulations of CSF flow.
+\end{itemize}
+\end{frame}
+\notetoself{Further work on this subject may include developing standardized procedures for obtaining parameter data for the brain and spinal cord. This could in turn allow for standardized parameter values, which would be very useful when comparing different models. Another interesting extension would be to obtain patient-specific geometries, parameter data and pressure data. This would allow comparison between different patients with the same condition.
+
+Since the linear viscoelasticity model appeared to have little effect, testing a non-linear model may be of interest. Finally, a fully coupled simulation using computational fluid dynamics to simulate CSF flow would be a very interesting extension.}
+
+
+\begin{frame}[plain]
+Thank you for your attention!
+\end{frame}
+
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{References}    
+  \begin{thebibliography}{10}    
+  %\beamertemplatebookbibitems
+  \beamertemplatearticlebibitems
+  \bibitem{chiariSymptoms2004}
+    {Diane M. Mueller}, ND RN and {John J. Oro'}, MD.
+    \newblock {\em Prospective Analysis of Presenting Symptoms Among 265 Patients With Radiographic Evidence of Chiari Malformation Type I With or Without Syringomyelia}.
+    \newblock {Journal of the American Academy of Nurse Practitioners}, 16(3), 2004.
+  \bibitem{stoverudPia2014}
+  St{\o}verud, Karen H. and Aln{\ae}s, Martin and Langtangen, Hans Petter and Haughton, Victor and Mardal, Kent-Andr{\'e}.
+  	\newblock{Effect of pia mater, central canal, and geometry on wave propagation and fluid movement in the cervical spinal cord.}
+  	\newblock{Manuscript submitted for publication}, 2014.
+%  \bibitem{Jemand2000}
+%    S.~Jemand.
+%    \newblock On this and that.
+%    \newblock {\em Journal of This and That}, 2(1):50--100, 2000.
+  \end{thebibliography}
+\end{frame}
+%@article{chiariSymptoms2004,
+%	author = {{Diane M. Mueller}, ND RN and {John J. Oro'}, MD},
+%	journal = {Journal of the American Academy of Nurse Practitioners},
+%	number = {3},
+%	publisher = {American Association of Nurse Practitioners},
+%	title = {{Prospective Analysis of Presenting Symptoms Among 265 Patients With Radiographic Evidence of Chiari Malformation Type I With or Without Syringomyelia}},
+%	volume = {16},
+%	year = {2004}
+%}
+
+
+
+\end{document}

@@ -1,0 +1,1098 @@
+\documentclass[12pt,a4paper, xcolor={usenames,dvipsnames,svgnames,table}]{beamer}
+\usepackage{presentationStyle}
+%\setbeameroption{show only notes}
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}
+%    \frametitle{Outline}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+\setbeamertemplate{section in toc}[ball unnumbered]
+\title % (optional, only for long titles)
+{Simulating the viscoelastic response of the spinal cord}
+%\subtitle{Evidence from India}
+\author % (optional, for multiple authors)
+{Nina Kristine Kylstad\inst{1}}
+\institute[UiO] % (optional)
+{
+  \inst{1}%
+  Faculty of Mathematics and Natural Sciences\\
+  University of Oslo
+}
+\date% (optional)
+{$10^{\text{th}}$ June, 2014}
+\subject{Master thesis presentation}
+\begin{document}
+
+% ------- TITLE -------- %
+\frame[plain]{\titlepage}
+\notetoself{Welcome. Today, I will be presenting my masters thesis, \textbf{Simulating the viscoelastic response of the spinal cord.}}
+
+
+% ------ OUTLINE --------%
+\begin{frame}{Outline}
+\tableofcontents
+%\frametitle{Testing}
+%\begin{itemize}
+%\pause \item Medical background
+%\pause \item The simulation scenario
+%\pause \item Mathematical models
+%\pause \item Discretization
+%\pause \item Implementation
+%\pause \item Results
+%	\begin{itemize}
+%	\item Verification of implementation
+%	\item Simulation results
+%	\end{itemize}
+%\pause \item Conclusions
+%\end{itemize}
+\end{frame}
+\notetoself{Here is an overview of the presentation. I will begin by giving a brief overview of the medical background motivating the thesis, followed by a review of the simulation scenario. The mathematical models used to model the spinal cord will be introduced and discretized. I will give a brief overview of the computer implementation, followed by results from the simulations and finally the conclusions I arrived at.}
+
+
+% ----- INTRODUCTION ----- %
+\section{Medical backgound}
+\note{I will start of with the medical background. This provides the motivation for the simulations in the thesis.}
+%\addcontentsline{toc}{section}{ -- Medical background}
+
+\subsection{Chiari I malformation}
+\begin{frame}[shrink]
+\frametitle{The Chiari I malformation}
+\begin{multicols}{2}
+\begin{itemize}
+\item<2-> Malformation of the brain / skull.
+\item<3-> Downward displacement of hindbrain:
+	\begin{itemize}
+	\item<3-> $\approx 5$mm below foramen magnum.
+	\item<4-> May block CSF flow from brain to spinal column. 
+%	\item<4-> May cause abnormal CSF flow/pressures.
+	\end{itemize}
+\item<5-> Up to $1\%$ of normal adults have malformation.
+\item<6-> Few display symptoms.
+\end{itemize}
+\pause \begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{\imagepath/chiari.jpg}
+\end{figure}
+\end{multicols}
+\end{frame}
+\notetoself{The Chiari malformation is a malformation of the brain, or possibly the skull. It is characterized by a downward displacement of the cerebellum of approximately 5mm below the base of the skull, known as the foramen magnum. This downward displacement may block the flow of cerebrospinal fluid (CSF) from the brain to the spinal canal. Studies have shown that obstructions such as the Chiari I malformation cause abnormal CSF flow, and this is believed to be the cause of symptoms experienced by Chiari patients. It is believed that up to $1\%$ of normal adults have such a malformation, although few display symptoms.}
+
+
+\begin{frame}[shrink]
+\frametitle{The Chiari I malformation}
+\framesubtitle{Common symptoms}
+\begin{table}
+        \centering
+        \begin{tabular}{lc}
+                \toprule
+                \textit{Symptom}& $\boldsymbol{\%}$ \\
+                \midrule
+                Headache& 98 \\
+                Dizziness  & 84 \\
+                Difficulty sleeping  & 72 \\
+                Weakness of an upper extremity & 69 \\
+                Neck pain & 67 \\
+                Numbness/tingling of an upper extremity & 62 \\
+                Fatigue & 59 \\
+                Nausea & 58 \\
+                Shortness of breath & 57 \\
+                Blurred vision & 57 \\
+                Tinnitus & 56 \\
+                Difficulty swallowing  & 54 \\
+                Weakness of a lower extremity & 52 \\
+                \bottomrule
+        \end{tabular}
+        \caption[Chiari symptoms]{13 symptoms were reported by more than 50 \% of the 265 participating patients with Chiari I malformation in the study by Mueller and Oro' \cite{chiariSymptoms2004}}%\citet{chiariSymptoms2004}.}
+        \label{tab:med:symptoms}
+\end{table}
+\end{frame}
+\note{The symptoms of the Chiari I malformation are very diverse, making the condition difficult to diagnose without the use of magnetic resonance imaging. The Chiari I malformation is also related to other conditions, most notably syringomyelia.}
+
+\subsection{Syringomyelia}
+\begin{frame}
+\frametitle{Syringomyelia}
+\begin{itemize}
+\item<2-> Fluid-filled cavities (\emph{syrinxes}) develop in spinal cord.
+\item<3-> May cause irreversible nerve damage.
+\item<4-> $\approx 70\%$ of syringomyelia related to hindbrain disorders.
+\item<5-> $30-50\%$ of \emph{symptomatic} Chiari I patients develop syrinx.
+\end{itemize}
+\end{frame}
+\note{Syringomyelia is a condition in which fluid-filled cavities, also known as sytinxes, develop in the spinal cord tissue. Syrinxes may cause irreversible nerve damage; however, the reason why syrinxes form is yet to be determined. Estimated It is estimated that approximately $70\%$ of syringomyelia is related to hindbrain malformations such as the Chiari I malformation, and approximately $30-50\%$ of Chiari patients develop syrinxes. This thesis investigated the response of the spinal cord under pressure caused by CSF flow, to see if a mathematical model for the spinal cord could further understanding of syrinx formation.}
+
+%\subsection{CSF flow}
+%\begin{frame}
+%\frametitle{CSF flow}
+%Cerebrospinal fluid (CSF) flows in the subarachnoid space (SAS) in the brain and spinal column.
+%\begin{itemize}
+%\item<1-> Studies show that Chiari I results in abnormal CSF flow.
+%\begin{itemize}
+%\item<2-> Velocity
+%\item<2-> Pressure
+%\end{itemize}
+%\item<2-> Believed to be a possible cause for symptoms and syringomyelia.
+%\end{itemize}
+%\end{frame}
+
+
+\section{Simulation scenario}
+%\addcontentsline{toc}{section}{ -- Simulation scenario}
+\notetoself{We now continue to the simulation scenario. To understand what exactly is to be simulated, the spinal cord is studied.}
+
+
+%\subsection{Spinal cord}
+%\begin{frame}
+%\frametitle{The spinal cord}
+%\begin{multicols}{2}
+%\begin{itemize}
+%\item<2-> Part of the central nervous system.
+%\item<3-> Encased in the spinal column.
+%\item<4-> CSF flows past the spinal cord.
+%\item<5-> Cylindrical in shape.
+%\item<6-> Made up of grey and white matter.
+%\end{itemize}
+%\vspace{2cm}
+%\begin{figure}
+%\centering
+%\includegraphics[width=0.55\textwidth]{\imagepath/vertebra-cross-section.jpg}
+%\end{figure}
+%\end{multicols}
+%\end{frame}
+%\notetoself{The spinal cord, together with the brain, makes up the central nervous system. It is located within the spinal column, and protected by three layers of membranes known as the pia mater, arachnoid and dura mater. Between the pia and arachnoid is the subarachnoid space (SAS), in which CSF flows. It is from this flow that pressure is applied on the spinal cord. The spinal cord is cylindrical in shape, and is made up of a core of grey matter, covered by white matter.}
+
+
+% ----- SIMULATION SCENARIO ----- %
+\begin{frame}{Simulation scenario}
+\begin{multicols}{2}
+\begin{itemize}
+\item<1-> Anatomically accurate geometry.
+\item<1-> Spinal cord segment from sheep ($3.4$cm).
+\end{itemize}
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{\imagepath/plot_spinal_cord_mesh_3D_000.eps}
+\end{figure}
+\end{multicols}
+\end{frame}
+\notetoself{In the simulations, an anatomically accurate geometry is used to represent the spinal cord. This geometry is based on the spinal cord of a sheep, and is approximately 3.4 cm in length. }
+
+
+\begin{frame}{Simulation scenario}
+\begin{multicols}{2}
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{\imagepath/pressure_measurements.eps}
+\end{figure}
+\begin{itemize}
+\item<2-> Measured pressure variation from Chiari patient.
+\item<3-> Pressure modelled as travelling wave, 
+\begin{equation}
+p(z,t) = p_0(z + ct).
+\end{equation}
+\end{itemize}
+\end{multicols}
+\end{frame}
+\note{To simulate the pressure from CSF flow, measured pressure values from a Chiari patient was used. The pressure was modelled as a travelling wave on the form seen here, where $z$ is the longitudinal coordinate and $c$ is the wave speed, measured to be $2$m/s.}
+
+
+\section{Mathematical models}
+\notetoself{In order to simulate the response of the spinal cord under applied pressure, mathematical models for the spinal cord are needed. The spinal cord is considered a solid. Because the spinal cord has been shown to display viscoelastic properties, a viscoelastic model is used. In addition, a purely elastic model is used for comparison.}
+%\addcontentsline{toc}{section}{ -- Mathematical models}
+% ----- MATHEMATICAL MODELS ----- %
+
+\subsection{Governing equations}
+\begin{frame}[shrink]{Governing equations}
+Equations for elasticity,
+\begin{subequations}
+\begin{align}
+- \nabla\cdot\sigma &= f , \text{ in }\Omega, \label{eq:equi:main}\\
+u &= u_D, \text{ on } \dirichlet,  \label{eq:equi:dir}\\
+\sigma\cdot\nb &= g, \text{ on } \neumann.\label{eq:equi:neu}
+\end{align}
+\label{eq:equi}
+\end{subequations}
+\pause Neumann BC: Simulates the applies pressure,
+\[\sigma\cdot n = -p\cdot n.\]
+\pause Dirichlet BC: Constraints on top and bottom boundaries. 
+	\begin{itemize}
+	\item<4-> $u_D=0$.
+	\item<5-> $u_D = u_z=0$.
+	\end{itemize}
+\end{frame}
+\notetoself{\small The governing equations from the theory of elasticity are given here. Gamma D denotes the Dirichlet boundary and Gamma N denotes the Neumann boundary. The Neumann boundary condition simulated the applied pressure, where p is the travelling wave from the previous slide. The Dirichlet boundary condition is used to place constraints on the solution, and in this particular case the Dirichlet boundary was chosen to be the top and bottom boundaries, where the geometry would be connected to more spinal cord above and below. There are no obvious choices for what this condition should be. $u=0$ is a possibility, although that would not allow the spinal cord to compress in the radial direction at the boundaries. }
+\note{Another possibility is $u_z=0$. Dirichlet boundary conditions will be discussed in more detail later, and for now we leave $u=u_D$.}
+
+
+\subsection{Constitutive relationships}
+\begin{frame}
+\frametitle{Constitutive relationships}
+\framesubtitle{Stress vs. strain}
+\pause \begin{itemize}
+\item<2-> $\sigma = \sigma(u(x))$: The stress tensor.
+\item<3-> $\epsilon = \epsilon(u(x))$: The strain tensor, defined by
+\begin{equation}
+\epsilon = \half\left(\nabla \ub + (\nabla \ub)^ T \right).
+\label{eq:strain}
+\end{equation}
+\end{itemize}
+\pause \pause Constitutive relationship: $\sigma$ expressed in terms of $\epsilon$.
+
+\pause Linear, isotropic materials.
+\end{frame}
+\notetoself{In order to describe the specific behaviour of a material, a constitutive relationship is required. In particular, we want a stress-strain relationship. Sigma, as appears in the governing equations, is the stress tensor, while the strain tensor is defined as shown. The constitutive relationships we are looking for is then the stress expressed in terms of the strain.  For simplicity, only linear constitutive relationships have been considered, for isotropic materials.}
+
+
+\begin{frame}
+\frametitle{Constitutive relationships}
+\framesubtitle{Linear elasticity}
+\pause Stress-strain relationship given by
+\begin{equation}
+\sigma = 2 \mu \epsilon + \lambda \tr(\epsilon) I.
+\label{eq:sigma:linElast}
+\end{equation}
+
+$\mu, \lambda$: Lam\'e parameters, known in terms of $E$ (Young's modulus) and $\nu$ (Poisson ratio).
+\end{frame}
+\notetoself{The constitutive relationship of linear elasticity is very simple, and is given here. The parameters mu and lambda are known as Lam\'e parameters, and may be expressed in terms of the engineering constants E (Young's modulus) and $\nu$ (Poisson ratio). Young's modulus describes the stiffness of the material, and the Poisson ratio describes the compressibility of the material.}
+
+\begin{frame}[shrink]
+\frametitle{Constitutive relationships}
+\framesubtitle{Linear viscoelasticity}
+\pause Stress-strain relationship from spring-dashpot combinations.
+\begin{multicols}{2}
+\begin{figure}
+\centering
+\includegraphics[width=0.36\textwidth]{\imagepath/maxwell.eps}
+\caption{Maxwell}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.32\textwidth]{\imagepath/kv.eps}
+\caption{Kelvin-Voigt}
+\end{figure}
+\begin{figure}
+\centering
+\includegraphics[width=0.45\textwidth]{\imagepath/SLS.eps}
+\caption{Standard linear solid (SLS)}
+\end{figure}
+\end{multicols}
+\end{frame}
+\notetoself{There are several constitutive relationships for linear viscoelasticity. Simple relationships may be set up as combinations of springs (elastic component) and dashpots (viscous components), as shown in the figures. Simple analysis shows that the standard linear solid model is best suited of the three do model the spinal cord.}
+
+
+\begin{frame}
+\frametitle{Constitutive relationships}
+\framesubtitle{Linear viscoelasticity -- SLS}
+\begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth]{\imagepath/SLS.eps}
+\caption{Standard linear solid (SLS)}
+\end{figure}
+Constitutive relationship given by
+\begin{align}
+\sigma + \tau_\epsilon \dot{\sigma} = E_1 (\epsilon + \tau_{\sigma} \dot{\epsilon}) ,
+\label{eq:sls:model}
+\end{align}
+where $\tau_\epsilon = \frac{\eta}{E_2}$ and $\tau_{\sigma} = \eta \frac{E_1 + E_2}{E_1 E_2}$.
+\end{frame}
+\notetoself{The constitutive relationship for the SLS model is given here.}
+
+
+\begin{frame}
+\frametitle{Constitutive relationships}
+\framesubtitle{Linear viscoelasticity -- SLS}
+Rewritten on integral form:
+\begin{equation}
+\sigma(t) = D(0) \epsilon (t) - \int\limits_0^t D_s(t-s) \epsilon(s) ds,
+\label{eq:sls:volterra}
+\end{equation}
+where
+\begin{equation}
+D(t) = E_1 + E_2 \exponential{-t/\tau}.
+\label{eq:sls:D}
+\end{equation}
+\end{frame}
+\notetoself{This relationship may be written on integral form. D(t) is known as a stress relaxation function. The subscript $s$ denotes a derivative with respect to the integration variable $s$. Since the constitutive relationship is derived from a spring/dashpot combination in 1D, the effects of compressibility are neglected.}
+
+
+\begin{frame}
+\frametitle{Constitutive relationships}
+\framesubtitle{Linear viscoelasticity -- SLS (2D/3D)}
+Extending to 2D/3D, 
+\begin{align}
+D(t)\epsilon(t) &= 2 \mu(t) \epsilon(t) + \lambda(t) \tr (\epsilon(t)) I, \\
+D_s(t-s)\epsilon(s) &= 2{\mu}_s(t-s) \epsilon (s) + {\lambda}_s(t-s) \tr (\epsilon(s)) I,
+\end{align}
+where
+\begin{align*}
+\mu(t) = \mu_1 + \mu_2\exponential{-t/\tau},\\
+\lambda(t) = \lambda_1 + \lambda_2\exponential{-t/\tau}.
+\end{align*}
+\pause $\lambda(t) = C \mu(t)$ gives constant Poisson ratio.
+
+\pause $2\mu_1 = E_1$, $2\mu_2 = E_2$.
+\end{frame}
+\notetoself{In order to include these effects, and additional term is needed. The functions D(t) and $D_s(t)$ are redefined to be operators on the strain tensor, as shown. Note the additional term here as compared to the previous slide. The functions mu(t) and lambda(t) are stress relaxation functions, note that they are on the same form as the 1D stress relaxation function D(t). Setting lambda to be a constant times mu, results in a constant compressibility in time. Comparing the expressions for D(t) in the 1D and 2D/3D cases shows that $2\mu_1 = E_1$, $2\mu_2 = E_2$. Thus, only the parameters E1, E2 and eta from the spring/dashpot model need be determined, as well as the constant C, in order to set the correct Poisson ratio.}
+
+
+\subsection{Parameter values}
+\begin{frame}[shrink]
+\frametitle{Parameter values}
+\footnotesize
+\begin{table}[h!]	
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Constitutive & & & & &\\
+relationship & $E_1$(Pa) & $E_2$(Pa) & $\eta$(Pa s) &  $E$(Pa) & $\nu$ \\
+\midrule
+SLS & $0.84\tens{3}$& $2.03\tens{3}$ & $6.7$ &  -- & -- \\
+SLS* & $0.21\tens{5}$ & $0.53\tens{5}$ & $1.7\tens{2}$ &  -- & --\\
+\midrule
+Lin. elast & -- & -- & -- &  $1.6\tens{4}$ & $0.479$ \\
+Lin. elast* & -- & -- & -- &  $6.5\tens{2}$ & $0.479$\\
+\bottomrule
+\end{tabular}
+\caption{Summary of the parameter values selected from the literature. \\ *:Calculated values.}
+\label{tab:overall:param:summary}
+\end{table}
+\end{frame}
+\notetoself{Parameter values are selected from literature on the spinal cord. There is a very large span in the values reported in the literature, and selecting appropriate values is very difficult. The chosen parameter values are shown in the table. Note that one parameter combination is chosen for each constitutive relationship, and one combination is calculated in order to get displacement results of comparable magnitudes.}
+
+
+\section{Discretization}
+\notetoself{With the mathematical models in place, they may be discretized in order to be implemented on a computer.}
+% ------ DISCRETIZATION ------ %
+\begin{frame}{Systems to be discretized}
+Recall:
+\begin{align*}
+- \nabla\cdot\sigma &= f , \text{ in }\Omega, \\
+u &= u_D, \text{ on } \dirichlet, \\
+\sigma\cdot\nb &= g, \text{ on } \neumann.
+\end{align*}
+\pause Linear elasticity:
+\begin{equation*}
+\sigma = 2 \mu \epsilon + \lambda \tr(\epsilon) I.
+\end{equation*}
+\pause Linear viscoelasticity:
+\begin{equation*}
+\sigma(t) = D(0) \epsilon (t) - \int\limits_0^t D_s(t-s) \epsilon(s) ds.
+\end{equation*}
+\end{frame}
+\notetoself{Recall that the system to be discretized is the system of governing equations, where the stress is given by the constitutive relationships. The system is discretized using the finite element method.}
+
+
+\subsection{Variational formulations}
+\begin{frame}[shrink]
+\frametitle{Variational formulations}
+\framesubtitle{Linear elasticity}
+\pause Find $u\in V$ such that
+\begin{align*}
+a(u,v) &= L(v),\,\,\, \foralls v\in \hat{V},\\
+a(u,v) :&= \intO{2\mu\epsilon : \grad{\vb}} + \intO{\lambda \text{tr}(\epsilon)I : \grad{\vb}},\\
+L(v) :&= \intO{\inner{\fb}{\vb}} + \intN{\inner{\gb}{\vb}}.
+\end{align*}
+where 
+\begin{align*}
+ V &= \{\vb \in H^1(\Omega) : \vb = u_D \text{ on } \dirichlet\} ,  \\
+\hat{V} &= \{\vb \in H^1(\Omega) : \vb = {0} \text{ on } \dirichlet\}, 
+\end{align*}
+\pause Fully discrete: Find $u^h_i \in V^h$ such that
+\begin{align*}
+a(\ub^h_i, \vb) = L(\vb), \,\,\, \foralls \vb \in \hat{V}^h
+\end{align*}
+\end{frame}
+\notetoself{The variational formulation for the linear elasticity problem is given here. At the bottom, the finite element approximation has been inserted to give the fully discrete variational formulation. The i denotes discretization in time.}
+
+
+\begin{frame}[shrink]
+\frametitle{Variational formulations}
+\framesubtitle{Linear viscoelasticity}
+\pause Find $u\in V$ such that 
+\begin{align*}
+&b(t,t;u(t),v) - \intS{c(t,s;u(s),v)} = L(v),\,\,\, \foralls v\in \hat{V},\\
+&b(t, t; \ub, \vb) = \intO{D(0)\epsilon(t) : \nabla \vb}, \\
+&c(t, s; \ub, \vb) = \intO{D_s(t-s)\epsilon(s) : \nabla \vb},
+\end{align*}
+\pause Fully discrete: Find $u^h_i \in V^h$ such that
+\begin{align*}
+&b(t_i, t_i; \ub^h_i, \vb) - \frac{\dt}{2} c(t_i,t_i; \ub^h_i, \vb) \\
+&\mspace{20mu}= L(\vb) + \frac{\dt}{2} c(t_i,t_{0};\ub^h_{0},\vb)+ \dt \mysum{j=1}{i-1} c(t_i,t_j; \ub^h_j, \vb), \,\,\, \foralls \vb \in \hat{V}^h
+\end{align*}
+\end{frame}
+\notetoself{The variational formulation for the linear viscoelasticity problem using the SLS model is given here. The bilinear form on the left-hand-side has been split in two, to deal with the temporal integral separately. Inserting the finite element approximation $u^h_i$ and using the trapezoidal rule for numerical integration gives the fully discrete formulation shown at the bottom. Note that the sum on the right hand side must be calculated for every time step, and will become longer and longer for each time step. In order to avoid this, a more efficient way of calculating the sum is used.}
+
+
+\subsection{Efficient scheme}
+\begin{frame}
+\frametitle{Efficient scheme for viscoelasticity}
+Replace sum term:
+\begin{align}
+\mysum{j=1}{i-1} c(t_i,t_j; \ub^h_j, \vb) &= \exponential{-(t_i - t_{i-1})/\tau} \mysum{j=1}{i-2} c(t_{i-1},t_j; \ub_j^h,\vb) \nonumber\\
+&\mspace{20mu}+ c(t_i, t_{i-1}; \ub^h_{i-1}, \vb).\label{eq:visco:new:sum}
+\end{align}
+\end{frame}
+\notetoself{Because of the nature of the exponential function, the sum term may be rewritten in terms of the sum from the previous time step and the solution from the previous time step, as shown here.}
+
+
+\begin{frame}[shrink]
+\frametitle{Testing the efficient scheme}
+\begin{table}[h!]
+\centering
+\begin{tabular}{>{\itshape}cccccc}
+\toprule
+ & \multicolumn{2}{c}{Trapezoidal} & \multicolumn{2}{c}{Efficient} & \\
+\cmidrule{2-3} \cmidrule{4-5}
+$\dt$ & $e_h$ & rate & $e_h$ & rate & Difference \\
+\midrule
+1.00E-01 & 7.938E-04 & --     & 7.938E-04 & --     & 0.0\\
+5.00E-02 & 1.735E-04 & 2.19 & 1.735E-04 & 2.19 & 2.07E-17\\
+2.50E-02 & 4.067E-05 & 2.09 & 4.067E-05 & 2.09 & 4.76E-18\\
+1.25E-02 & 9.852E-06 & 2.05 & 9.852E-06 & 2.05 & 4.67E-17\\
+6.25E-03 & 2.425E-06 & 2.02 & 2.425E-06 & 2.02 & 8.34E-17\\
+3.13E-03 & 6.015E-07 & 2.01 & 6.015E-07 & 2.01 & 3.55E-18\\
+1.56E-03 & 1.498E-07 & 2.01 & 1.498E-07 & 2.01 & 9.79E-16\\
+7.81E-04 & 3.738E-08 & 2.00 & 3.738E-08 & 2.00 & 3.95E-16\\
+\bottomrule
+\end{tabular}
+\caption[Error comparison in trapezoidal and efficient sum]{Comparing errors in the solution for trapezoidal sum and efficient sum \eqref{eq:visco:new:sum}.}
+\label{table:integral:convergence}
+\end{table}
+\end{frame}
+\notetoself{Testing the new expression for the sum term shows that the results are just as accurate as the old sum. This is to be expected as the two expressions are mathematically equivalent. }
+
+
+\begin{frame}
+\frametitle{Testing the efficient scheme}
+Speedup:
+\begin{table}[h!]
+\centering
+\begin{tabular}{cc}
+\toprule
+& Time taken (s) \\
+\midrule
+Trapezoidal & 1.294\\
+Efficient & 0.017\\
+\cmidrule{1-2}
+Speedup & 74.6\\
+\bottomrule
+\end{tabular}
+\caption[Time comparison in trapezoidal and efficient sum]{Comparing time taken to obtain solution when using trapezoidal sum and efficient sum \eqref{eq:visco:new:sum}.}
+\label{tab:speedup}
+\end{table}
+\end{frame}
+\notetoself{Testing the time taken to calculate a long sum for the two methods shows an immense speedup when using the efficient sum.}
+
+
+\subsection{Boundary conditions}
+\begin{frame}
+\frametitle{Boundary conditions}
+$\Gamma_1, \Gamma_2$: top and bottom boundary respectively.
+\begin{itemize}
+\item<2-> $u_z=0$ on $\Gamma_1, \Gamma_2$
+\item<3-> No-rotation BC: $u\cdot\etheta=u_0\cdot\etheta=0$ on $\Gamma_1, \Gamma_2$, where
+\[ \etheta = \left(\begin{matrix}
+\frac{-(y_0 + y)}{r}\\
+\frac{x_0 + x}{r}\\
+0
+\end{matrix}\right), \]
+$x_0, y_0$: points, $r=\sqrt{(x_0+x)^2 + (y_0+y)^2}$. From method used in article by St{\o}verud et. al.~\cite{stoverudPia2014}.
+\item<4-> $u=0$ on point in $\Gamma_1, \Gamma_2$.
+\end{itemize}
+\end{frame}
+\note{We now return to the matter of the Dirichlet boundary conditions. The top boundary is denoted by Gamma 1 and the bottom boundary is denoted by Gamma 2. The condition $u_z=0$ seems more appropriate than $u=0$. However, setting only $u_z=0$ on the Dirichlet boundary does not provide enough constraints, and the solution is free to move and rotate. Therefore, a no-rotation boundary condition is also imposed, together with the condition $u=0$ in a point in the centre of the top and bottom boundaries. The first and third conditions here may be imposed strongly, meaning that they can be imposed by altering the linear system that arises from the finite element method. The no-rotation condition, however, must be imposed weakly. This is done with the use of Nitsche's method.}
+
+
+\begin{frame}[shrink]
+\frametitle{Boundary conditions}
+\framesubtitle{Weakly enforcing no-rotation condition}
+Using Nitsche's method, variational form:
+Find $u\in V$ such that
+
+\begin{align}
+&\intO{\sigma(\ub) : \grad{v}}  + \frac{\gamma}{ h_E} \intB{(\ub\cdot\etheta)(\vb\cdot\etheta)} \nonumber\\ 
+&\mspace{20mu} - \intB{(\sigma(\ub)\cdot\nb\cdot\etheta)(\vb\cdot\etheta)} - \intB{(\sigma(\vb)\cdot\nb\cdot\etheta)
+(\ub\cdot\etheta)}  \nonumber\\
+&= \intO{\inner{\fb}{\vb}} + \intN{\inner{\gb}{\vb}} + \frac{\gamma}{h_E} \intB{(\ub_0\cdot\etheta)(\vb\cdot\etheta)} \nonumber\\ 
+&\mspace{20mu} - \intB{(\sigma(\vb)\cdot\nb\cdot\etheta)
+(\ub_0\cdot\etheta)}, \,\,\, \foralls v \in \hat{V},  \nonumber\\
+\end{align}
+\end{frame}
+\notetoself{Using Nitsche's method for weakly imposing the no-rotation boundary condition results in the variational formulation shown here. The constitutive relationships are inserted for $\sigma$, as in the variational forms before. $\gamma$ is a stabilization factor.}
+
+\section{Implementation}
+\notetoself{Now that the boundary conditions are dealt with, the problem may be implemented.}
+% ------ IMPLEMENTATION ------ %
+\begin{frame}[shrink]{Implementation}
+\begin{itemize}
+\item<2-> Python
+\item<3-> FEniCS
+	\begin{itemize}
+	\item<4-> PETSc
+		\begin{itemize}
+		\item<4-> Direct LU solver (testing)
+		\item<4-> Krylov solver: GMRES with AMG preconditioner (simulations)
+		\end{itemize}
+	\end{itemize}
+\item<5-> Object oriented approach
+\begin{figure}
+\includegraphics[width=0.5\textwidth]{\imagepath/class_hierarchy.eps}
+\end{figure}
+\end{itemize}
+\end{frame}
+\notetoself{The problem was implemented using Python, together with the open-dource finite element software FEniCS. FEniCS automates the process of assembling the variational formulations into linear systems. To solve the linear systems, FEniCS uses the PETSc backend. In PETSc, many different linear solvers are implememted. The ones used in this thesis are a direct LU solver, which was used for testing, and an iterative Krylov solver, specifically the generalized minimal residual method with an algebraic multigrid preconditioner, was used for the simulations. }
+\note{The implementation was done in an object-oriented approach, creating a superclass ElasticityPtoblem to contain all the methods and variables common to both problems, and subclasses that inherit these, while also implementing their respective methods. The implementations were tested using both visual tests, and the method of manufactured solutions.}
+
+
+\subsection{Verification}
+\begin{frame}[shrink]
+\frametitle{Verifying the implementations}
+\framesubtitle{Linear elasticity}
+\begin{figure}[h!]
+%\includegraphics[width=\textwidth]{\imagepath/linElast_simulation_2D_simple_behavior.eps}
+\begin{subfigure}[b]{0.45\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/pressure_var_test.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/pressure_var_test.eps}
+\caption{Applied pressure}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/linElast_simulation_2D_simple_behavior.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/linElast_simulation_2D_simple_behavior.eps}
+\caption{Displacement}
+\end{subfigure}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/creep_result1.eps_tex}
+\caption[2D simulation result in a point -- linear elasticity]{(a) Pressure variation over time, and (b) Resulting displacement over time in a chosen point in the mesh from simple pressure simulation using linear elasticity solver on unit square geometry (2D).}
+\label{fig:res:sim:point:linElast:2D}
+\end{figure}
+\end{frame}
+\notetoself{The visual test for linear elasticity shows the behaviour of a chosen point in the geometry over time, under a constant applied pressure which is subsequently removed. The chosen point in the geometry reaches equilibrium instantaneously and remains at this equilibrium until the pressure is removed, thus behaving exactly as expected.}
+
+
+\begin{frame}
+\frametitle{Verifying the implementations}
+\framesubtitle{Linear elasticity}
+\begin{table}[h!]
+\centering
+\begin{tabular}{>{\itshape}ccccc}
+\toprule
+& \multicolumn{2}{c}{Degree 1} & \multicolumn{2}{c}{Degree 2}\\
+\cmidrule{2-3}\cmidrule{4-5}
+${h}$ & $e$ & rate & $e$ & rate \\
+\midrule
+2.50E-01 & 1.53E-01 & --   &2.33E-03 & --   \\
+1.25E-01 & 4.46E-02 & 1.78 &2.78E-04 & 3.07 \\
+6.25E-02 & 1.17E-02 & 1.93 &3.41E-05 & 3.03 \\
+3.12E-02 & 2.97E-03 & 1.98 &4.22E-06 & 3.01 \\
+1.56E-02 & 7.46E-04 & 1.99 &5.26E-07 & 3.01 \\
+7.81E-03 & 1.87E-04 & 2.00 &6.56E-08 & 3.00 \\
+\bottomrule
+\end{tabular}
+\caption[Errors from manufactured solution -- linear elasticity (2D)]{Errors in the numerical solution $\ub$ for linear elasticity, when compared to a manufactured exact solution $\ub_e$, for elements of degrees 1 and 2 in 2D using direct LU solver. }
+\label{tab:convergence:linElast:2D:lu}
+\end{table}
+\end{frame}
+\notetoself{Using the method of manufactured solutions, the error in the numerical solution is tested and the results are displayed in the table. $h$ represents the mesh resolution, and is defined as the maximum cell diameter in the mesh. It is expected that the error for elements of degree 1 will show a convergence rate of 2, while the error for elements of degree 2 will show a convergence rate of 3. Thus, the implementation performs exactly as expected. The results are similar in 3D.}
+
+\begin{frame}
+\frametitle{Verifying the implementations}
+\framesubtitle{Linear viscoelasticity}
+\begin{figure}[h!]
+%\includegraphics[width=\textwidth]{\imagepath/linElast_simulation_2D_simple_behavior.eps}
+\begin{subfigure}[b]{0.45\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/pressure_var_test.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/pressure_var_test.eps}
+\caption{Applied pressure}
+\end{subfigure}
+\begin{subfigure}[b]{0.45\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/linElast_simulation_2D_simple_behavior.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/creep_result2.eps}
+\caption{Displacement}
+\end{subfigure}
+\caption{(a) Pressure variation over time, and (b) Resulting displacement over time in a chosen point in the mesh from simple pressure simulation using linear viscoelasticity solver on unit square geometry (2D).}
+\label{fig:visco:creep:results}
+\end{figure}
+\end{frame}
+\notetoself{The visual test for linear viscoelasticity shows the behaviour of a chosen point in the geometry over time, under a constant applied pressure which is subsequently removed. Under a constant applied pressure, the chosen point in the mesh displays an instantaneous elastic response followed by a gradual, bounded increase in displacement. This is known as the viscoelastic property of creep, and is the expected response, suggesting that the implementation of the viscoelasticity problem is working.}
+
+
+\begin{frame}[shrink]
+\frametitle{Verifying the implementations}
+\framesubtitle{Linear viscoelasticity}
+\scriptsize
+\begin{table}[h!]
+\centering
+\begin{tabular}{>{\itshape}ccccccc}
+\toprule
+${\dt}\,\, \backslash \,\,h$   &  \emph{3.54E-01}  &  \emph{1.77E-01}  &  \emph{8.84E-02}  &  \emph{4.42E-02}  &  \emph{2.21E-02}  & \emph{1.10E-02} \\\midrule
+2.00E-02 & \textbf{4.19E-03} & 3.96E-03 & 5.64E-03 & 6.09E-03 & \textbf{6.21E-03} & \textbf{6.23E-03} \\
+1.00E-02 & 7.90E-03 & \textbf{1.18E-03} & 9.64E-04 & 1.38E-03 & \textbf{1.49E-03} & \textbf{1.51E-03} \\
+5.00E-03 & 8.91E-03 & 2.12E-03 & \textbf{3.10E-04} & 2.40E-04 & \textbf{3.43E-04} & \textbf{3.68E-04} \\
+2.50E-03 & 9.16E-03 & 2.37E-03 & 5.42E-04 & \textbf{7.87E-05} & \textbf{5.98E-05} & \textbf{8.37E-05} \\
+1.25E-03 & 9.22E-03 & 2.44E-03 & 6.07E-04 & 1.37E-04 & \textbf{1.98E-05} & -* \\
+1.00E-04 & 9.24E-03 & 2.46E-03 & 6.29E-04 & 1.58E-04 &  \textbf{3.95E-05} & -* \\
+5.00E-05 & \textbf{9.24E-03} & \textbf{2.46E-03} & \textbf{6.29E-04} & \textbf{1.58E-04} & \textbf{3.96E-05} & -* \\
+\bottomrule
+\end{tabular}
+\caption{Errors in the numerical solution for linear viscoelasticity (SLS model), when compared to a manufactured exact solution, for elements of degree 1 in 2D using direct LU solver.}
+\label{tab:compare:errors:visco:1}
+\end{table}
+\end{frame}
+\notetoself{The error in the numerical solution is tested using the method of manufactured solutions. The errors, when varying resolution in both time and space, for elements of degree 1 are shown in the table. $h$ represents the mesh resolution, and is defined as the maximum cell diameter in the mesh. $\dt$ represents the time step size. * Note that these error values are missing due to the large time requirements for the computations. In the bottom row, where $\dt$ is very small, there is a clear second order convergence in space.}
+\note{There is also a tendency towards a second order convergence on the diagonal. In the far right column, where h is small, there is a second order convergence in time to begin with.
+It is possible that an even finer mesh in space is required to fully capture the behaviour of the error in time; however, due to the very long computing times this would require, it was not prioritized, and it is assumed that the error has adequate convergence in time.}
+
+\begin{frame}[shrink]
+\frametitle{Verifying the implementations}
+\framesubtitle{Linear viscoelasticity}
+\footnotesize
+\begin{table}[h!]
+\centering
+\begin{tabular}{>{\itshape}~c^c^c^c^c^c}
+\toprule
+\rowstyle{\itshape}
+$\dt \,\, \backslash \,\, h$   &  3.54E-01     &  1.77E-01     &  8.84E-02     &  4.42E-02     &  2.21E-02     \\
+\midrule
+2.00E-02 & \textbf{6.25E-03} & 6.25E-03 & 6.25E-03 & 6.25E-03 & \textbf{6.25E-03} \\
+
+1.00E-02 & 1.53E-03 & \textbf{1.53E-03} & 1.53E-03 & 1.53E-03 & \textbf{1.53E-03} \\
+
+5.00E-03 & 3.85E-04 & 3.80E-04 & \textbf{3.79E-04} & 3.79E-04 & \textbf{3.79E-04} \\
+
+2.50E-03 & 1.06E-04 & 9.51E-05 & 9.47E-05 & \textbf{9.47E-05} & \textbf{9.47E-05} \\
+
+1.25E-03 & 4.61E-05 & 2.45E-05 & 2.37E-05 & 2.37E-05 & \textbf{2.37E-05} \\
+
+1.00E-04 & 3.69E-05 & 5.13E-06 & 6.89E-07 & 1.75E-07 & \textbf{1.52E-07} \\
+
+5.00E-05 & \textbf{3.69E-05} & \textbf{5.12E-06} & \textbf{6.70E-07} & \textbf{9.37E-08} & \textbf{3.94E-08}\\
+\bottomrule
+\end{tabular}
+\caption[Errors from manufactured solutions -- SLS (2D), degree 2]{Errors in the numerical solution for linear viscoelasticity (SLS model), when compared to a manufactured exact solution, for elements of degree 2 in 2D using direct LU solver. }
+\label{tab:compare:errors:visco:2}
+\end{table}
+\end{frame}
+\notetoself{there is a second order convergence on the diagonal. There is also a clear second order convergence in the rightmost column, as well as tendencies towards a third order convergence in the bottom row, corresponding to the third order convergence we saw in the linear elasticity problem for elements of degree 2.
+
+Overall it appears that the error in the solution for the linear viscoelasticity problem converges much as expected, and the implementation for the linear viscoelasticity problem is assumed to be verified.}
+
+\section{Simulation results}
+\notetoself{This brings us to the simulations. Results from the simulations will now be reviewed.}
+% ------ RESULTS ------ %
+\subsection{Overview of models}
+\begin{frame}[shrink]{Simulations}
+\framesubtitle{Overview of the models}
+\footnotesize
+\begin{table}[h!]	
+\centering
+\begin{tabular}{>{\itshape}ccccc}
+\toprule
+& \multicolumn{4}{c}{SLS} \\
+\cmidrule{2-5}
+& $E_1$(Pa) & $E_2$(Pa) & $\eta$(Pa s) & $C$ \\
+\midrule
+Model 1 & $0.84\tens{3}$& $2.03\tens{3}$ & $6.7$ & $22.8\,(0.479*)$ \\
+Model 2 & $0.21\tens{5}$ & $0.53\tens{5}$ & $1.7\tens{2}$ & $22.8\,(0.479*)$\\
+Model 3 & $0.84\tens{3}$ & $2.03\tens{3}$ & $13.4$ & $22.8\,(0.479*)$\\
+Model 4 & $0.84\tens{3}$& $2.03\tens{3}$ & $6.7$ & $0.0\,(0.0*)$ \\%\addlinespace[8pt]
+\midrule
+& \multicolumn{4}{c}{Linear elasticity} \\
+\cmidrule{2-5}
+& $E$(Pa) & $\nu$ &  & \\
+\midrule
+Model 5 & $1.6\tens{4}$ & $0.479$ & -- & -- \\
+Model 6 & $6.5\tens{2}$ & $0.479$ & -- & -- \\
+\bottomrule
+\end{tabular}
+\caption{Summary of the parameters to be used in simulations. \\ *$\nu$, defined implcitly through $C$.}
+\label{tab:overall:param:summary}
+\end{table}
+\end{frame}
+\notetoself{An overview of the constitutive relationships and corresponding parameter values used for simulations are shown in the table. Model 1 is the default for linear viscoelasticity while Model 5 is the default for linear elasticity. Models 2 and 6 use parameter values that have been calculated in order to obtain similar displacement magnitudes as Models 5 and 1 respectively. Model 3 tests the effect of a higher viscosity. Model 4 tests the effect of neglecting compressibility. The results are compared to one another: First the viscoelastic results are compared, and then viscoelastic and purely elastic results are compared. The comparisons consist of both a visual comparison, and line plots displaying the displacement of selected points in the geometry over time.}
+
+
+\subsection{Viscoelastic results}
+\begin{frame}[shrink]
+\frametitle{Viscoelastic results}
+\framesubtitle{Visual plot: Models 1 and 3}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-0-075.eps}
+\caption{Model 1}
+\end{subfigure}
+\quad
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-large-eta-0-075.eps}
+\caption{Model 3}
+\end{subfigure}
+\caption{Visual comparison of Model 1 and Model 3 at $t=0.075$s. The displacement patterns are similar for Models 1 and 3, while the magnitudes of the displacement differ slightly.}
+\label{fig:compare:m1m3}
+\end{figure}
+\end{frame}
+\notetoself{This shows the results from using Models 1 and 3, at a selected time level. The comparison here suggests that changing $\eta$ does not have a large effect on the displacement pattern. Qualitatively the plots look similar. However, it should be noted that the magnitude of the displacements decreased noticeably by just doubling $\eta$, the values are approximately 1.6 times larger for Model 1 compared to Model 3.}
+
+
+\begin{frame}
+\frametitle{Viscoelastic results}
+\framesubtitle{Line plot: Models 1 and 3}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/simulation-results/SLS-plot-point-default.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-line-plot.eps}
+\caption{Model 1}
+\label{fig:compare:m1m3:point:1}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/simulation-results/SLS-plot-point-large-eta.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-large-eps-line-plot.eps}
+\caption{Model 3}
+\label{fig:compare:m1m3:point:3}
+\end{subfigure}
+\caption[Displacement magnitude over time for a point in Models 1 and 3]{Displacement magnitude over time for chosen points in the geometry for Model 1 and Model 3. The two plots show the similar qualitative behavior, but differ in magnitude.}
+\label{fig:compare:m1m3:point}
+\end{figure}
+\end{frame}
+\notetoself{Here we see plots of the displacement magnitude in three points in the geometry over time. The plots  have very similar shapes; at first glance they appear identical. The magnitude of the displacement is the largest the point in the middle of the geometry , while the displacements for the top and bottom points have similar magnitudes. The ratio of the instantaneous elastic response to the peak displacement is nearly double for Model 1 when compared to Model 3. Increasing eta appears to dampen the behaviour.}
+
+
+\begin{frame}[shrink]
+\frametitle{Viscoelastic results}
+\framesubtitle{Visual plot: Models 1 and 4}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-0-075.eps}
+\caption{Model 1}
+\end{subfigure}
+\quad
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-C-0-0-075.eps}
+\caption{Model 4}
+\end{subfigure}
+\caption{Visual comparison of Model 1 and Model 4 at $t=0.075$s. The displacement patterns are drastically different for Models 1 and 4, as are the magnitudes of the displacement.}
+\label{fig:compare:m1m4}
+\end{figure}
+\end{frame}
+\notetoself{Comparing Model 1 with Model 4 (which ignores the effects of compressibility) shows that the effect of compressibility is significant. The displacement is an order of magnitude larger for Model 4, and the displacement patters are drastically different for Models 1 and 4.}
+
+
+\begin{frame}
+\frametitle{Viscoelastic results}
+\framesubtitle{Line plot: Models 1 and 4}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-line-plot.eps}
+\caption{Model 1}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-line-plot-C0.eps}
+\caption{Model 4}
+\end{subfigure}
+\caption[Displacement magnitude over time for a point in Models 1 and 4]{Displacement magnitude over time for chosen points in the geometry for Model 1 and Model 4. The two plots differ both in qualitative behavior and in magnitude.}
+\label{fig:compare:m1m4:point}
+\end{figure}
+\end{frame}
+\notetoself{Comparing the behaviour of the chosen points over time shows that the two models behave very differently. Clearly compressibility has a large effect on the solution, and must be taken into account.}
+
+\begin{frame}
+\frametitle{Viscoelastic results}
+\framesubtitle{Line plot: Model 1 over $4$ cycles}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-line-plot-long.eps}
+\caption{Displacement in the selected points over four cycles ($T=3.4$s).}
+\label{fig:m1:long}
+\end{figure}
+\end{frame}
+\notetoself{A simulation was run over four cycles. The displacements in the selected  points in the geometry for Model 1 over time for the four cycles are shown here. Qualitatively, the displacement appears the same for each of the cycles.}
+
+\begin{frame}
+\frametitle{Viscoelastic results}
+\framesubtitle{Peak displacements over time: Model 1}
+\begin{table}
+\centering
+\begin{tabular}{cccc}
+\toprule
+Cycle & $u_{T, max}$(cm) & $u_{M, max}$(cm) & $u_{B, max}$(cm)\\
+\midrule
+1 & 0.064560 & 0.134180 & 0.0534309\\
+2 & 0.064612 & 0.134151 & 0.0534311\\
+3 & 0.064609 & 0.134119 & 0.0534312\\
+4 & 0.064609 & 0.134119 & 0.0534312\\
+\bottomrule
+\end{tabular}
+\caption[Peak displacements over four cycles -- Model 1]{Peak displacements for the points $x_T, x_M$ and $x_B$ for each cycle, using Model 1 with $T=3.4$. The difference in the peak displacements over four cycles is in the order of $1\tens{-7}$m for each of the points.}
+\label{tab:compare:peaks:cycles}
+\end{table}
+\end{frame}
+\notetoself{However, measurements of the exact peak displacement values for each of the points show that the peak displacement does vary sligtly, in the order of $10-100$nm each cycle. The variation appears to decrease for each cycle, not being visible at all between cycles 3 and 4.}
+
+\subsection{Comparing with linear elasticity}
+\begin{frame}[shrink]
+\frametitle{Comparing with linear elasticity}
+\framesubtitle{Visual plot: Models 1 and 6}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-0-075.eps}
+\caption{Model 1}
+\label{fig:compare:m1m6:1}
+\end{subfigure}
+\quad
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/linElast-smallE-0-075.eps}
+\caption{Model 6}
+\label{fig:compare:m1m6:6}
+\end{subfigure}
+\caption{Visual comparison of Model 1 and Model 6 at $t=0.075$s.}
+\label{fig:compare:m1m6}
+\end{figure}
+\end{frame}
+\notetoself{Here we see a comparison between a viscoelastic and a purely elastic model. Model 6 uses calculated parameter values so that the displacement magnitudes are similar. The displacement patterns for Models 1 and 6 appear relatively similar. The only clear difference at this time level is that the largest displacements are focused slightly more along the sides of the geometry for Model 6, and more in the centre of the geometry for Model 1.}
+
+\begin{frame}
+\frametitle{Comparing with linear elasticity}
+\framesubtitle{Line plot: Models 1 and 6}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/simulation-results/SLS-plot-point-default.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-line-plot.eps}
+\caption{Model 1}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+%\def\svgwidth{\columnwidth}
+%\input{\imagepath/simulation-results/SLS-plot-point-large-eta.eps_tex}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/linElast-smallE-line-plot.eps}
+\caption{Model 6}
+\end{subfigure}
+\caption[Displacement magnitude over time for a point in Models 1 and 6]{Displacement magnitude over time for a chosen point in the geometry for Model 1 and Model 6. The two curves show the similar qualitative behavior, but differ in magnitude.}
+\label{fig:compare:m1m6:point}
+\end{figure}
+\end{frame}
+\notetoself{Looking at the displacements in the chosen points over time reveals why the displacement patterns are slightly different for Models 1 and 6. The results from Model 1 appear similar to the results from Model 6, but lag slightly behind.}
+
+\begin{frame}
+\frametitle{Comparing with linear elasticity}
+\framesubtitle{Time taken to reach peak displacement: Models 1 and 6}
+\begin{table}[h!]
+\centering
+\begin{tabular}{ccc}
+\toprule
+ & Reaches peak after (s)\\
+ \cmidrule{2-3}
+Point & Model 1 & Model 6\\
+\midrule
+$x_T$ & 0.055 & 0.04\\
+$x_M$ & 0.045 & 0.035\\
+$x_B$ & 0.14  & 0.125\\
+\bottomrule
+\end{tabular}
+\caption[Time to reach peak displacements -- Models 1 and 6]{Time taken to reach peak displacement for the chosen points in Model 1 and Model 6.}
+\label{tab:compare:time:m1m6}
+\end{table}
+\end{frame}
+\notetoself{The times taken to reach peak displacement for the chosen points in the two models are shown here. Model 1 lags behind Model 6 in that it takes 10-15 ms longer for the points to reach peak displacement.}
+
+
+\begin{frame}[shrink]
+\frametitle{Comparing with linear elasticity}
+\framesubtitle{Visual plot: Models 2 and 5}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-largeE-0-075.eps}
+\caption{Model 2}
+\label{fig:compare:m2m5:2}
+\end{subfigure}
+\quad
+\begin{subfigure}[b]{0.45\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/linElast-largeE-0-075.eps}
+\caption{Model 5}
+\label{fig:compare:m2m5:5}
+\end{subfigure}
+\caption{Visual comparison of Model 2 and Model 5 at $t=0.075$s.}
+\label{fig:compare:m2m5}
+\end{figure}
+\end{frame}
+\notetoself{The comparison of Models 2 and 5 is very similar to the comparison of Models 1 and 6. The difference is the magnitude of the displacements, which is much smaller for Models 2 and 5. Scaling the parameter values up results in lower displacement values, but otherwise similar behaviour as the lower parameter values.}
+
+\begin{frame}
+\frametitle{Comparing with linear elasticity}
+\framesubtitle{Line plot: Models 2 and 5}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-largeE-line-plot.eps}
+\caption{Model 2}
+\label{fig:compare:m2m5:point:2}
+\end{subfigure}
+\begin{subfigure}[b]{0.48\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/linElast-largeE-line-plot.eps}
+\caption{Model 5}
+\label{fig:compare:m2m5:point:5}
+\end{subfigure}
+\caption[Displacement magnitude over time for a point in Models 2 and 5]{Displacement magnitude over time for a chosen point in the geometry for Model 2 and Model 5. The two curves show the similar qualitative behavior, but differ in magnitude.}
+\label{fig:compare:m2m5:point}
+\end{figure}
+\end{frame}
+\notetoself{This is also displayed here. The plots display the same behaviour as the plots comparing Models 1 and 6.}
+
+
+\begin{frame}
+\frametitle{Comparing with linear elasticity}
+\framesubtitle{Peak displacements over time: Model 6}
+\begin{table}[h!]
+\centering
+\begin{tabular}{cccc}
+\toprule
+Cycle & $u_{T, max}$(cm) & $u_{M, max}$(cm) & $u_{B, max}$(cm)\\
+\midrule
+1 & 0.0765298 & 0.166881 & 0.0600790\\
+2 & 0.0765298 & 0.166881 & 0.0600790\\
+3 & 0.0765298 & 0.166881 & 0.0600790\\
+4 & 0.0765298 & 0.166881 & 0.0600790\\
+\bottomrule
+\end{tabular}
+\caption[Peak displacements over four cycles -- Model 6]{Peak displacements for the points $x_T, x_M$ and $x_B$ for each cycle, using Model 6 with $T=3.4$. There is no difference in the magnitude of the peak displacement for each cycle.}
+\label{tab:compare:peaks:cycles:linelast}
+\end{table}
+\end{frame}
+\notetoself{Running a simulation with Model 6 over 4 cycles does not result in a variation in the peak displacements in the chosen points, as seen in the table. }
+
+\subsection{Comparing with poroelasticity}
+\begin{frame}[shrink]
+\frametitle{Comparing with linear poro}
+\framesubtitle{Visual comparison: Poroelastic, linear elastic, linear viscoelastic}
+\begin{figure}[h!]
+\centering
+\begin{subfigure}[b]{0.325\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/u_case1_box.png}
+\caption{Poroelastic \cite{stoverudPia2014}}
+\label{fig:compare:poro:p}
+\end{subfigure}
+\begin{subfigure}[b]{0.325\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/u_case9_box.png}
+\caption{Linear elastic \cite{stoverudPia2014}}
+\label{fig:compare:poro:l}
+\end{subfigure}
+\begin{subfigure}[b]{0.325\textwidth}
+\includegraphics[width=\textwidth]{\imagepath/simulation-results/SLS-default-0-05.eps}
+\caption{SLS, Model 1}
+\label{fig:compare:poro:v}
+\end{subfigure}
+\caption{Comparison of results from St{\o}verud et. al.~\cite{stoverudPia2014} with viscoelastic results using Model 1. Note that the top and bottom $0.5$cm have been cut from the geometry to display the same geometry as St{\o}verud et. al.~\cite{stoverudPia2014}.}
+\label{fig:compare:poro}
+\end{figure}
+\end{frame}
+\notetoself{A comparison is made with the results obtained by St{\o}verud et. al, who used a poroelastic model to simulate the response of the spinal cord under similar conditions and using the same geometry. A visual comparison at the time level when the displacement magnitude was largest is shown, using Model 1 as the viscoelastic model. Qualitatively, the displacement patterns appear similar, but the magnitudes of the displacement is much larger for Model 1 than for the models used by St{\o}verud et. al.}
+
+
+\section{Conclusions}
+\notetoself{The simulation results and verification tests allow some conclusions to be made. Some suggestions for further work are also provided.}
+% ------ CONCLUSIONS ------ %
+\begin{frame}{Conclusions}
+\begin{itemize}
+\item<2-> Difficult to establish parameter values.
+\item<3-> Scaling parameter values affects displacement magnitudes.
+\item<4-> Changing $\eta$ -- effect on magnitude and behaviour.
+\item<5-> Compressibility important. 
+\item<6-> Small but clear viscoelastic effect:
+	\begin{itemize}
+	\item<7-> Lag, approx $10$ms.
+	\item<8-> Varying peak displacement over several cycles, $\approx 10^{-7}-10^{-8}$m.
+	\end{itemize}
+\end{itemize}
+\end{frame} 
+\notetoself{In this thesis, mathematical models for simulating the linear viscoelastic and linear elastic response of the spinal cord have been developed, discretized using the finite element method, and implemented. An efficient scheme for the viscoelasticity problem was developed, resulting in comparable computational speeds for both the linear viscoelasticity problem and the linear elasticity problem. Parameter values were chosen from the literature. However, due to the lack of standardized parameter values, determining appropriate values was challenging, and resulted in differences in displacement magnitudes of approximately 2 orders of magnitude when using parameter values selected from the literature.}
+\notetoself{Scaling the parameter values up/down resulted in displacement magnitudes decreasing/increasing, but had no effect on the displacement pattern or the behaviour of selected points in the geometry.
+
+The effect of compressibility was shown to be important. There was a small, but clear effect of using a viscoelastic model as compared to a purely elastic model. This effect was displayed through a lag in the viscoelastic model of approximately 10ms, and the varying peak displacement displayed by the viscoelastic model when a simulation was run over four cycles.}
+
+\begin{frame}{Conclusions}
+\begin{itemize}
+\item Viscoelastic behaviour similar to linear elastic behaviour.
+%	\begin{itemize}
+%	\item<2-> Lag does not seem to be significant.
+%	\item<3-> Variation in peak displacements over time appears to decrease over time, not 		increase.
+%	\end{itemize}
+\item<2-> Linear viscoelastic model has little or no effect in context of syringomyelia.
+\item<3-> Elastic/viscoelastic models assume solid spinal cord.
+\item<4-> Poroelastic model -- fluid flow within spinal cord.
+\end{itemize}
+\end{frame}
+\notetoself{Apart from this, the viscoelastic behaviour appears to be very similar to the elastic behaviour. The lag displayed by the viscoelastic models is very small, and does not seem significant. Also, the peak displacements results over time displayed by the viscoelastic model over several cycles suggested that the variation decreased for each cycle, and we do not expect any variation in the peak displacement after four cycles. Because of this, together with the uncertainty in the parameter values, it appears that the linear viscoelasticity model has little or no effect in the context of syringomyelia. }
+\note{A limitation of using purely elastic/viscoelastic models is that they model the spinal cord as a solid. This means that any fluid flow within the spinal cord itself is assumed negligible. However, seeing as syrinxes contain fluid, and seeing as the viscoelastic effect turned out to be very small, it may be more interesting to use models that also take into account the fluid flow within the spinal cord for further research into the development of syrinxes, for example a poroelastic model.}
+
+\subsection{Further work}
+\begin{frame}
+\frametitle{Further work}
+\begin{itemize}
+\item<2-> Develop standard procedures for obtaining parameter data.
+	\begin{itemize}
+	\item<2-> Standardized parameter values.
+	\end{itemize}
+\item<3-> Obtain patient-specific spinal cord geometry, parameter data and pressure data.
+\item<4-> Test effect of non-linear model.
+\item<5-> Couple with CFD simulations of CSF flow.
+\end{itemize}
+\end{frame}
+\notetoself{Further work on this subject may include developing standardized procedures for obtaining parameter data for the brain and spinal cord. This could in turn allow for standardized parameter values, which would be very useful when comparing different models. Another interesting extension would be to obtain patient-specific geometries, parameter data and pressure data. This would allow comparison between different patients with the same condition.
+
+Since the linear viscoelasticity model appeared to have little effect, testing a non-linear model may be of interest. Finally, a fully coupled simulation using computational fluid dynamics to simulate CSF flow would be a very interesting extension.}
+
+
+\begin{frame}[plain]
+Thank you for your attention!
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle<presentation>{References}    
+  \begin{thebibliography}{10}    
+  %\beamertemplatebookbibitems
+  \beamertemplatearticlebibitems
+  \bibitem{chiariSymptoms2004}
+    {Diane M. Mueller}, ND RN and {John J. Oro'}, MD.
+    \newblock {\em Prospective Analysis of Presenting Symptoms Among 265 Patients With Radiographic Evidence of Chiari Malformation Type I With or Without Syringomyelia}.
+    \newblock {Journal of the American Academy of Nurse Practitioners}, 16(3), 2004.
+  \bibitem{stoverudPia2014}
+  St{\o}verud, Karen H. and Aln{\ae}s, Martin and Langtangen, Hans Petter and Haughton, Victor and Mardal, Kent-Andr{\'e}.
+  	\newblock{Effect of pia mater, central canal, and geometry on wave propagation and fluid movement in the cervical spinal cord.}
+  	\newblock{Manuscript submitted for publication}, 2014.
+%  \bibitem{Jemand2000}
+%    S.~Jemand.
+%    \newblock On this and that.
+%    \newblock {\em Journal of This and That}, 2(1):50--100, 2000.
+  \end{thebibliography}
+\end{frame}
+%@article{chiariSymptoms2004,
+%	author = {{Diane M. Mueller}, ND RN and {John J. Oro'}, MD},
+%	journal = {Journal of the American Academy of Nurse Practitioners},
+%	number = {3},
+%	publisher = {American Association of Nurse Practitioners},
+%	title = {{Prospective Analysis of Presenting Symptoms Among 265 Patients With Radiographic Evidence of Chiari Malformation Type I With or Without Syringomyelia}},
+%	volume = {16},
+%	year = {2004}
+%}
+
+
+\end{document}
