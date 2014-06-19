@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper, xcolor={usenames,dvipsnames,svgnames,table}]{beamer}
 \usepackage{presentationStyle}
 \usepackage{arydshln,leftidx,mathtools}
-
+\newcommand{\subfigure}{\subfloat}
 \renewcommand{\d}{\partial}
 %\setbeameroption{show only notes}
 \AtBeginSection[]
@@ -470,8 +470,12 @@ Modified setup
 
 
 \begin{frame}[shrink]{Parameters and other details}
-blablabla
-
+\begin{itemize}
+ \item <1-> Craske et.al. report increases of 5$\frac{\text{nMol}}{\text{L}}$ in spines.
+ \item <2-> Corresponds to 1-2 walkers, using values from Arellano et.al.
+ \item <3-> Spine geometries chosen at random to correspond with Arellano et.al.
+ \item <4-> Initial condition is modified to accommodate absorption effects (\url{http://jcb.rupress.org/content/170/7/1147/suppl/DC1}).
+\end{itemize}
 \end{frame}
 \notetoself{}
 
@@ -490,114 +494,135 @@ blablabla
 \notetoself{}
 
 
-% \begin{frame}[shrink]
-% \frametitle{PDE solvers}
+\begin{frame}[shrink]{PDE solvers}
 % Include one Convergence test, and numerical exact solution plot for each scheme!
-% \begin{columns}
-%  \column{0.5\textwidt}
-%  BE\\
-%  \begin{figure}[H]
-%  \centering
-%  \begin{subfigure}
-%   \includegraphics[]{}
+\begin{columns}
+ \column{0.5\textwidth}
+\vspace{5pt}\\ BE
+ \begin{figure}[h!]
+ \centering
+  \includegraphics[width=0.8\textwidth]{../../results/experiment_14052014_0744_errorplot_BE1D/results/ConvergenceTest.eps}
+ \end{figure}
+ \begin{figure}[h!]
+ \centering
+  \includegraphics[width=0.8\textwidth]{../../results/experiment_14042014_0759_BE1D_numerical_exact/results/numerical_exact.eps}
 %  \end{subfigure}
-% 
-%  \begin{subfigure}
-%   \includegraphics[]{}
-%  \end{subfigure}
-%  \end{figure}
-% 
-%   \column{0.5\textwidt}
-%  FE\\
-%  \begin{figure}[H]
-%  \centering
-%  \begin{subfigure}
-%   \includegraphics[]{}
-%  \end{subfigure}
-% 
-%  \begin{subfigure}
-%   \includegraphics[]{}
-%  \end{subfigure}
-%  \end{figure}
-% \end{columns}
-% 
-% \end{frame}
-% \notetoself{}
+ \end{figure}
 
-
-\begin{frame}
-\frametitle{RW solver}
+\column{0.5\textwidth}
+\vspace{5pt} \\FE
+ \begin{figure}[h!]
+ \centering
+  \includegraphics[width=0.8\textwidth]{../../results/experiment_27052014_1152_FE2D_new_convergence_time/results/ConvergenceTest_pretty.eps}
+ \end{figure}
+ \begin{figure}[h!]
+ \centering
+  \includegraphics[width=0.8\textwidth]{../Figures/exact_numerical_1d_n130.eps}
+ \end{figure}
+\end{columns}
 
 \end{frame}
 \notetoself{}
 
 
-\begin{frame}[shrink]
-\frametitle{Hybrid solver}
+\begin{frame}[shrink]{RW solver}
+\begin{columns}
+ \column{0.5\textwidth}
+ \begin{itemize}
+  \item <2-> Needs a new initial condition, otherwise similar.
+  \item <3-> No numerical exact solution.
+  \item <4-> Expected convergence rate of $0.5$.
+  \item <5-> Verifies that the coupling works.
+ \end{itemize}
+\column{0.5\textwidth}
+\vspace{5pt}\\
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=0.8\textwidth]{../../results/experiment_01052014_1615_Redoing_RW_tests/results/errorplot.eps}
+\end{figure}
+\begin{figure}[h!]
+\centering
+  \includegraphics[width=0.8\textwidth]{../../results/experiment_01052014_1615_Redoing_RW_tests/results/ConvergenceTest.eps}
+\end{figure}
+\end{columns}
 
+\end{frame}
+\notetoself{}
+
+
+\begin{frame}[shrink]{Hybrid solver}
+\begin{columns}
+ \column{0.5\textwidth}
+ \vspace{5pt}\\
+ \begin{itemize}
+ \item <2-> New error term:
+ \begin{equation*}
+   \epsilon(t) = C_t \Delta t + C_x \Delta x^2 + \frac{C_{RW}}{\sqrt{Hc}}
+ \end{equation*}
+ \item <2-> A lot of walkers are required:
+ \begin{equation*}
+  Hc \geq \frac{1}{\Delta t^2}
+ \end{equation*}
+  \item <3-> Expect first order convergence.
+  \item <4-> The extra error can be controlled (at a large cost).
+ \end{itemize}
+\column{0.5\textwidth}
+\vspace{5pt}\\
+\begin{figure}[H]
+ \centering
+  \includegraphics[width=\textwidth]{../../results/experiment_15042014_0608_convergence_tests_etc/results/ConvergenceTest.eps}
+\end{figure}
+\end{columns}
 \end{frame}
 \notetoself{}
 
 \subsection{Application}
-\begin{frame}
-\frametitle{Results from application}
+\begin{frame}[shrink]{Results from application}
+\begin{columns}
+ \column{0.5\textwidth}
+ \begin{itemize}
+  \item <2-> Consistently towards lower range of results by Craske et.al.
+  \item <3-> Otherwise relatively good.
+  \item <4-> $\sim$ 2-3 seconds can be added.
+ \end{itemize}
+ \column{0.5\textwidth}
+ \begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../Figures/spine_stats_reltime_nl.eps}
+ \end{figure}
+ \begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{../Figures/spine_stats_boxplot_reltime_longneck.eps}
+ \end{figure}
+\end{columns}
+
 \end{frame}
 \notetoself{}
 
 
 
 \section{Concluding remarks}
+\subsection{Conclusions}
 \notetoself{The simulation results and verification tests allow some conclusions to be made. Some suggestions for further work are also provided.}
 % ------ CONCLUSIONS ------ %
-\begin{frame}{Conclusions}
+\begin{frame}[shrink]{Conclusions}
 \begin{itemize}
-\item<2-> Difficult to establish parameter values.
-\item<3-> Scaling parameter values affects displacement magnitudes.
-\item<4-> Changing $\eta$ -- effect on magnitude and behaviour.
-\item<5-> Compressibility important. 
-\item<6-> Small but clear viscoelastic effect:
-	\begin{itemize}
-	\item<7-> Lag, approx $10$ms.
-	\item<8-> Varying peak displacement over several cycles, $\approx 10^{-7}-10^{-8}$m.
-	\end{itemize}
+\item<2-> Both PDE, RW and hybrid solvers are implemented correctly.
+\item<3-> Software can be modified to model real applications.
+\item<4-> Proof of concept.
 \end{itemize}
 \end{frame} 
-\notetoself{In this thesis, mathematical models for simulating the linear viscoelastic and linear elastic response of the spinal cord have been developed, discretized using the finite element method, and implemented. An efficient scheme for the viscoelasticity problem was developed, resulting in comparable computational speeds for both the linear viscoelasticity problem and the linear elasticity problem. Parameter values were chosen from the literature. However, due to the lack of standardized parameter values, determining appropriate values was challenging, and resulted in differences in displacement magnitudes of approximately 2 orders of magnitude when using parameter values selected from the literature.}
-\notetoself{Scaling the parameter values up/down resulted in displacement magnitudes decreasing/increasing, but had no effect on the displacement pattern or the behaviour of selected points in the geometry.
-
-The effect of compressibility was shown to be important. There was a small, but clear effect of using a viscoelastic model as compared to a purely elastic model. This effect was displayed through a lag in the viscoelastic model of approximately 10ms, and the varying peak displacement displayed by the viscoelastic model when a simulation was run over four cycles.}
-
-\begin{frame}{Conclusions}
-\begin{itemize}
-\item Viscoelastic behaviour similar to linear elastic behaviour.
-%	\begin{itemize}
-%	\item<2-> Lag does not seem to be significant.
-%	\item<3-> Variation in peak displacements over time appears to decrease over time, not 		increase.
-%	\end{itemize}
-\item<2-> Linear viscoelastic model has little or no effect in context of syringomyelia.
-\item<3-> Elastic/viscoelastic models assume solid spinal cord.
-\item<4-> Poroelastic model -- fluid flow within spinal cord.
-\end{itemize}
-\end{frame}
-\notetoself{Apart from this, the viscoelastic behaviour appears to be very similar to the elastic behaviour. The lag displayed by the viscoelastic models is very small, and does not seem significant. Also, the peak displacements results over time displayed by the viscoelastic model over several cycles suggested that the variation decreased for each cycle, and we do not expect any variation in the peak displacement after four cycles. Because of this, together with the uncertainty in the parameter values, it appears that the linear viscoelasticity model has little or no effect in the context of syringomyelia. }
-\note{A limitation of using purely elastic/viscoelastic models is that they model the spinal cord as a solid. This means that any fluid flow within the spinal cord itself is assumed negligible. However, seeing as syrinxes contain fluid, and seeing as the viscoelastic effect turned out to be very small, it may be more interesting to use models that also take into account the fluid flow within the spinal cord for further research into the development of syrinxes, for example a poroelastic model.}
+\notetoself{}
 
 \subsection{Further work}
-\begin{frame}
-\frametitle{Further work}
+\begin{frame}[shrink]{Further work}
 \begin{itemize}
-\item<2-> Develop standard procedures for obtaining parameter data.
-	\begin{itemize}
-	\item<2-> Standardized parameter values.
-	\end{itemize}
-\item<3-> Obtain patient-specific spinal cord geometry, parameter data and pressure data.
-\item<4-> Test effect of non-linear model.
-\item<5-> Couple with CFD simulations of CSF flow.
+\item<2-> Implement flux exchange boundary conditions
+\item<3-> Find other physical applications - anisotropy.
+\item<4-> Implement Finite element PDE solver.
 \end{itemize}
 \end{frame}
-\notetoself{Further work on this subject may include developing standardized procedures for obtaining parameter data for the brain and spinal cord. This could in turn allow for standardized parameter values, which would be very useful when comparing different models. Another interesting extension would be to obtain patient-specific geometries, parameter data and pressure data. This would allow comparison between different patients with the same condition.
-
-Since the linear viscoelasticity model appeared to have little effect, testing a non-linear model may be of interest. Finally, a fully coupled simulation using computational fluid dynamics to simulate CSF flow would be a very interesting extension.}
+\notetoself{}
 
 
 \begin{frame}[plain]
